@@ -2,7 +2,7 @@
 shaping: true
 ---
 
-# Blood Sweat Beers — Slices
+# Volt — Slices
 
 Vertical implementation slices derived from the breadboard. Each slice ends in demo-able UI. Build in order — later slices depend on earlier ones.
 
@@ -39,7 +39,34 @@ Vertical implementation slices derived from the breadboard. Each slice ends in d
 
 ---
 
-## V7: PR Detection + Progress Charts
+## V7: OAuth Login (Google + Apple)
+
+**Shape parts:** None (standalone)
+
+| # | Component | Affordance | Control | Wires Out | Returns To |
+|---|-----------|------------|---------|-----------|------------|
+| U200 | login-page | "Sign in with Google" button | click | → N200 | — |
+| U201 | login-page | "Sign in with Apple" button | click | → N201 | — |
+| U202 | registration-page | "Sign up with Google" button | click | → N200 | — |
+| U203 | registration-page | "Sign up with Apple" button | click | → N201 | — |
+| N200 | OmniAuth Google | Redirect to Google OAuth → callback → find_or_create user | redirect | → S_users | → feed |
+| N201 | OmniAuth Apple | Redirect to Apple OAuth → callback → find_or_create user | redirect | → S_users | → feed |
+
+**What to build:**
+- Add `omniauth`, `omniauth-google-oauth2`, `omniauth-apple` gems
+- `oauth_identities` table: user_id, provider (string), uid (string), unique index on [provider, uid]
+- OmniAuth initializer with Google + Apple credentials (stored in Rails credentials)
+- `OauthCallbacksController`: handles `/auth/:provider/callback`; finds existing identity or creates new user + identity; signs in
+- Link existing account: if a user signs in with OAuth and the email matches an existing account, link the identity to that account
+- OAuth buttons on sign-in and registration pages (styled with provider brand guidelines)
+- Keep email/password login as fallback — OAuth is additive, not a replacement
+- CSRF protection: OmniAuth `allowed_request_methods: [:post]`
+
+**Demo:** Visit sign-in page → tap "Sign in with Google" → Google consent screen → redirected back → signed in on feed. Next visit: tap Google again → instant sign-in (no registration needed).
+
+---
+
+## V8: PR Detection + Progress Charts
 
 **Shape parts:** A5.3 (PR detection), A5.4 (personal_records), A6.4 (progress charts)
 
@@ -67,7 +94,7 @@ Vertical implementation slices derived from the breadboard. Each slice ends in d
 
 ---
 
-## V8: Daily Challenges
+## V9: Daily Challenges
 
 **Shape parts:** A9.1–A9.5 (wods, wod_entries, leaderboard, GenerateDailyWodJob)
 
@@ -103,7 +130,7 @@ Vertical implementation slices derived from the breadboard. Each slice ends in d
 
 ---
 
-## V9: Calendar History
+## V10: Calendar History
 
 **Shape parts:** A6.2 (calendar + Groupdate)
 
@@ -127,7 +154,7 @@ Vertical implementation slices derived from the breadboard. Each slice ends in d
 
 ---
 
-## V10: Exercise Guides
+## V11: Exercise Guides
 
 **Shape parts:** None (standalone)
 
@@ -148,7 +175,7 @@ Vertical implementation slices derived from the breadboard. Each slice ends in d
 
 ---
 
-## V11: Pro Tier + Stripe
+## V12: Pro Tier + Stripe
 
 **Shape parts:** B1–B7
 
@@ -178,7 +205,7 @@ Vertical implementation slices derived from the breadboard. Each slice ends in d
 
 ---
 
-## V12: Workout Streaks
+## V13: Workout Streaks
 
 **Shape parts:** None (standalone, simple)
 
@@ -199,7 +226,7 @@ Vertical implementation slices derived from the breadboard. Each slice ends in d
 
 ---
 
-## V13: Training Plans (Pro)
+## V14: Training Plans (Pro)
 
 **Shape parts:** C1–C7
 
@@ -235,7 +262,7 @@ Vertical implementation slices derived from the breadboard. Each slice ends in d
 
 ---
 
-## V14: Share Card
+## V15: Share Card
 
 **Shape parts:** None (standalone)
 
@@ -255,7 +282,7 @@ Vertical implementation slices derived from the breadboard. Each slice ends in d
 
 ---
 
-## V15: AI Coaching Insights (Pro)
+## V16: AI Coaching Insights (Pro)
 
 **Shape parts:** None (standalone, Pro-only)
 
@@ -298,7 +325,7 @@ Vertical implementation slices derived from the breadboard. Each slice ends in d
 
 ---
 
-## V16: PWA — Install, Push, Offline
+## V17: PWA — Install, Push, Offline
 
 **Shape parts:** D1–D5
 
@@ -325,7 +352,7 @@ Vertical implementation slices derived from the breadboard. Each slice ends in d
 
 ---
 
-## V17: Native Apps (iOS + Android)
+## V18: Native Apps (iOS + Android)
 
 **Shape parts:** E1–E5
 
@@ -347,7 +374,7 @@ Vertical implementation slices derived from the breadboard. Each slice ends in d
 
 ---
 
-## V18: Device Integration (native app required)
+## V19: Device Integration (native app required)
 
 **Shape parts:** F1–F6
 
@@ -374,7 +401,7 @@ Vertical implementation slices derived from the breadboard. Each slice ends in d
 
 ---
 
-## V19: Community Challenges + Friend Challenges
+## V20: Community Challenges + Friend Challenges
 
 **Shape parts:** None (extends V5 + V8)
 
@@ -398,25 +425,26 @@ Vertical implementation slices derived from the breadboard. Each slice ends in d
 ## Dependency Map
 
 ```
-V7 (PRs) → no hard deps but groupdate gem shared with V9
-V8 (Challenges) → no hard deps
-V9 (Calendar) → groupdate gem (also in V7)
-V11 (Pro/Stripe) → should ship before V13, V15 (those are Pro features)
-V12 (Streaks) → no hard deps
-V13 (Plans) → V11 (Pro gate), uses V6 (remix logic)
-V14 (Share Card) → V2 (workout logs)
-V15 (Coaching) → V11 (Pro gate), V2 (logs for data)
-V16 (PWA) → can ship any time; enables better mobile UX for V8 challenges
-V17 (Native Apps) → V16 recommended first; big programme of work
-V18 (Device) → V17 required
-V19 (Community Challenges) → V5 (follows), V8 (challenge infra)
+V8 (PRs) → no hard deps but groupdate gem shared with V9
+V9 (Challenges) → no hard deps
+V10 (Calendar) → groupdate gem (also in V8)
+V12 (Pro/Stripe) → should ship before V13, V15 (those are Pro features)
+V13 (Streaks) → no hard deps
+V14 (Plans) → V12 (Pro gate), uses V6 (remix logic)
+V15 (Share Card) → V2 (workout logs)
+V16 (Coaching) → V12 (Pro gate), V2 (logs for data)
+V17 (PWA) → can ship any time; enables better mobile UX for V9 challenges
+V18 (Native Apps) → V16 recommended first; big programme of work
+V19 (Device) → V17 required
+V20 (Community Challenges) → V5 (follows), V8 (challenge infra)
 ```
 
 ## Suggested Build Order (next 6 slices)
 
-1. **V7** PR Detection + Progress Charts — high user value, self-contained
-2. **V8** Daily Challenges — drives daily engagement, community feel
-3. **V11** Pro Tier + Stripe — unlocks revenue before building Pro features
-4. **V9** Calendar History — completes the core personal tracking loop
-5. **V12** Workout Streaks — low effort, high retention impact
-6. **V13** Training Plans — headline Pro feature, justifies subscription
+1. **V7** OAuth Login (Google + Apple) — unblocks user onboarding
+1. **V8** PR Detection + Progress Charts — high user value, self-contained
+2. **V9** Daily Challenges — drives daily engagement, community feel
+3. **V12** Pro Tier + Stripe — unlocks revenue before building Pro features
+4. **V10** Calendar History — completes the core personal tracking loop
+5. **V13** Workout Streaks — low effort, high retention impact
+6. **V14** Training Plans — headline Pro feature, justifies subscription
