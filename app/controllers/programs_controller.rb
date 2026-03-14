@@ -1,6 +1,7 @@
 class ProgramsController < ApplicationController
   before_action :require_authentication
   before_action :set_program, only: [ :show, :destroy, :retry_slot ]
+  rate_limit to: 5, within: 3.minutes, only: :create
 
   def new
     @program    = Program.new(weeks_count: 4, sessions_per_week: 3, duration_mins: 45, difficulty: "intermediate")
