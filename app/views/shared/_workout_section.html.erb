@@ -1,9 +1,10 @@
 <%# Locals: section (Hash), distance_sport (Boolean, optional),
 #           workout (Workout, optional), section_index (Integer, optional),
-#           swappable (Boolean, optional) %>
+#           swappable (Boolean, optional), preview_token (String, optional) %>
 <% swappable     = local_assigns.fetch(:swappable, false)
    workout       = local_assigns.fetch(:workout, nil)
-   section_index = local_assigns.fetch(:section_index, nil) %>
+   section_index = local_assigns.fetch(:section_index, nil)
+   preview_token = local_assigns.fetch(:preview_token, nil) %>
 <% sec_format = section["format"].to_s %>
 <% sec_mins = sec_format == "tabata" ? 4 : (section["duration_mins"].to_i > 0 ? section["duration_mins"].to_i : nil) %>
 
@@ -142,7 +143,8 @@
             section_index:  section_index,
             exercise_index: ei,
             swappable:      swappable,
-            is_tabata:      sec_format == "tabata" %>
+            is_tabata:      sec_format == "tabata",
+            preview_token:  preview_token %>
     <% end %>
   <% end %>
 
