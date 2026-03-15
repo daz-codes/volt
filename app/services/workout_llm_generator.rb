@@ -290,19 +290,35 @@ class WorkoutLLMGenerator
     @prompt_mode    = prompt_mode.to_sym
   end
 
+  # Returns a persisted Workout record. Used by remix/regenerate flows.
   def call
+    create_workout(generate_data)
+  end
+
+  # Returns a hash { attrs:, debug_info:, group_tag_name: } without persisting.
+  # Used by the controller to cache for preview.
+  def generate
+    data = generate_data
+    {
+      attrs:          build_workout_attrs(data),
+      debug_info:     @llm_calls,
+      group_tag_name: @group_tag_name.presence
+    }
+  end
+
+  private
+
+  def generate_data
     if @source_workout
       prompt       = build_remix_prompt
-      workout_data = call_llm(prompt)
-      create_workout(workout_data)
+      call_llm(prompt)
     elsif @prompt_mode == :examples
       example_workouts = fetch_top_liked_examples
       prompt           = build_example_prompt(example_workouts)
       workout_data     = call_llm(prompt)
       workout_data     = validate_and_fix(workout_data)
       workout_data     = collapse_duplicate_exercises(workout_data)
-      workout_data     = collapse_set_notation(workout_data)
-      create_workout(workout_data)
+      collapse_set_notation(workout_data)
     else
       context_workouts  = fetch_context
       program_research  = research_unknown_program
@@ -312,12 +328,9 @@ class WorkoutLLMGenerator
       workout_data     = call_llm(prompt)
       workout_data     = validate_and_fix(workout_data)
       workout_data     = collapse_duplicate_exercises(workout_data)
-      workout_data     = collapse_set_notation(workout_data)
-      create_workout(workout_data)
+      collapse_set_notation(workout_data)
     end
   end
-
-  private
 
   def fetch_context
     # Event sessions (Hyrox, Deka) skip community workouts — they all look the same
@@ -1255,7 +1268,7 @@ class WorkoutLLMGenerator
     lift_map = {
       "deadlift_1rm"   => "Deadlift / Trap Bar Deadlift / RDL / Sumo Deadlift",
       "squat_1rm"      => "Back Squat / Front Squat / Bulgarian Split Squat",
-      "bench_1rm"      => "Bench Press / Incline Press / DB Press / Push Press",
+      "bench_1rm"      => "Bench Press / Incline Press / DB Press",
       "clean_jerk_1rm" => "Clean & Jerk / Power Clean / Hang Clean / Hang Power Clean",
       "snatch_1rm"     => "Snatch / Hang Snatch / Power Snatch"
     }
@@ -1269,6 +1282,19 @@ class WorkoutLLMGenerator
                "10 reps=#{(rm * 0.75).round}kg | " \
                "15 reps=#{(rm * 0.68).round}kg | " \
                "20+ reps=#{(rm * 0.62).round}kg — NEVER exceed the 1RM of #{rm.round}kg"
+    end
+
+    # Derive overhead press weights from bench 1RM (~65% of bench)
+    if pbs["bench_1rm"]
+      bench = pbs["bench_1rm"].to_f
+      ohp = (bench * 0.65).round
+      lines << "  Push Press / Strict Press / Overhead Press (est. 1RM #{ohp}kg from bench): " \
+               "3–5 reps=#{(ohp * 0.87).round}kg | " \
+               "6–8 reps=#{(ohp * 0.80).round}kg | " \
+               "10 reps=#{(ohp * 0.75).round}kg | " \
+               "15 reps=#{(ohp * 0.68).round}kg | " \
+               "20+ reps=#{(ohp * 0.62).round}kg"
+      lines << "  DB Shoulder Press / DB Push Press: use roughly half the barbell overhead figure per hand"
     end
 
     # Derive carry / unilateral loads from deadlift 1RM if available
@@ -1419,6 +1445,7 @@ class WorkoutLLMGenerator
     if has_strength || bw > 0
       strength_guide = build_strength_weight_guide(pbs, bw)
       out << "Strength weight guide — HARD LIMITS, do not exceed these:\n#{strength_guide}"
+      out << "  NOTE: For Deka/Hyrox exercises, ALWAYS use the race-accurate reference weights (competition standards) instead of the strength guide above. The strength guide is for general gym lifts only."
     end
 
     unless other_pb_lines.empty?
@@ -1669,21 +1696,9 @@ class WorkoutLLMGenerator
   end
 
   def create_workout(data)
-    activity_name = @activity || @source_workout&.activity_name
-    activity_record = activity_name.present? ? Activity.find_or_create_by!(name: activity_name) : nil
+    attrs = build_workout_attrs(data)
+    workout = Workout.create!(**attrs, user: @user, status: "active")
 
-    workout = Workout.create!(
-      user:          @user,
-      name:          data["name"].presence || "Generated Workout",
-      activity:      activity_record,
-      session_notes: @session_notes,
-      duration_mins: data["duration_mins"].to_i.positive? ? data["duration_mins"] : @duration_mins,
-      difficulty:    Workout::DIFFICULTIES.include?(data["difficulty"]) ? data["difficulty"] : @difficulty,
-      status:        "active",
-      structure:     data["structure"]
-    )
-
-    # Community tag (e.g. "Hyrox Manchester 2026")
     if @group_tag_name.present?
       tag = Tag.find_or_create_by!(slug: @group_tag_name.parameterize) { |t| t.name = @group_tag_name }
       workout.tags = [ tag ]
@@ -1692,5 +1707,21 @@ class WorkoutLLMGenerator
     Rails.cache.write("workout_llm_debug_#{workout.id}", @llm_calls, expires_in: 2.hours) if @llm_calls.present?
     DiscoverExerciseVideosJob.perform_later(workout.id)
     workout
+  end
+
+  # Returns a hash of workout attributes without persisting.
+  # Used by the controller to cache the result for preview.
+  def build_workout_attrs(data)
+    activity_name = @activity || @source_workout&.activity_name
+    activity_record = activity_name.present? ? Activity.find_or_create_by!(name: activity_name) : nil
+
+    {
+      name:          data["name"].presence || "Generated Workout",
+      activity_id:   activity_record&.id,
+      session_notes: @session_notes,
+      duration_mins: data["duration_mins"].to_i.positive? ? data["duration_mins"] : @duration_mins,
+      difficulty:    Workout::DIFFICULTIES.include?(data["difficulty"]) ? data["difficulty"] : @difficulty,
+      structure:     data["structure"]
+    }
   end
 end

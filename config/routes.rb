@@ -19,6 +19,9 @@ Rails.application.routes.draw do
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
+  get  "workouts/preview/:token",         to: "workouts#preview",         as: :preview_workout
+  post "workouts/preview/:token/persist", to: "workouts#persist_preview", as: :persist_preview_workout
+
   resources :workouts, only: [ :new, :create, :show, :edit, :update, :destroy ] do
     member do
       get   :log

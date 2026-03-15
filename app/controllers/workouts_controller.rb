@@ -67,13 +67,16 @@ class WorkoutsController < ApplicationController
   # POST /workouts/:id/remix
   def remix
     source = Workout.find(params[:id])
-    generated = WorkoutLLMGenerator.call(
+    generator = WorkoutLLMGenerator.new(
       user:           Current.user,
       source_workout: source,
       duration_mins:  params[:duration_mins],
       difficulty:     params[:difficulty]
     )
-    redirect_to workout_path(generated)
+    result = generator.generate
+    token = SecureRandom.urlsafe_base64(16)
+    Rails.cache.write("workout_preview:#{token}", result, expires_in: 1.hour)
+    redirect_to preview_workout_path(token: token)
   rescue WorkoutLLMGenerator::WorkoutGenerationError => e
     redirect_back fallback_location: root_path, alert: e.message
   rescue => e
@@ -81,11 +84,49 @@ class WorkoutsController < ApplicationController
     redirect_back fallback_location: root_path, alert: "Something went wrong generating your workout. Please try again."
   end
 
-  # POST /workouts/:id/save
+  # GET /workouts/preview/:token
+  def preview
+    cached = Rails.cache.read("workout_preview:#{params[:token]}")
+    unless cached
+      redirect_to root_path, alert: "Preview expired — please generate again."
+      return
+    end
+
+    attrs = cached[:attrs]
+    @workout = Workout.new(attrs)
+    @workout.activity = Activity.find_by(id: attrs[:activity_id]) if attrs[:activity_id]
+    @preview_token = params[:token]
+    @debug_info = cached[:debug_info]
+  end
+
+  # POST /workouts/preview/:token/persist
+  def persist_preview
+    cached = Rails.cache.read("workout_preview:#{params[:token]}")
+    unless cached
+      redirect_to root_path, alert: "Preview expired — please generate again."
+      return
+    end
+
+    workout = Current.user.workouts.create!(**cached[:attrs], status: "active")
+
+    if cached[:group_tag_name].present?
+      tag = Tag.find_or_create_by!(slug: cached[:group_tag_name].parameterize) { |t| t.name = cached[:group_tag_name] }
+      workout.tags = [ tag ]
+    end
+
+    Rails.cache.delete("workout_preview:#{params[:token]}")
+
+    if params[:intent] == "log"
+      redirect_to workout_path(workout, do_this: true)
+    else
+      redirect_to workout_path(workout), notice: "\"#{workout.name}\" saved to your library."
+    end
+  end
+
+  # POST /workouts/:id/save — copy another user's workout to your library
   def save
     source = Workout.find(params[:id])
 
-    # Another user's workout — copy it if not already saved
     if Current.user.workouts.exists?(source_workout: source)
       redirect_to library_path, notice: "\"#{source.name}\" is already in your library."
       return
@@ -142,19 +183,17 @@ class WorkoutsController < ApplicationController
   # POST /workouts/:id/regenerate
   def regenerate
     old = Current.user.workouts.find(params[:id])
-    unless old.status == "preview"
-      redirect_to workout_path(old) and return
-    end
-
-    fresh = WorkoutLLMGenerator.call(
+    generator = WorkoutLLMGenerator.new(
       user:          Current.user,
       activity:      old.activity_name,
       session_notes: old.session_notes,
       duration_mins: old.duration_mins,
       difficulty:    old.difficulty
     )
-    old.destroy
-    redirect_to workout_path(fresh)
+    result = generator.generate
+    token = SecureRandom.urlsafe_base64(16)
+    Rails.cache.write("workout_preview:#{token}", result, expires_in: 1.hour)
+    redirect_to preview_workout_path(token: token)
   rescue WorkoutLLMGenerator::WorkoutGenerationError => e
     redirect_to workout_path(old), alert: e.message
   rescue => e
@@ -235,7 +274,7 @@ class WorkoutsController < ApplicationController
     group_tag_name = params[:group_code].presence
     prompt_mode   = params[:prompt_mode] == "examples" ? :examples : :full
 
-    @workout = WorkoutLLMGenerator.call(
+    generator = WorkoutLLMGenerator.new(
       user:          Current.user,
       activity:      activity,
       session_notes: session_notes,
@@ -244,9 +283,13 @@ class WorkoutsController < ApplicationController
       difficulty:    params[:difficulty],
       prompt_mode:   prompt_mode
     )
+    result = generator.generate
+
+    token = SecureRandom.urlsafe_base64(16)
+    Rails.cache.write("workout_preview:#{token}", result, expires_in: 1.hour)
 
     Current.user.generation_uses.create!
-    redirect_to workout_path(@workout)
+    redirect_to preview_workout_path(token: token)
   rescue WorkoutLLMGenerator::WorkoutGenerationError => e
     Rails.logger.warn "LLM generation failed (#{e.message}) — attempting fallback workout"
     fallback = find_fallback_workout(activity, params[:difficulty])

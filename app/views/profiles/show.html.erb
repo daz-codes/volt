@@ -72,6 +72,31 @@
     </div>
   </div>
 
+  <%# Quick links %>
+  <div class="mb-8">
+    <h2 class="text-xs font-black uppercase tracking-widest text-gray-500 mb-4">Quick Links</h2>
+    <div class="grid grid-cols-3 gap-3">
+      <%= link_to calendar_path, class: "flex flex-col items-center gap-2 bg-zinc-800 border border-zinc-700 rounded-2xl p-4 hover:border-zinc-500 transition-colors" do %>
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+        </svg>
+        <span class="text-gray-300 text-xs font-medium">Calendar</span>
+      <% end %>
+      <%= link_to progress_path, class: "flex flex-col items-center gap-2 bg-zinc-800 border border-zinc-700 rounded-2xl p-4 hover:border-zinc-500 transition-colors" do %>
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+        </svg>
+        <span class="text-gray-300 text-xs font-medium">Progress</span>
+      <% end %>
+      <%= link_to users_path, class: "flex flex-col items-center gap-2 bg-zinc-800 border border-zinc-700 rounded-2xl p-4 hover:border-zinc-500 transition-colors" do %>
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/>
+        </svg>
+        <span class="text-gray-300 text-xs font-medium">Find People</span>
+      <% end %>
+    </div>
+  </div>
+
   <%# Physical %>
   <% if @user.age.present? || @user.height_cm.present? || @user.weight_kg.present? || @user.gender.present? %>
     <div class="mb-8">

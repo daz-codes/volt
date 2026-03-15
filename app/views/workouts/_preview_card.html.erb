@@ -1,3 +1,4 @@
+<%# Locals: workout, preview_token, debug_info %>
 <div class="mt-6 bg-zinc-800 border border-zinc-600/70 rounded-2xl overflow-hidden shadow-sm">
 
   <%# Header: name + meta %>
@@ -6,7 +7,7 @@
       <h2 class="text-2xl text-gray-300 tracking-tight leading-tight mb-3 font-jost uppercase"><%= workout.name %></h2>
     <% end %>
 
-    <% main_slug = workout.activity_slug.to_s %>
+    <% main_slug = workout.activity&.name.to_s.parameterize %>
     <% is_distance_sport = main_slug.match?(/\A(run|swim|row|ski|bike|cycl|jog|tri|duat)/) %>
     <% total_distance_m = is_distance_sport && workout.structure.is_a?(Hash) ?
          workout.structure["sections"].to_a.sum { |s| section_distance_m(s) } : 0 %>
@@ -23,19 +24,11 @@
         <% end %>
         <div class="flex items-center gap-1.5 flex-wrap mt-2">
           <span class="text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border border-gray-600 bg-zinc-700/50 text-gray-300">
-            <%= workout.difficulty.capitalize %>
+            <%= workout.difficulty&.capitalize %>
           </span>
         </div>
-        <% if workout.tags.any? %>
-          <div class="flex flex-wrap gap-1.5 mt-2">
-            <% workout.tags.each do |tag| %>
-              <%= link_to "##{tag.name}", library_path(tag_id: tag.id), class: "text-xs bg-violet-500/15 border border-violet-400/40 text-violet-400 hover:text-white hover:border-violet-400 px-2.5 py-0.5 rounded-full font-semibold transition-colors" %>
-            <% end %>
-          </div>
-        <% end %>
       </div>
 
-      <%# Single circle — distance for distance sports, time otherwise %>
       <% if is_distance_sport && dist_value %>
         <div class="flex flex-col items-center justify-center w-14 h-14 rounded-full bg-sky-500 shadow-md shadow-sky-500/20 flex-shrink-0">
           <span class="text-white font-black text-sm leading-none"><%= dist_value %></span>
@@ -56,7 +49,6 @@
 
   <%# Sections %>
   <% sections = workout.structure.is_a?(Hash) ? Array(workout.structure["sections"]) : [] %>
-  <% swappable = Current.user == workout.user %>
   <div class="px-4 py-3 space-y-2">
     <% sections.each_with_index do |section, si| %>
       <%= render "shared/workout_section",
@@ -64,51 +56,30 @@
             distance_sport: is_distance_sport,
             workout:        workout,
             section_index:  si,
-            swappable:      swappable %>
+            swappable:      false %>
     <% end %>
   </div>
 
-  <%# Actions %>
-  <% own_workout = Current.user == workout.user %>
+  <%# Actions — desktop %>
   <div class="hidden sm:flex bg-zinc-900 border-t border-zinc-700 px-5 py-4 flex-col sm:flex-row gap-3">
-    <button type="button"
-            onclick="document.getElementById('complete_workout_<%= workout.id %>').showModal()"
-            class="sm:flex-1 text-center bg-volt hover:bg-volt/80 active:opacity-90 text-zinc-950 font-black py-3 rounded-xl text-sm transition-colors uppercase tracking-wide shadow-sm shadow-volt/20 cursor-pointer">
+    <%= button_to persist_preview_workout_path(token: preview_token, intent: "log"), method: :post,
+        data: { turbo_frame: "_top" },
+        form: { class: "contents" },
+        class: "sm:flex-1 text-center bg-volt hover:bg-volt/80 active:opacity-90 text-zinc-950 font-black py-3 rounded-xl text-sm transition-colors uppercase tracking-wide shadow-sm shadow-volt/20 cursor-pointer" do %>
       Do this
-    </button>
-    <% if own_workout %>
-      <%= link_to "Edit", edit_workout_path(workout),
-          data: { turbo_frame: "workout_preview" },
-          class: "text-center py-3 px-4 border border-zinc-600 hover:border-lime-400 hover:text-lime-400 text-gray-300 font-bold rounded-xl text-sm transition-colors" %>
     <% end %>
-    <% if Current.user.pro? %>
-      <%= link_to export_pdf_workout_path(workout),
-          data: { turbo: false },
-          class: "flex items-center gap-1.5 py-3 px-4 border border-zinc-600 hover:border-gray-500 text-gray-300 hover:text-white font-bold rounded-xl text-sm transition-colors",
-          title: "Export as PDF" do %>
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        PDF
-      <% end %>
-    <% end %>
-    <% if own_workout %>
-      <%= link_to library_path, class: "flex items-center justify-center gap-1.5 py-3 px-4 border border-zinc-600 text-gray-400 font-bold rounded-xl text-sm transition-colors hover:border-gray-500 hover:text-gray-300" do %>
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-        Saved
-      <% end %>
-    <% else %>
-      <%= button_to "Save to Library", save_workout_path(workout), method: :post,
-          data: { turbo_frame: "_top" },
-          form: { class: "contents" },
-          class: "text-center py-3 px-4 border border-zinc-600 hover:border-gray-500 text-gray-300 hover:text-white font-bold rounded-xl text-sm transition-colors cursor-pointer" %>
+    <%= button_to persist_preview_workout_path(token: preview_token, intent: "save"), method: :post,
+        data: { turbo_frame: "_top" },
+        form: { class: "contents" },
+        class: "flex items-center justify-center gap-1.5 py-3 px-4 border border-lime-400 text-lime-400 hover:bg-lime-400 hover:text-zinc-950 font-bold rounded-xl text-sm transition-colors cursor-pointer" do %>
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+      Save
     <% end %>
   </div>
 
 </div>
 
-<%= render "shared/complete_workout_dialog", workout: workout %>
-
-<% debug_info = local_assigns[:debug_info] %>
-<% if debug_info.present? && Current.user == workout.user %>
+<% if debug_info.present? %>
   <details class="mt-4 rounded-xl border border-zinc-700/50 bg-zinc-900/60 text-xs">
     <summary class="px-4 py-2 cursor-pointer text-gray-600 hover:text-gray-400 font-mono select-none">
       LLM debug — <%= debug_info.size %> call<%= debug_info.size == 1 ? "" : "s" %>

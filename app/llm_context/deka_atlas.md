@@ -12,7 +12,7 @@ The prompt specifies 2–4 Deka Atlas zones for this session. Build those into t
 These exercises develop the same physical qualities as the Deka Atlas zones. The toolkit is shoulder-and-carry focused.
 
 **Overhead strength and endurance**
-Push Press, Push Jerk, Strict Press (DB or barbell), Landmine Press, Single-Arm DB Overhead Press, DB Arnold Press, Plate Press, Kettlebell Press, Overhead Hold (static, timed)
+Push Press (22.5kg DB peak / 15kg foundation — same as DB Shoulder to Overhead Press zone weight), Push Jerk, Strict Press (DB or barbell), Landmine Press, Single-Arm DB Overhead Press, DB Arnold Press, Plate Press, Kettlebell Press, Overhead Hold (static, timed)
 
 **Turkish Get-up and loaded movement**
 KB Turkish Get-up (TGU), Overhead Walking Lunge, Overhead Squat, Suitcase Carry, Overhead Carry (plate or KB)
