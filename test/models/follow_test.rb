@@ -6,17 +6,10 @@ class FollowTest < ActiveSupport::TestCase
     assert_not follow.valid?
   end
 
-  test "accept sets status and accepted_at" do
+  test "auto-accepts on create" do
     follow = Follow.create!(follower: users(:two), following: users(:one))
-    follow.accept!
     assert_equal "accepted", follow.status
     assert_not_nil follow.accepted_at
-  end
-
-  test "pending scope" do
-    pending = Follow.create!(follower: users(:two), following: users(:one))
-    assert_includes Follow.pending, pending
-    assert_not_includes Follow.pending, follows(:one_follows_two)
   end
 
   test "accepted scope" do

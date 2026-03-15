@@ -19,8 +19,9 @@ Rails.application.routes.draw do
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
-  get  "workouts/preview/:token",         to: "workouts#preview",         as: :preview_workout
-  post "workouts/preview/:token/persist", to: "workouts#persist_preview", as: :persist_preview_workout
+  get  "workouts/preview/:token",              to: "workouts#preview",              as: :preview_workout
+  post "workouts/preview/:token/persist",      to: "workouts#persist_preview",      as: :persist_preview_workout
+  post "workouts/preview/:token/swap_exercise", to: "workouts#swap_preview_exercise", as: :swap_preview_exercise
 
   resources :workouts, only: [ :new, :create, :show, :edit, :update, :destroy ] do
     member do
@@ -60,12 +61,10 @@ Rails.application.routes.draw do
   resources :users, only: [ :index, :show ] do
     collection { post :contacts_search }
   end
-  resources :follows, only: [ :create, :destroy, :index ] do
-    collection { get :pending_count }
-  end
-  resources :follows, only: [] do
-    member { patch :accept }
-  end
+  resources :follows, only: [ :create, :destroy ]
+
+  get "privacy", to: "pages#privacy", as: :privacy
+  get "terms",   to: "pages#terms",   as: :terms
 
   # Defines the root path route ("/")
   root "feed#index"

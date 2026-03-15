@@ -15,7 +15,9 @@ export default class extends Controller {
     navigator.geolocation.getCurrentPosition(
       (position) => this.#reverseGeocode(position.coords),
       (err) => {
-        const msg = err.code === 1 ? "Location access denied" : "Could not get your location"
+        const msg = err.code === 1
+          ? "Location denied — enable in your browser/device settings and try again"
+          : "Could not get your location"
         this.#setStatus(msg)
         this.buttonTarget.disabled = false
       },
