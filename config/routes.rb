@@ -60,12 +60,7 @@ Rails.application.routes.draw do
   resources :users, only: [ :index, :show ] do
     collection { post :contacts_search }
   end
-  resources :follows, only: [ :create, :destroy, :index ] do
-    collection { get :pending_count }
-  end
-  resources :follows, only: [] do
-    member { patch :accept }
-  end
+  resources :follows, only: [ :create, :destroy ]
 
   # Defines the root path route ("/")
   root "feed#index"

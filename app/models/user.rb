@@ -76,17 +76,19 @@ class User < ApplicationRecord
     follows_as_follower.accepted.pluck(:following_id)
   end
 
-  # Count of pending inbound follow requests
-  def pending_follow_request_count
-    follows_as_following.pending.count
-  end
-
   # Follow state this user has toward another user
   def follow_state_for(other_user)
     return :self if id == other_user.id
     follow = follows_as_follower.find_by(following_id: other_user.id)
-    return :none unless follow
-    follow.status.to_sym
+    return follow.status.to_sym if follow
+
+    # Not following them — do they follow us?
+    follows_as_following.exists?(follower_id: other_user.id) ? :follow_back : :none
+  end
+
+  # Does other_user follow this user?
+  def followed_by?(other_user)
+    follows_as_following.exists?(follower_id: other_user.id)
   end
 
   private

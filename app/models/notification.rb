@@ -13,6 +13,7 @@ class Notification < ApplicationRecord
   def message
     name = actor.display
     case action
+    when "new_follower"    then "#{name} started following you"
     when "follow_request"  then "#{name} wants to follow you"
     when "follow_accepted" then "#{name} accepted your follow request"
     when "comment"         then "#{name} commented on your workout"

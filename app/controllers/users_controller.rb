@@ -5,7 +5,7 @@ class UsersController < ApplicationController
   def index
     if params[:q].present?
       q = "%#{params[:q].gsub('%', '').gsub('_', '\\_')}%"
-      @users = User.where("username ILIKE :q OR display_name ILIKE :q OR email_address ILIKE :q", q: q)
+      @users = User.where("username LIKE :q OR display_name LIKE :q OR email_address LIKE :q", q: q)
                    .where.not(id: Current.user.id)
                    .limit(20)
     else
@@ -38,11 +38,9 @@ class UsersController < ApplicationController
     @follower_count = @profile_user.follows_as_following.accepted.count
     @following_count = @profile_user.follows_as_follower.accepted.count
 
-    if @follow_state == :accepted
-      @recent_logs = @profile_user.workout_logs
-                                  .includes(workout: [ :tags, :activity ])
-                                  .recent
-                                  .limit(10)
-    end
+    @recent_logs = @profile_user.workout_logs
+                                .includes(workout: [ :tags, :activity ])
+                                .recent
+                                .limit(10)
   end
 end

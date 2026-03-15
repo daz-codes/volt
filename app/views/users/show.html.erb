@@ -39,51 +39,37 @@
   </div>
 
   <%# Workout list %>
-  <% if @follow_state == :accepted %>
-    <% if @recent_logs.any? %>
-      <div class="bg-zinc-800 border border-zinc-600/70 rounded-2xl overflow-hidden">
-        <div class="px-5 py-3 border-b border-zinc-700">
-          <p class="text-xs font-black text-gray-500 uppercase tracking-widest">Recent Workouts</p>
-        </div>
-        <div class="divide-y divide-zinc-700/50">
-          <% @recent_logs.each do |wl| %>
-            <%= link_to workout_log_path(wl), class: "flex items-center gap-4 px-5 py-4 hover:bg-zinc-700/30 transition-colors" do %>
-              <div class="flex flex-col items-center justify-center w-10 h-10 rounded-full bg-volt flex-shrink-0">
-                <span class="text-zinc-950 font-black text-sm leading-none"><%= wl.workout.duration_mins %></span>
-                <span class="text-zinc-800 text-[7px] font-bold leading-none mt-0.5 uppercase">min</span>
-              </div>
-              <div class="flex-1 min-w-0">
-                <p class="text-white font-bold text-sm truncate"><%= wl.workout.name.presence || "Workout" %></p>
-                <div class="flex items-center gap-2 mt-0.5">
-                  <% if wl.workout.activity.present? %>
-                    <span class="text-volt text-xs font-bold uppercase"><%= wl.workout.activity.name %></span>
-                    <span class="text-gray-700 text-xs">·</span>
-                  <% end %>
-                  <span class="text-gray-500 text-xs"><%= wl.workout.difficulty.capitalize %></span>
+  <% if @recent_logs.any? %>
+    <div class="bg-zinc-800 border border-zinc-600/70 rounded-2xl overflow-hidden">
+      <div class="px-5 py-3 border-b border-zinc-700">
+        <p class="text-xs font-black text-gray-500 uppercase tracking-widest">Recent Workouts</p>
+      </div>
+      <div class="divide-y divide-zinc-700/50">
+        <% @recent_logs.each do |wl| %>
+          <%= link_to workout_log_path(wl), class: "flex items-center gap-4 px-5 py-4 hover:bg-zinc-700/30 transition-colors" do %>
+            <div class="flex flex-col items-center justify-center w-10 h-10 rounded-full bg-volt flex-shrink-0">
+              <span class="text-zinc-950 font-black text-sm leading-none"><%= wl.workout.duration_mins %></span>
+              <span class="text-zinc-800 text-[7px] font-bold leading-none mt-0.5 uppercase">min</span>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-white font-bold text-sm truncate"><%= wl.workout.name.presence || "Workout" %></p>
+              <div class="flex items-center gap-2 mt-0.5">
+                <% if wl.workout.activity.present? %>
+                  <span class="text-volt text-xs font-bold uppercase"><%= wl.workout.activity.name %></span>
                   <span class="text-gray-700 text-xs">·</span>
-                  <span class="text-gray-500 text-xs"><%= wl.completed_at.strftime("%-d %b") %></span>
-                </div>
+                <% end %>
+                <span class="text-gray-500 text-xs"><%= wl.workout.difficulty.capitalize %></span>
+                <span class="text-gray-700 text-xs">·</span>
+                <span class="text-gray-500 text-xs"><%= wl.completed_at.strftime("%-d %b") %></span>
               </div>
-            <% end %>
+            </div>
           <% end %>
-        </div>
+        <% end %>
       </div>
-    <% else %>
-      <div class="bg-zinc-800 border border-zinc-600/70 rounded-2xl p-12 text-center">
-        <p class="text-gray-600 text-sm">No workouts logged yet.</p>
-      </div>
-    <% end %>
-  <% elsif @follow_state == :pending %>
-    <div class="bg-zinc-800 border border-zinc-600/70 rounded-2xl p-12 text-center">
-      <p class="text-3xl mb-3">🔒</p>
-      <p class="text-white font-bold">Follow request pending</p>
-      <p class="text-gray-500 text-sm mt-1">Workouts will be visible once your request is accepted.</p>
     </div>
   <% else %>
     <div class="bg-zinc-800 border border-zinc-600/70 rounded-2xl p-12 text-center">
-      <p class="text-3xl mb-3">🔒</p>
-      <p class="text-white font-bold">Follow to see workouts</p>
-      <p class="text-gray-500 text-sm mt-1">Send a follow request to view their training.</p>
+      <p class="text-gray-600 text-sm">No workouts logged yet.</p>
     </div>
   <% end %>
 
