@@ -1,4 +1,10 @@
 <div class="mx-auto md:w-2/3 w-full">
+  <div class="flex flex-col items-center mb-8">
+    <img src="/favicon-96x96.png" width="80" height="80" alt="Volt logo" class="mb-3">
+    <span class="font-black tracking-tight text-5xl uppercase bg-gradient-to-r from-[#eafc23] to-lime-400 bg-clip-text text-transparent" style="font-family: 'Jost', sans-serif; letter-spacing: 0.08em;">VOLT</span>
+    <span class="text-sm font-medium tracking-wide text-gray-500 mt-1">Energise your workout</span>
+  </div>
+
   <% if alert = flash[:alert] %>
     <p class="py-2 px-3 bg-red-50 mb-5 text-red-500 font-medium rounded-lg inline-block" id="alert"><%= alert %></p>
   <% end %>

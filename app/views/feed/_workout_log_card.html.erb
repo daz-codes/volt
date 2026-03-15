@@ -82,16 +82,6 @@
       <% end %>
     </div>
 
-    <%# Goal / coaching cue %>
-    <% if goal.present? %>
-      <p class="text-gray-500 text-xs italic mt-2.5 leading-snug"><%= goal %></p>
-    <% end %>
-
-    <%# Exercise summary %>
-    <% if summary_text.present? %>
-      <p class="text-sky-200 text-xs font-medium mt-1 leading-relaxed"><%= summary_text %></p>
-    <% end %>
-
     <%# Tags %>
     <% if display_tags.any? %>
       <div class="flex items-center gap-1.5 mt-3 flex-wrap">
@@ -101,12 +91,23 @@
       </div>
     <% end %>
 
-
   </div>
 
   <%# Photo %>
   <% if workout_log.photo.attached? %>
     <%= image_tag workout_log.photo, class: "w-full max-h-96 object-cover" %>
+  <% end %>
+
+  <%# Goal / coaching cue + Exercise summary (after photo) %>
+  <% if goal.present? || summary_text.present? %>
+    <div class="px-4 pb-3">
+      <% if goal.present? %>
+        <p class="text-gray-500 text-xs italic mt-2.5 leading-snug"><%= goal %></p>
+      <% end %>
+      <% if summary_text.present? %>
+        <p class="text-sky-200 text-xs font-medium mt-1 leading-relaxed"><%= summary_text %></p>
+      <% end %>
+    </div>
   <% end %>
 
   <%# ── Footer ── %>

@@ -27,10 +27,11 @@
       <nav class="border-b border-zinc-700/50 sticky top-0 bg-zinc-900/85 backdrop-blur z-10" data-controller="mobile-nav">
 
         <div class="container mx-auto px-5 py-3 flex items-center gap-4">
-          <%# Logo — left %>
+          <%# Logo — left (full on desktop, icon-only on mobile) %>
           <%= link_to root_path, class: "flex items-center gap-2 flex-shrink-0" do %>
-            <img src="/favicon-96x96.png" width="66" height="66" alt="Volt logo" class="flex-shrink-0" style="margin-top: -10px;">
-            <div class="flex flex-col items-center leading-none">
+            <img src="/favicon-96x96.png" width="66" height="66" alt="Volt logo" class="hidden md:block flex-shrink-0" style="margin-top: -10px;">
+            <img src="/favicon-96x96.png" width="36" height="36" alt="Volt logo" class="md:hidden flex-shrink-0">
+            <div class="hidden md:flex flex-col items-center leading-none">
               <span class="font-black tracking-tight text-4xl uppercase bg-gradient-to-r from-[#eafc23] to-lime-400 bg-clip-text text-transparent" style="font-family: 'Jost', sans-serif; letter-spacing: 0.08em;">VOLT</span>
               <span class="text-xs font-medium tracking-wide text-gray-500 mt-0.5">Energise your workout</span>
             </div>
@@ -97,8 +98,8 @@
             <% end %>
           </div>
 
-          <%# Mobile: generate + notification + burger %>
-          <div class="md:hidden flex items-center gap-2 ml-auto">
+          <%# Mobile: burger (next to logo) + generate + notification %>
+          <div class="md:hidden flex items-center gap-3 ml-auto">
             <button type="button" data-action="click->dialog#open"
                     class="flex items-center gap-1.5 bg-lime-400 hover:bg-lime-300 active:opacity-90 text-zinc-950 text-xs font-black px-3 py-2 rounded-xl transition-colors cursor-pointer uppercase tracking-wide">
               <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -116,11 +117,11 @@
               <% end %>
             <% end %>
             <button type="button" data-action="click->mobile-nav#toggle"
-                    class="p-1.5 text-gray-400 hover:text-white transition-colors cursor-pointer" aria-label="Menu">
-              <svg data-mobile-nav-target="burger" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    class="p-1 text-gray-400 hover:text-white transition-colors cursor-pointer" aria-label="Menu">
+              <svg data-mobile-nav-target="burger" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>
               </svg>
-              <svg data-mobile-nav-target="close" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="hidden">
+              <svg data-mobile-nav-target="close" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="hidden">
                 <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
               </svg>
             </button>
