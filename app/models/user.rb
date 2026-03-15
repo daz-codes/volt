@@ -86,11 +86,6 @@ class User < ApplicationRecord
     follows_as_following.exists?(follower_id: other_user.id) ? :follow_back : :none
   end
 
-  # Does other_user follow this user?
-  def followed_by?(other_user)
-    follows_as_following.exists?(follower_id: other_user.id)
-  end
-
   private
 
   def skip_password_validation?
