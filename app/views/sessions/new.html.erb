@@ -35,4 +35,11 @@
     Don't have an account?
     <%= link_to "Sign up", new_registration_path, class: "text-gray-700 underline hover:no-underline" %>
   </p>
+
+  <p class="mt-4 text-xs text-gray-600">
+    By signing in you agree to our
+    <%= link_to "Terms of Service", terms_path, class: "underline hover:no-underline" %>
+    and
+    <%= link_to "Privacy Policy", privacy_path, class: "underline hover:no-underline" %>.
+  </p>
 </div>

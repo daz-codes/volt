@@ -123,6 +123,54 @@ class WorkoutsController < ApplicationController
     end
   end
 
+  # POST /workouts/preview/:token/swap_exercise
+  def swap_preview_exercise
+    cache_key = "workout_preview:#{params[:token]}"
+    cached = Rails.cache.read(cache_key)
+    unless cached
+      head :gone
+      return
+    end
+
+    section_index  = params[:section_index].to_i
+    exercise_index = params[:exercise_index].to_i
+    attrs = cached[:attrs]
+
+    result = ExerciseSwapService.call_without_persist(
+      structure:      attrs[:structure],
+      activity_name:  Activity.find_by(id: attrs[:activity_id])&.name,
+      difficulty:     attrs[:difficulty],
+      section_index:  section_index,
+      exercise_index: exercise_index,
+      reason:         params[:reason].presence
+    )
+
+    # Update cached structure
+    cached[:attrs][:structure] = result[:updated_structure]
+    Rails.cache.write(cache_key, cached, expires_in: 1.hour)
+
+    section = result[:updated_structure]["sections"][section_index]
+    render turbo_stream: turbo_stream.replace(
+      "preview_exercise_#{params[:token]}_#{section_index}_#{exercise_index}",
+      partial: "shared/exercise_row",
+      locals: {
+        exercise:       result[:replacement],
+        workout:        nil,
+        section:        section,
+        section_index:  section_index,
+        exercise_index: exercise_index,
+        swappable:      true,
+        preview_token:  params[:token]
+      }
+    )
+  rescue ExerciseSwapService::SwapError => e
+    Rails.logger.warn "Preview exercise swap failed: #{e.message}"
+    render turbo_stream: turbo_stream.replace(
+      "preview_exercise_#{params[:token]}_#{section_index}_#{exercise_index}",
+      html: "<div id='preview_exercise_#{params[:token]}_#{section_index}_#{exercise_index}' class='px-3 py-2.5 border-t border-zinc-700/50'><p class='text-red-400 text-xs'>Swap failed — please try again.</p></div>".html_safe
+    )
+  end
+
   # POST /workouts/:id/save — copy another user's workout to your library
   def save
     source = Workout.find(params[:id])

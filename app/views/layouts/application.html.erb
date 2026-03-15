@@ -245,6 +245,16 @@
       </dialog>
     <% end %>
 
+    <footer class="border-t border-zinc-800 mt-12 py-6">
+      <div class="container mx-auto px-5 flex items-center justify-center gap-4 text-gray-600 text-xs">
+        <span>&copy; <%= Date.current.year %> Volt</span>
+        <span>&middot;</span>
+        <%= link_to "Privacy", privacy_path, class: "hover:text-gray-400 transition-colors" %>
+        <span>&middot;</span>
+        <%= link_to "Terms", terms_path, class: "hover:text-gray-400 transition-colors" %>
+      </div>
+    </footer>
+
     <%# Generate workout modal — pre-rendered, shown/hidden via dialog controller %>
     <dialog class="w-full max-w-2xl rounded-2xl border border-gray-600 bg-zinc-900 text-white p-0 shadow-2xl"
             data-dialog-target="modal"
