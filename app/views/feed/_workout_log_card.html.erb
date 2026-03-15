@@ -31,43 +31,38 @@
   <%# ── Card body ── %>
   <div class="px-4 pt-4 pb-3">
 
-    <%# Header: title + difficulty badge + duration circle %>
-    <div class="flex items-start justify-between gap-3">
-      <p class="text-gray-300 text-2xl leading-tight tracking-tight font-jost uppercase">
-        <%= workout.name.presence || "Untitled Workout" %>
-      </p>
-      <div class="flex flex-col items-end gap-1 flex-shrink-0 mt-0.5">
-        <% if workout.activity.present? %>
-          <p class="text-volt font-black text-sm uppercase tracking-wide leading-none"><%= workout.activity.name %></p>
+    <%# Row 1: Title only %>
+    <p class="text-gray-300 text-2xl leading-tight tracking-tight font-jost uppercase">
+      <%= workout.name.presence || "Untitled Workout" %>
+    </p>
+
+    <%# Row 2: Activity type · duration · distance · difficulty · sweat %>
+    <div class="flex items-center gap-2 mt-2 flex-wrap">
+      <% if workout.activity.present? %>
+        <span class="text-volt font-black text-xs uppercase tracking-wide"><%= workout.activity.name %></span>
+        <span class="text-gray-700 text-xs">·</span>
+      <% end %>
+      <span class="text-xs font-bold text-gray-300"><%= workout.duration_mins %> min</span>
+      <% if dist_value %>
+        <span class="text-gray-700 text-xs">·</span>
+        <span class="text-xs font-bold text-sky-400"><%= dist_value %><%= dist_unit %></span>
+      <% end %>
+      <span class="text-gray-700 text-xs">·</span>
+      <span class="text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border border-gray-600 bg-zinc-700/50 text-gray-300"><%= workout.difficulty.capitalize %></span>
+      <span class="text-gray-700 text-xs">·</span>
+      <div class="flex gap-px flex-shrink-0">
+        <% 5.times do |i| %>
+          <span class="text-xs <%= i < workout_log.sweat_rating ? 'opacity-90' : 'opacity-15' %>">💧</span>
         <% end %>
-        <div class="flex items-center gap-1.5">
-        <span class="text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border border-gray-600 bg-zinc-700/50 text-gray-300"><%= workout.difficulty.capitalize %></span>
-        <% if dist_value %>
-          <div class="flex flex-col items-center justify-center w-10 h-10 rounded-full bg-sky-500 shadow-sm shadow-sky-500/25 flex-shrink-0">
-            <span class="text-white font-black text-xs leading-none"><%= dist_value %></span>
-            <span class="text-sky-200 text-[7px] font-bold leading-none mt-0.5 uppercase tracking-wide"><%= dist_unit %></span>
-          </div>
-        <% end %>
-        <div class="flex flex-col items-center justify-center w-10 h-10 rounded-full bg-volt shadow-sm shadow-volt/25 flex-shrink-0">
-          <span class="text-zinc-950 font-black text-sm leading-none"><%= workout.duration_mins %></span>
-          <span class="text-zinc-800 text-[7px] font-bold leading-none mt-0.5 uppercase tracking-wide">min</span>
-        </div>
-        </div><%# close inner flex row %>
       </div>
     </div>
 
-    <%# Attribution: avatar · username · sweat · date · location %>
+    <%# Row 3: Avatar · username · date · location · follow button %>
     <div class="flex items-center justify-between mt-2">
       <div class="flex items-center gap-2 min-w-0 flex-wrap">
         <%= render "shared/avatar", user: workout_log.user %>
         <%= link_to workout_log.user.display, user_path(workout_log.user),
               class: "text-xs font-bold text-gray-300 hover:text-sky-200 transition-colors" %>
-        <span class="text-gray-700 text-xs">·</span>
-        <div class="flex gap-px flex-shrink-0">
-          <% 5.times do |i| %>
-            <span class="text-xs <%= i < workout_log.sweat_rating ? 'opacity-90' : 'opacity-15' %>">💧</span>
-          <% end %>
-        </div>
         <span class="text-gray-700 text-xs">·</span>
         <span class="text-xs text-gray-600 flex-shrink-0"><%= workout_log.completed_at.strftime("%-d %b %Y") %></span>
         <% if workout_log.location.present? %>
