@@ -61,12 +61,7 @@ Rails.application.routes.draw do
   resources :users, only: [ :index, :show ] do
     collection { post :contacts_search }
   end
-  resources :follows, only: [ :create, :destroy, :index ] do
-    collection { get :pending_count }
-  end
-  resources :follows, only: [] do
-    member { patch :accept }
-  end
+  resources :follows, only: [ :create, :destroy ]
 
   get "privacy", to: "pages#privacy", as: :privacy
   get "terms",   to: "pages#terms",   as: :terms

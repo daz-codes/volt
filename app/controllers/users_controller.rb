@@ -38,11 +38,9 @@ class UsersController < ApplicationController
     @follower_count = @profile_user.follows_as_following.accepted.count
     @following_count = @profile_user.follows_as_follower.accepted.count
 
-    if @follow_state == :accepted
-      @recent_logs = @profile_user.workout_logs
-                                  .includes(workout: [ :tags, :activity ])
-                                  .recent
-                                  .limit(10)
-    end
+    @recent_logs = @profile_user.workout_logs
+                                .includes(workout: [ :tags, :activity ])
+                                .recent
+                                .limit(10)
   end
 end
