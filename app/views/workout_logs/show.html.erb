@@ -125,7 +125,7 @@
   <div class="flex gap-3 mt-4">
     <%= link_to "Back to Feed", root_path,
         class: "flex-1 text-center border border-zinc-600 hover:border-gray-500 text-gray-300 hover:text-white font-bold py-3 rounded-xl text-sm transition-colors" %>
-    <% if Current.user.pro? %>
+    <% if Current.user.pro_features? %>
       <%= link_to export_pdf_workout_path(@workout),
           class: "flex items-center gap-1.5 border border-zinc-600 hover:border-gray-500 text-gray-300 hover:text-white font-bold py-3 px-4 rounded-xl text-sm transition-colors",
           title: "Export workout as PDF" do %>

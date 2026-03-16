@@ -6,6 +6,7 @@ class Workout < ApplicationRecord
   has_many :taggings, as: :taggable, dependent: :destroy
   has_many :tags, through: :taggings
   has_many :workout_likes, dependent: :destroy
+  has_many :shares, as: :shareable, dependent: :destroy
 
   after_save :record_exercise_weights, if: -> { saved_change_to_status?(to: "active") }
 

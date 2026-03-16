@@ -27,6 +27,80 @@
     </div>
   </div>
 
+  <%# Tabs %>
+  <div class="flex items-center gap-1 mb-6 border-b border-zinc-700">
+    <%= link_to "My Library", library_path,
+          class: "px-4 py-2.5 text-sm font-bold transition-colors border-b-2 #{@tab == 'mine' ? 'text-white border-volt' : 'text-gray-500 hover:text-gray-300 border-transparent'}" %>
+    <%= link_to library_path(tab: "shared"),
+          class: "px-4 py-2.5 text-sm font-bold transition-colors border-b-2 flex items-center gap-1.5 #{@tab == 'shared' ? 'text-white border-volt' : 'text-gray-500 hover:text-gray-300 border-transparent'}" do %>
+      Shared with me
+      <% if @shared_count > 0 %>
+        <span class="bg-zinc-700 text-gray-300 text-[10px] font-black rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1"><%= @shared_count %></span>
+      <% end %>
+    <% end %>
+  </div>
+
+  <% if @tab == "shared" %>
+    <% if @shared_items.any? %>
+      <div class="space-y-3">
+        <% @shared_items.each do |share| %>
+          <div class="bg-zinc-800 border border-zinc-600/70 rounded-2xl overflow-hidden shadow-sm">
+            <div class="px-4 pt-4 pb-3">
+              <div class="flex items-center gap-2 mb-2">
+                <%= render "shared/avatar", user: share.sender, classes: "w-6 h-6 text-[10px]" %>
+                <span class="text-xs text-gray-400">
+                  <span class="font-bold text-gray-300"><%= share.sender.display %></span> shared a <%= share.shareable_type.downcase %>
+                  <span class="text-gray-600">· <%= time_ago_in_words(share.created_at) %> ago</span>
+                </span>
+              </div>
+              <% if share.message.present? %>
+                <p class="text-gray-400 text-sm italic mb-2">"<%= share.message %>"</p>
+              <% end %>
+              <% item = share.shareable %>
+              <div class="flex items-start justify-between gap-3">
+                <div class="min-w-0">
+                  <p class="text-gray-300 text-xl leading-tight tracking-tight font-jost uppercase truncate"><%= item.name %></p>
+                  <div class="flex items-center gap-2 mt-1">
+                    <% if item.respond_to?(:activity) && item.activity.present? %>
+                      <span class="text-volt text-xs font-black uppercase"><%= item.activity.name %></span>
+                      <span class="text-gray-700 text-xs">·</span>
+                    <% end %>
+                    <span class="text-xs text-gray-500"><%= item.duration_mins %> min</span>
+                    <span class="text-gray-700 text-xs">·</span>
+                    <span class="text-xs text-gray-500"><%= item.difficulty.capitalize %></span>
+                    <% if share.shareable_type == "Program" %>
+                      <span class="text-gray-700 text-xs">·</span>
+                      <span class="text-xs text-gray-500"><%= item.weeks_count %> weeks</span>
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="bg-zinc-900 border-t border-zinc-700 px-4 py-3 flex items-center gap-2">
+              <% if share.shareable_type == "Workout" %>
+                <%= link_to "View", workout_path(item),
+                      class: "flex-1 text-center text-xs font-black border border-gray-600 hover:border-gray-500 text-gray-400 hover:text-white px-3 py-2 rounded-xl transition-colors uppercase tracking-wide" %>
+                <%= button_to "Save to Library", save_workout_path(item), method: :post,
+                      form: { class: "contents" },
+                      class: "flex-1 text-center text-xs font-black bg-volt hover:bg-volt/80 text-zinc-950 px-3 py-2 rounded-xl transition-colors cursor-pointer uppercase tracking-wide" %>
+              <% else %>
+                <%= link_to "View", program_path(item),
+                      class: "flex-1 text-center text-xs font-black bg-volt hover:bg-volt/80 text-zinc-950 px-3 py-2 rounded-xl transition-colors uppercase tracking-wide" %>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="text-center py-20">
+        <p class="text-5xl mb-4">📬</p>
+        <h2 class="text-xl font-black mb-2">Nothing shared yet</h2>
+        <p class="text-gray-500 text-sm">When someone shares a workout or program with you, it'll show up here.</p>
+      </div>
+    <% end %>
+
+  <% else %>
+
   <%# Programs section %>
   <% if @programs.any? %>
     <div class="mb-8">
@@ -186,7 +260,7 @@
                   <span></span>
                 <% end %>
                 <div class="flex items-center gap-3">
-                  <% if Current.user.pro? %>
+                  <% if Current.user.pro_features? %>
                     <%= link_to export_pdf_workout_path(workout),
                           data: { turbo: false },
                           class: "flex items-center gap-1 text-gray-600 hover:text-gray-300 transition-colors",
@@ -276,5 +350,7 @@
       <% end %>
     </div>
   <% end %>
+
+  <% end %><%# close mine/shared tab %>
 </div>
 

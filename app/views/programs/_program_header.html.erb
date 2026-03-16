@@ -26,6 +26,14 @@
     <% elsif program.complete? %>
       <span class="text-xs font-bold text-lime-400 uppercase tracking-wide">Ready</span>
     <% end %>
+    <button type="button"
+            onclick="document.getElementById('share_dialog_program_<%= program.id %>').showModal()"
+            class="text-xs text-gray-600 hover:text-sky-400 transition-colors cursor-pointer"
+            title="Share">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/>
+      </svg>
+    </button>
     <%= button_to program_path(program), method: :delete,
           data: { turbo_confirm: "Delete \"#{program.name}\"? This will delete all #{program.weeks_count * program.sessions_per_week} workouts." },
           class: "text-xs text-gray-600 hover:text-red-400 transition-colors cursor-pointer" do %>

@@ -4,17 +4,27 @@ class WorkoutsController < ApplicationController
 
   # GET /library
   def index
-    @programs  = Current.user.programs.order(created_at: :desc)
-    @workouts  = Current.user.workouts
-                       .includes(:tags, :activity)
-                       .order(created_at: :desc)
-    if params[:activity].present?
-      @activity_filter = params[:activity]
-      @workouts = @workouts.joins(:activity).where(activities: { name: params[:activity] })
-    elsif params[:tag_id].present?
-      @tag = Tag.find_by(id: params[:tag_id])
-      @workouts = @workouts.joins(:tags).where(tags: { id: params[:tag_id] }) if @tag
+    @tab = params[:tab] == "shared" ? "shared" : "mine"
+
+    if @tab == "shared"
+      @shared_items = Current.user.shares_received
+                             .includes(:sender, :shareable)
+                             .order(created_at: :desc)
+    else
+      @programs  = Current.user.programs.order(created_at: :desc)
+      @workouts  = Current.user.workouts
+                         .includes(:tags, :activity)
+                         .order(created_at: :desc)
+      if params[:activity].present?
+        @activity_filter = params[:activity]
+        @workouts = @workouts.joins(:activity).where(activities: { name: params[:activity] })
+      elsif params[:tag_id].present?
+        @tag = Tag.find_by(id: params[:tag_id])
+        @workouts = @workouts.joins(:tags).where(tags: { id: params[:tag_id] }) if @tag
+      end
     end
+
+    @shared_count = Current.user.shares_received.count
   end
 
   # GET /workouts/new  — manual builder
@@ -251,7 +261,7 @@ class WorkoutsController < ApplicationController
 
   # GET /workouts/:id/export_pdf
   def export_pdf
-    unless Current.user.pro?
+    unless Current.user.pro_features?
       redirect_to workout_path(params[:id]), alert: "PDF export is a Pro feature."
       return
     end
@@ -313,7 +323,7 @@ class WorkoutsController < ApplicationController
 
   def create_with_llm
     if Current.user.generation_limit_reached?
-      redirect_to root_path, alert: "You've used all #{User::FREE_GENERATION_LIMIT} free generations this week. Upgrade to Pro for unlimited workouts."
+      redirect_to root_path, alert: "You've used all #{Current.user.generation_limit} generations this week. Upgrade to Pro for unlimited workouts."
       return
     end
 

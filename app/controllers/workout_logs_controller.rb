@@ -43,7 +43,11 @@ class WorkoutLogsController < ApplicationController
   end
 
   def show
-    @workout_log = Current.user.workout_logs.find(params[:id])
+    @workout_log = WorkoutLog.find(params[:id])
+    if @workout_log.visibility == "private" && @workout_log.user_id != Current.user.id
+      redirect_to root_path, alert: "That workout log is private."
+      return
+    end
     @workout     = @workout_log.workout
     @exercise_logs = @workout_log.exercise_logs.order(:step_order).index_by(&:step_order)
   end

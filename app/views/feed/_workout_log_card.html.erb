@@ -57,7 +57,7 @@
       </div>
     </div>
 
-    <%# Row 3: Avatar · username · date · location · follow button %>
+    <%# Row 3: Avatar · username · date · location · share · follow button %>
     <div class="flex items-center justify-between mt-2">
       <div class="flex items-center gap-2 min-w-0 flex-wrap">
         <%= render "shared/avatar", user: workout_log.user %>
@@ -128,6 +128,16 @@
       Save
     <% end %>
   <% end %>
+  <% share_btn = capture do %>
+    <button type="button"
+            onclick="event.stopPropagation(); document.getElementById('share_dialog_workout_<%= workout.id %>').showModal()"
+            class="flex items-center justify-center gap-1.5 text-xs font-black border border-gray-600 hover:border-sky-400 hover:text-sky-400 text-gray-400 px-3 py-2 rounded-xl transition-colors cursor-pointer uppercase tracking-wide flex-1">
+      <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/>
+      </svg>
+      Share
+    </button>
+  <% end %>
   <% do_this_btn = capture do %>
     <button type="button"
             onclick="event.stopPropagation(); document.getElementById('complete_workout_<%= workout.id %>').showModal()"
@@ -143,9 +153,10 @@
         <div class="flex items-center gap-2 mb-2.5">
           <%= remix_btn %>
           <%= save_btn %>
+          <%= share_btn %>
           <%= do_this_btn %>
         </div>
-        <%# Row 2: social + pdf + workout toggle %>
+        <%# Row 2: social + share + pdf + workout toggle %>
         <div class="flex items-center justify-between gap-2">
           <div class="flex items-center gap-3">
             <%= render "workouts/like_button", workout: workout, liked: liked, like_count: like_count %>
@@ -157,7 +168,7 @@
               </svg>
               <span id="comment_count_<%= workout_log.id %>" class="text-xs font-semibold"><%= workout_log.comments_count %></span>
             <% end %>
-            <% if Current.user.pro? %>
+            <% if Current.user.pro_features? %>
               <%= link_to export_pdf_workout_path(workout),
                     data: { turbo: false },
                     class: "flex items-center gap-1 text-gray-500 hover:text-gray-300 transition-colors",
@@ -195,7 +206,7 @@
           </svg>
           <span id="comment_count_<%= workout_log.id %>" class="text-xs font-semibold"><%= workout_log.comments_count %></span>
         <% end %>
-        <% if Current.user.pro? %>
+        <% if Current.user.pro_features? %>
           <%= link_to export_pdf_workout_path(workout),
                 data: { turbo: false },
                 class: "flex items-center gap-1 text-gray-500 hover:text-gray-300 transition-colors",
@@ -219,6 +230,7 @@
 </div>
 
 <%= render "shared/complete_workout_dialog", workout: workout %>
+<%= render "shared/share_dialog", shareable: workout, shareable_type: "Workout" %>
 
 <%# Remix dialog %>
 <dialog id="remix_<%= workout.id %>"

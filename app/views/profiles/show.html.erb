@@ -11,6 +11,8 @@
           <h1 class="text-2xl font-bold tracking-tight"><%= @user.display %></h1>
           <% if @user.pro? %>
             <span class="bg-volt text-zinc-950 text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full">Pro</span>
+          <% elsif @user.beta? %>
+            <span class="bg-sky-400 text-zinc-950 text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full">Beta</span>
           <% end %>
         </div>
         <% if @user.username.present? %>
@@ -45,28 +47,33 @@
               form: { data: { turbo_confirm: "Downgrade to the Free plan?" } },
               class: "text-gray-500 hover:text-white text-xs font-medium transition-colors flex-shrink-0 ml-4 bg-transparent border-0 p-0 cursor-pointer" %>
         </div>
+      <% elsif @user.beta? %>
+        <div>
+          <div class="flex items-center gap-2 mb-1">
+            <span class="bg-sky-400 text-zinc-950 text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full">Beta</span>
+            <span class="text-white font-bold text-sm">Volt Beta</span>
+          </div>
+          <p class="text-gray-500 text-xs">All Pro features · <%= @user.generations_remaining %> of <%= User::BETA_GENERATION_LIMIT %> generations left this week</p>
+        </div>
       <% else %>
         <div class="flex items-center justify-between mb-4">
           <div>
             <p class="text-white font-bold text-sm mb-1">Free Plan</p>
             <% remaining = @user.generations_remaining %>
-            <p class="text-gray-500 text-xs"><%= remaining %> of <%= User::FREE_GENERATION_LIMIT %> generations left this week</p>
+            <p class="text-gray-500 text-xs"><%= remaining %> of <%= @user.generation_limit %> generations left this week</p>
           </div>
         </div>
-        <div class="bg-zinc-700/50 rounded-xl p-4 mb-4">
-          <p class="text-white font-bold text-sm mb-2">Upgrade to Pro</p>
-          <ul class="space-y-1.5 mb-4">
-            <li class="flex items-center gap-2 text-gray-300 text-xs">
-              <span class="text-volt">✓</span> Unlimited AI workout generations
-            </li>
-            <li class="flex items-center gap-2 text-gray-300 text-xs">
-              <span class="text-volt">✓</span> Priority access to new features
-            </li>
-          </ul>
-          <%= button_to "Upgrade to Pro (Free for now)",
-              upgrade_subscription_path,
-              method: :patch,
-              class: "block w-full bg-volt hover:bg-volt/80 text-zinc-950 font-bold py-2.5 rounded-xl text-sm transition-colors text-center cursor-pointer" %>
+        <div class="bg-zinc-700/50 rounded-xl p-4">
+          <p class="text-white font-bold text-sm mb-1">Become a Beta Tester!</p>
+          <p class="text-gray-400 text-xs mb-4">Test all the Pro features for free for a limited time. Enter the code below.</p>
+          <%= form_with url: activate_beta_subscription_path, method: :post, class: "flex gap-2" do |f| %>
+            <%= f.text_field :beta_code,
+                placeholder: "Enter beta code",
+                class: "flex-1 bg-zinc-800 border border-zinc-600 rounded-xl px-3 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-volt transition-colors uppercase tracking-wider",
+                autocomplete: "off" %>
+            <%= f.submit "Activate",
+                class: "bg-volt hover:bg-volt/80 text-zinc-950 font-bold px-5 py-2.5 rounded-xl text-sm transition-colors cursor-pointer" %>
+          <% end %>
         </div>
       <% end %>
     </div>

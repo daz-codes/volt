@@ -12,6 +12,8 @@
             <h1 class="text-xl font-black tracking-tight" style="font-family: 'Jost', sans-serif"><%= @profile_user.display %></h1>
             <% if @profile_user.pro? %>
               <span class="bg-volt text-zinc-950 text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full">Pro</span>
+            <% elsif @profile_user.beta? %>
+              <span class="bg-sky-400 text-zinc-950 text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full">Beta</span>
             <% end %>
           </div>
           <% if @profile_user.username.present? %>

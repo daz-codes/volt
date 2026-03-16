@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_03_14_170423) do
+ActiveRecord::Schema[8.2].define(version: 2026_03_16_140152) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -229,6 +229,19 @@ ActiveRecord::Schema[8.2].define(version: 2026_03_14_170423) do
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
+  create_table "shares", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "message"
+    t.integer "recipient_id", null: false
+    t.integer "sender_id", null: false
+    t.integer "shareable_id", null: false
+    t.string "shareable_type", null: false
+    t.datetime "updated_at", null: false
+    t.index ["recipient_id"], name: "index_shares_on_recipient_id"
+    t.index ["sender_id"], name: "index_shares_on_sender_id"
+    t.index ["shareable_type", "shareable_id"], name: "index_shares_on_shareable"
+  end
+
   create_table "solid_cache_entries", force: :cascade do |t|
     t.integer "byte_size", limit: 4, null: false
     t.datetime "created_at", null: false
@@ -346,6 +359,8 @@ ActiveRecord::Schema[8.2].define(version: 2026_03_14_170423) do
   add_foreign_key "programs", "activities"
   add_foreign_key "programs", "users"
   add_foreign_key "sessions", "users"
+  add_foreign_key "shares", "users", column: "recipient_id"
+  add_foreign_key "shares", "users", column: "sender_id"
   add_foreign_key "taggings", "tags"
   add_foreign_key "workout_likes", "users"
   add_foreign_key "workout_likes", "workouts"

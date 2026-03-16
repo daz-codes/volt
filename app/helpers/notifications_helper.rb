@@ -7,6 +7,9 @@ module NotificationsHelper
       workout_log_path(notification.notifiable.workout_log)
     when "like"
       workout_path(notification.notifiable.workout)
+    when "share"
+      share = notification.notifiable
+      share.shareable_type == "Workout" ? workout_path(share.shareable) : program_path(share.shareable)
     else
       notifications_path
     end
@@ -19,6 +22,7 @@ module NotificationsHelper
     when "new_follower"    then "👋"
     when "comment"         then "💬"
     when "like"            then "⚡"
+    when "share"           then "📤"
     end
   end
 end

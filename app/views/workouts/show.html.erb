@@ -23,6 +23,14 @@
             form: { class: "contents" },
             class: "flex-1 text-center py-3 px-4 border border-zinc-600 hover:border-gray-500 text-gray-300 hover:text-white font-bold rounded-xl text-sm transition-colors cursor-pointer" %>
       <% end %>
+      <button type="button"
+              onclick="document.getElementById('share_dialog_workout_<%= @workout.id %>').showModal()"
+              class="flex-1 flex items-center justify-center gap-1.5 py-3 px-4 border border-zinc-600 hover:border-sky-400 hover:text-sky-400 text-gray-300 font-bold rounded-xl text-sm transition-colors cursor-pointer">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/>
+        </svg>
+        Share
+      </button>
       <% if own_workout %>
         <%= link_to "Edit", edit_workout_path(@workout),
             data: { turbo_frame: "workout_preview" },
@@ -44,6 +52,8 @@
   <% end %>
 
 </div>
+
+<%= render "shared/share_dialog", shareable: @workout, shareable_type: "Workout" %>
 
 <% if params[:do_this] %>
   <script>document.getElementById('complete_workout_<%= @workout.id %>')?.showModal()</script>

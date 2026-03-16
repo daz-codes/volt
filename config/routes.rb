@@ -53,6 +53,7 @@ Rails.application.routes.draw do
   resource :subscription, only: [] do
     patch :upgrade
     patch :downgrade
+    post  :activate_beta
   end
   get  "progress",                    to: "progress#index",        as: :progress
   get  "progress/:test_key",          to: "progress#show",          as: :progress_test
@@ -62,6 +63,9 @@ Rails.application.routes.draw do
     collection { post :contacts_search }
   end
   resources :follows, only: [ :create, :destroy ]
+  resources :shares, only: :create do
+    collection { get :search_users }
+  end
 
   get "privacy", to: "pages#privacy", as: :privacy
   get "terms",   to: "pages#terms",   as: :terms

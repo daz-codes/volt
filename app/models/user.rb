@@ -1,5 +1,6 @@
 class User < ApplicationRecord
   FREE_GENERATION_LIMIT = 5
+  BETA_GENERATION_LIMIT = 25
 
   validates :email_address, uniqueness: true
   validates :username, uniqueness: true, allow_nil: true,
@@ -18,10 +19,14 @@ class User < ApplicationRecord
   has_many :generation_uses, dependent: :destroy
   has_many :programs, dependent: :destroy
   has_many :fitness_test_entries, dependent: :destroy
+  has_many :challenge_entries, dependent: :destroy
   has_many :notifications, foreign_key: :recipient_id, dependent: :destroy
 
   has_many :follows_as_follower,  class_name: "Follow", foreign_key: :follower_id,  dependent: :destroy
   has_many :follows_as_following, class_name: "Follow", foreign_key: :following_id, dependent: :destroy
+
+  has_many :shares_sent,     class_name: "Share", foreign_key: :sender_id,    dependent: :destroy
+  has_many :shares_received, class_name: "Share", foreign_key: :recipient_id, dependent: :destroy
 
   normalizes :email_address, with: ->(e) { e.strip.downcase }
   normalizes :username, with: ->(u) { u.presence }  # treat blank as nil
@@ -42,21 +47,40 @@ class User < ApplicationRecord
     plan == "pro"
   end
 
+  def beta?
+    plan == "beta"
+  end
+
+  def pro_features?
+    pro? || beta?
+  end
+
   def free?
-    plan == "free"
+    !pro? && !beta?
   end
 
   def generations_this_week
     generation_uses.where(created_at: 1.week.ago..).count
   end
 
+  def generation_limit
+    if pro?
+      nil
+    elsif beta?
+      BETA_GENERATION_LIMIT
+    else
+      FREE_GENERATION_LIMIT
+    end
+  end
+
   def generation_limit_reached?
-    free? && generations_this_week >= FREE_GENERATION_LIMIT
+    return false if pro?
+    generations_this_week >= generation_limit
   end
 
   def generations_remaining
     return nil if pro?
-    [ FREE_GENERATION_LIMIT - generations_this_week, 0 ].max
+    [ generation_limit - generations_this_week, 0 ].max
   end
 
   def display

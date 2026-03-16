@@ -1,0 +1,18 @@
+<% @users.each do |user| %>
+  <button type="button"
+          data-action="click->share-search#select"
+          data-user-id="<%= user.id %>"
+          data-user-name="<%= user.display %>"
+          class="flex items-center gap-3 w-full text-left px-3 py-2.5 hover:bg-zinc-700/50 rounded-xl transition-colors cursor-pointer">
+    <%= render "shared/avatar", user: user, classes: "w-7 h-7 text-[10px]" %>
+    <div class="min-w-0">
+      <p class="text-white text-sm font-semibold truncate"><%= user.display %></p>
+      <% if user.username.present? %>
+        <p class="text-gray-500 text-xs">@<%= user.username %></p>
+      <% end %>
+    </div>
+  </button>
+<% end %>
+<% if @users.empty? && params[:q].present? %>
+  <p class="text-gray-500 text-xs px-3 py-2">No users found.</p>
+<% end %>

@@ -3,6 +3,7 @@ class Program < ApplicationRecord
   belongs_to :activity, optional: true
   has_many :program_workouts, dependent: :destroy
   has_many :workouts, through: :program_workouts
+  has_many :shares, as: :shareable, dependent: :destroy
 
   STATUSES     = %w[pending building complete failed].freeze
   DIFFICULTIES = %w[beginner intermediate advanced].freeze

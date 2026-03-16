@@ -16,6 +16,7 @@ class Notification < ApplicationRecord
     when "new_follower"    then "#{name} started following you"
     when "comment"         then "#{name} commented on your workout"
     when "like"            then "#{name} liked your workout"
+    when "share"           then "#{name} shared a #{notifiable.shareable_type.downcase} with you"
     end
   end
 end

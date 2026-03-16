@@ -6,6 +6,8 @@
     <%= render "programs/program_header", program: @program %>
   </div>
 
+  <%= render "shared/share_dialog", shareable: @program, shareable_type: "Program" %>
+
   <% @grid.each do |week_number, slots| %>
     <div class="mb-8">
       <h2 class="text-xs font-black uppercase tracking-widest text-gray-500 mb-3">Week <%= week_number %></h2>

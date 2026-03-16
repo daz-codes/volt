@@ -79,6 +79,8 @@
                 <span><%= Current.user.display %></span>
                 <% if Current.user.pro? %>
                   <span class="text-volt text-[9px] font-black uppercase tracking-wider">Pro</span>
+                <% elsif Current.user.beta? %>
+                  <span class="text-sky-400 text-[9px] font-black uppercase tracking-wider">Beta</span>
                 <% end %>
               </div>
             <% end %>

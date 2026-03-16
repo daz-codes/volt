@@ -1,15 +1,15 @@
 <div class="px-6 py-6">
 
   <% user_at_limit = Current.user.generation_limit_reached? %>
-  <% generations_used = Current.user.free? ? Current.user.generations_this_week : nil %>
+  <% generations_used = Current.user.pro? ? nil : Current.user.generations_this_week %>
 
   <div class="flex items-start justify-between mb-6">
     <div>
       <h1 class="text-2xl font-bold tracking-tight">Generate Workout</h1>
-      <% if Current.user.pro? %>
+      <% if Current.user.pro_features? %>
         <p class="text-gray-400 mt-0.5 text-sm">Pick your session type and focus, and we'll build it.</p>
       <% elsif user_at_limit %>
-        <p class="text-red-400 mt-0.5 text-sm font-medium">You've used all <%= User::FREE_GENERATION_LIMIT %> free generations this week.</p>
+        <p class="text-red-400 mt-0.5 text-sm font-medium">You've used all <%= Current.user.generation_limit %> generations this week.</p>
       <% else %>
         <p class="text-gray-400 mt-0.5 text-sm">Pick your session type and focus, and we'll build it.</p>
       <% end %>
@@ -115,7 +115,7 @@
     <% end %>
 
     <% unless user_at_limit %>
-      <% if Current.user.pro? %>
+      <% if Current.user.pro_features? %>
         <div class="flex items-center justify-center gap-1.5 mb-3">
           <span class="bg-volt text-zinc-950 text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full">Pro</span>
           <span class="text-gray-500 text-xs">Unlimited generations</span>
@@ -134,17 +134,15 @@
   <% if user_at_limit %>
     <div class="bg-zinc-800 border border-zinc-600 rounded-xl p-4 mb-4 text-center">
       <p class="text-white font-bold text-sm mb-1">Weekly limit reached</p>
-      <p class="text-gray-400 text-xs mb-3">Upgrade to Pro for unlimited AI-generated workouts, Sonnet 4.6 model, and more.</p>
-      <%= button_to "Upgrade to Pro",
-          upgrade_subscription_path,
-          method: :patch,
+      <p class="text-gray-400 text-xs mb-3">You've used all your generations this week. Check back next week or activate a beta code on your profile.</p>
+      <%= link_to "Go to Profile", profile_path,
           class: "inline-block w-full bg-volt hover:bg-volt/80 text-zinc-950 font-bold py-3 rounded-xl text-base transition-colors text-center cursor-pointer" %>
     </div>
   <% elsif Current.user.free? %>
     <p class="text-gray-600 text-xs text-center mb-3">
-      <%= generations_used %> of <%= User::FREE_GENERATION_LIMIT %> free generations used this week ·
-      <%= button_to "Upgrade to Pro", upgrade_subscription_path, method: :patch,
-          class: "text-volt hover:text-volt/80 inline cursor-pointer bg-transparent border-0 p-0 text-xs font-inherit" %>
+      <%= generations_used %> of <%= Current.user.generation_limit %> generations used this week ·
+      <%= link_to "Become a Beta Tester", profile_path,
+          class: "text-volt hover:text-volt/80 text-xs" %>
     </p>
   <% end %>
 
