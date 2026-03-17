@@ -40,7 +40,7 @@
     <% featured_names = featured_types.map { |t| t[:activity] || t[:name] } %>
     <div class="mb-6">
       <p class="text-sm font-semibold text-gray-300 uppercase tracking-wide mb-3">Session Type</p>
-      <div class="grid grid-cols-3 gap-2">
+      <div class="grid grid-cols-4 gap-2">
         <% featured_types.each do |ft| %>
           <label class="cursor-pointer">
             <% activity_value = ft[:activity] || ft[:name] %>
