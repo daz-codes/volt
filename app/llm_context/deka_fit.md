@@ -26,13 +26,13 @@ SkiErg, Rowing, Air Bike — short intervals (250–500m) or calorie targets (15
 **Core and stability**
 Plank Holds, Hollow Body Hold, GHD Sit-ups, Ab Wheel, Dead Bug, Med Ball Russian Twist
 
-**Running** (MANDATORY in every Deka Fit session)
-500m–1km run intervals at race pace. Deka Fit has a 500m run before every zone (5km total) — running is half the race and MUST appear in every training session. Place run intervals between station clusters to replicate race transitions.
+**Treadmill Running** (MANDATORY in every Deka Fit session)
+500m–1km treadmill run intervals at race pace. Deka Fit has a 500m run before every zone (5km total) — running is half the race and MUST appear in every training session. Use treadmill (not outdoor running). Place treadmill intervals between station clusters to replicate race transitions.
 
 ## Session Structure
-Warm-up → Main set (anchor zones + run intervals + toolkit) → Cool-down stretches.
+Warm-up → Main set (anchor zones + treadmill run intervals + toolkit) → Cool-down stretches.
 
-**IMPORTANT:** Every Deka Fit session MUST include at least 2 running intervals (500m–1km each) placed between station work. This is non-negotiable — running is the backbone of the race format.
+**IMPORTANT:** Every Deka Fit session MUST include at least 2 treadmill running intervals (500m–1km each) placed between station work. This is non-negotiable — running is the backbone of the race format. Always use treadmill.
 
 ## Coaching Notes
 - Anchor zones should use race-accurate weights and distances from the prompt reference.

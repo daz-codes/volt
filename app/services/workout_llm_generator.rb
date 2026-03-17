@@ -335,12 +335,12 @@ class WorkoutLLMGenerator
     "deka" => {
       primary: %w[for_time rounds emom],
       secondary: %w[amrap tabata ladder matrix hundred],
-      guidance: "Deka sessions should blend race-specific station work with conditioning variety. For_time and rounds simulate race pacing. EMOMs build station endurance. Mix in AMRAPs, tabatas, ladders, matrices, and hundreds to keep training sessions varied — not every session should be a race simulation."
+      guidance: "Deka sessions should blend race-specific station work with conditioning variety. For_time and rounds simulate race pacing. EMOMs build station endurance. Mix in AMRAPs, tabatas, ladders, matrices, and hundreds to keep training sessions varied — not every session should be a race simulation. MANDATORY: Every Deka session MUST include at least 2 treadmill running intervals (500m–1km each) placed between station blocks — running is half the race. Use treadmill, not outdoor running."
     },
     "deka-fit" => {
       primary: %w[for_time rounds emom],
       secondary: %w[amrap tabata ladder matrix hundred],
-      guidance: "Deka Fit sessions should blend race-specific station work with conditioning variety. For_time and rounds simulate race pacing. EMOMs build station endurance. Mix in AMRAPs, tabatas, ladders, matrices, and hundreds to keep training varied. MANDATORY: Every Deka Fit session MUST include at least 2 running intervals (500m–1km each) placed between station blocks — running is half the race (5km across 10 × 500m runs)."
+      guidance: "Deka Fit sessions should blend race-specific station work with conditioning variety. For_time and rounds simulate race pacing. EMOMs build station endurance. Mix in AMRAPs, tabatas, ladders, matrices, and hundreds to keep training varied. MANDATORY: Every Deka Fit session MUST include at least 2 treadmill running intervals (500m–1km each) placed between station blocks — running is half the race (5km across 10 × 500m runs). Use treadmill, not outdoor running."
     },
     "deka-strong" => {
       primary: %w[for_time rounds emom],
@@ -360,7 +360,7 @@ class WorkoutLLMGenerator
     "hyrox" => {
       primary: %w[for_time rounds emom],
       secondary: %w[amrap tabata ladder hundred],
-      guidance: "Hyrox sessions must include running — it's the backbone of the race. For_time and rounds simulate race pacing. EMOMs build station endurance. Mix in AMRAPs, tabatas, ladders, and hundreds for training variety. Every session should have running intervals somewhere in the main set."
+      guidance: "Hyrox sessions must include treadmill running — it's the backbone of the race (8 × 1km). For_time and rounds simulate race pacing. EMOMs build station endurance. Mix in AMRAPs, tabatas, ladders, and hundreds for training variety. MANDATORY: Every Hyrox session MUST include at least 2 treadmill running intervals (500m–1km each) placed between station blocks. Use treadmill, not outdoor running."
     },
     # ── General / fallback ──
 

@@ -30,14 +30,14 @@ Assault Bike, SkiErg, Rowing — short intervals (250–500m) or calorie targets
 Plank Holds, Hollow Body, GHD Sit-ups, Ab Wheel, Pallof Press, Dead Bug
 
 ## Session Structure
-Warm-up → Running warm-up → Main set (running intervals + anchor movements + toolkit) → Optional finisher → Cool-down stretches.
+Warm-up → Treadmill warm-up → Main set (treadmill running intervals + anchor movements + toolkit) → Optional finisher → Cool-down stretches.
 
-## MANDATORY Running Component
-Every Hyrox session MUST include running. The race is 8×1km runs — running is the backbone, not optional. Include at least one of:
-- 1km run repeats (2–4 reps at race pace or faster) with station work between reps
-- 800m–1km intervals paired with stations (run → station → run → station)
-- A running warm-up block (1–2km at easy pace) PLUS shorter run intervals (400–800m) within the main set
-Running should appear early and throughout the session, not tacked on as an afterthought.
+## MANDATORY Treadmill Running Component
+Every Hyrox session MUST include treadmill running. The race is 8×1km runs — running is the backbone, not optional. Always use treadmill (not outdoor running). Include at least one of:
+- 1km treadmill repeats (2–4 reps at race pace or faster) with station work between reps
+- 800m–1km treadmill intervals paired with stations (run → station → run → station)
+- A treadmill warm-up block (1–2km at easy pace) PLUS shorter treadmill intervals (400–800m) within the main set
+Treadmill running should appear early and throughout the session, not tacked on as an afterthought.
 
 ## Coaching Notes
 - Anchor movements should appear in the main working sets, calibrated to race-appropriate weight/distance.
