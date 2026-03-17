@@ -39,7 +39,7 @@ class ProfilesController < ApplicationController
     params.require(:user).permit(
       :username, :display_name,
       :age, :height_cm, :weight_kg, :gender,
-      :pool_length
+      :pool_length, :speed_unit
     )
   end
 end

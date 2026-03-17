@@ -24,15 +24,16 @@ class WorkoutLLMGenerator
     "deka-atlas"         => "deka_atlas.md",
     "dirty-dozen"        => "dirty_dozen.md",
     "crossfit"           => "crossfit.md",
-    "functional-fitness"  => "functional.md",
-    "functional-muscle"   => "functional_muscle.md",
-    "hiit"               => "hiit.md",
-    "bodyweight"         => "bodyweight.md",
-    "meta-fit"           => "metafit.md",
+    "functional-muscle"  => "functional_muscle.md",
+    # Canonical Volt slugs → context files
+    "circuit-breaker"    => "functional.md",
+    "dynamo"             => "hiit.md",
+    "tread-shred"        => "barrys.md",
+    "alternator"         => "functional.md",
+    "ohm"                => "bodyweight.md",
+    "transformer"        => "functional.md",
     "metafit"            => "metafit.md",
     "metafit-bodyweight" => "metafit.md",
-    "barry-s-bootcamp"   => "barrys.md",
-    "barrys-bootcamp"    => "barrys.md",
     "barrys"             => "barrys.md",
     "f45"                => "f45.md"
   }.freeze
@@ -192,6 +193,182 @@ class WorkoutLLMGenerator
       instruction: "Metabolic session — keep rest short and reps high. Lighter weights, fast transitions, sustained effort. Think: sweat, breathing hard, and muscular fatigue from volume rather than load." }
   ].freeze
 
+  # Maps branded/alias activity slugs to their canonical Volt slug.
+  # Any slug not in this map is treated as its own canonical slug.
+  ACTIVITY_ALIASES = {
+    # Alternator (Hybrid Training / Cardio & Strength)
+    "hybrid-training"    => "alternator",
+    "cardio-strength"    => "alternator",
+    "cardio-and-strength" => "alternator",
+    # Tread & Shred (Barry's)
+    "barry-s"            => "tread-shred",
+    "barry-s-bootcamp"   => "tread-shred",
+    # Circuit Breaker (Functional Fitness / F45)
+    "functional-fitness" => "circuit-breaker",
+    "f45"                => "circuit-breaker",
+    "functional-workout" => "circuit-breaker",
+    # Dynamo (HIIT / MetaFit)
+    "hiit"               => "dynamo",
+    "meta-fit"           => "dynamo",
+    "metafit"            => "dynamo",
+    # Transformer (Strength)
+    "strength"           => "transformer",
+    "strength-training"  => "transformer",
+    # Ohm (Pilates / Yoga / Mobility)
+    "pilates"            => "ohm",
+    "yoga"               => "ohm",
+    "mobility"           => "ohm",
+    # Functional Muscle aliases
+    "jog-sunday-workout" => "functional-muscle",
+    "maximum-voltage"    => "functional-muscle",
+    # General
+    "full-body-training" => "general-fitness"
+  }.freeze
+
+  # Format affinity per activity type — guides the LLM toward formats that suit
+  # each session style while still allowing creative freedom.
+  FORMAT_AFFINITY = {
+    # ── Volt-branded canonical types ──
+
+    # Transformer: structured strength sets and progressions
+    "transformer" => {
+      primary: %w[rounds straight ladder],
+      secondary: %w[mountain emom],
+      guidance: "Strength sessions should be built around structured sets with planned rest. Use rounds (5x5, 10x10, 3x8) as the backbone. Ladders and mountains work well for progressive overload. Avoid tabatas, AMRAPs, and high-rep conditioning circuits — this is about heavy, controlled lifting with adequate recovery."
+    },
+    # Circuit Breaker: functional fitness / F45-style circuit training
+    "circuit-breaker" => {
+      primary: %w[amrap emom tabata for_time rounds],
+      secondary: %w[ladder matrix hundred mountain],
+      guidance: "Circuit Breaker sessions thrive on variety and continuous effort. AMRAPs, EMOMs, tabatas, and for_time efforts should be the main formats. Mix in rounds for structured strength work. Ladders, matrices, and hundreds make great finishers. Keep rest short and transitions fast. Think F45 / functional fitness group training — high energy, fast transitions, minimal rest."
+    },
+    # Dynamo: HIIT / MetaFit — high-intensity bodyweight and light equipment
+    "dynamo" => {
+      primary: %w[tabata amrap matrix for_time rounds emom],
+      secondary: %w[hundred ladder],
+      guidance: "Dynamo sessions are all about work-to-rest ratios and intensity. Tabatas, AMRAPs, matrices, and for_time sprints are the bread and butter. Hundreds make excellent finishers. Keep everything fast-paced with short rest windows. Bodyweight and light equipment — the intensity comes from speed and volume, not load."
+    },
+    # Ohm: pilates / yoga / mobility — controlled movement
+    "ohm" => {
+      primary: %w[straight rounds],
+      secondary: %w[hundred],
+      guidance: "Ohm sessions should flow through controlled movements with precise form. Use straight format for most sections. Rounds work for repeated sequences. The hundred is a classic Pilates exercise. Keep everything slow, controlled, and focused on core stability, flexibility, and mobility. No high-intensity cardio — this is mindful movement."
+    },
+    # Tread & Shred: treadmill + floor alternating (Barry's-style)
+    "tread-shred" => {
+      primary: %w[rounds emom for_time],
+      secondary: %w[tabata amrap ladder],
+      guidance: <<~TREAD_SHRED.strip
+        Tread & Shred sessions have a strict structure — follow this exactly:
+
+        WARM-UP: Section name: "Warm-up Jog". format: straight, duration_mins: 5. One exercise only: "Light Jog" with duration_s: 300. No rounds, no stretching, no activation, no other exercises.
+
+        MAIN SET STRUCTURE: For every 30 minutes of main set time, generate exactly 1 treadmill block and 1 floor block, strictly alternating (tread → floor → tread → floor). Each block is 10-14 minutes.
+        - 30-min session: warm-up → 1 tread → 1 floor → cool-down
+        - 45-min session: warm-up → 1 tread → 1 floor → 1 tread → cool-down (or add a short floor finisher)
+        - 60-min session: warm-up → 1 tread → 1 floor → 1 tread → 1 floor → cool-down
+
+        TREADMILL BLOCKS: Do NOT use rest_secs between rounds — instead include recovery jog exercises (easy pace) between sprint efforts. You never stop on a treadmill, you just slow down. Vary the treadmill style each block — pick from this menu:
+        - Speed intervals: alternate sprint (30-60s) and recovery jog (20-30s)
+        - Incline ladder: start at 10% incline, drop 1% each round at steady pace (or reverse — climb from 1% to 10%)
+        - Fartlek: unstructured pace changes — fast/moderate/easy in varying durations (e.g. 45s fast, 30s easy, 60s moderate, 20s sprint)
+        - Tempo block: sustained moderate-hard pace for 8-12 minutes with brief surges
+        - Hill repeats: high incline (8-12%) sprints with flat recovery jogs
+        - Speed ladder: progressively faster efforts (build up then back down)
+        - 1-min on/1-min off: classic interval format, sprint then easy jog
+        Use the athlete's preferred speed unit (see Athlete Context) for all treadmill speeds.
+        Never repeat the same treadmill style twice in one session.
+
+        FLOOR BLOCKS: Dumbbell strength circuits, bench work, and bodyweight movements. Floor focus can be upper body, lower body, core, or a full-body mix — if the athlete provided session notes, let those guide the focus. Abs exercises can appear within floor blocks but there is NO separate abs section. IMPORTANT: do NOT use rowing machines, ski ergs, assault bikes, or any other cardio equipment on the floor. The treadmill is the only cardio machine in a Tread & Shred session.
+
+        NO separate abs/core section. NO activation warm-up. The session is just: jog warm-up → alternating tread/floor blocks → cool-down stretch.
+      TREAD_SHRED
+    },
+    # Alternator: alternating DIFFERENT cardio machines with floor strength
+    "alternator" => {
+      primary: %w[rounds emom for_time],
+      secondary: %w[tabata amrap ladder],
+      guidance: <<~ALTERNATOR.strip
+        Alternator sessions alternate between cardio machine efforts and floor strength circuits. This is the key concept: DIFFERENT cardio machines throughout the session, paired with targeted floor work.
+
+        WARM-UP: Section name: "Warm-up". format: straight, duration_mins: 5. One exercise only — easy effort on any cardio machine with duration_s: 300. No stretching, no activation.
+
+        MAIN SET STRUCTURE: Strictly alternate between cardio blocks and floor blocks. Each block is 8-12 minutes. Use a DIFFERENT cardio machine for each cardio block — this is what makes Alternator special. Example 60-min session:
+        - warm-up → Ski Erg intervals → Upper Body Floor → Row intervals → Lower Body Floor → Assault Bike intervals → Core/Full Body Floor → cool-down
+        Example 45-min session:
+        - warm-up → Row intervals → Upper Body Floor → Assault Bike intervals → Lower Body Floor → cool-down
+
+        CARDIO BLOCKS: Pick from assault bike, rowing machine, ski erg, and treadmill. Use a different machine each block. Vary the interval style:
+        - Cal sprints: e.g. 10 cal sprint / 30s easy × 8
+        - Distance repeats: e.g. 250m row / 30s rest × 6
+        - Pace ladders: build intensity across rounds
+        - Sustained efforts: 3-4 min at threshold pace
+        - Alternating work/rest: 40s on / 20s off
+        Do NOT use rest_secs — include easy-pace recovery on the same machine between efforts.
+
+        FLOOR BLOCKS: Dumbbell and bodyweight strength circuits. Each floor block should have a clear focus that complements the surrounding cardio:
+        - After ski erg (pull-heavy cardio) → push-focused floor (bench press, shoulder press, push-ups)
+        - After rowing (full body) → lower body floor (squats, lunges, RDLs)
+        - After assault bike (legs) → upper body floor (rows, presses, curls)
+        - After treadmill (running) → core or full body floor
+        This push/pull pairing keeps the session balanced and avoids fatiguing the same muscles back-to-back.
+
+        NO separate abs/core section — abs exercises can appear within floor blocks. NO activation warm-up. The session is: easy cardio warm-up → alternating machine/floor blocks → cool-down stretch.
+      ALTERNATOR
+    },
+    # ── Unchanged types ──
+
+    "crossfit" => {
+      primary: %w[amrap emom for_time rounds],
+      secondary: %w[tabata ladder hundred mountain],
+      guidance: "CrossFit sessions should feature classic WOD formats: AMRAPs, EMOMs, and for_time efforts. Rounds work for strength components. The session should feel like a box class — varied, intense, and competitive."
+    },
+    "kettlebell" => {
+      primary: %w[rounds emom for_time amrap],
+      secondary: %w[tabata ladder mountain hundred],
+      guidance: "Kettlebell sessions combine strength and conditioning. Rounds and EMOMs work for structured KB complexes. For_time and AMRAPs create conditioning intensity. Ladders and mountains are excellent for KB swings and cleans. Keep the flow continuous — kettlebell work should feel rhythmic."
+    },
+    # ── Race/event types ──
+
+    "deka" => {
+      primary: %w[for_time rounds emom],
+      secondary: %w[amrap tabata ladder matrix hundred],
+      guidance: "Deka sessions should blend race-specific station work with conditioning variety. For_time and rounds simulate race pacing. EMOMs build station endurance. Mix in AMRAPs, tabatas, ladders, matrices, and hundreds to keep training sessions varied — not every session should be a race simulation."
+    },
+    "deka-fit" => {
+      primary: %w[for_time rounds emom],
+      secondary: %w[amrap tabata ladder matrix hundred],
+      guidance: "Deka Fit sessions should blend race-specific station work with conditioning variety. For_time and rounds simulate race pacing. EMOMs build station endurance. Mix in AMRAPs, tabatas, ladders, matrices, and hundreds to keep training varied."
+    },
+    "deka-strong" => {
+      primary: %w[for_time rounds emom],
+      secondary: %w[amrap tabata ladder matrix hundred],
+      guidance: "Deka Strong sessions should blend race-specific station work with conditioning variety. For_time and rounds simulate race pacing. EMOMs build station endurance. Mix in AMRAPs, tabatas, ladders, matrices, and hundreds to keep training varied."
+    },
+    "deka-mile" => {
+      primary: %w[for_time rounds emom],
+      secondary: %w[amrap tabata ladder matrix hundred],
+      guidance: "Deka Mile sessions should blend race-specific station work with conditioning variety. For_time and rounds simulate race pacing. EMOMs build station endurance. Mix in AMRAPs, tabatas, ladders, matrices, and hundreds to keep training varied."
+    },
+    "deka-atlas" => {
+      primary: %w[for_time rounds emom],
+      secondary: %w[amrap tabata ladder matrix hundred],
+      guidance: "Deka Atlas sessions should blend race-specific station work with conditioning variety. For_time and rounds simulate race pacing. EMOMs build station endurance. Mix in AMRAPs, tabatas, ladders, matrices, and hundreds to keep training varied."
+    },
+    "hyrox" => {
+      primary: %w[for_time rounds emom],
+      secondary: %w[amrap tabata ladder hundred],
+      guidance: "Hyrox sessions must include running — it's the backbone of the race. For_time and rounds simulate race pacing. EMOMs build station endurance. Mix in AMRAPs, tabatas, ladders, and hundreds for training variety. Every session should have running intervals somewhere in the main set."
+    },
+    # ── General / fallback ──
+
+    "general-fitness" => {
+      primary: %w[rounds amrap emom for_time],
+      secondary: %w[tabata ladder hundred matrix mountain],
+      guidance: "General fitness sessions should be well-rounded. Use a mix of formats — rounds for strength work, AMRAPs and EMOMs for conditioning, and tabatas or hundreds as finishers. Variety keeps things interesting."
+    }
+  }.freeze
+
   API_URI = URI("https://api.anthropic.com/v1/messages").freeze
   MODEL   = "claude-haiku-4-5-20251001".freeze
 
@@ -274,20 +451,20 @@ class WorkoutLLMGenerator
     }
   }.freeze
 
-  def self.call(user:, duration_mins:, difficulty:, activity: nil, group_tag_name: nil, source_workout: nil, session_notes: nil, prompt_mode: :full, **_legacy)
-    new(user: user, activity: activity, group_tag_name: group_tag_name, duration_mins: duration_mins, difficulty: difficulty, source_workout: source_workout, session_notes: session_notes, prompt_mode: prompt_mode).call
+  def self.call(user:, duration_mins:, difficulty:, activity: nil, group_tag_name: nil, source_workout: nil, session_notes: nil, **_legacy)
+    new(user: user, activity: activity, group_tag_name: group_tag_name, duration_mins: duration_mins, difficulty: difficulty, source_workout: source_workout, session_notes: session_notes).call
   end
 
-  def initialize(user:, duration_mins:, difficulty:, activity: nil, group_tag_name: nil, source_workout: nil, session_notes: nil, prompt_mode: :full, **_legacy)
+  def initialize(user:, duration_mins:, difficulty:, activity: nil, group_tag_name: nil, source_workout: nil, session_notes: nil, **_legacy)
     @user           = user
     @activity       = activity.presence
-    @activity_slug  = @activity&.parameterize
+    raw_slug        = @activity&.parameterize
+    @activity_slug  = ACTIVITY_ALIASES[raw_slug] || raw_slug
     @group_tag_name = group_tag_name.presence
     @duration_mins  = duration_mins.to_i
     @difficulty     = difficulty
     @source_workout = source_workout
     @session_notes  = session_notes.presence
-    @prompt_mode    = prompt_mode.to_sym
   end
 
   # Returns a persisted Workout record. Used by remix/regenerate flows.
@@ -312,19 +489,9 @@ class WorkoutLLMGenerator
     if @source_workout
       prompt       = build_remix_prompt
       call_llm(prompt)
-    elsif @prompt_mode == :examples
+    else
       example_workouts = fetch_top_liked_examples
       prompt           = build_example_prompt(example_workouts)
-      workout_data     = call_llm(prompt)
-      workout_data     = validate_and_fix(workout_data)
-      workout_data     = collapse_duplicate_exercises(workout_data)
-      collapse_set_notation(workout_data)
-    else
-      context_workouts  = fetch_context
-      program_research  = research_unknown_program
-      recent_names      = fetch_recent_workout_names
-      recent_fm_formats = fetch_recent_fm_formats
-      prompt            = build_prompt(context_workouts, program_research, recent_names, recent_fm_formats)
       workout_data     = call_llm(prompt)
       workout_data     = validate_and_fix(workout_data)
       workout_data     = collapse_duplicate_exercises(workout_data)
@@ -413,18 +580,79 @@ class WorkoutLLMGenerator
       EXAMPLES
     end
 
-    sections << <<~RULES
-      Use the create_workout tool. Key guidelines:
-      - Give it a punchy, memorable name (2-4 words) — creative, not generic
-      - Use a variety of section formats (don't repeat the same format back-to-back)
-      - Include a warm-up and cool-down
-      - Be specific with reps, distances, and weights
-      - Rep counts should be clean numbers (even or multiples of 5)
-      - NEVER use numbered block prefixes like "Block 1:", "Block 2:" in section names — use creative, descriptive names instead
-      - Make it genuinely fun and challenging — the kind of workout people talk about afterwards
-    RULES
+    # Add race-accurate reference weights for event sessions (Hyrox, Deka, etc.)
+    if event_session?
+      ref_map = EVENT_REFERENCE[@activity_slug] || {}
+      unless ref_map.empty?
+        ref_lines = ref_map.map do |station, ref|
+          text = resolve_station_ref(ref)
+          "  #{station}: #{text}"
+        end
+        sections << <<~RACE_INFO
+          Competition reference weights/distances for #{main_name} (use these when prescribing event-specific exercises):
+          #{ref_lines.join("\n")}
+        RACE_INFO
+      end
+
+      # Training rep rule for event sessions
+      training_rule = training_rep_rule
+      sections << training_rule if training_rule
+    end
+
+    # Functional Muscle gets its full rule set — this is a specific class protocol
+    if @activity_slug == "functional-muscle"
+      fm_archetype = fm_session_archetype
+      sections << fm_archetype if fm_archetype
+
+      fm_rule = functional_muscle_rule
+      sections << fm_rule if fm_rule
+
+      recent_fm = fetch_recent_fm_formats
+      if recent_fm.present?
+        sections << <<~FM_RECENT
+          RECENT SESSIONS — the user's recent Functional Muscle sessions were:
+          #{recent_fm}
+          Use this to avoid repetition: pick different strength machines, a different Pilates 100 exercise, and vary the tabata compounds.
+        FM_RECENT
+      end
+    else
+      # Format affinity guidance for all other activity types
+      affinity = format_affinity_for_activity
+      if affinity
+        sections << <<~FORMAT
+          ## Format Selection for #{main_name}
+          #{affinity[:guidance]}
+          Primary formats: #{affinity[:primary].join(", ")}
+          Also available: #{affinity[:secondary].join(", ")}
+          Use at least 3 different formats across the session. No two adjacent sections should share the same format.
+        FORMAT
+      end
+
+      sections << <<~RULES
+        Use the create_workout tool. Key guidelines:
+        - Give it a punchy, memorable name (2-4 words) — creative, not generic
+        - Include a warm-up and cool-down
+        - Be specific with reps, distances, and weights
+        - Rep counts should be clean numbers (even or multiples of 5)
+        - NEVER use numbered block prefixes like "Block 1:", "Block 2:" in section names — use creative, descriptive names instead
+        - Make it genuinely fun and challenging — the kind of workout people talk about afterwards
+      RULES
+    end
+
+    # Session notes override everything
+    if @session_notes
+      sections << <<~NOTES
+        ## Session Notes (HIGHEST PRIORITY — override all other guidance):
+        #{@session_notes}
+      NOTES
+    end
 
     sections.join("\n")
+  end
+
+  # Returns the format affinity hash for the current activity, or a general fallback.
+  def format_affinity_for_activity
+    FORMAT_AFFINITY[@activity_slug || ""] || FORMAT_AFFINITY["general-fitness"]
   end
 
   # Returns the names of the user's 5 most recent workouts that share the current main tag.
@@ -1214,6 +1442,9 @@ class WorkoutLLMGenerator
     known_weights = format_known_weights
     sections << known_weights if known_weights.present?
 
+    speed_unit = @user.speed_unit.presence || "kmh"
+    sections << "Speed unit preference: #{speed_unit == "mph" ? "mph" : "km/h"} — use this unit for ALL treadmill speeds and running paces."
+
     return nil if sections.empty?
 
     "## Athlete Context\n#{sections.join("\n")}\n"
@@ -1309,8 +1540,13 @@ class WorkoutLLMGenerator
     end
 
     lines << "  Body weight: #{bw.round(1)}kg" if bw > 0
-    lines << "  CRITICAL: These are absolute maximums — the athlete cannot lift more than their 1RM. " \
-             "Scale all prescribed weights to the values above. A 120kg deadlift 1RM means 0 reps at 180kg."
+
+    # Only add the 1RM warning when we actually have lift data to reference
+    has_lift_data = %w[deadlift_1rm squat_1rm bench_1rm clean_jerk_1rm snatch_1rm].any? { |k| pbs[k] }
+    if has_lift_data
+      lines << "  CRITICAL: These are absolute maximums — the athlete cannot lift more than their 1RM. " \
+               "Scale all prescribed weights to the values above. A 120kg deadlift 1RM means 0 reps at 180kg."
+    end
 
     lines.join("\n")
   end
@@ -1445,7 +1681,9 @@ class WorkoutLLMGenerator
     if has_strength || bw > 0
       strength_guide = build_strength_weight_guide(pbs, bw)
       out << "Strength weight guide — HARD LIMITS, do not exceed these:\n#{strength_guide}"
-      out << "  NOTE: For Deka/Hyrox exercises, ALWAYS use the race-accurate reference weights (competition standards) instead of the strength guide above. The strength guide is for general gym lifts only."
+      if has_strength && event_session?
+        out << "  NOTE: For Deka/Hyrox exercises, ALWAYS use the race-accurate reference weights (competition standards) instead of the strength guide above. The strength guide is for general gym lifts only."
+      end
     end
 
     unless other_pb_lines.empty?

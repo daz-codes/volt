@@ -72,6 +72,8 @@ class WorkoutValidator
     fix_rotating_emom_reps(sections)
     check_cooldown(sections)
 
+    fix_warmup_format(sections)
+
     if @main_tag_slug == "functional-muscle"
       fix_fm_remove_activation(sections)
       fix_fm_circuit_emom_reps(sections)
@@ -713,5 +715,24 @@ class WorkoutValidator
     return if last.nil?
     return if last["name"]&.downcase&.match?(/cool|stretch|recovery/)
     @warnings << "No cool-down detected — last section is '#{last["name"]}'"
+  end
+
+  # Warm-up sections should always be format: straight with no rounds.
+  # The LLM sometimes wraps them in rounds from example patterns.
+  def fix_warmup_format(sections)
+    warmup = sections.first
+    return unless warmup
+    return unless warmup["name"].to_s.match?(/warm|jog|light/i)
+
+    if warmup["format"] != "straight"
+      old_format = warmup["format"]
+      warmup["format"] = "straight"
+      @fixes << "Warm-up format #{old_format} → straight"
+    end
+
+    if warmup["rounds"].to_i > 0
+      warmup.delete("rounds")
+      @fixes << "Warm-up: removed rounds"
+    end
   end
 end
