@@ -340,7 +340,7 @@ class WorkoutLLMGenerator
     "deka-fit" => {
       primary: %w[for_time rounds emom],
       secondary: %w[amrap tabata ladder matrix hundred],
-      guidance: "Deka Fit sessions should blend race-specific station work with conditioning variety. For_time and rounds simulate race pacing. EMOMs build station endurance. Mix in AMRAPs, tabatas, ladders, matrices, and hundreds to keep training varied."
+      guidance: "Deka Fit sessions should blend race-specific station work with conditioning variety. For_time and rounds simulate race pacing. EMOMs build station endurance. Mix in AMRAPs, tabatas, ladders, matrices, and hundreds to keep training varied. MANDATORY: Every Deka Fit session MUST include at least 2 running intervals (500m–1km each) placed between station blocks — running is half the race (5km across 10 × 500m runs)."
     },
     "deka-strong" => {
       primary: %w[for_time rounds emom],

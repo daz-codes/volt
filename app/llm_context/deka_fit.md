@@ -26,13 +26,15 @@ SkiErg, Rowing, Air Bike — short intervals (250–500m) or calorie targets (15
 **Core and stability**
 Plank Holds, Hollow Body Hold, GHD Sit-ups, Ab Wheel, Dead Bug, Med Ball Russian Twist
 
-**Running** (complements zone work)
-1km run intervals at race pace — use between station clusters to replicate Deka Fit transitions.
+**Running** (MANDATORY in every Deka Fit session)
+500m–1km run intervals at race pace. Deka Fit has a 500m run before every zone (5km total) — running is half the race and MUST appear in every training session. Place run intervals between station clusters to replicate race transitions.
 
 ## Session Structure
-Warm-up → Main set (anchor zones + toolkit) → Optional running intervals → Optional finisher → Cool-down stretches.
+Warm-up → Main set (anchor zones + run intervals + toolkit) → Cool-down stretches.
+
+**IMPORTANT:** Every Deka Fit session MUST include at least 2 running intervals (500m–1km each) placed between station work. This is non-negotiable — running is the backbone of the race format.
 
 ## Coaching Notes
 - Anchor zones should use race-accurate weights and distances from the prompt reference.
-- Running-to-station transitions matter — occasionally sequence a run interval directly into a zone exercise with no rest.
+- Running-to-station transitions matter — sequence a run interval directly into a zone exercise with no rest to replicate race conditions.
 - Grip endurance is a limiter for carries — sequence carry work after other pulling/grip movements to train fatigue tolerance.
