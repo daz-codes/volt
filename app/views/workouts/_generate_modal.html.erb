@@ -76,11 +76,13 @@
         <% end %>
       </div>
 
-      <%# Recent custom activities (excluding the 6 featured) %>
+      <%# Recent custom activities (excluding the featured tiles) %>
       <% recent_activity_ids = Current.user.workouts.where.not(activity_id: nil)
                                            .order(created_at: :desc)
                                            .select(:activity_id).distinct.limit(10).map(&:activity_id) %>
-      <% recent_activities = Activity.where(id: recent_activity_ids).where.not(name: featured_names).limit(3) %>
+      <% recent_activities = Activity.where(id: recent_activity_ids).where.not(name: featured_names)
+                                     .sort_by { |a| recent_activity_ids.index(a.id) || 999 }
+                                     .first(6) %>
       <% if recent_activities.any? %>
         <div class="flex flex-wrap gap-2 mt-3">
           <% recent_activities.each do |activity| %>
