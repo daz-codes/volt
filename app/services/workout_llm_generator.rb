@@ -272,7 +272,7 @@ class WorkoutLLMGenerator
 
         TREADMILL BLOCKS: Do NOT use rest_secs between rounds — instead include recovery jog exercises (easy pace) between sprint efforts. You never stop on a treadmill, you just slow down. Vary the treadmill style each block — pick from this menu:
         - Speed intervals: alternate sprint (30-60s) and recovery jog (20-30s)
-        - Incline ladder: start at 10% incline, drop 1% each round at steady pace (or reverse — climb from 1% to 10%)
+        - Incline ladder: start at 10% incline, drop 1% each round at steady pace (or reverse — climb from 1% to 10%). IMPORTANT: each rung MUST have a duration_s (e.g. 45-60s per rung) so the athlete knows how long to run
         - Fartlek: unstructured pace changes — fast/moderate/easy in varying durations (e.g. 45s fast, 30s easy, 60s moderate, 20s sprint)
         - Tempo block: sustained moderate-hard pace for 8-12 minutes with brief surges
         - Hill repeats: high incline (8-12%) sprints with flat recovery jogs

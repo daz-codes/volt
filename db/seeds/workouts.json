@@ -1043,11 +1043,12 @@
           "end": 1,
           "step": 1,
           "varies": "reps",
-          "notes": "Incline drops 1% each round at 11 km/h steady pace. Recovery jog 30s between.",
+          "notes": "Incline drops 1% each round at 11 km/h steady pace. Recovery jog 20s between rungs.",
           "exercises": [
             {
               "name": "Treadmill Incline Run",
-              "notes": "11 km/h, incline matches the rung number"
+              "duration_s": 45,
+              "notes": "45s per rung at 11 km/h, incline matches the rung number"
             }
           ]
         },
