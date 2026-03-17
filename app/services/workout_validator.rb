@@ -717,12 +717,12 @@ class WorkoutValidator
     @warnings << "No cool-down detected — last section is '#{last["name"]}'"
   end
 
-  # Warm-up sections should always be format: straight with no rounds.
-  # The LLM sometimes wraps them in rounds from example patterns.
+  # The first section is always the warm-up and should be format: straight
+  # with no rounds. The LLM sometimes wraps them in rounds from example
+  # patterns or gives them creative names that don't contain "warm-up".
   def fix_warmup_format(sections)
     warmup = sections.first
     return unless warmup
-    return unless warmup["name"].to_s.match?(/warm|jog|light/i)
 
     if warmup["format"] != "straight"
       old_format = warmup["format"]
