@@ -330,7 +330,7 @@ class WorkoutsController < ApplicationController
     activity      = params[:activity].presence || params[:custom_activity].presence
     session_notes = params[:session_notes].presence
     group_tag_name = params[:group_code].presence
-    prompt_mode   = params[:prompt_mode] == "examples" ? :examples : :full
+    prompt_mode   = :examples
 
     generator = WorkoutLLMGenerator.new(
       user:          Current.user,

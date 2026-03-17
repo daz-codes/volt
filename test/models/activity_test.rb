@@ -20,10 +20,14 @@ class ActivityTest < ActiveSupport::TestCase
   end
 
   test "DEFAULT_NAMES contains expected activities" do
-    assert_includes Activity::DEFAULT_NAMES, "General Fitness"
     assert_includes Activity::DEFAULT_NAMES, "Hyrox"
-    assert_includes Activity::DEFAULT_NAMES, "F45"
-    assert_equal 7, Activity::DEFAULT_NAMES.size
+    assert_includes Activity::DEFAULT_NAMES, "Alternator"
+    assert_includes Activity::DEFAULT_NAMES, "Tread & Shred"
+    assert_includes Activity::DEFAULT_NAMES, "Circuit Breaker"
+    assert_includes Activity::DEFAULT_NAMES, "Dynamo"
+    assert_includes Activity::DEFAULT_NAMES, "Transformer"
+    assert_includes Activity::DEFAULT_NAMES, "Ohm"
+    assert_equal 13, Activity::DEFAULT_NAMES.size
   end
 
   test "defaults scope returns only default activities" do

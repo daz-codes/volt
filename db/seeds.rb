@@ -399,6 +399,99 @@ else
       ],
       "goal" => "Move fast but keep form. This one sneaks up on you — the push-ups after jump squats will humble you."
     }
+  },
+  # ── Barry's ──────────────────────────────────────────────────────────
+  {
+    name:          "Double Red",
+    activity:      "Barry's",
+    duration_mins: 50,
+    difficulty:    "intermediate",
+    structure: {
+      "sections" => [
+        { "name" => "Warm-up Jog", "format" => "straight", "duration_mins" => 5,
+          "exercises" => [
+            { "name" => "Light Jog", "duration_s" => 300, "notes" => "Start at 10 km/h, build to 12 km/h over 5 minutes" }
+          ] },
+        { "name" => "Treadmill — Speed Intervals", "format" => "rounds", "rounds" => 6, "rest_secs" => 0,
+          "exercises" => [
+            { "name" => "Treadmill Sprint", "duration_s" => 45, "notes" => "15-16 km/h, 1% incline" },
+            { "name" => "Treadmill Recovery Jog", "duration_s" => 30, "notes" => "10 km/h, catch your breath" }
+          ] },
+        { "name" => "Floor — Upper Body Strength", "format" => "rounds", "rounds" => 3, "rest_secs" => 30,
+          "exercises" => [
+            { "name" => "Dumbbell Bench Press", "reps" => 12, "weight_kg" => 14 },
+            { "name" => "Dumbbell Bent-Over Row", "reps" => 12, "weight_kg" => 16 },
+            { "name" => "Push-ups", "reps" => 15 },
+            { "name" => "Dumbbell Lateral Raise", "reps" => 12, "weight_kg" => 6 }
+          ] },
+        { "name" => "Treadmill — Hill Climber", "format" => "rounds", "rounds" => 5, "rest_secs" => 0,
+          "exercises" => [
+            { "name" => "Treadmill Incline Run", "duration_s" => 60, "notes" => "12 km/h, 6-8% incline" },
+            { "name" => "Treadmill Flat Recovery", "duration_s" => 30, "notes" => "10 km/h, 0% incline" }
+          ] },
+        { "name" => "Floor — Lower Body Burn", "format" => "rounds", "rounds" => 3, "rest_secs" => 30,
+          "exercises" => [
+            { "name" => "Dumbbell Goblet Squat", "reps" => 15, "weight_kg" => 16 },
+            { "name" => "Dumbbell Reverse Lunge", "reps" => 12, "weight_kg" => 12, "notes" => "Per leg" },
+            { "name" => "Dumbbell Romanian Deadlift", "reps" => 12, "weight_kg" => 14 },
+            { "name" => "Jump Squats", "reps" => 10 }
+          ] },
+        { "name" => "Cool-down Stretch", "format" => "straight", "duration_mins" => 5,
+          "exercises" => [
+            { "name" => "Hip Flexor Stretch", "duration_s" => 45, "notes" => "Each side" },
+            { "name" => "Quad Stretch", "duration_s" => 45, "notes" => "Each side" },
+            { "name" => "Forward Fold", "duration_s" => 45 },
+            { "name" => "Chest Opener", "duration_s" => 45 }
+          ] }
+      ],
+      "goal" => "Alternate hard treadmill blocks with focused dumbbell circuits. Push the pace on the treads, control the weight on the floor."
+    }
+  },
+  {
+    name:          "Lights Out",
+    activity:      "Barry's",
+    duration_mins: 60,
+    difficulty:    "advanced",
+    structure: {
+      "sections" => [
+        { "name" => "Warm-up Jog", "format" => "straight", "duration_mins" => 5,
+          "exercises" => [
+            { "name" => "Light Jog", "duration_s" => 300, "notes" => "Start at 10 km/h, build to 13 km/h over 5 minutes" }
+          ] },
+        { "name" => "Treadmill — Ladder Sprints", "format" => "ladder", "start" => 30, "end" => 60, "step" => 10, "varies" => "reps",
+          "notes" => "Sprint duration increases each rung: 30s, 40s, 50s, 60s. Walk 30s between.",
+          "exercises" => [
+            { "name" => "Treadmill Sprint", "notes" => "16-18 km/h, 1% incline" }
+          ] },
+        { "name" => "Floor — Chest & Back", "format" => "rounds", "rounds" => 4, "rest_secs" => 30,
+          "exercises" => [
+            { "name" => "Dumbbell Bench Press", "reps" => 10, "weight_kg" => 18 },
+            { "name" => "Dumbbell Single-Arm Row", "reps" => 10, "weight_kg" => 20, "notes" => "Per arm" },
+            { "name" => "Dumbbell Chest Fly", "reps" => 12, "weight_kg" => 12 },
+            { "name" => "Renegade Row", "reps" => 10, "weight_kg" => 12 }
+          ] },
+        { "name" => "Treadmill — Incline Repeats", "format" => "rounds", "rounds" => 6, "rest_secs" => 0,
+          "exercises" => [
+            { "name" => "Treadmill Hill Sprint", "duration_s" => 50, "notes" => "13 km/h, 8-10% incline" },
+            { "name" => "Treadmill Flat Walk", "duration_s" => 25, "notes" => "5.5 km/h, 0% incline" }
+          ] },
+        { "name" => "Floor — Legs & Shoulders", "format" => "rounds", "rounds" => 4, "rest_secs" => 30,
+          "exercises" => [
+            { "name" => "Dumbbell Thrusters", "reps" => 10, "weight_kg" => 14 },
+            { "name" => "Dumbbell Walking Lunge", "reps" => 12, "weight_kg" => 12, "notes" => "Per leg" },
+            { "name" => "Dumbbell Shoulder Press", "reps" => 10, "weight_kg" => 12 },
+            { "name" => "Burpees", "reps" => 8 }
+          ] },
+        { "name" => "Cool-down Stretch", "format" => "straight", "duration_mins" => 5,
+          "exercises" => [
+            { "name" => "Hip Flexor Stretch", "duration_s" => 45, "notes" => "Each side" },
+            { "name" => "Pigeon Pose", "duration_s" => 45, "notes" => "Each side" },
+            { "name" => "Forward Fold", "duration_s" => 45 },
+            { "name" => "Lying Spinal Twist", "duration_s" => 45, "notes" => "Each side" }
+          ] }
+      ],
+      "goal" => "Sprint hard, lift heavy. The treadmill blocks get progressively harder — the floor work is your active recovery. Leave nothing in the tank."
+    }
   }
   ]
 end
