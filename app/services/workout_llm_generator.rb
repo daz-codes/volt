@@ -218,6 +218,8 @@ class WorkoutLLMGenerator
     "pilates"            => "ohm",
     "yoga"               => "ohm",
     "mobility"           => "ohm",
+    # Iron Engine (Kettlebell)
+    "iron-engine"        => "kettlebell",
     # Functional Muscle aliases
     "jog-sunday-workout" => "functional-muscle",
     "maximum-voltage"    => "functional-muscle",
