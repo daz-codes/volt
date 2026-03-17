@@ -330,7 +330,6 @@ class WorkoutsController < ApplicationController
     activity      = params[:activity].presence || params[:custom_activity].presence
     session_notes = params[:session_notes].presence
     group_tag_name = params[:group_code].presence
-    prompt_mode   = :examples
 
     generator = WorkoutLLMGenerator.new(
       user:          Current.user,
@@ -338,8 +337,7 @@ class WorkoutsController < ApplicationController
       session_notes: session_notes,
       group_tag_name: group_tag_name,
       duration_mins: params[:duration_mins],
-      difficulty:    params[:difficulty],
-      prompt_mode:   prompt_mode
+      difficulty:    params[:difficulty]
     )
     result = generator.generate
 

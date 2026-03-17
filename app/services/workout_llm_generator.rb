@@ -32,15 +32,8 @@ class WorkoutLLMGenerator
     "alternator"         => "functional.md",
     "ohm"                => "bodyweight.md",
     "transformer"        => "functional.md",
-    # Legacy slugs (resolved via ACTIVITY_ALIASES, but kept for tag-based lookups)
-    "functional-fitness" => "functional.md",
-    "hiit"               => "hiit.md",
-    "bodyweight"         => "bodyweight.md",
-    "meta-fit"           => "metafit.md",
     "metafit"            => "metafit.md",
     "metafit-bodyweight" => "metafit.md",
-    "barry-s-bootcamp"   => "barrys.md",
-    "barrys-bootcamp"    => "barrys.md",
     "barrys"             => "barrys.md",
     "f45"                => "f45.md"
   }.freeze
@@ -229,7 +222,6 @@ class WorkoutLLMGenerator
     "jog-sunday-workout" => "functional-muscle",
     "maximum-voltage"    => "functional-muscle",
     # General
-    "general-fitness"    => "general-fitness",
     "full-body-training" => "general-fitness"
   }.freeze
 
@@ -459,11 +451,11 @@ class WorkoutLLMGenerator
     }
   }.freeze
 
-  def self.call(user:, duration_mins:, difficulty:, activity: nil, group_tag_name: nil, source_workout: nil, session_notes: nil, prompt_mode: :full, **_legacy)
-    new(user: user, activity: activity, group_tag_name: group_tag_name, duration_mins: duration_mins, difficulty: difficulty, source_workout: source_workout, session_notes: session_notes, prompt_mode: prompt_mode).call
+  def self.call(user:, duration_mins:, difficulty:, activity: nil, group_tag_name: nil, source_workout: nil, session_notes: nil, **_legacy)
+    new(user: user, activity: activity, group_tag_name: group_tag_name, duration_mins: duration_mins, difficulty: difficulty, source_workout: source_workout, session_notes: session_notes).call
   end
 
-  def initialize(user:, duration_mins:, difficulty:, activity: nil, group_tag_name: nil, source_workout: nil, session_notes: nil, prompt_mode: :full, **_legacy)
+  def initialize(user:, duration_mins:, difficulty:, activity: nil, group_tag_name: nil, source_workout: nil, session_notes: nil, **_legacy)
     @user           = user
     @activity       = activity.presence
     raw_slug        = @activity&.parameterize
@@ -473,7 +465,6 @@ class WorkoutLLMGenerator
     @difficulty     = difficulty
     @source_workout = source_workout
     @session_notes  = session_notes.presence
-    @prompt_mode    = prompt_mode.to_sym
   end
 
   # Returns a persisted Workout record. Used by remix/regenerate flows.
@@ -498,19 +489,9 @@ class WorkoutLLMGenerator
     if @source_workout
       prompt       = build_remix_prompt
       call_llm(prompt)
-    elsif @prompt_mode == :examples
+    else
       example_workouts = fetch_top_liked_examples
       prompt           = build_example_prompt(example_workouts)
-      workout_data     = call_llm(prompt)
-      workout_data     = validate_and_fix(workout_data)
-      workout_data     = collapse_duplicate_exercises(workout_data)
-      collapse_set_notation(workout_data)
-    else
-      context_workouts  = fetch_context
-      program_research  = research_unknown_program
-      recent_names      = fetch_recent_workout_names
-      recent_fm_formats = fetch_recent_fm_formats
-      prompt            = build_prompt(context_workouts, program_research, recent_names, recent_fm_formats)
       workout_data     = call_llm(prompt)
       workout_data     = validate_and_fix(workout_data)
       workout_data     = collapse_duplicate_exercises(workout_data)

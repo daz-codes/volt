@@ -28,21 +28,22 @@
 
     <%# Session Type — featured tiles + recent pills + custom input %>
     <% featured_types = [
-      { name: "Functional Muscle", icon: "muscle",     desc: "Tabatas, strength & Bear Mountain" },
+      { name: "Maximum Voltage",   activity: "Functional Muscle", icon: "muscle",     desc: "The ultimate all-round workout" },
       { name: "Transformer",       icon: "strength",   desc: "Heavy lifts, structured sets" },
       { name: "Alternator",        icon: "alternator",  desc: "Machine cardio + floor strength" },
-      { name: "Circuit Breaker",   icon: "circuit",    desc: "Fast circuits, minimal rest" },
-      { name: "Dynamo",            icon: "dynamo",     desc: "HIIT, tabatas & bodyweight" },
+      { name: "Circuit Breaker",   icon: "circuit",    desc: "Fast, functional circuits with minimal rest" },
+      { name: "Dynamo",            icon: "dynamo",     desc: "High intensity workouts to build your engine" },
       { name: "Ohm",               icon: "ohm",        desc: "Yoga, pilates & mobility" }
     ] %>
-    <% featured_names = featured_types.map { |t| t[:name] } %>
+    <% featured_names = featured_types.map { |t| t[:activity] || t[:name] } %>
     <div class="mb-6">
       <p class="text-sm font-semibold text-gray-300 uppercase tracking-wide mb-3">Session Type</p>
       <div class="grid grid-cols-3 gap-2">
         <% featured_types.each do |ft| %>
           <label class="cursor-pointer">
-            <%= radio_button_tag "activity", ft[:name], false,
-                id: "activity_#{ft[:name].parameterize}",
+            <% activity_value = ft[:activity] || ft[:name] %>
+            <%= radio_button_tag "activity", activity_value, false,
+                id: "activity_#{activity_value.parameterize}",
                 class: "peer sr-only",
                 data: { generate_form_target: "pill", action: "change->generate-form#pillSelected" } %>
             <div class="border-2 border-zinc-600 rounded-xl p-3 peer-checked:border-lime-400 peer-checked:bg-lime-400/10 peer-checked:text-lime-400 text-gray-500 transition-all text-center">
@@ -119,6 +120,15 @@
       </div>
     </div>
 
+    <%# Session Notes — free text, anything goes %>
+    <div class="mb-6">
+      <p class="text-sm font-semibold text-gray-300 uppercase tracking-wide mb-1">Session Notes</p>
+      <p class="text-xs text-gray-500 mb-3">Injuries, equipment, intensity, focus — anything that should shape this session.</p>
+      <%= text_field_tag :session_notes, nil,
+          placeholder: "e.g. injured knee · hotel gym · zone 2 only · upper body · no running",
+          class: "w-full bg-zinc-800 border border-zinc-600 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-lime-400 transition-colors" %>
+    </div>
+
     <%# Difficulty %>
     <div class="mb-6">
       <p class="text-sm font-semibold text-gray-300 uppercase tracking-wide mb-3">Difficulty</p>
@@ -133,15 +143,6 @@
           </label>
         <% end %>
       </div>
-    </div>
-
-    <%# Session Notes — free text, anything goes %>
-    <div class="mb-6">
-      <p class="text-sm font-semibold text-gray-300 uppercase tracking-wide mb-1">Session Notes</p>
-      <p class="text-xs text-gray-500 mb-3">Injuries, equipment, intensity, focus — anything that should shape this session.</p>
-      <%= text_field_tag :session_notes, nil,
-          placeholder: "e.g. injured knee · hotel gym · zone 2 only · upper body · no running",
-          class: "w-full bg-zinc-800 border border-zinc-600 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-lime-400 transition-colors" %>
     </div>
 
     <%# Workout Tag — hidden until tagging UX is designed (see project memory) %>

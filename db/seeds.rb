@@ -403,7 +403,7 @@ else
   # ── Barry's ──────────────────────────────────────────────────────────
   {
     name:          "Double Red",
-    activity:      "Barry's",
+    activity:      "Tread & Shred",
     duration_mins: 50,
     difficulty:    "intermediate",
     structure: {
@@ -449,7 +449,7 @@ else
   },
   {
     name:          "Lights Out",
-    activity:      "Barry's",
+    activity:      "Tread & Shred",
     duration_mins: 60,
     difficulty:    "advanced",
     structure: {
