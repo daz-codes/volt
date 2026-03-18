@@ -221,7 +221,7 @@ class WorkoutLLMGenerator
     # Iron Engine (Kettlebell)
     "iron-engine"        => "kettlebell",
     # Functional Muscle aliases
-    "jog-sunday-workout" => "functional-muscle",
+    "sunday-workout"     => "functional-muscle",
     "maximum-voltage"    => "functional-muscle",
     # General
     "full-body-training" => "general-fitness"

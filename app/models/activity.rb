@@ -1,8 +1,9 @@
 class Activity < ApplicationRecord
   DEFAULT_NAMES = [
     "Alternator", "Tread & Shred", "Circuit Breaker", "Dynamo",
-    "Transformer", "Ohm", "CrossFit", "Kettlebell",
-    "Functional Muscle", "Hyrox", "Deka", "Deka Strong", "Deka Atlas"
+    "Transformer", "Ohm", "CrossFit", "Kettlebell", "Iron Engine",
+    "Functional Muscle", "Maximum Voltage", "Sunday Workout",
+    "Hyrox", "Deka", "Deka Strong", "Deka Atlas"
   ].freeze
 
   has_many :workouts
