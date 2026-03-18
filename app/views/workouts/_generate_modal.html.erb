@@ -40,7 +40,7 @@
     <% featured_names = featured_types.map { |t| t[:name] } + ["Functional Muscle", "Kettlebell"] %>
     <div class="mb-6">
       <p class="text-sm font-semibold text-gray-300 uppercase tracking-wide mb-3">Session Type</p>
-      <div class="grid grid-cols-4 gap-2">
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
         <% featured_types.each do |ft| %>
           <label class="cursor-pointer">
             <%= radio_button_tag "activity", ft[:name], false,
