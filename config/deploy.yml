@@ -35,7 +35,8 @@ env:
     - ANTHROPIC_API_KEY
     - GOOGLE_CLIENT_ID
     - GOOGLE_CLIENT_SECRET
-  clear: {}
+  clear:
+    SOLID_QUEUE_IN_PUMA: true
 
 # Aliases are triggered with "bin/kamal <alias>".
 aliases:
