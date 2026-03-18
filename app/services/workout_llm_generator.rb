@@ -333,39 +333,39 @@ class WorkoutLLMGenerator
     # ── Race/event types ──
 
     "deka" => {
-      primary: %w[for_time rounds emom],
-      secondary: %w[amrap tabata ladder matrix hundred],
+      primary: %w[ rounds emom amrap tabata ladder hundred],
+      secondary: %w[for_time matrix mountain],
       guidance: "Deka sessions should blend race-specific station work with conditioning variety. For_time and rounds simulate race pacing. EMOMs build station endurance. Mix in AMRAPs, tabatas, ladders, matrices, and hundreds to keep training sessions varied — not every session should be a race simulation. MANDATORY: Every Deka session MUST include at least 2 treadmill running intervals (500m–1km each) placed between station blocks — running is half the race. Use treadmill, not outdoor running."
     },
     "deka-fit" => {
-      primary: %w[for_time rounds emom],
-      secondary: %w[amrap tabata ladder matrix hundred],
+      primary: %w[ rounds emom amrap tabata ladder hundred],
+      secondary: %w[for_time matrix mountain],
       guidance: "Deka Fit sessions should blend race-specific station work with conditioning variety. For_time and rounds simulate race pacing. EMOMs build station endurance. Mix in AMRAPs, tabatas, ladders, matrices, and hundreds to keep training varied. MANDATORY: Every Deka Fit session MUST include at least 2 treadmill running intervals (500m–1km each) placed between station blocks — running is half the race (5km across 10 × 500m runs). Use treadmill, not outdoor running."
     },
     "deka-strong" => {
-      primary: %w[for_time rounds emom],
-      secondary: %w[amrap tabata ladder matrix hundred],
+      primary: %w[ rounds emom amrap tabata ladder hundred],
+      secondary: %w[for_time matrix mountain],
       guidance: "Deka Strong sessions should blend race-specific station work with conditioning variety. For_time and rounds simulate race pacing. EMOMs build station endurance. Mix in AMRAPs, tabatas, ladders, matrices, and hundreds to keep training varied."
     },
     "deka-mile" => {
-      primary: %w[for_time rounds emom],
-      secondary: %w[amrap tabata ladder matrix hundred],
+      primary: %w[ rounds emom amrap tabata ladder hundred],
+      secondary: %w[for_time matrix mountain],
       guidance: "Deka Mile sessions should blend race-specific station work with conditioning variety. For_time and rounds simulate race pacing. EMOMs build station endurance. Mix in AMRAPs, tabatas, ladders, matrices, and hundreds to keep training varied."
     },
     "deka-atlas" => {
-      primary: %w[for_time rounds emom],
-      secondary: %w[amrap tabata ladder matrix hundred],
+      primary: %w[ rounds emom amrap tabata ladder hundred],
+      secondary: %w[for_time matrix mountain],
       guidance: "Deka Atlas sessions should blend race-specific station work with conditioning variety. For_time and rounds simulate race pacing. EMOMs build station endurance. Mix in AMRAPs, tabatas, ladders, matrices, and hundreds to keep training varied."
     },
     "hyrox" => {
       primary: %w[for_time rounds emom],
-      secondary: %w[amrap tabata ladder hundred],
+      secondary: %w[amrap tabata ladder hundred mountain],
       guidance: "Hyrox sessions must include treadmill running — it's the backbone of the race (8 × 1km). For_time and rounds simulate race pacing. EMOMs build station endurance. Mix in AMRAPs, tabatas, ladders, and hundreds for training variety. MANDATORY: Every Hyrox session MUST include at least 2 treadmill running intervals (500m–1km each) placed between station blocks. Use treadmill, not outdoor running."
     },
     # ── General / fallback ──
 
     "general-fitness" => {
-      primary: %w[rounds amrap emom for_time],
+      primary: %w[rounds amrap emom for_time tabata],
       secondary: %w[tabata ladder hundred matrix mountain],
       guidance: "General fitness sessions should be well-rounded. Use a mix of formats — rounds for strength work, AMRAPs and EMOMs for conditioning, and tabatas or hundreds as finishers. Variety keeps things interesting."
     }
@@ -934,6 +934,8 @@ class WorkoutLLMGenerator
       "- ANCHOR MOVEMENTS: #{selected_stations.join(", ")} must be central to the main set. Complement them with toolkit exercises from the sport context — create a complete, varied workout, not a drill of the anchor movements repeated in every section."
     end
 
+    time_budget = build_time_budget
+
     sections << <<~RULES
       Use the create_workout tool. Requirements:
       #{race_sim_rule}
@@ -942,9 +944,10 @@ class WorkoutLLMGenerator
       #{structure_rule}
       #{station_rule}
       #{equipment_rule}
+      #{time_budget}
       - Warm-up: #{@duration_mins <= 30 ? "3 minutes (format: straight, duration_mins: 3). Keep it simple — 1 exercise, steady cardio only." : "5 minutes (format: straight, duration_mins: 5). Use the Warm-Up Approach specified above — follow it exactly."}
       - Cool-down: #{@duration_mins <= 30 ? "2 minutes (format: straight, duration_mins: 2). Keep it minimal — just a note to loosen off and stretch, no detailed holds." : "5 minutes (format: straight, duration_mins: 5). Use the Cool-Down Approach specified above. No reps or distances — hold times only, described in notes (e.g. \"30s each side\")."}.
-      - Main sets: do NOT set duration_mins on main sets — let the reps, rounds, and format define the work. Only amrap and emom sections need a duration_mins (their time cap). A short punchy finisher (e.g. Tabata, The Hundred/Centurion, for_time sprint) is a welcome extra at the end of the main work.
+      - Main sets: do NOT set duration_mins on main sets — let the reps, rounds, and format define the work. Only amrap and emom sections need a duration_mins (their time cap). A short punchy finisher (e.g. Tabata, The Hundred/Centurion, for_time sprint) is a welcome extra at the end of the main work — but ONLY if the time budget allows it.
       #{core_rule}
       #{training_rule}
       - Rep counts and calorie targets must be "clean" numbers — even numbers (2, 4, 6, 8, 10, 12, 16, 20…) or multiples of 5 (5, 10, 15, 20, 25…). Never use odd, awkward counts like 13, 7, 11, 17, or 19. When scaling from competition volumes, round to the nearest clean number.
@@ -961,9 +964,9 @@ class WorkoutLLMGenerator
           - circuit (emom_style: "circuit"): all exercises done together each minute, rest for the remainder. Max 2 exercises (3 only if all bodyweight). The work must be completable in ~40 seconds to leave rest. HARD REP CAP per minute: beginner ≤8, intermediate ≤12, advanced ≤16 total reps across all exercises. CARDIO MACHINE BAN: Do NOT include SkiErg, Rowing Machine, or Air/Assault Bike in a circuit EMOM — they take too long and leave no time for the other exercise(s). Use cardio machines in rotating EMOMs instead, where they get a full minute. E.g. "EMOM 10: 5 thrusters + 5 burpees". Set duration_mins for the total time cap.
           - rotating (emom_style: "rotating"): THE CONTINUOUS CIRCUIT — a different exercise each minute, cycling non-stop through the full duration. Each exercise fills its own minute — no reps, no calories, no distance, no duration on exercises. Do NOT add minute-assignment notes like "Min 1, 3, 5:" — exercises just rotate in order. Coaching notes only (e.g. "explosive hip extension"). duration_mins MUST be a multiple of the exercise count. *** FOR THIS SESSION use: #{cc_config} *** Mix one cardio machine + strength/skill movements + an active recovery or core exercise for best effect. The cardio minute is the "recovery" — keep it to a sustainable hard effort, not a sprint.
         * amrap — clock-driven main set. Complete as many rounds as possible in the time cap. Scores rounds+reps. Great for mixed-modal circuits, testing work capacity. E.g. "AMRAP 12: 10 KB swings + 8 box jumps + 6 burpees". Use freely — this is underused and highly effective.
-        * for_time — complete the prescribed work as fast as possible, record finishing time. When using multiple exercises, always set rounds: 3 minimum — a single pass through a mixed circuit is not a meaningful conditioning block. E.g. "3 rounds for time: 20 cal SkiErg + 20 KB swings + 12 box jumps", "5 rounds: 400m row + 10 burpees". Single-exercise for_time (e.g. 100 cal row for time) can use rounds: 1.
+        * for_time — race the clock with minimal or no rest between rounds. The goal is to complete all the work as fast as possible and record the finishing time. Always set rounds explicitly (3–5 rounds typical) so the athlete knows the full volume up front. Do NOT set rest_secs (or set it to 0) — the athlete chooses when to breathe. E.g. "5 rounds for time: 20 cal SkiErg + 20 KB swings + 12 box jumps", "3 rounds for time: 400m row + 10 burpees". Single-exercise for_time (e.g. 100 cal row for time) can use rounds: 1.
         * hundred — "The Centurion": exactly 100 reps of a single exercise, done for time. Set reps: 100 on the one exercise. A genuinely brutal and satisfying finisher for ANY session type — not just Functional Muscle. Works for: KB swings, wall balls, box jumps, push-ups, burpees, thrusters, air squats, sit-ups, rowing calories, ski calories. Use it as a punchy end to a main set when you want one last gut-check. Not just a gimmick — it's a legitimate conditioning tool.
-        * rounds — structured circuit with planned rest. Good for strength work, controlled conditioning with recovery between efforts. ALWAYS set rounds explicitly (e.g. rounds: 5 for 5×5 strength, rounds: 3 for a conditioning circuit) — never leave rounds absent or zero.
+        * rounds — structured circuit with planned rest between rounds. The athlete works, rests a set time, then goes again — pacing is controlled, not a race. Good for strength work and conditioning where recovery matters. ALWAYS set rounds explicitly (e.g. rounds: 5 for 5×5 strength, rounds: 3 for a conditioning circuit) and set rest_secs (30–90s) for recovery between rounds.
         * ladder / mountain — rep or distance progression each rung. Highly effective and underused — use it regularly, not just occasionally. ONLY when all exercises share the same metric AND the step size is realistic:
           - reps: step 1–5. E.g. start:10 end:1 step:1 = 10,9,8...1 reps.
           - calories: step 5–10. E.g. start:20 end:5 step:5 = 20,15,10,5 cal.
@@ -1117,6 +1120,40 @@ class WorkoutLLMGenerator
 
   def race_simulation?
     session_notes_flag?(/\brace[- ]?sim(ulation)?\b/i)
+  end
+
+  # Calculates a concrete time budget so the LLM doesn't overshoot session duration.
+  # Rule of thumb: ~1 main section per 15 min of working time, plus an optional
+  # quick finisher (tabata/hundred/abs) if there's 4+ min left over.
+  def build_time_budget
+    if @duration_mins <= 30
+      warmup_mins = 3
+      cooldown_mins = 2
+    else
+      warmup_mins = 5
+      cooldown_mins = 5
+    end
+    working_mins = @duration_mins - warmup_mins - cooldown_mins
+    main_sections = (working_mins / 15.0).floor
+    main_sections = [ main_sections, 1 ].max
+    leftover = working_mins - (main_sections * 15)
+    finisher = leftover >= 4 ? "Yes — a quick finisher (Tabata = 4 min, The Hundred ≈ 5 min, or a short abs set ≈ 3 min) fits in the remaining #{leftover} min." : "No finisher — there is not enough spare time."
+
+    <<~BUDGET
+      - *** TIME BUDGET (CRITICAL — sessions MUST fit within #{@duration_mins} minutes) ***
+        Warm-up: #{warmup_mins} min | Cool-down: #{cooldown_mins} min | Working time: #{working_mins} min.
+        At ~15 min per main section, you have room for #{main_sections} main section#{"s" if main_sections > 1}.
+        Finisher: #{finisher}
+        TIMING GUIDE per format (use these to stay on budget):
+        - AMRAP / EMOM: duration_mins IS the time — set it to fit the budget exactly.
+        - Tabata: always exactly 4 min.
+        - Rounds (3–5 exercises): ~3 min per round. 3 rounds ≈ 9 min, 4 rounds ≈ 12 min, 5 rounds ≈ 15 min.
+        - For Time (3–5 exercises): similar to rounds — 3 rounds ≈ 9 min, 4 rounds ≈ 12 min.
+        - Ladder/Mountain: count the rungs × ~1.5 min each (including rest). 6 rungs ≈ 9 min, 8 rungs ≈ 12 min, 10 rungs ≈ 15 min.
+        - Hundred: ~4–6 min depending on the exercise.
+        - Single-exercise strength (e.g. 5×5): ~2 min per set including rest. 5 sets ≈ 10 min.
+        Add up your sections — if the total exceeds #{working_mins} min, cut a section or reduce rounds/duration. NEVER exceed the budget.
+    BUDGET
   end
 
   def sport_purity_rule
@@ -1518,16 +1555,17 @@ class WorkoutLLMGenerator
                "20+ reps=#{(rm * 0.62).round}kg — NEVER exceed the 1RM of #{rm.round}kg"
     end
 
-    # Derive overhead press weights from bench 1RM (~65% of bench)
+    # Derive overhead press weights from bench 1RM (~50% of bench).
+    # Conservative: these are conditioning weights, not fresh max-effort sets.
     if pbs["bench_1rm"]
       bench = pbs["bench_1rm"].to_f
-      ohp = (bench * 0.65).round
-      lines << "  Push Press / Strict Press / Overhead Press (est. 1RM #{ohp}kg from bench): " \
-               "3–5 reps=#{(ohp * 0.87).round}kg | " \
-               "6–8 reps=#{(ohp * 0.80).round}kg | " \
-               "10 reps=#{(ohp * 0.75).round}kg | " \
-               "15 reps=#{(ohp * 0.68).round}kg | " \
-               "20+ reps=#{(ohp * 0.62).round}kg"
+      ohp = (bench * 0.50).round
+      lines << "  Push Press / Strict Press / Overhead Press (est. working max #{ohp}kg from bench — these are CONDITIONING weights, not powerlifting): " \
+               "3–5 reps=#{(ohp * 0.85).round}kg | " \
+               "6–8 reps=#{(ohp * 0.75).round}kg | " \
+               "10 reps=#{(ohp * 0.68).round}kg | " \
+               "15 reps=#{(ohp * 0.60).round}kg | " \
+               "20+ reps=#{(ohp * 0.55).round}kg"
       lines << "  DB Shoulder Press / DB Push Press: use roughly half the barbell overhead figure per hand"
     end
 

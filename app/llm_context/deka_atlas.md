@@ -12,7 +12,8 @@ The prompt specifies 2–4 Deka Atlas zones for this session. Build those into t
 These exercises develop the same physical qualities as the Deka Atlas zones. The toolkit is shoulder-and-carry focused.
 
 **Overhead strength and endurance**
-Push Press (22.5kg DB peak / 15kg foundation — same as DB Shoulder to Overhead Press zone weight), Push Jerk, Strict Press (DB or barbell), Landmine Press, Single-Arm DB Overhead Press, DB Arnold Press, Plate Press, Kettlebell Press, Overhead Hold (static, timed)
+DB Push Press, DB Strict Press, DB Arnold Press, Landmine Press, Single-Arm DB Overhead Press, Kettlebell Press, Overhead Hold (static, timed)
+⚠️ WEIGHT RULE: All overhead pressing in Deka Atlas training uses DUMBBELLS at race weight — 22.5kg per hand (peak) / 15kg per hand (foundation). Do NOT use barbell push press or barbell overhead press. The race zones are all dumbbell-based — train with the implements you'll race with.
 
 **Turkish Get-up and loaded movement**
 KB Turkish Get-up (TGU), Overhead Walking Lunge, Overhead Squat, Suitcase Carry, Overhead Carry (plate or KB)
@@ -40,3 +41,4 @@ Warm-up (shoulder mobility focus: band pull-aparts, shoulder circles, light over
 - Turkish Get-ups are a skill drill, not a conditioning movement — programme them early in the session when fresh.
 - Overhead holds (static) build the endurance needed for the Atlas Shoulder to Carry zone.
 - Heavy carries should be as heavy as possible while maintaining posture — grip failure before muscular failure is a warning sign.
+- ALL pressing is dumbbell-based at race weights. Never prescribe barbell push press — the event uses dumbbells exclusively. Ignore general strength benchmarks for overhead work; use race weights instead.
