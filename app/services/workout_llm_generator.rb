@@ -969,6 +969,7 @@ class WorkoutLLMGenerator
           - calories: step 5–10. E.g. start:20 end:5 step:5 = 20,15,10,5 cal.
           - distance_m: step 10–20. E.g. start:40 end:20 step:10 = 40m,30m,20m.
           - mountain: ascend then descend. E.g. start:5 peak:15 end:5 step:5 = 5,10,15,10,5 reps. Great for barbell strength work (Bears, cleans, deadlifts).
+          IMPORTANT: Always set rest_between_rungs (30–60s) on ladder/mountain sections — athletes need recovery between rungs.
           - INVALID: mixing reps, distance, and calorie exercises in the same ladder.
         * straight — fixed sets with rest. Use for simple warm-ups or isolated single exercises.
         * matrix — progressive exercise combinations. List 3–5 exercises in order. The section builds up then strips back: for 3 exercises: A, A+B, A+B+C, B+C, C. For 4: A, A+B, A+B+C, A+B+C+D, B+C+D, C+D, D. For 5: A, A+B, A+B+C, A+B+C+D, A+B+C+D+E, B+C+D+E, C+D+E, D+E, E. IMPORTANT: all exercises must use the same metric — either all reps (same count each) or all duration_s (same seconds each). Prefer duration_s: 30 for each exercise most of the time — this is the most common Metafit style. Set rest_secs for the rest between each combination (typically 30–60s).

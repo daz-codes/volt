@@ -70,6 +70,7 @@ class WorkoutValidator
     fix_tabata_exercise_names(sections)
     fix_tabata_exercise_notes(sections)
     fix_ladder_exercise_notes(sections)
+    fix_ladder_rest(sections)
     fix_redundant_section_notes(sections)
     fix_rotating_emom_reps(sections)
     check_cooldown(sections)
@@ -382,6 +383,17 @@ class WorkoutValidator
           @fixes << "Ladder '#{section["name"]}': stripped sequence from '#{exercise["name"]}' notes (shown in metric)"
         end
       end
+    end
+  end
+
+  # Ensure ladder/mountain sections have rest_between_rungs set.
+  # Athletes need recovery between rungs — default to 45s if missing.
+  def fix_ladder_rest(sections)
+    sections.each do |section|
+      next unless %w[ladder mountain].include?(section["format"])
+      next if section["rest_between_rungs"].to_i > 0
+      section["rest_between_rungs"] = 45
+      @fixes << "Ladder '#{section["name"]}': added rest_between_rungs: 45s"
     end
   end
 
