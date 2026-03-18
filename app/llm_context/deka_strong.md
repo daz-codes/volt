@@ -8,31 +8,35 @@ Build the qualities Deka Strong demands: strength and endurance across 10 back-t
 ## Anchor Movements
 The prompt specifies 2–4 Deka Strong zones for this session. Build those into the main set as the primary training focus. Race-accurate weights and distances for the selected zones are provided in the prompt.
 
-## Exercise Toolkit — Use These Freely
-These exercises develop the same physical qualities as the Deka Strong zones. No running — replace with machines for cardio intervals.
+## Primary Exercises — Competition Movements (use often)
+These are the actual Deka race zones. They should form the backbone of every session alongside the anchor movements.
+
+RAM Reverse Lunges, Row, Box Jump / Step Over, Med Ball Sit-up Throw, SkiErg, Farmer's Carry, Air Bike, Dead Ball Yoke Over, Sled Push / Pull, RAM Weighted Burpees
+
+## Secondary Exercises — Supplementary Training (use sparingly)
+These develop the same physical qualities but are NOT competition movements. Use 2–3 per session to add variety — they should never outnumber or overshadow the primary exercises. No running — use machines for cardio.
 
 **Legs and lower body**
-Goblet Squats, Leg Press, Bulgarian Split Squats, Split Squats (loaded), Jumping Lunges, Reverse Lunges (loaded), Step-ups (weighted box), Hip Thrust, KB Deadlift, Nordic Hamstring Curl
+Goblet Squats, Bulgarian Split Squats, Split Squats (loaded), Jumping Lunges, Reverse Lunges (loaded), Step-ups (weighted), Hip Thrust, KB Deadlift
 
 **Posterior chain and carries**
-KB Swings, Romanian Deadlift, Trap Bar Deadlift, Good Morning, Farmer's Carry, Sled Push, Sled Pull (belt)
+KB Swings, Romanian Deadlift, Good Morning, Sandbag Carry
 
 **Pulling and grip**
-DB Row, Cable Row, Ring Row, Lat Pulldown, Seated Cable Row, Band Pull-aparts, Dead Hangs, Plate Pinch
+DB Row, Cable Row, Ring Row, Lat Pulldown, Band Pull-aparts, Dead Hangs
 
 **Pushing and upper body**
-Push Press, DB Bench Press, Landmine Press, Push-ups, Ring Dips
-
-**Cardio machines** (no running — use machines instead)
-SkiErg, Rowing, Air Bike — short intervals for conditioning blocks within the session.
+Push Press, DB Bench Press, Landmine Press, Push-ups
 
 **Core and stability**
-Plank Holds, Hollow Body Hold, GHD Sit-ups, Ab Wheel, Pallof Press
+Plank Holds, Hollow Body Hold, Ab Wheel, Pallof Press
 
 ## Session Structure
-Warm-up → Main set (anchor zones + toolkit) → Optional machine conditioning block → Cool-down stretches.
+Warm-up → Main set (anchor zones + primary/secondary exercises) → Optional machine conditioning block → Cool-down stretches.
 
 ## Coaching Notes
 - NO running in Deka Strong sessions — replace any running impulses with machine intervals (SkiErg, row, or bike).
+- Prioritise primary (competition) exercises — they should make up the majority of the session.
+- Secondary exercises fill gaps and add variety but should not dominate.
 - Back-to-back station transitions with minimal rest simulate race conditions.
 - Grip fatigue accumulates quickly — sequence carries after other grip-heavy work to train fatigue tolerance.

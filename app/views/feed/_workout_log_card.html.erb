@@ -195,8 +195,15 @@
 
   <% else %>
     <div class="bg-zinc-900 border-t border-zinc-700 px-4 py-3">
-      <%# Row 1: social %>
-      <div class="flex items-center gap-3 mb-2.5">
+      <%# Row 1: action buttons — same layout as sections branch %>
+      <div class="flex items-center gap-2 mb-2.5">
+        <%= remix_btn %>
+        <%= save_btn %>
+        <%= share_btn %>
+        <%= do_this_btn %>
+      </div>
+      <%# Row 2: social %>
+      <div class="flex items-center gap-3">
         <%= render "workouts/like_button", workout: workout, liked: liked, like_count: like_count %>
         <%= link_to workout_log_comments_path(workout_log),
               data: { turbo_frame: dom_id(workout_log, :comments) },
@@ -215,12 +222,6 @@
             <span class="text-xs font-semibold">PDF</span>
           <% end %>
         <% end %>
-      </div>
-      <%# Row 2: action buttons %>
-      <div class="flex items-center gap-2">
-        <%= remix_btn %>
-        <%= save_btn %>
-        <%= do_this_btn %>
       </div>
     </div>
   <% end %>

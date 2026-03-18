@@ -8,33 +8,35 @@ Build the qualities Deka Fit demands: aerobic capacity under fatigue, running ec
 ## Anchor Movements
 The prompt specifies 2–4 Deka zones for this session. Build those into the main set as the primary training focus. Race-accurate weights and distances for the selected zones are provided in the prompt.
 
-## Exercise Toolkit — Use These Freely
-These exercises develop the same physical qualities as the Deka Fit zones. Mix them with anchor movements to create a complete, varied session.
+## Primary Exercises — Competition Movements (use often)
+These are the actual Deka Fit race zones plus treadmill running. They should form the backbone of every session alongside the anchor movements.
 
-**Legs and lower body endurance**
-Goblet Squats, Bulgarian Split Squats, Split Squats (loaded), Jumping Lunges, Step-ups (weighted box), Reverse Lunges (loaded), Leg Press, Walking Lunges, Hip Thrust, KB Deadlift
+RAM Reverse Lunges, Row (500m), Box Jump / Step Over, Med Ball Sit-up Throw, SkiErg, Farmer's Carry, Air Bike, Dead Ball Yoke Over, Sled Push / Pull, RAM Weighted Burpees, Treadmill Running (500m–1km intervals)
+
+## Secondary Exercises — Supplementary Training (use sparingly)
+These develop the same physical qualities but are NOT competition movements. Use 2–3 per session to add variety — they should never outnumber or overshadow the primary exercises.
+
+**Legs and lower body**
+Goblet Squats, Bulgarian Split Squats, Split Squats (loaded), Jumping Lunges, Reverse Lunges (loaded), Step-ups (weighted), Hip Thrust, KB Deadlift
 
 **Posterior chain and carries**
-KB Swings, Romanian Deadlift, Trap Bar Deadlift, Good Morning, Farmer's Carry (any implement), Sandbag Carry, Sled Drag (belt)
+KB Swings, Romanian Deadlift, Good Morning, Sandbag Carry, Sled Drag (belt)
 
-**Pulling and row muscles**
-DB Row, Cable Row, Ring Row, Lat Pulldown, Seated Cable Row, Band Pull-aparts
-
-**Cardio machines** (for intervals or warm-up pacing)
-SkiErg, Rowing, Air Bike — short intervals (250–500m) or calorie targets (15–25 cal)
+**Pulling and grip**
+DB Row, Cable Row, Ring Row, Lat Pulldown, Band Pull-aparts
 
 **Core and stability**
-Plank Holds, Hollow Body Hold, GHD Sit-ups, Ab Wheel, Dead Bug, Med Ball Russian Twist
-
-**Treadmill Running** (MANDATORY in every Deka Fit session)
-500m–1km treadmill run intervals at race pace. Deka Fit has a 500m run before every zone (5km total) — running is half the race and MUST appear in every training session. Use treadmill (not outdoor running). Place treadmill intervals between station clusters to replicate race transitions.
+Plank Holds, Hollow Body Hold, Ab Wheel, Dead Bug, Med Ball Russian Twist
 
 ## Session Structure
-Warm-up → Main set (anchor zones + treadmill run intervals + toolkit) → Cool-down stretches.
+Warm-up → Main set (anchor zones + treadmill run intervals + primary/secondary exercises) → Cool-down stretches.
 
-**IMPORTANT:** Every Deka Fit session MUST include at least 2 treadmill running intervals (500m–1km each) placed between station work. This is non-negotiable — running is the backbone of the race format. Always use treadmill.
+## MANDATORY Treadmill Running Component
+Every Deka Fit session MUST include at least 2 treadmill running intervals (500m–1km each) placed between station work. This is non-negotiable — running is the backbone of the race format (5km across 10 × 500m runs). Always use treadmill (not outdoor running). Place treadmill intervals between station clusters to replicate race transitions.
 
 ## Coaching Notes
 - Anchor zones should use race-accurate weights and distances from the prompt reference.
+- Prioritise primary (competition) exercises — they should make up the majority of the session.
+- Secondary exercises fill gaps and add variety but should not dominate.
 - Running-to-station transitions matter — sequence a run interval directly into a zone exercise with no rest to replicate race conditions.
 - Grip endurance is a limiter for carries — sequence carry work after other pulling/grip movements to train fatigue tolerance.

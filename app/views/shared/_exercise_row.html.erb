@@ -96,7 +96,18 @@
         <span class="text-xs font-bold text-sky-200"><%= exercise["weight_kg"] %>kg</span>
       <% end %>
       <% if !is_tabata && exercise["notes"].present? %>
-        <span class="text-gray-400 text-xs italic"><%= exercise["notes"] %></span>
+        <% breath_match = exercise["notes"].match(/\A(\d+\s+deep breaths(?:\s+each side)?)\b\.?\s*/i)
+           if breath_match
+             breath_text = breath_match[1]
+             remaining_notes = exercise["notes"].sub(/\A\d+\s+deep breaths(?:\s+each side)?\b\.?\s*/i, "").strip
+        %>
+          <span class="text-xs font-bold text-sky-200"><%= breath_text %></span>
+          <% if remaining_notes.present? %>
+            <span class="text-gray-400 text-xs italic"><%= remaining_notes %></span>
+          <% end %>
+        <% else %>
+          <span class="text-gray-400 text-xs italic"><%= exercise["notes"] %></span>
+        <% end %>
       <% end %>
     </div>
   <% end %>

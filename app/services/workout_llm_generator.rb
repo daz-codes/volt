@@ -31,7 +31,7 @@ class WorkoutLLMGenerator
     "tread-shred"        => "barrys.md",
     "alternator"         => "functional.md",
     "ohm"                => "bodyweight.md",
-    "transformer"        => "functional.md",
+    "transformer"        => "transformer.md",
     "metafit"            => "metafit.md",
     "metafit-bodyweight" => "metafit.md",
     "barrys"             => "barrys.md",
@@ -152,20 +152,13 @@ class WorkoutLLMGenerator
 
   COOLDOWN_OPTIONS = [
     { label: "Lower Body Focus",
-      duration_s: 45,
-      instruction: "Prioritise hips, hamstrings, quads. 5 stretches, each duration_s: 45. Choose from: hip flexor stretch (kneeling lunge), pigeon pose or figure-four glute stretch, seated forward fold, standing quad stretch, lying spinal twist, butterfly stretch." },
+      instruction: "Prioritise hips, hamstrings, quads. Choose from: hip flexor stretch (kneeling lunge), pigeon pose or figure-four glute stretch, seated forward fold, standing quad stretch, lying spinal twist, butterfly stretch." },
     { label: "Upper Body Focus",
-      duration_s: 45,
-      instruction: "Prioritise chest, shoulders, lats. 5 stretches, each duration_s: 45. Choose from: chest opener (hands clasped behind back), cross-body shoulder stretch, doorframe pec stretch, thread the needle, child's pose with arms extended, lat stretch in doorframe." },
+      instruction: "Prioritise chest, shoulders, lats. Choose from: chest opener (hands clasped behind back), cross-body shoulder stretch, thread the needle, child's pose with arms extended, lat stretch." },
     { label: "Full Body Stretch",
-      duration_s: 45,
-      instruction: "Cover all major muscle groups. 5 stretches, each duration_s: 45. Pick one lower body, one hip, one hamstring, one chest/shoulder, one spine. Choose from: hip flexor lunge, pigeon pose, forward fold, chest opener, thoracic rotation, lying spinal twist." },
-    { label: "Mobility Flow",
-      duration_s: 30,
-      instruction: "Movement-based cool-down rather than static holds. 5 exercises, each duration_s: 30. Use slow controlled reps described in notes: world's greatest stretch, deep squat to stand, cat-cow, thread the needle, downward dog with heel pedals." },
+      instruction: "Cover all major muscle groups. Pick one lower body, one hip, one hamstring, one chest/shoulder, one spine. Choose from: hip flexor lunge, pigeon pose, forward fold, chest opener, thoracic rotation, lying spinal twist." },
     { label: "Recovery Stretch",
-      duration_s: 60,
-      instruction: "Longer holds, very relaxed. 4 stretches only, each duration_s: 60. Choose from: child's pose, butterfly stretch, supine hamstring pull, lying spinal twist, pigeon pose. Fewer stretches held longer — designed to fully lower heart rate." }
+      instruction: "Longer, relaxed holds to fully lower heart rate. Choose from: child's pose, butterfly stretch, supine hamstring pull, lying spinal twist, pigeon pose." }
   ].freeze
 
   # Mixed appears 4× (40%), each pure style appears 2× (20%).
@@ -232,11 +225,11 @@ class WorkoutLLMGenerator
   FORMAT_AFFINITY = {
     # ── Volt-branded canonical types ──
 
-    # Transformer: structured strength sets and progressions
+    # Transformer: pure strength — no conditioning, no cardio, no metabolic work
     "transformer" => {
-      primary: %w[rounds straight ladder],
-      secondary: %w[mountain emom],
-      guidance: "Strength sessions should be built around structured sets with planned rest. Use rounds (5x5, 10x10, 3x8) as the backbone. Ladders and mountains work well for progressive overload. Avoid tabatas, AMRAPs, and high-rep conditioning circuits — this is about heavy, controlled lifting with adequate recovery."
+      primary: %w[rounds straight],
+      secondary: %w[],
+      guidance: "PURE STRENGTH SESSION — use ONLY rounds and straight formats. No AMRAP, EMOM, tabata, for_time, ladder, matrix, or hundred. No treadmill, no cardio machines, no metabolic finishers, no battle ropes, no medicine balls. Build around 3–5 heavy compound lifts (barbell and dumbbell) with structured sets and planned rest (60–120s). Rep ranges: 3–5 heavy, 6–10 hypertrophy, 10–15 accessories only. Every section should be 1–2 exercises with 4–5 rounds. This is a lifting session, not a circuit."
     },
     # Circuit Breaker: functional fitness / F45-style circuit training
     "circuit-breaker" => {
@@ -813,33 +806,34 @@ class WorkoutLLMGenerator
   end
 
   def build_warmup_cooldown
-    if @duration_mins < 30
-      return <<~WC
+    breaths = @duration_mins <= 30 ? 5 : 10
+
+    if @duration_mins <= 30
+      warmup_section = <<~W
         ## Warm-Up Approach: Light Cardio (3 min)
         Use a single exercise: 3 minutes of easy cardio (e.g. light jog, easy row, easy bike). format: straight, duration_mins: 3, one exercise with duration_s: 180.
-
-        ## Cool-Down Approach: Quick Stretch (2 min)
-        Use a single exercise: 2 minutes of loosening off and stretching. format: straight, duration_mins: 2, one exercise with duration_s: 120.
-      WC
-    end
-
-    # When session notes suggest limited equipment, skip warm-ups that reference machines
-    warmup_pool = if equipment_limited?
-      WARMUP_OPTIONS.select { |w| w[:label].match?(/Activation|Bodyweight|Band/) }
+      W
     else
-      WARMUP_OPTIONS
+      # When session notes suggest limited equipment, skip warm-ups that reference machines
+      warmup_pool = if equipment_limited?
+        WARMUP_OPTIONS.select { |w| w[:label].match?(/Activation|Bodyweight|Band/) }
+      else
+        WARMUP_OPTIONS
+      end
+      warmup_pool = WARMUP_OPTIONS if warmup_pool.empty? # safety fallback
+      warmup = warmup_pool.sample
+      warmup_section = <<~W
+        ## Warm-Up Approach: #{warmup[:label]}
+        #{warmup[:instruction]}
+      W
     end
-    warmup_pool = WARMUP_OPTIONS if warmup_pool.empty? # safety fallback
 
-    warmup   = warmup_pool.sample
     cooldown = COOLDOWN_OPTIONS.sample
     <<~WC
-      ## Warm-Up Approach: #{warmup[:label]}
-      #{warmup[:instruction]}
-
+      #{warmup_section}
       ## Cool-Down Approach: #{cooldown[:label]}
       #{cooldown[:instruction]}
-      IMPORTANT: every cool-down exercise must use duration_s: #{cooldown[:duration_s]} — all the same, no exceptions. Do not mix durations.
+      BREATHING RULE: Every cool-down exercise uses #{breaths} deep breaths (noted in each exercise's notes field, e.g. "#{breaths} deep breaths" or "#{breaths} deep breaths each side"). Do NOT use duration_s, reps, or time — breaths only. Keep it simple.
     WC
   end
 
@@ -946,7 +940,7 @@ class WorkoutLLMGenerator
       #{equipment_rule}
       #{time_budget}
       - Warm-up: #{@duration_mins <= 30 ? "3 minutes (format: straight, duration_mins: 3). Keep it simple — 1 exercise, steady cardio only." : "5 minutes (format: straight, duration_mins: 5). Use the Warm-Up Approach specified above — follow it exactly."}
-      - Cool-down: #{@duration_mins <= 30 ? "2 minutes (format: straight, duration_mins: 2). Keep it minimal — just a note to loosen off and stretch, no detailed holds." : "5 minutes (format: straight, duration_mins: 5). Use the Cool-Down Approach specified above. No reps or distances — hold times only, described in notes (e.g. \"30s each side\")."}.
+      - Cool-down (MANDATORY — EVERY workout must end with a cool-down as the FINAL section): #{@duration_mins <= 30 ? "2 minutes, format: straight, duration_mins: 2, 3–4 stretches." : "5 minutes, format: straight, duration_mins: 5, 4–6 stretches. Use the Cool-Down Approach specified above."} Name it something creative (e.g. "Wind Down", "Decompress", "Reset", "Melt"). Choose stretches that match what was trained — leg-heavy session = hip flexors, quads, hamstrings; upper body = chest opener, lats, shoulders. Vary the stretches each time — do NOT always default to child's pose. No reps, no duration_s — every exercise uses notes only: "#{@duration_mins <= 30 ? 5 : 10} deep breaths" or "#{@duration_mins <= 30 ? 5 : 10} deep breaths each side" for unilateral stretches.
       - Main sets: do NOT set duration_mins on main sets — let the reps, rounds, and format define the work. Only amrap and emom sections need a duration_mins (their time cap). A short punchy finisher (e.g. Tabata, The Hundred/Centurion, for_time sprint) is a welcome extra at the end of the main work — but ONLY if the time budget allows it.
       #{core_rule}
       #{training_rule}
@@ -954,7 +948,7 @@ class WorkoutLLMGenerator
       - Be specific with reps, distances, and weights
       - SECTION NAMES MUST BE ACCURATE: never mention an exercise or activity in a section name unless it actually appears in that section's exercises. "Run + Station" must contain running. "Sled Circuit" must contain sled work. If unsure, use a generic evocative name instead.
       - NEVER use numbered block prefixes like "Block 1:", "Block 2:", "Block 3:" or "Part 1:", "Part 2:" in section names. Use creative, descriptive names instead.
-      - Give it a punchy, memorable name — something a gym community would actually call it. Be creative and unpredictable: draw from feelings, imagery, places, days, animals, weather, mythology, slang — anything vivid. Actively vary the style each time (e.g. a cheeky two-worder one time, a dramatic three-worder the next, a dry/ironic name after that). BANNED WORDS — never use: Iron, Gauntlet, Grinder, Thunder, Beast, Inferno, Blitz, Crusher, Destroyer, Titan. #{recent_names.any? ? "The user's recent workout names are: #{recent_names.map { |n| "\"#{n}\"" }.join(", ")}. Do NOT reuse any word or theme from these." : ""}
+      - Give it a punchy, memorable name — something a gym community would actually call it. Be creative and unpredictable: draw from feelings, imagery, places, days, animals, weather, mythology, slang — anything vivid. Actively vary the style each time (e.g. a cheeky two-worder one time, a dramatic three-worder the next, a dry/ironic name after that). NEVER use the session type name as the workout name — "#{main_name}" is the TYPE of session, not the name. The name must be original and creative. BANNED WORDS in workout names: Voltage, Maximum, Transformer, Dynamo, Alternator, Circuit Breaker, Tread & Shred, Iron Engine, Ohm — these are session type brands, not workout names. #{recent_names.any? ? "The user's recent workout names are: #{recent_names.map { |n| "\"#{n}\"" }.join(", ")}. Do NOT reuse any word or theme from these." : ""}
       #{recent_fm_formats.present? ? "- RECENT SESSIONS — the user's recent Functional Muscle sessions were:\n#{recent_fm_formats.lines.map { |l| "        #{l}" }.join}\n      Use this to avoid repetition: pick different strength machines from the ones listed, pick a different Pilates 100 exercise, and vary the tabata compounds. Block types (12-min, ladder etc) can repeat if they fit — but machines and finisher should rotate." : ""}
       #{sport_rule}
       #{pace_limits}
@@ -974,11 +968,13 @@ class WorkoutLLMGenerator
           - mountain: ascend then descend. E.g. start:5 peak:15 end:5 step:5 = 5,10,15,10,5 reps. Great for barbell strength work (Bears, cleans, deadlifts).
           IMPORTANT: Always set rest_between_rungs (30–60s) on ladder/mountain sections — athletes need recovery between rungs.
           - INVALID: mixing reps, distance, and calorie exercises in the same ladder.
+          - INVALID: using ladder format for treadmill speed/pace changes — speeds are not reps or distances. For treadmill pace work (speed ladders, fartlek, pace builds), use format: straight with a single exercise. Protocol: 1 min at each speed + 1 min easy jog (10 km/h) between = 2 min per speed. E.g. 5 speeds (12→16 km/h) = 10 min total. Set duration_s for the total time. Notes: "12→16 km/h, 1 min at each speed with 1 min easy jog (10 km/h) between". ONE exercise only — do not add a separate recovery jog exercise.
         * straight — fixed sets with rest. Use for simple warm-ups or isolated single exercises.
         * matrix — progressive exercise combinations. List 3–5 exercises in order. The section builds up then strips back: for 3 exercises: A, A+B, A+B+C, B+C, C. For 4: A, A+B, A+B+C, A+B+C+D, B+C+D, C+D, D. For 5: A, A+B, A+B+C, A+B+C+D, A+B+C+D+E, B+C+D+E, C+D+E, D+E, E. IMPORTANT: all exercises must use the same metric — either all reps (same count each) or all duration_s (same seconds each). Prefer duration_s: 30 for each exercise most of the time — this is the most common Metafit style. Set rest_secs for the rest between each combination (typically 30–60s).
       - EXERCISE VARIETY ACROSS THE SESSION: never use the same base movement in more than one section. If Back Squat appears in one section, do NOT use Back Squat (or Paused Back Squat, or any squat variation on a barbell) in another section — pick a different compound like Front Squat, Deadlift, or Overhead Press instead. The whole session should expose the athlete to as many different movement patterns as possible.
       - NEVER repeat the same exercise as multiple entries in the exercises array. This is a critical mistake — do NOT list "Bench Press (Set 1)", "Bench Press (Set 2)", "Bench Press (Set 3)" as three separate entries. Instead, use a single entry and set rounds: 3 on the section. Notes like "Set 1:", "Set 2:" in exercise notes are forbidden.
       - SINGLE-EXERCISE SECTIONS are valid and often better than circuits, especially for strength and power work. A section with just one exercise is perfectly correct: e.g. '5 × 5 Deadlift (heavy)', 'EMOM 10: 8 Thrusters', '4 × 8 Romanian Deadlift'. Do not feel obligated to bundle every movement into a multi-exercise circuit. HOWEVER: a single-exercise section MUST always use multiple sets (rounds: 3 minimum) or a timed modality (emom/amrap/for_time). BANNED: a section with 1 exercise and rounds ≤ 2 (or no rounds). This is always wrong. Every section must represent real training volume, not a single isolated set.
+      - NEVER describe the real programming in the notes instead of the structure. If you want 5 × 60m sprints, set rounds: 5 and distance_m: 60 — do NOT set rounds: 1 with "5 × 60m sprints" in the notes. The notes field is for coaching cues only (e.g. "explosive hip drive", "keep chest tall"). The structure (rounds, reps, distance_m, duration_s, rest_secs) must always reflect the actual work.
       - NEVER list the same exercise more than once in a section's exercises array. If you need the same movement repeated (e.g. 5 × 25m Freestyle), use rounds: 5 with a single exercise entry — not 5 separate entries. Duplicate entries are always wrong.
       #{@session_notes.present? ? "\n      *** REMINDER — ATHLETE'S SESSION FOCUS (HIGHEST PRIORITY): \"#{@session_notes}\" — The exercises you select MUST clearly reflect this focus. If the athlete asked for sleds, use sleds heavily. If they asked for strength, programme heavy barbell work. Do not just change the name — change the actual exercises. ***" : ""}
       RULES

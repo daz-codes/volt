@@ -61,6 +61,7 @@ class WorkoutValidator
       end
     end
 
+    fix_notes_as_programming(sections)
     fix_for_time_rounds(sections)
     fix_alternating_reps(sections)
     fix_clean_rep_counts(sections)
@@ -70,9 +71,13 @@ class WorkoutValidator
     fix_tabata_exercise_names(sections)
     fix_tabata_exercise_notes(sections)
     fix_ladder_exercise_notes(sections)
+    fix_treadmill_ladder(sections)
     fix_ladder_rest(sections)
+    fix_atlas_barbell_press(sections)
+    fix_overhead_weight_cap(sections)
     fix_redundant_section_notes(sections)
     fix_rotating_emom_reps(sections)
+    fix_emom_notes(sections)
     check_cooldown(sections)
 
     fix_warmup_format(sections)
@@ -275,9 +280,66 @@ class WorkoutValidator
         section["rounds"] = 3
         @fixes << "'#{section["name"]}': rounds missing → set to 3"
       elsif rounds.to_i < 3 && Array(section["exercises"]).size == 1
+        # Single exercise with duration_s is a timed block (e.g. 8-min treadmill fartlek) — 1 round is fine
+        ex = Array(section["exercises"]).first
+        next if ex && (ex["duration_s"].to_i > 0 || section["duration_mins"].to_i > 0)
         # Single exercise, too few rounds
         section["rounds"] = 3
         @fixes << "'#{section["name"]}': single exercise with #{rounds} round(s) → 3 rounds"
+      end
+    end
+  end
+
+  # Detect programming hidden in exercise notes (e.g. "5 × 60m sprints with 45s rest")
+  # and promote it to actual structure fields (rounds, distance_m, rest_secs).
+  HIDDEN_ROUNDS_PATTERN = /(\d+)\s*[×x]\s*(\d+)\s*(m|reps?|cal)\b/i.freeze
+  HIDDEN_REST_PATTERN   = /(\d+)\s*(?:s|sec|seconds?)\s*(?:rest|recovery|easy|glid)/i.freeze
+
+  def fix_notes_as_programming(sections)
+    sections.each do |section|
+      next if section["name"].to_s.match?(WARMUP_COOLDOWN_PATTERN)
+      Array(section["exercises"]).each do |ex|
+        notes = ex["notes"].to_s
+        next unless notes.match?(HIDDEN_ROUNDS_PATTERN)
+
+        match = notes.match(HIDDEN_ROUNDS_PATTERN)
+        rounds_val = match[1].to_i
+        metric_val = match[2].to_i
+        metric_unit = match[3].downcase
+
+        next unless rounds_val >= 2 && metric_val > 0
+
+        # Promote to structure
+        if section["rounds"].to_i <= 2
+          section["rounds"] = rounds_val
+          @fixes << "'#{section["name"]}': extracted #{rounds_val} rounds from notes"
+        end
+
+        case metric_unit
+        when "m"
+          ex["distance_m"] = metric_val unless ex["distance_m"].to_i > 0
+        when /rep/
+          ex["reps"] = metric_val unless ex["reps"].to_i > 0
+        when "cal"
+          ex["calories"] = metric_val unless ex["calories"].to_i > 0
+        end
+
+        # Extract rest if present
+        if (rest_match = notes.match(HIDDEN_REST_PATTERN))
+          rest_val = rest_match[1].to_i
+          section["rest_secs"] = rest_val if rest_val > 0 && section["rest_secs"].to_i.zero?
+          @fixes << "'#{section["name"]}': extracted #{rest_val}s rest from notes"
+        end
+
+        # Clean the programming out of notes, keep any remaining coaching cues
+        cleaned = notes.sub(/\d+\s*[×x]\s*\d+\s*(?:m|reps?|cal)\b[^.]*(?:\.\s*)?/i, "").strip
+        cleaned = cleaned.sub(/\d+\s*(?:s|sec|seconds?)\s*(?:rest|recovery|easy|glid)\w*[^.]*(?:\.\s*)?/i, "").strip
+        if cleaned.empty?
+          ex.delete("notes")
+        else
+          ex["notes"] = cleaned
+        end
+        @fixes << "'#{section["name"]}': promoted hidden programming from '#{ex["name"]}' notes to structure"
       end
     end
   end
@@ -397,6 +459,113 @@ class WorkoutValidator
     end
   end
 
+  # Treadmill exercises in ladder format are always wrong — speeds/inclines aren't reps.
+  # Convert to straight format: one exercise, total duration, protocol in notes.
+  # Detects incline vs speed based on section name and ladder values.
+  TREADMILL_PATTERN = /treadmill|pace.?build|fartlek|speed.?ladder|climb|jog|run|incline/i.freeze
+  INCLINE_PATTERN   = /incline|climb|hill|gradient/i.freeze
+
+  def fix_treadmill_ladder(sections)
+    sections.each do |section|
+      next unless %w[ladder mountain].include?(section["format"])
+      exercises = Array(section["exercises"])
+      # Match on section name OR exercise names
+      is_treadmill = section["name"].to_s.match?(TREADMILL_PATTERN) ||
+                     exercises.any? { |ex| ex["name"].to_s.match?(TREADMILL_PATTERN) }
+      next unless is_treadmill
+
+      # Build progression from ladder values
+      sv = section["start"].to_f; ev = section["end"].to_f
+      step = [section["step"].to_f, 1.0].max
+
+      vals = []
+      if section["format"] == "ladder"
+        v = sv; if sv <= ev; while v <= ev + 0.001; vals << v; v += step; end; else; while v >= ev - 0.001; vals << v; v -= step; end; end
+      else
+        pk = section["peak"].to_f
+        v = sv; while v <= pk + 0.001; vals << v; v += step; end
+        v = pk - step; while v >= ev - 0.001; vals << v; v -= step; end
+      end
+      vals = vals.map { |v| v == v.to_i ? v.to_i : v }
+
+      # Detect incline vs speed from section/exercise names and values
+      is_incline = section["name"].to_s.match?(INCLINE_PATTERN) ||
+                   exercises.any? { |ex| ex["name"].to_s.match?(INCLINE_PATTERN) } ||
+                   vals.max <= 15 # speeds below 15 km/h with a start of 1-3 are almost certainly inclines
+
+      # Sanity check: if "speed" values start below 5, they're probably incline %
+      is_incline = true if vals.first <= 3
+
+      if is_incline
+        # Incline ladder: 1 min at each incline %, 1 min flat between
+        # Cap incline at sensible max (15%) and ensure values make sense as %
+        vals = vals.map { |v| [v, 15].min }
+        total_mins = vals.size * 2
+        total_secs = total_mins * 60
+        pace_note = "#{vals.first}%→#{vals.last}% incline, 1 min at each grade (keep pace at 10–12 km/h) with 1 min flat (0%) between"
+        ex_name = "Treadmill Incline Ladder"
+      else
+        # Speed ladder: 1 min at each speed + 1 min easy jog between
+        total_mins = vals.size * 2
+        total_secs = total_mins * 60
+        pace_note = "#{vals.first}→#{vals.last} km/h, 1 min at each speed with 1 min easy jog (10 km/h) between"
+        ex_name = "Treadmill Speed Ladder"
+      end
+
+      # Convert to straight format with a single exercise
+      section["format"] = "straight"
+      section["duration_mins"] = total_mins
+      section.delete("rounds")
+      %w[start end step peak varies rest_between_rungs rest_secs].each { |k| section.delete(k) }
+
+      # Collapse to one exercise — drop recovery jog entries
+      first_ex = exercises.first
+      first_ex["name"] = ex_name
+      first_ex["duration_s"] = total_secs
+      %w[reps calories distance_m weight_kg].each { |k| first_ex.delete(k) }
+      first_ex["notes"] = pace_note
+      section["exercises"] = [first_ex]
+
+      label = is_incline ? "incline" : "speed"
+      @fixes << "'#{section["name"]}': treadmill #{label} ladder → straight (#{vals.join(" → ")}#{is_incline ? "%" : " km/h"}, #{total_mins} min)"
+    end
+  end
+
+  # Deka Atlas: convert barbell push press → DB push press at race weights.
+  # The event is entirely dumbbell-based — barbell push press is never correct.
+  ATLAS_DB_PRESS_WEIGHT = { "advanced" => 22.5, "intermediate" => 17.5, "beginner" => 15 }.freeze
+
+  def fix_atlas_barbell_press(sections)
+    return unless @main_tag_slug == "deka-atlas"
+    sections.each do |section|
+      Array(section["exercises"]).each do |ex|
+        next unless ex["name"].to_s.match?(/push\s*press.*barbell|barbell.*push\s*press|strict\s*press.*barbell|barbell.*strict\s*press|overhead\s*press.*barbell|barbell.*overhead\s*press/i)
+        old_name = ex["name"]
+        ex["name"] = "DB Push Press"
+        ex["weight_kg"] = ATLAS_DB_PRESS_WEIGHT.fetch(@difficulty, 22.5)
+        @fixes << "'#{section["name"]}': #{old_name} → DB Push Press at #{ex["weight_kg"]}kg (Deka Atlas = dumbbells only)"
+      end
+    end
+  end
+
+  # Cap overhead pressing weights at sensible maximums for conditioning work.
+  # Even strong athletes shouldn't be push pressing 60kg+ in a circuit context.
+  OHP_WEIGHT_CAPS = { "beginner" => 30, "intermediate" => 40, "advanced" => 50 }.freeze
+  OHP_PATTERN = /push\s*press|strict\s*press|overhead\s*press|shoulder\s*press|jerk/i.freeze
+
+  def fix_overhead_weight_cap(sections)
+    cap = OHP_WEIGHT_CAPS.fetch(@difficulty, 50)
+    sections.each do |section|
+      Array(section["exercises"]).each do |ex|
+        next unless ex["name"].to_s.match?(OHP_PATTERN)
+        next unless ex["weight_kg"].to_f > cap
+        old_weight = ex["weight_kg"]
+        ex["weight_kg"] = cap
+        @fixes << "'#{section["name"]}': #{ex["name"]} #{old_weight}kg → #{cap}kg (overhead cap for #{@difficulty})"
+      end
+    end
+  end
+
   # Strip leading "N sets of N reps at Xkg" sentences from section notes — that
   # information is already shown structurally in the section header and exercise rows.
   REDUNDANT_NOTE_PATTERN = /\A\d+\s+sets?\s+of\s+\d+[^.]*\.\s*/i
@@ -465,7 +634,10 @@ class WorkoutValidator
   # Rotating EMOM exercises fill the full minute — reps, calories, distance, and duration
   # must not be set. Also strip notes that are just minute-assignment labels (e.g. "Min 1, 3, 5:").
   # These are redundant — exercises just rotate in order; the athlete doesn't need minute callouts.
-  ROTATING_EMOM_NOTE_JUNK = /\A\s*min(?:ute)?s?\s+[\d,\s]+[:–\-]/i.freeze
+  EMOM_NOTE_JUNK = /\A\s*min(?:ute)?s?\s+[\d,\s]+[:–\-]/i.freeze
+  # Notes that just restate the EMOM structure: "12 cal row, remaining time rest. Repeat × 10 minutes"
+  EMOM_RESTATE_PATTERN = /\d+\s*(?:cal|reps?|m)\s+\w+[^.]*remain\w*\s+time\s+rest[^.]*\.?\s*/i.freeze
+  EMOM_REPEAT_PATTERN  = /repeat\s*[×x]\s*\d+\s*min\w*\.?\s*/i.freeze
 
   def fix_rotating_emom_reps(sections)
     sections.each do |section|
@@ -481,8 +653,8 @@ class WorkoutValidator
         end
 
         # Strip minute-assignment prefix from notes (e.g. "Min 1, 3, 5, 7: explosive snatch")
-        if ex["notes"].to_s.match?(ROTATING_EMOM_NOTE_JUNK)
-          cleaned = ex["notes"].sub(ROTATING_EMOM_NOTE_JUNK, "").strip.sub(/\A[,.\s]+/, "").strip
+        if ex["notes"].to_s.match?(EMOM_NOTE_JUNK)
+          cleaned = ex["notes"].sub(EMOM_NOTE_JUNK, "").strip.sub(/\A[,.\s]+/, "").strip
           if cleaned.present?
             ex["notes"] = cleaned
           else
@@ -493,6 +665,32 @@ class WorkoutValidator
 
         next if stripped.empty?
         @fixes << "Continuous Circuit '#{section["name"]}': cleaned '#{ex["name"]}' (#{stripped.join(", ")})"
+      end
+    end
+  end
+
+  # Strip notes on ANY EMOM exercise that just restate the structure
+  # (e.g. "Minute 1: 12 cal row, remaining time rest. Repeat × 10 minutes")
+  def fix_emom_notes(sections)
+    sections.each do |section|
+      next unless section["format"] == "emom"
+      Array(section["exercises"]).each do |ex|
+        notes = ex["notes"].to_s
+        next if notes.blank?
+
+        cleaned = notes
+        cleaned = cleaned.sub(EMOM_NOTE_JUNK, "").strip.sub(/\A[,.\s]+/, "").strip
+        cleaned = cleaned.sub(EMOM_RESTATE_PATTERN, "").strip
+        cleaned = cleaned.sub(EMOM_REPEAT_PATTERN, "").strip
+
+        next if cleaned == notes
+
+        if cleaned.empty?
+          ex.delete("notes")
+        else
+          ex["notes"] = cleaned
+        end
+        @fixes << "EMOM '#{section["name"]}': stripped restated programming from '#{ex["name"]}' notes"
       end
     end
   end
@@ -763,21 +961,101 @@ class WorkoutValidator
     @fixes << "FM: moved abs section(s) to just before cool-down"
   end
 
-  # Warn if the last section doesn't look like a cool-down.
+  # Ensure a cool-down exists as the LAST section. If a cooldown-like section
+  # exists mid-workout, leave it (it's a mid-session refresher) but still ensure
+  # the final section is a proper cooldown. If none exists anywhere, inject one.
+  COOLDOWN_NAME_PATTERN = /\bcool|stretch|recovery\s*flow|wind.?down/i.freeze
+
   def check_cooldown(sections)
+    breaths = @duration_mins <= 30 ? 5 : 10
+
     last = sections.last
-    return if last.nil?
-    return if last["name"]&.downcase&.match?(/cool|stretch|recovery/)
-    @warnings << "No cool-down detected — last section is '#{last["name"]}'"
+    last_is_cooldown = last && last["name"].to_s.match?(COOLDOWN_NAME_PATTERN)
+
+    unless last_is_cooldown
+      # Inject a varied cooldown — rotate through different options
+      cooldown_options = [
+        [
+          { "name" => "Pigeon Pose", "notes" => "#{breaths} deep breaths each side" },
+          { "name" => "Seated Forward Fold", "notes" => "#{breaths} deep breaths" },
+          { "name" => "Lying Spinal Twist", "notes" => "#{breaths} deep breaths each side" }
+        ],
+        [
+          { "name" => "World's Greatest Stretch", "notes" => "#{breaths} deep breaths each side" },
+          { "name" => "Child's Pose with Arms Extended", "notes" => "#{breaths} deep breaths" },
+          { "name" => "Supine Figure-Four Stretch", "notes" => "#{breaths} deep breaths each side" }
+        ],
+        [
+          { "name" => "Downward Dog", "notes" => "#{breaths} deep breaths" },
+          { "name" => "Low Lunge Hip Opener", "notes" => "#{breaths} deep breaths each side" },
+          { "name" => "Butterfly Stretch", "notes" => "#{breaths} deep breaths" }
+        ],
+        [
+          { "name" => "Cat-Cow", "notes" => "#{breaths} deep breaths" },
+          { "name" => "Thread the Needle", "notes" => "#{breaths} deep breaths each side" },
+          { "name" => "Standing Quad Stretch", "notes" => "#{breaths} deep breaths each side" }
+        ]
+      ]
+
+      cooldown = {
+        "name" => "Cool-Down",
+        "format" => "straight",
+        "duration_mins" => @duration_mins <= 30 ? 2 : 5,
+        "exercises" => cooldown_options.sample
+      }
+      sections << cooldown
+      @fixes << "Injected missing cool-down as final section"
+      return
+    end
+
+    Array(last["exercises"]).each do |ex|
+      stripped = []
+      %w[duration_s reps calories distance_m].each do |field|
+        if ex[field].present?
+          stripped << field
+          ex.delete(field)
+        end
+      end
+      @fixes << "Cool-down: stripped #{stripped.join(", ")} from '#{ex["name"]}'" if stripped.any?
+
+      # Ensure notes contain breaths instruction
+      notes = ex["notes"].to_s
+      unless notes.match?(/breath/i)
+        breath_note = "#{breaths} deep breaths"
+        if ex["name"].to_s.match?(/twist|pigeon|flexor|lunge.*stretch|thread|side|single|one.?leg|scorpion/i)
+          breath_note = "#{breaths} deep breaths each side"
+        end
+        ex["notes"] = [breath_note, notes.presence].compact.join(". ")
+        @fixes << "Cool-down: added '#{breath_note}' to '#{ex["name"]}'"
+      end
+    end
   end
 
   # The first section is always the warm-up and should be format: straight
-  # with no rounds. The LLM sometimes wraps them in rounds from example
-  # patterns or gives them creative names that don't contain "warm-up".
+  # with no rounds. If the LLM omitted a warm-up entirely, inject a default.
   def fix_warmup_format(sections)
-    warmup = sections.first
-    return unless warmup
+    first = sections.first
+    has_warmup = first && (
+      first["name"].to_s.downcase.match?(/warm|primer|activation|ignition|mobilit/) ||
+      sections.index(first) == 0 && first["format"] == "straight" && first["duration_mins"].to_i <= 5
+    )
 
+    unless has_warmup
+      warmup_mins = @duration_mins <= 30 ? 3 : 5
+      warmup = {
+        "name" => "Warm-Up",
+        "format" => "straight",
+        "duration_mins" => warmup_mins,
+        "exercises" => [
+          { "name" => "Easy Row", "duration_s" => warmup_mins * 60, "notes" => "Light pace, get the blood flowing" }
+        ]
+      }
+      sections.unshift(warmup)
+      @fixes << "Injected missing warm-up section (#{warmup_mins} min)"
+      return
+    end
+
+    warmup = sections.first
     if warmup["format"] != "straight"
       old_format = warmup["format"]
       warmup["format"] = "straight"
