@@ -128,7 +128,8 @@
           metric = if e["duration_s"].to_i > 0
             "#{e["duration_s"].to_i}s "
           elsif e["reps"].to_i > 0
-            "#{e["reps"]} "
+            unit = e["name"].to_s.match?(/carry|walk|drag|push|pull|prowler|sled|shuttle/i) ? "m" : ""
+            "#{e["reps"]}#{unit} "
           end
           "#{metric}#{e["name"]}"
         }.join(" + ") %></p>
