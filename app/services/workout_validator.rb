@@ -69,6 +69,7 @@ class WorkoutValidator
     fix_tabata_exercise_metrics(sections)
     fix_tabata_exercise_names(sections)
     fix_tabata_exercise_notes(sections)
+    fix_ladder_exercise_notes(sections)
     fix_redundant_section_notes(sections)
     fix_rotating_emom_reps(sections)
     check_cooldown(sections)
@@ -356,6 +357,30 @@ class WorkoutValidator
         next if cleaned == original || cleaned.empty?
         exercise["name"] = cleaned
         @fixes << "Tabata '#{section["name"]}': cleaned exercise name '#{original}' → '#{cleaned}'"
+      end
+    end
+  end
+
+  # Strip ladder/mountain sequence descriptions from exercise notes.
+  # The UI now shows "40 cal → 45 cal → 50 cal → 55 cal → 60 cal" in the metric
+  # line, so notes like "40 cal → 45 cal → 50 cal..." are redundant.
+  def fix_ladder_exercise_notes(sections)
+    sections.each do |section|
+      next unless %w[ladder mountain].include?(section["format"])
+      Array(section["exercises"]).each do |exercise|
+        next unless exercise["notes"].present?
+        # Strip leading sequence patterns like "40 cal → 45 cal → 50 cal..."
+        cleaned = exercise["notes"]
+          .sub(/\A\d+\s*(?:cal|reps|kg|m|s)\s*(?:→|->|,)\s*(?:\d+\s*(?:cal|reps|kg|m|s)\s*(?:→|->|,)\s*)*\d+\s*(?:cal|reps|kg|m|s)\.?\s*/i, "")
+          .strip
+        if cleaned != exercise["notes"]
+          if cleaned.empty?
+            exercise.delete("notes")
+          else
+            exercise["notes"] = cleaned
+          end
+          @fixes << "Ladder '#{section["name"]}': stripped sequence from '#{exercise["name"]}' notes (shown in metric)"
+        end
       end
     end
   end
