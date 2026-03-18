@@ -12,7 +12,7 @@ The prompt specifies 2–4 Deka zones for this session. Build those into the mai
 These exercises develop the same physical qualities as the Deka Fit zones. Mix them with anchor movements to create a complete, varied session.
 
 **Legs and lower body endurance**
-Goblet Squats, Bulgarian Split Squats, Step-ups (weighted box), Reverse Lunges (loaded), Leg Press, Walking Lunges, Hip Thrust, KB Deadlift
+Goblet Squats, Bulgarian Split Squats, Split Squats (loaded), Jumping Lunges, Step-ups (weighted box), Reverse Lunges (loaded), Leg Press, Walking Lunges, Hip Thrust, KB Deadlift
 
 **Posterior chain and carries**
 KB Swings, Romanian Deadlift, Trap Bar Deadlift, Good Morning, Farmer's Carry (any implement), Sandbag Carry, Sled Drag (belt)

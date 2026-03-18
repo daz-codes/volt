@@ -15,7 +15,7 @@ These exercises develop the same physical qualities as the Deka Mile zones. Runn
 1km intervals at mile pace or slightly faster — use between station clusters to replicate race transitions. Treadmill or outdoor.
 
 **Legs and running support**
-Goblet Squats, Reverse Lunges (loaded), Bulgarian Split Squats, Leg Press, Step-ups, Hip Thrust, Nordic Hamstring Curl, Calf Raises (weighted)
+Goblet Squats, Reverse Lunges (loaded), Bulgarian Split Squats, Split Squats (loaded), Jumping Lunges, Leg Press, Step-ups, Hip Thrust, Nordic Hamstring Curl, Calf Raises (weighted)
 
 **Posterior chain and carries**
 KB Swings, Romanian Deadlift, Good Morning, Farmer's Carry, Sled Push / Pull

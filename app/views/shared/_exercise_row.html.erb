@@ -66,7 +66,7 @@
       <% elsif !is_tabata && exercise["calories"] %>
         <span class="text-xs font-bold text-sky-200"><%= exercise["calories"] %> cal</span>
       <% elsif !is_tabata && exercise["reps"] %>
-        <% reps_unit = exercise["name"].to_s.match?(/carry|walk|drag|push|pull|prowler|sled|shuttle/i) ? "m" : "reps" %>
+        <% reps_unit = exercise["name"].to_s.match?(/carry|sled|prowler|drag|shuttle|farmer/i) ? "m" : "reps" %>
         <span class="text-xs font-bold text-sky-200"><%= exercise["reps"] %> <%= reps_unit %></span>
       <% elsif exercise["duration_s"] %>
         <% ds = exercise["duration_s"].to_i; dm = ds / 60; dr = ds % 60 %>

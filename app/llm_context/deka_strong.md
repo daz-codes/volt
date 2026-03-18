@@ -12,7 +12,7 @@ The prompt specifies 2–4 Deka Strong zones for this session. Build those into 
 These exercises develop the same physical qualities as the Deka Strong zones. No running — replace with machines for cardio intervals.
 
 **Legs and lower body**
-Goblet Squats, Leg Press, Bulgarian Split Squats, Reverse Lunges (loaded), Step-ups (weighted box), Hip Thrust, KB Deadlift, Nordic Hamstring Curl
+Goblet Squats, Leg Press, Bulgarian Split Squats, Split Squats (loaded), Jumping Lunges, Reverse Lunges (loaded), Step-ups (weighted box), Hip Thrust, KB Deadlift, Nordic Hamstring Curl
 
 **Posterior chain and carries**
 KB Swings, Romanian Deadlift, Trap Bar Deadlift, Good Morning, Farmer's Carry, Sled Push, Sled Pull (belt)

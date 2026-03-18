@@ -21,7 +21,7 @@ Push Press, Landmine Press, DB Bench Press, Ring Dips, Push-ups, Dips, Battle Ro
 Ring Rows, Lat Pulldown, DB Row, Cable Row, TRX Row, Band Pull-apart, Dead Hangs, Farmer's Carry (any implement — KB, DB, hex bar)
 
 **Legs and lunges**
-Goblet Squat, Bulgarian Split Squat, Reverse Lunges (loaded), DB Step-up, Leg Press, Walking Lunges
+Goblet Squat, Bulgarian Split Squat, Split Squats (loaded), Jumping Lunges, Reverse Lunges (loaded), DB Step-up, Leg Press, Walking Lunges
 
 **Cardio machines** (use for intervals or warm-up pacing, not to pad distance)
 Assault Bike, SkiErg, Rowing — short intervals (250–500m) or calorie targets
