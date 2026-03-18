@@ -92,7 +92,9 @@
       "Bash(PATH=\"/opt/homebrew/bin:/Users/daz/.local/share/mise/installs/ruby/3.4.7/bin:$PATH\" bin/rails db:seed:*)",
       "Bash(xxd:*)",
       "Bash(printf \\\\n:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(PATH=\"/opt/homebrew/bin:/Users/daz/.local/share/mise/installs/ruby/3.4.7/bin:$PATH\" bundle list:*)",
+      "Bash(PATH=\"/opt/homebrew/bin:/Users/daz/.local/share/mise/installs/ruby/3.4.7/bin:$PATH\" gem search:*)"
     ]
   }
 }
