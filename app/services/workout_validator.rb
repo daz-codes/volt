@@ -67,6 +67,7 @@ class WorkoutValidator
     fix_rest_secs(sections)
     fix_single_set_sections(sections)
     fix_tabata_exercise_metrics(sections)
+    fix_tabata_exercise_names(sections)
     fix_tabata_exercise_notes(sections)
     fix_redundant_section_notes(sections)
     fix_rotating_emom_reps(sections)
@@ -339,6 +340,22 @@ class WorkoutValidator
         next unless exercise["notes"].present?
         exercise.delete("notes")
         @fixes << "'#{exercise["name"]}' in '#{section["name"]}': removed tabata interval notes (shown in UI)"
+      end
+    end
+  end
+
+  # Strip parenthetical timing/format info from tabata exercise names.
+  # The LLM sometimes generates names like "Air Squat (tabata—20s work)" or
+  # "Push-up (20s on/10s off)" — the UI already shows tabata timing.
+  def fix_tabata_exercise_names(sections)
+    sections.each do |section|
+      next unless section["format"] == "tabata"
+      Array(section["exercises"]).each do |exercise|
+        original = exercise["name"].to_s
+        cleaned = original.sub(/\s*\(.*(?:tabata|20s|10s|work|rest|on.off|burst).*\)\s*$/i, "").strip
+        next if cleaned == original || cleaned.empty?
+        exercise["name"] = cleaned
+        @fixes << "Tabata '#{section["name"]}': cleaned exercise name '#{original}' → '#{cleaned}'"
       end
     end
   end
