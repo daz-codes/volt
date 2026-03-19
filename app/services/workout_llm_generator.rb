@@ -807,20 +807,28 @@ class WorkoutLLMGenerator
 
   def build_warmup_cooldown
     breaths = @duration_mins <= 30 ? 5 : 10
+    bodyweight_only = @activity_slug.in?(BODYWEIGHT_ONLY_SLUGS)
 
     if @duration_mins <= 30
-      warmup_section = <<~W
-        ## Warm-Up Approach: Light Cardio (3 min)
-        Use a single exercise: 3 minutes of easy cardio (e.g. light jog, easy row, easy bike). format: straight, duration_mins: 3, one exercise with duration_s: 180.
-      W
+      if bodyweight_only
+        warmup_section = <<~W
+          ## Warm-Up Approach: Bodyweight Activation (3 min)
+          3–4 bodyweight activation exercises, 30–45 seconds each (duration_s: 30 or 45). No equipment, no cardio machines. Choose movements that prime the whole body: e.g. jumping jacks, inchworms, leg swings, arm circles, air squats. format: straight, duration_mins: 3.
+        W
+      else
+        warmup_section = <<~W
+          ## Warm-Up Approach: Light Cardio (3 min)
+          Use a single exercise: 3 minutes of easy cardio (e.g. light jog, easy row, easy bike). format: straight, duration_mins: 3, one exercise with duration_s: 180.
+        W
+      end
     else
-      # When session notes suggest limited equipment, skip warm-ups that reference machines
-      warmup_pool = if equipment_limited?
-        WARMUP_OPTIONS.select { |w| w[:label].match?(/Activation|Bodyweight|Band/) }
+      # Filter warm-ups for bodyweight-only or equipment-limited sessions
+      warmup_pool = if bodyweight_only || equipment_limited?
+        WARMUP_OPTIONS.select { |w| w[:label].match?(/Activation|Bodyweight/) }
       else
         WARMUP_OPTIONS
       end
-      warmup_pool = WARMUP_OPTIONS if warmup_pool.empty? # safety fallback
+      warmup_pool = WARMUP_OPTIONS.select { |w| w[:label].match?(/Activation|Bodyweight/) } if warmup_pool.empty?
       warmup = warmup_pool.sample
       warmup_section = <<~W
         ## Warm-Up Approach: #{warmup[:label]}
@@ -1430,8 +1438,13 @@ class WorkoutLLMGenerator
       RULE
     end
 
+    bodyweight_only = @activity_slug.in?(BODYWEIGHT_ONLY_SLUGS)
     warmup = if @duration_mins <= 30
-      "- Warm-up: 3 minutes (format: straight, duration_mins: 3). Keep it simple — 1 exercise, steady cardio only."
+      if bodyweight_only
+        "- Warm-up: 3 minutes (format: straight, duration_mins: 3). Keep it simple — 3–4 bodyweight activation exercises (e.g. jumping jacks, arm circles, leg swings, air squats). No equipment, no cardio machines."
+      else
+        "- Warm-up: 3 minutes (format: straight, duration_mins: 3). Keep it simple — 1 exercise, steady cardio only."
+      end
     else
       "- Warm-up: 5 minutes (format: straight, duration_mins: 5). Use the Warm-Up Approach specified above — follow it exactly."
     end

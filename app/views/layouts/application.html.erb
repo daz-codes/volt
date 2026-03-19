@@ -101,15 +101,17 @@
             <% end %>
           </div>
 
-          <%# Mobile: burger (next to logo) + generate + notification %>
-          <div class="md:hidden flex items-center gap-3 ml-auto">
+          <%# Mobile: generate workout (centred) + notification + burger (right) %>
+          <div class="md:hidden flex-1 flex justify-center">
             <button type="button" data-action="click->dialog#open"
                     class="flex items-center gap-1.5 bg-lime-400 hover:bg-lime-300 active:opacity-90 text-zinc-950 text-xs font-black px-3 py-2 rounded-xl transition-colors cursor-pointer uppercase tracking-wide">
               <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
               </svg>
-              Generate
+              Generate Workout
             </button>
+          </div>
+          <div class="md:hidden flex items-center gap-3 flex-shrink-0">
             <%= link_to notifications_path, class: "relative flex items-center text-gray-400 hover:text-white transition-colors" do %>
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
@@ -134,13 +136,6 @@
         <%# Mobile dropdown menu %>
         <div data-mobile-nav-target="menu" class="hidden md:hidden border-t border-zinc-700 bg-zinc-900">
           <div class="container mx-auto px-5 py-4 space-y-1">
-            <button type="button" data-action="click->dialog#open click->mobile-nav#toggle"
-                    class="flex items-center gap-3 w-full text-left bg-volt hover:bg-volt/80 text-zinc-950 font-black px-4 py-3 rounded-xl text-sm transition-colors uppercase tracking-wide cursor-pointer">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-              </svg>
-              Generate Workout
-            </button>
             <button type="button" onclick="document.getElementById('build_choice_dialog').showModal()"
                     data-action="click->mobile-nav#toggle"
                     class="flex items-center gap-3 w-full border border-zinc-600 hover:border-gray-500 text-gray-300 hover:text-white font-bold px-4 py-3 rounded-xl text-sm transition-colors cursor-pointer">
@@ -162,18 +157,6 @@
                   <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
                 </svg>
                 My Log
-              <% end %>
-              <%= link_to notifications_path, class: "flex items-center gap-3 text-gray-300 hover:text-white font-medium px-4 py-3 rounded-xl hover:bg-zinc-700/50 transition-colors" do %>
-                <div class="relative">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-                  </svg>
-                </div>
-                <span class="flex-1">Notifications</span>
-                <% unread_menu = Current.user.unread_notification_count %>
-                <% if unread_menu > 0 %>
-                  <span class="bg-volt text-zinc-950 text-[9px] font-black rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1 leading-none"><%= unread_menu > 9 ? "9+" : unread_menu %></span>
-                <% end %>
               <% end %>
               <div class="border-t border-zinc-700 my-2"></div>
               <%= link_to profile_path, class: "flex items-center gap-3 text-gray-300 hover:text-white font-medium px-4 py-3 rounded-xl hover:bg-zinc-700/50 transition-colors" do %>
@@ -202,7 +185,7 @@
         <div class="container mx-auto"><%= message %></div>
       </div>
     <% end %>
-    <main class="container mx-auto px-5 py-8">
+    <main class="container mx-auto <%= content_for?(:full_bleed) ? 'px-0 sm:px-5' : 'px-5' %> py-8">
       <%= yield %>
     </main>
 
