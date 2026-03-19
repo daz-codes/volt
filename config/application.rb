@@ -16,12 +16,7 @@ module Volt
     # Common ones are `templates`, `generators`, or `middleware`, for example.
     config.autoload_lib(ignore: %w[assets tasks])
 
-    # Configuration for the application, engines, and railties goes here.
-    #
-    # These settings can be overridden in specific environments using the files
-    # in config/environments, which are processed later.
-    #
-    # config.time_zone = "Central Time (US & Canada)"
-    # config.eager_load_paths << Rails.root.join("extras")
+    # Point Solid Queue at the dedicated queue database
+    config.solid_queue.connects_to = { database: { writing: :queue, reading: :queue } }
   end
 end

@@ -237,17 +237,17 @@ class WorkoutLLMGenerator
       secondary: %w[ladder matrix hundred mountain],
       guidance: "Circuit Breaker sessions thrive on variety and continuous effort. AMRAPs, EMOMs, tabatas, and for_time efforts should be the main formats. Mix in rounds for structured strength work. Ladders, matrices, and hundreds make great finishers. Keep rest short and transitions fast. Think F45 / functional fitness group training — high energy, fast transitions, minimal rest."
     },
-    # Dynamo: HIIT / MetaFit — high-intensity bodyweight and light equipment
+    # Dynamo: HIIT / MetaFit — bodyweight-only high intensity
     "dynamo" => {
       primary: %w[tabata amrap matrix for_time rounds emom],
       secondary: %w[hundred ladder],
-      guidance: "Dynamo sessions are all about work-to-rest ratios and intensity. Tabatas, AMRAPs, matrices, and for_time sprints are the bread and butter. Hundreds make excellent finishers. Keep everything fast-paced with short rest windows. Bodyweight and light equipment — the intensity comes from speed and volume, not load."
+      guidance: "Dynamo sessions are bodyweight-only HIIT — NO equipment whatsoever (no dumbbells, no kettlebells, no barbells, no cardio machines, no rowers, no bikes). The intensity comes from speed, plyometrics, and volume, not load. Tabatas, AMRAPs, matrices, and for_time sprints are the bread and butter. Hundreds make excellent finishers. Keep everything fast-paced with short rest windows."
     },
     # Ohm: pilates / yoga / mobility — controlled movement
     "ohm" => {
       primary: %w[straight rounds],
       secondary: %w[hundred],
-      guidance: "Ohm sessions should flow through controlled movements with precise form. Use straight format for most sections. Rounds work for repeated sequences. The hundred is a classic Pilates exercise. Keep everything slow, controlled, and focused on core stability, flexibility, and mobility. No high-intensity cardio — this is mindful movement."
+      guidance: "Ohm sessions should flow through controlled movements with precise form. Use straight format for most sections. Rounds work for repeated sequences. The hundred is a classic Pilates exercise. Keep everything slow, controlled, and focused on core stability, flexibility, and mobility. No high-intensity cardio — this is mindful movement. Open with an activation/flow section (gentle mobilisation, not cardio machines) and close with an ease-down/savasana section. NO separate warm-up or cool-down — the activation and ease-down ARE the bookends."
     },
     # Tread & Shred: treadmill + floor alternating (Barry's-style)
     "tread-shred" => {
@@ -858,7 +858,7 @@ class WorkoutLLMGenerator
 
     sections << build_difficulty_guidance
     sections << build_training_emphasis
-    sections << build_warmup_cooldown
+    sections << build_warmup_cooldown unless skip_warmup_cooldown?
 
     if selected_stations
       # For event sessions with a station selection: inject the training philosophy
@@ -899,19 +899,21 @@ class WorkoutLLMGenerator
     if @session_notes.present?
       sections << <<~NOTES
         ## *** ATHLETE'S SESSION FOCUS — HIGHEST PRIORITY ***
-        The athlete has specifically requested the following focus for this session. This is the SINGLE MOST IMPORTANT instruction — it overrides default exercise selection and must be clearly reflected in the exercises chosen:
+        The athlete has specifically requested the following for this session. This OVERRIDES all other exercise selection rules. Read it carefully and apply it literally:
 
         >>> #{@session_notes} <<<
 
-        How to apply this:
-        - "strength" / "hypertrophy" / "bodybuilding" / "muscle" → STRUCTURE LIKE A REAL LIFTING SESSION: single-exercise sections with heavy sets (e.g. "5×5 Back Squat", "4×8 Romanian Deadlift", "4×10 Overhead Press") are the backbone. Each major compound gets its OWN section with proper rounds and rest (60-90s). Accessory work can be supersets (2 exercises) but NOT large circuits. Minimise cardio — warm-up and cool-down only. At least 70% of the session should be dedicated barbell/dumbbell strength work.
-        - "cardio focus" → sustained machine work (rower, ski, bike, run), high-rep bodyweight, AMRAPs, EMOMs. At least 60% of the session should be cardio/conditioning.
-        - "sled focus" → sled pushes, sled pulls, sled drags must appear in MULTIPLE sections, as the primary exercises. The sled is the centrepiece — not a single appearance.
-        - "burpee focus" → burpee variations (burpee box jump-overs, burpee pull-ups, bar-facing burpees, lateral burpees) must appear in MULTIPLE sections. Build the session around burpees.
-        - Any specific exercise/equipment mentioned → that exercise must appear in at least 2-3 sections as a primary movement.
-        - Injury mentions → avoid exercises that load or stress that area
-        - Equipment constraints → use only the specified equipment throughout
-        - The workout NAME should reflect this focus (e.g. a sled focus session should reference sleds in the name)
+        INTERPRETATION RULES — apply the athlete's words exactly as written:
+        - If they say to use specific equipment (e.g. "only use rower for cardio") → use ONLY that equipment for that purpose. Do not substitute other machines.
+        - If they say to avoid something → do not include it anywhere in the session.
+        - If they mention an injury or limitation → avoid all exercises that load or stress that area.
+        - If they ask for specific exercises or equipment → those must appear prominently in multiple sections, not just once.
+        - If they describe a training style:
+          * "strength" / "hypertrophy" / "muscle" → heavy barbell/dumbbell sets (5×5, 4×8, 3×10) with proper rest. Minimise cardio. At least 70% dedicated lifting.
+          * "cardio" / "conditioning" → sustained machine work, high-rep bodyweight, AMRAPs, EMOMs. At least 60% cardio.
+        - If the notes describe equipment constraints or a limited setting → use ONLY what they mention. Everything else is banned.
+        - The workout NAME should reflect the athlete's focus.
+        - When in doubt, take the athlete's words at face value. They know what they want — your job is to build the best possible session within their constraints.
       NOTES
     end
 
@@ -939,8 +941,7 @@ class WorkoutLLMGenerator
       #{station_rule}
       #{equipment_rule}
       #{time_budget}
-      - Warm-up: #{@duration_mins <= 30 ? "3 minutes (format: straight, duration_mins: 3). Keep it simple — 1 exercise, steady cardio only." : "5 minutes (format: straight, duration_mins: 5). Use the Warm-Up Approach specified above — follow it exactly."}
-      - Cool-down (MANDATORY — EVERY workout must end with a cool-down as the FINAL section): #{@duration_mins <= 30 ? "2 minutes, format: straight, duration_mins: 2, 3–4 stretches." : "5 minutes, format: straight, duration_mins: 5, 4–6 stretches. Use the Cool-Down Approach specified above."} Name it something creative (e.g. "Wind Down", "Decompress", "Reset", "Melt"). Choose stretches that match what was trained — leg-heavy session = hip flexors, quads, hamstrings; upper body = chest opener, lats, shoulders. Vary the stretches each time — do NOT always default to child's pose. No reps, no duration_s — every exercise uses notes only: "#{@duration_mins <= 30 ? 5 : 10} deep breaths" or "#{@duration_mins <= 30 ? 5 : 10} deep breaths each side" for unilateral stretches.
+      #{warmup_cooldown_rule}
       - Main sets: do NOT set duration_mins on main sets — let the reps, rounds, and format define the work. Only amrap and emom sections need a duration_mins (their time cap). A short punchy finisher (e.g. Tabata, The Hundred/Centurion, for_time sprint) is a welcome extra at the end of the main work — but ONLY if the time budget allows it.
       #{core_rule}
       #{training_rule}
@@ -1118,10 +1119,26 @@ class WorkoutLLMGenerator
     session_notes_flag?(/\brace[- ]?sim(ulation)?\b/i)
   end
 
+  def skip_warmup_cooldown?
+    @activity_slug.in?(NO_WARMUP_COOLDOWN_SLUGS)
+  end
+
   # Calculates a concrete time budget so the LLM doesn't overshoot session duration.
   # Rule of thumb: ~1 main section per 15 min of working time, plus an optional
   # quick finisher (tabata/hundred/abs) if there's 4+ min left over.
   def build_time_budget
+    if skip_warmup_cooldown?
+      # Ohm-style sessions: all time is working content (activation + main + ease-down)
+      working_mins = @duration_mins
+      main_sections = [ (working_mins / 15.0).floor, 2 ].max
+      return <<~BUDGET
+        - *** TIME BUDGET (CRITICAL — sessions MUST fit within #{@duration_mins} minutes) ***
+          All #{@duration_mins} minutes are session content (activation → main sections → ease-down). No separate warm-up/cool-down.
+          At ~15 min per main section, you have room for #{main_sections} section#{"s" if main_sections > 1} (including activation and ease-down).
+          TIMING GUIDE: Use straight format for most sections. Rounds work for repeated flow sequences. Keep everything slow and controlled.
+      BUDGET
+    end
+
     if @duration_mins <= 30
       warmup_mins = 3
       cooldown_mins = 2
@@ -1406,7 +1423,38 @@ class WorkoutLLMGenerator
     end
   end
 
+  def warmup_cooldown_rule
+    if skip_warmup_cooldown?
+      return <<~RULE.strip
+        - NO separate warm-up or cool-down sections. Ohm-style sessions (yoga, pilates, mobility) should open with an activation/flow section and close with an ease-down/savasana section — these are part of the session content, not bolted-on cardio warm-ups or generic stretches. Do NOT include any cardio machine work (rower, bike, ski erg) in this session.
+      RULE
+    end
+
+    warmup = if @duration_mins <= 30
+      "- Warm-up: 3 minutes (format: straight, duration_mins: 3). Keep it simple — 1 exercise, steady cardio only."
+    else
+      "- Warm-up: 5 minutes (format: straight, duration_mins: 5). Use the Warm-Up Approach specified above — follow it exactly."
+    end
+
+    breaths = @duration_mins <= 30 ? 5 : 10
+    cooldown = if @duration_mins <= 30
+      "- Cool-down (MANDATORY — EVERY workout must end with a cool-down as the FINAL section): 2 minutes, format: straight, duration_mins: 2, 3–4 stretches."
+    else
+      "- Cool-down (MANDATORY — EVERY workout must end with a cool-down as the FINAL section): 5 minutes, format: straight, duration_mins: 5, 4–6 stretches. Use the Cool-Down Approach specified above."
+    end
+    cooldown += " Name it something creative (e.g. \"Wind Down\", \"Decompress\", \"Reset\", \"Melt\"). Choose stretches that match what was trained — leg-heavy session = hip flexors, quads, hamstrings; upper body = chest opener, lats, shoulders. Vary the stretches each time — do NOT always default to child's pose. No reps, no duration_s — every exercise uses notes only: \"#{breaths} deep breaths\" or \"#{breaths} deep breaths each side\" for unilateral stretches."
+
+    "#{warmup}\n      #{cooldown}"
+  end
+
   def build_session_structure
+    if skip_warmup_cooldown?
+      sections = [ 1 + ((@duration_mins - 15) / 15.0).floor, 2 ].max
+      return "- Session structure: Activation/Flow (5 min) → #{sections - 2} main section#{"s" if sections > 3} → Ease Down/Savasana (5 min). " \
+             "All #{@duration_mins} minutes are working content — no separate warm-up or cool-down. " \
+             "Do NOT set duration_mins on main sections."
+    end
+
     if @duration_mins < 30
       return "- Session structure: Warm-up (3 min) → 1 main set → Cool-down (2 min). " \
              "This is a short session — keep it tight. No finisher. 1 main set only. " \
@@ -1766,7 +1814,11 @@ class WorkoutLLMGenerator
   end
 
   # Activity slugs that are inherently bodyweight-only programs.
-  BODYWEIGHT_ONLY_SLUGS = %w[bodyweight meta-fit metafit metafit-bodyweight].freeze
+  BODYWEIGHT_ONLY_SLUGS = %w[bodyweight dynamo meta-fit metafit metafit-bodyweight].freeze
+
+  # Session types that use their own activation/ease-down flow instead of a
+  # generic warm-up + cool-down.  No rower warm-ups, no stretch cool-downs.
+  NO_WARMUP_COOLDOWN_SLUGS = %w[ohm].freeze
 
   # Randomly selects a subset of event stations for this session.
   # Returns nil if the event has no station pool, or if the user specified actual
