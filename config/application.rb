@@ -15,8 +15,5 @@ module Volt
     # not contain `.rb` files, or that should not be reloaded or eager loaded.
     # Common ones are `templates`, `generators`, or `middleware`, for example.
     config.autoload_lib(ignore: %w[assets tasks])
-
-    # Point Solid Queue at the dedicated queue database
-    config.solid_queue.connects_to = { database: { writing: :queue, reading: :queue } }
   end
 end

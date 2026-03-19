@@ -98,7 +98,9 @@
       "Bash(PATH=\"/opt/homebrew/bin:/Users/daz/.local/share/mise/installs/ruby/3.4.7/bin:$PATH\" sqlite3:*)",
       "Bash(PATH=\"/opt/homebrew/bin:/Users/daz/.local/share/mise/installs/ruby/3.4.7/bin:$PATH\" bin/rails db:prepare:*)",
       "Bash(PATH=\"/opt/homebrew/bin:/Users/daz/.local/share/mise/installs/ruby/3.4.7/bin:$PATH\" gem list:*)",
-      "Bash(PATH=\"/opt/homebrew/bin:/Users/daz/.local/share/mise/installs/ruby/3.4.7/bin:$PATH\" timeout 5 bundle exec:*)"
+      "Bash(PATH=\"/opt/homebrew/bin:/Users/daz/.local/share/mise/installs/ruby/3.4.7/bin:$PATH\" timeout 5 bundle exec:*)",
+      "Bash(PATH=\"/opt/homebrew/bin:/Users/daz/.local/share/mise/installs/ruby/3.4.7/bin:$PATH\" SECRET_KEY_BASE_DUMMY=1 bin/rails assets:precompile:*)",
+      "Bash(PATH=\"/opt/homebrew/bin:/Users/daz/.local/share/mise/installs/ruby/3.4.7/bin:$PATH\" rm:*)"
     ]
   }
 }
