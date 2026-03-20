@@ -10,8 +10,7 @@
 <% display_tags = session_tags.any? ? session_tags : workout_tags %>
 <% goal = structure.is_a?(Hash) ? structure["goal"] : nil %>
 
-<div class="bg-zinc-800 sm:border sm:border-zinc-600/70 sm:rounded-2xl overflow-hidden shadow-sm hover:border-gray-600 hover:shadow-md transition-all duration-200 cursor-pointer"
-     onclick="if(!event.target.closest('a,button,form,input,turbo-frame')) document.getElementById('workout_modal_<%= workout.id %>').showModal()">
+<div class="bg-zinc-800 sm:border sm:border-zinc-600/70 sm:rounded-2xl overflow-hidden shadow-sm hover:border-gray-600 hover:shadow-md transition-all duration-200">
 
   <%# ── Card body ── %>
   <div class="px-4 pt-4 pb-3">
@@ -125,46 +124,34 @@
     </div>
   </div>
 
+  <%# ── Show/Hide Workout toggle ── %>
+  <details class="group">
+    <summary class="bg-zinc-900 border-t border-zinc-700/50 px-4 py-2.5 list-none cursor-pointer select-none text-center">
+      <span class="inline-flex items-center gap-1.5 text-gray-500 text-xs font-bold uppercase tracking-wide group-open:hidden hover:text-gray-300 transition-colors">
+        Show Workout
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </span>
+      <span class="hidden items-center gap-1.5 text-gray-400 text-xs font-bold uppercase tracking-wide group-open:inline-flex hover:text-gray-300 transition-colors">
+        Hide Workout
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+      </span>
+    </summary>
+    <div class="bg-zinc-900 border-t border-zinc-700/40 px-3 py-3 space-y-2">
+      <% if goal.present? %>
+        <p class="text-gray-500 text-sm italic leading-snug mb-2"><%= goal %></p>
+      <% end %>
+      <% if sections.any? %>
+        <% sections.each do |section| %>
+          <%= render "shared/workout_section", section: section, distance_sport: false %>
+        <% end %>
+      <% else %>
+        <p class="text-gray-600 text-sm text-center py-4">No workout details added yet</p>
+      <% end %>
+    </div>
+  </details>
+
   <%= turbo_frame_tag dom_id(workout_log, :comments) %>
 
 </div>
-
-<%# ── Workout detail modal ── %>
-<dialog id="workout_modal_<%= workout.id %>"
-        class="w-full max-w-lg rounded-2xl border border-zinc-600 bg-zinc-800 text-white p-0 shadow-2xl backdrop:bg-black/70 max-h-[85vh]"
-        onclick="if(event.target===this) this.close()">
-  <div class="sticky top-0 z-10 bg-zinc-800 border-b border-zinc-700 px-5 py-4 flex items-start justify-between">
-    <div class="min-w-0">
-      <h2 class="text-xl font-jost font-black tracking-tight uppercase truncate"><%= workout.name.presence || "Untitled Workout" %></h2>
-      <div class="flex items-center gap-2 mt-1 flex-wrap">
-        <% if workout.activity.present? %>
-          <span class="text-volt font-black text-xs uppercase tracking-wide"><%= workout.activity.name %></span>
-          <span class="text-gray-700 text-xs">·</span>
-        <% end %>
-        <span class="text-xs font-bold text-gray-300"><%= workout.duration_mins %> min</span>
-        <span class="text-gray-700 text-xs">·</span>
-        <span class="text-xs font-bold uppercase text-gray-300"><%= workout.difficulty.capitalize %></span>
-      </div>
-    </div>
-    <button type="button" onclick="this.closest('dialog').close()"
-            class="flex-shrink-0 ml-3 flex items-center justify-center w-8 h-8 rounded-full text-gray-500 hover:text-white hover:bg-zinc-700 transition-colors cursor-pointer">
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-      </svg>
-    </button>
-  </div>
-  <div class="px-4 py-3 space-y-2 overflow-y-auto" style="max-height: calc(85vh - 80px)">
-    <% if goal.present? %>
-      <p class="text-gray-500 text-sm italic leading-snug mb-3"><%= goal %></p>
-    <% end %>
-    <% if sections.any? %>
-      <% sections.each do |section| %>
-        <%= render "shared/workout_section", section: section, distance_sport: false %>
-      <% end %>
-    <% else %>
-      <p class="text-gray-600 text-sm text-center py-6">No workout details added yet</p>
-    <% end %>
-  </div>
-</dialog>
 
 <%= render "shared/share_dialog", shareable: workout, shareable_type: "Workout" %>

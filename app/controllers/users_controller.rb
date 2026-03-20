@@ -39,8 +39,9 @@ class UsersController < ApplicationController
     @following_count = @profile_user.follows_as_follower.accepted.count
 
     @recent_logs = @profile_user.workout_logs
-                                .includes(workout: [ :tags, :activity ])
+                                .includes(:user, :tags, workout: [ :tags, :activity, :workout_likes ])
                                 .recent
-                                .limit(10)
+                                .limit(20)
+    @liked_workout_ids = Current.user.workout_likes.pluck(:workout_id).to_set
   end
 end
