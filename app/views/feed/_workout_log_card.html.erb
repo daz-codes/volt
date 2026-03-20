@@ -4,15 +4,6 @@
 <% like_count = workout.workout_likes.size %>
 <% is_own     = workout_log.user == Current.user %>
 
-<% main_slug = workout.activity_slug.to_s %>
-<% is_distance_sport = main_slug.match?(/\A(run|swim|row|ski|bike|cycl|jog|tri|duat)/) %>
-<% total_distance_m = is_distance_sport && structure.is_a?(Hash) ?
-     structure["sections"].to_a.sum { |s| section_distance_m(s) } : 0 %>
-<% dist_value, dist_unit = if total_distance_m >= 1000
-     [ (total_distance_m / 1000.0).round(1).to_s.delete_suffix(".0"), "km" ]
-   elsif total_distance_m > 0
-     [ total_distance_m.to_s, "m" ]
-   end %>
 <% sections = structure.is_a?(Hash) ? Array(structure["sections"]) : [] %>
 <% session_tags = workout_log.tags %>
 <% workout_tags = workout.tags %>
@@ -30,44 +21,30 @@
       <%= workout.name.presence || "Untitled Workout" %>
     </p>
 
-    <%# Row 2: Activity type · duration · distance · difficulty · sweat %>
+    <%# Row 2: Activity type, difficulty, duration, sweat rating %>
     <div class="flex items-center gap-2 mt-2 flex-wrap">
       <% if workout.activity.present? %>
         <span class="text-volt font-black text-xs uppercase tracking-wide"><%= workout.activity.name %></span>
-        <span class="text-gray-700 text-xs">·</span>
       <% end %>
-      <span class="text-xs font-bold text-gray-300"><%= workout.duration_mins %> min</span>
-      <% if dist_value %>
-        <span class="text-gray-700 text-xs">·</span>
-        <span class="text-xs font-bold text-sky-400"><%= dist_value %><%= dist_unit %></span>
-      <% end %>
-      <span class="text-gray-700 text-xs">·</span>
       <span class="text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border border-gray-600 bg-zinc-700/50 text-gray-300"><%= workout.difficulty.capitalize %></span>
-    </div>
-
-    <%# Row 3: Avatar · username · date · location · follow button %>
-    <div class="flex items-center justify-between mt-1.5">
-      <div class="flex items-center gap-1.5 min-w-0 flex-wrap">
-        <%= render "shared/avatar", user: workout_log.user %>
-        <%= link_to workout_log.user.display, user_path(workout_log.user),
-              class: "text-xs font-bold text-gray-300 hover:text-sky-200 transition-colors" %>
-        <span class="text-gray-700 text-xs">·</span>
-        <span class="text-xs text-gray-600 flex-shrink-0"><%= workout_log.completed_at.strftime("%-d %b %Y") %></span>
-        <span class="text-gray-700 text-xs">·</span>
-        <div class="flex gap-px flex-shrink-0">
-          <% 5.times do |i| %>
-            <span class="text-xs <%= i < workout_log.sweat_rating ? 'opacity-90' : 'opacity-15' %>">💧</span>
-          <% end %>
-        </div>
-        <% if workout_log.location.present? %>
-          <span class="text-gray-700 text-xs">·</span>
-          <span class="text-xs text-gray-600 truncate"><%= workout_log.location %></span>
+      <span class="text-xs font-bold text-gray-300"><%= workout.duration_mins %> min</span>
+      <div class="flex gap-px flex-shrink-0">
+        <% 5.times do |i| %>
+          <span class="text-xs <%= i < workout_log.sweat_rating ? 'opacity-90' : 'opacity-15' %>">💧</span>
         <% end %>
       </div>
-      <% unless is_own %>
-        <% follow_state = Current.user.follow_state_for(workout_log.user) %>
-        <% follow = Current.user.follows_as_follower.find_by(following: workout_log.user) %>
-        <%= render "shared/follow_button", user: workout_log.user, follow_state: follow_state, follow: follow %>
+    </div>
+
+    <%# Row 3: Avatar · username · date · location %>
+    <div class="flex items-center gap-1.5 mt-1.5 flex-wrap">
+      <%= render "shared/avatar", user: workout_log.user %>
+      <%= link_to workout_log.user.display, user_path(workout_log.user),
+            class: "text-xs font-bold text-gray-300 hover:text-sky-200 transition-colors" %>
+      <span class="text-gray-700 text-xs">·</span>
+      <span class="text-xs text-gray-600 flex-shrink-0"><%= workout_log.completed_at.strftime("%-d %b %Y") %></span>
+      <% if workout_log.location.present? %>
+        <span class="text-gray-700 text-xs">·</span>
+        <span class="text-xs text-gray-600 truncate"><%= workout_log.location %></span>
       <% end %>
     </div>
 
@@ -93,57 +70,58 @@
     </div>
   <% end %>
 
-  <%# ── Footer: single row — like, comment, save, share, pdf ── %>
+  <%# ── Footer: like+comment left, save+share+pdf right ── %>
   <div class="bg-zinc-900 border-t border-zinc-700 px-3 py-2">
-    <div class="flex items-center gap-0.5">
-      <%# Like %>
-      <%= turbo_frame_tag "like_workout_#{workout.id}" do %>
-        <%= button_to like_workout_path(workout), method: :post,
-              form: { class: "contents" },
-              class: "flex items-center gap-1 p-2 transition-colors cursor-pointer #{liked ? 'text-red-500 hover:text-red-400' : 'text-gray-500 hover:text-gray-300'}",
-              title: "Like" do %>
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="<%= liked ? 'currentColor' : 'none' %>" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+    <div class="flex items-center justify-between">
+      <%# Left: like + comment %>
+      <div class="flex items-center gap-1">
+        <%= turbo_frame_tag "like_workout_#{workout.id}" do %>
+          <%= button_to like_workout_path(workout), method: :post,
+                form: { class: "contents" },
+                class: "flex items-center gap-1.5 p-2 transition-colors cursor-pointer #{liked ? 'text-red-500 hover:text-red-400' : 'text-gray-500 hover:text-gray-300'}",
+                title: "Like" do %>
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="<%= liked ? 'currentColor' : 'none' %>" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+            <span class="text-sm font-semibold"><%= like_count %></span>
+          <% end %>
+        <% end %>
+        <%= link_to workout_log_comments_path(workout_log),
+              data: { turbo_frame: dom_id(workout_log, :comments) },
+              class: "flex items-center gap-1.5 text-gray-500 hover:text-gray-300 transition-colors p-2" do %>
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
           </svg>
-          <span class="text-xs font-semibold"><%= like_count %></span>
+          <span class="text-sm font-semibold" id="comment_count_<%= workout_log.id %>"><%= workout_log.comments_count %></span>
         <% end %>
-      <% end %>
-      <%# Comment %>
-      <%= link_to workout_log_comments_path(workout_log),
-            data: { turbo_frame: dom_id(workout_log, :comments) },
-            class: "flex items-center gap-1 text-gray-500 hover:text-gray-300 transition-colors p-2" do %>
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-        </svg>
-        <span class="text-xs font-semibold" id="comment_count_<%= workout_log.id %>"><%= workout_log.comments_count %></span>
-      <% end %>
-      <%# Save %>
-      <%= button_to save_workout_path(workout), method: :post,
-            form: { class: "contents" },
-            class: "text-gray-500 hover:text-gray-300 transition-colors p-2 cursor-pointer",
-            title: "Save to library" do %>
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
-        </svg>
-      <% end %>
-      <%# Share %>
-      <button type="button"
-              onclick="event.stopPropagation(); document.getElementById('share_dialog_workout_<%= workout.id %>').showModal()"
-              class="text-gray-500 hover:text-gray-300 transition-colors p-2 cursor-pointer"
-              title="Share">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/>
-        </svg>
-      </button>
-      <% if Current.user.pro_features? %>
-        <%# PDF %>
-        <%= link_to export_pdf_workout_path(workout),
-              data: { turbo: false },
-              class: "text-gray-500 hover:text-gray-300 transition-colors p-2",
-              title: "Export as PDF" do %>
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      </div>
+      <%# Right: save + share + pdf %>
+      <div class="flex items-center gap-1">
+        <%= button_to save_workout_path(workout), method: :post,
+              form: { class: "contents" },
+              class: "text-gray-500 hover:text-gray-300 transition-colors p-2 cursor-pointer",
+              title: "Save to library" do %>
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+          </svg>
         <% end %>
-      <% end %>
+        <button type="button"
+                onclick="event.stopPropagation(); document.getElementById('share_dialog_workout_<%= workout.id %>').showModal()"
+                class="text-gray-500 hover:text-gray-300 transition-colors p-2 cursor-pointer"
+                title="Share">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/>
+          </svg>
+        </button>
+        <% if Current.user.pro_features? %>
+          <%= link_to export_pdf_workout_path(workout),
+                data: { turbo: false },
+                class: "text-gray-500 hover:text-gray-300 transition-colors p-2",
+                title: "Export as PDF" do %>
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <% end %>
+        <% end %>
+      </div>
     </div>
   </div>
 
@@ -181,7 +159,7 @@
     <% end %>
     <% if sections.any? %>
       <% sections.each do |section| %>
-        <%= render "shared/workout_section", section: section, distance_sport: is_distance_sport %>
+        <%= render "shared/workout_section", section: section, distance_sport: false %>
       <% end %>
     <% else %>
       <p class="text-gray-600 text-sm text-center py-6">No workout details added yet</p>
