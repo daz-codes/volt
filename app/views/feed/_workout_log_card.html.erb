@@ -38,6 +38,7 @@
     <div class="flex items-center gap-1.5 mt-1.5 flex-wrap">
       <%= render "shared/avatar", user: workout_log.user %>
       <%= link_to workout_log.user.display, user_path(workout_log.user),
+            data: { turbo_frame: "_top" },
             class: "text-xs font-bold text-gray-300 hover:text-sky-200 transition-colors" %>
       <span class="text-gray-700 text-xs">·</span>
       <span class="text-xs text-gray-600 flex-shrink-0"><%= workout_log.completed_at.strftime("%-d %b %Y") %></span>

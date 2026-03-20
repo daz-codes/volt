@@ -38,10 +38,21 @@ class UsersController < ApplicationController
     @follower_count = @profile_user.follows_as_following.accepted.count
     @following_count = @profile_user.follows_as_follower.accepted.count
 
-    @recent_logs = @profile_user.workout_logs
-                                .includes(:user, :tags, workout: [ :tags, :activity, :workout_likes ])
-                                .recent
-                                .limit(20)
-    @liked_workout_ids = Current.user.workout_likes.pluck(:workout_id).to_set
+    @page = [ params[:page].to_i, 1 ].max
+    per_page = 10
+    offset = (@page - 1) * per_page
+
+    results = @profile_user.workout_logs
+                           .includes(:user, :tags, photo_attachment: :blob, workout: [ :tags, :activity, :workout_likes ])
+                           .recent
+                           .offset(offset)
+                           .limit(per_page + 1)
+                           .to_a
+
+    @has_more     = results.size > per_page
+    @workout_logs = results.first(per_page)
+    @next_page    = @page + 1
+    workout_ids   = @workout_logs.map(&:workout_id)
+    @liked_workout_ids = workout_ids.any? ? WorkoutLike.where(user_id: Current.user.id, workout_id: workout_ids).pluck(:workout_id).to_set : Set.new
   end
 end

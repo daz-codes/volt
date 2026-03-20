@@ -1,56 +1,81 @@
 <% content_for :title, @profile_user.display %>
+<% content_for :full_bleed, true %>
 
-<div class="max-w-2xl mx-auto">
+<% if @page == 1 %>
+  <div class="max-w-2xl mx-auto">
 
-  <%# Profile header %>
-  <div class="bg-zinc-800 border border-zinc-600/70 rounded-2xl p-6 mb-4">
-    <div class="flex items-start justify-between mb-5">
-      <div class="flex items-center gap-4">
-        <%= render "shared/avatar", user: @profile_user, classes: "w-14 h-14 text-xl" %>
-        <div>
-          <div class="flex items-center gap-2">
-            <h1 class="text-xl font-black tracking-tight" style="font-family: 'Jost', sans-serif"><%= @profile_user.display %></h1>
-            <% if @profile_user.pro? %>
-              <span class="bg-volt text-zinc-950 text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full">Pro</span>
-            <% elsif @profile_user.beta? %>
-              <span class="bg-sky-400 text-zinc-950 text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full">Beta</span>
+    <%# Profile header %>
+    <div class="bg-zinc-800 sm:border sm:border-zinc-600/70 sm:rounded-2xl p-6 mb-4">
+      <div class="flex items-start justify-between mb-5">
+        <div class="flex items-center gap-4">
+          <%= render "shared/avatar", user: @profile_user, classes: "w-14 h-14 text-xl" %>
+          <div>
+            <div class="flex items-center gap-2">
+              <h1 class="text-xl font-black tracking-tight" style="font-family: 'Jost', sans-serif"><%= @profile_user.display %></h1>
+              <% if @profile_user.pro? %>
+                <span class="bg-volt text-zinc-950 text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full">Pro</span>
+              <% elsif @profile_user.beta? %>
+                <span class="bg-sky-400 text-zinc-950 text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full">Beta</span>
+              <% end %>
+            </div>
+            <% if @profile_user.username.present? %>
+              <p class="text-gray-500 text-sm">@<%= @profile_user.username %></p>
             <% end %>
           </div>
-          <% if @profile_user.username.present? %>
-            <p class="text-gray-500 text-sm">@<%= @profile_user.username %></p>
-          <% end %>
+        </div>
+        <%= render "shared/follow_button", user: @profile_user, follow_state: @follow_state, follow: @follow %>
+      </div>
+
+      <div class="grid grid-cols-3 gap-3 text-center">
+        <div class="bg-zinc-700/40 rounded-xl py-3">
+          <p class="text-2xl font-black text-white"><%= @workout_count %></p>
+          <p class="text-gray-500 text-xs uppercase tracking-wide mt-0.5">Workouts</p>
+        </div>
+        <div class="bg-zinc-700/40 rounded-xl py-3">
+          <p class="text-2xl font-black text-white"><%= @follower_count %></p>
+          <p class="text-gray-500 text-xs uppercase tracking-wide mt-0.5">Followers</p>
+        </div>
+        <div class="bg-zinc-700/40 rounded-xl py-3">
+          <p class="text-2xl font-black text-white"><%= @following_count %></p>
+          <p class="text-gray-500 text-xs uppercase tracking-wide mt-0.5">Following</p>
         </div>
       </div>
-      <%= render "shared/follow_button", user: @profile_user, follow_state: @follow_state, follow: @follow %>
     </div>
 
-    <div class="grid grid-cols-3 gap-3 text-center">
-      <div class="bg-zinc-700/40 rounded-xl py-3">
-        <p class="text-2xl font-black text-white"><%= @workout_count %></p>
-        <p class="text-gray-500 text-xs uppercase tracking-wide mt-0.5">Workouts</p>
+    <%# Workout feed %>
+    <% if @workout_logs.any? %>
+      <div class="space-y-4">
+        <% @workout_logs.each do |wl| %>
+          <%= render "feed/workout_log_card", workout_log: wl, liked_workout_ids: @liked_workout_ids %>
+        <% end %>
       </div>
-      <div class="bg-zinc-700/40 rounded-xl py-3">
-        <p class="text-2xl font-black text-white"><%= @follower_count %></p>
-        <p class="text-gray-500 text-xs uppercase tracking-wide mt-0.5">Followers</p>
+
+      <% if @has_more %>
+        <%= turbo_frame_tag "user_feed_page_#{@next_page}", src: user_path(@profile_user, page: @next_page), loading: "lazy" do %>
+          <div class="py-8 text-center text-gray-700 text-sm">Loading more workouts...</div>
+        <% end %>
+      <% end %>
+    <% else %>
+      <div class="bg-zinc-800 sm:border sm:border-zinc-600/70 sm:rounded-2xl p-12 text-center">
+        <p class="text-gray-600 text-sm">No workouts logged yet.</p>
       </div>
-      <div class="bg-zinc-700/40 rounded-xl py-3">
-        <p class="text-2xl font-black text-white"><%= @following_count %></p>
-        <p class="text-gray-500 text-xs uppercase tracking-wide mt-0.5">Following</p>
-      </div>
-    </div>
+    <% end %>
+
   </div>
 
-  <%# Workout feed %>
-  <% if @recent_logs.any? %>
-    <div class="space-y-4">
-      <% @recent_logs.each do |wl| %>
+<% else %>
+  <%# Subsequent pages loaded lazily into turbo frame %>
+  <%= turbo_frame_tag "user_feed_page_#{@page}" do %>
+    <div class="space-y-4 mt-4">
+      <% @workout_logs.each do |wl| %>
         <%= render "feed/workout_log_card", workout_log: wl, liked_workout_ids: @liked_workout_ids %>
       <% end %>
     </div>
-  <% else %>
-    <div class="bg-zinc-800 border border-zinc-600/70 rounded-2xl p-12 text-center">
-      <p class="text-gray-600 text-sm">No workouts logged yet.</p>
-    </div>
-  <% end %>
 
-</div>
+    <% if @has_more %>
+      <%= turbo_frame_tag "user_feed_page_#{@next_page}", src: user_path(@profile_user, page: @next_page), loading: "lazy" do %>
+        <div class="py-8 text-center text-gray-700 text-sm">Loading more workouts...</div>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>
