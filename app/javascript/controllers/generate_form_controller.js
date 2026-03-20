@@ -1,31 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["pill", "customInput", "submitBtn"]
-
-  customTyped() {
-    const hasText = this.customInputTarget.value.trim() !== ""
-    if (hasText) {
-      this.pillTargets.forEach(radio => radio.checked = false)
-    }
-    this.#toggleCustomBorder(hasText)
-  }
-
-  pillSelected() {
-    this.customInputTarget.value = ""
-    this.#toggleCustomBorder(false)
-  }
-
-  #toggleCustomBorder(active) {
-    const input = this.customInputTarget
-    if (active) {
-      input.classList.remove("border-zinc-700")
-      input.classList.add("border-lime-400", "bg-lime-400/5")
-    } else {
-      input.classList.remove("border-lime-400", "bg-lime-400/5")
-      input.classList.add("border-zinc-700")
-    }
-  }
+  static targets = ["submitBtn"]
 
   showSpinner() {
     this.submitBtnTarget.disabled = true

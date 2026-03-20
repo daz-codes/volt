@@ -64,9 +64,9 @@
     <%= image_tag workout_log.photo, class: "w-full max-h-96 object-cover" %>
   <% end %>
 
-  <% if goal.present? %>
+  <% if workout_log.notes.present? %>
     <div class="px-4 pt-1 pb-3">
-      <p class="text-gray-500 text-xs italic leading-snug"><%= goal %></p>
+      <p class="text-gray-500 text-xs italic leading-snug"><%= workout_log.notes %></p>
     </div>
   <% end %>
 
@@ -126,13 +126,13 @@
   </div>
 
   <%# ── Show/Hide Workout toggle ── %>
-  <details class="group">
-    <summary class="bg-zinc-900 border-t border-zinc-700/50 px-4 py-2.5 list-none cursor-pointer select-none text-center">
-      <span class="inline-flex items-center gap-1.5 text-gray-500 text-xs font-bold uppercase tracking-wide group-open:hidden hover:text-gray-300 transition-colors">
+  <details class="group/details">
+    <summary class="bg-zinc-900 border-t border-zinc-700/50 px-4 py-2.5 list-none cursor-pointer select-none text-center [&::-webkit-details-marker]:hidden">
+      <span class="show-label inline-flex items-center gap-1.5 text-gray-500 text-xs font-bold uppercase tracking-wide hover:text-gray-300 transition-colors">
         Show Workout
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
       </span>
-      <span class="hidden items-center gap-1.5 text-gray-400 text-xs font-bold uppercase tracking-wide group-open:inline-flex hover:text-gray-300 transition-colors">
+      <span class="hide-label hidden items-center gap-1.5 text-gray-400 text-xs font-bold uppercase tracking-wide hover:text-gray-300 transition-colors">
         Hide Workout
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
       </span>
