@@ -538,9 +538,8 @@ class WorkoutLLMGenerator
     Workout.most_liked_with_activity(@activity, limit: 5)
   end
 
-  # Builds a minimal prompt that relies on example workouts instead of extensive rules.
-  # The idea: show the LLM 5 high-quality workouts and ask it to create something fresh
-  # in the same style, rather than micromanaging every detail with rules.
+  # Builds the prompt using example workouts as style references plus the full
+  # structural rules (time budget, session structure, warm-up/cool-down, difficulty).
   def build_example_prompt(example_workouts)
     main_name = @activity || "general fitness"
 
@@ -567,6 +566,9 @@ class WorkoutLLMGenerator
       Generate a #{@duration_mins}-minute #{@difficulty} #{main_name} session.
     TASK
 
+    # Difficulty scaling (rep ranges, weights, rest, complexity)
+    sections << build_difficulty_guidance
+
     if example_workouts.any?
       sections << <<~EXAMPLES
         Here are #{example_workouts.size} example workouts that the athlete loves. Study their structure, exercise selection, format variety, naming style, and rep schemes — then create something FRESH in the same spirit. Do not copy them directly, but match their quality and style:
@@ -574,6 +576,14 @@ class WorkoutLLMGenerator
         #{JSON.pretty_generate(examples_json)}
       EXAMPLES
     end
+
+    # Warm-up and cool-down approach (selected randomly for variety)
+    # FM has its own warm-up/cool-down in functional_muscle_rule — skip general one
+    sections << build_warmup_cooldown unless skip_warmup_cooldown? || @activity_slug == "functional-muscle"
+
+    # Sport-specific context file (Deka, Hyrox, etc.)
+    sport_context = load_sport_context([ @activity ].compact)
+    sections << sport_context if sport_context.present?
 
     # Add race-accurate reference weights for event sessions (Hyrox, Deka, etc.)
     if event_session?
@@ -622,16 +632,6 @@ class WorkoutLLMGenerator
           Use at least 3 different formats across the session. No two adjacent sections should share the same format.
         FORMAT
       end
-
-      sections << <<~RULES
-        Use the create_workout tool. Key guidelines:
-        - Give it a punchy, memorable name (2-4 words) — creative, not generic
-        - Include a warm-up and cool-down
-        - Be specific with reps, distances, and weights
-        - Rep counts should be clean numbers (even or multiples of 5)
-        - NEVER use numbered block prefixes like "Block 1:", "Block 2:" in section names — use creative, descriptive names instead
-        - Make it genuinely fun and challenging — the kind of workout people talk about afterwards
-      RULES
     end
 
     # Session notes override everything
@@ -640,6 +640,57 @@ class WorkoutLLMGenerator
         ## Session Notes (HIGHEST PRIORITY — override all other guidance):
         #{@session_notes}
       NOTES
+    end
+
+    # Critical structural rules — time budget, session structure, warm-up/cool-down timing
+    # FM sessions have their own complete protocol — skip general structure/timing rules
+    # to avoid conflicting instructions.
+    if @activity_slug == "functional-muscle"
+      sport_rule      = sport_purity_rule
+      pace_limits     = pace_limit_rule
+      equipment_rule  = build_equipment_rule
+
+      sections << <<~RULES
+        Use the create_workout tool. Requirements:
+        #{sport_rule}
+        #{pace_limits}
+        #{equipment_rule}
+        - Give it a punchy, memorable name (2-4 words) — creative, not generic
+        - Be specific with reps, distances, and weights
+        - Rep counts should be clean numbers (even or multiples of 5)
+        - NEVER use numbered block prefixes like "Block 1:", "Block 2:" in section names — use creative, descriptive names instead
+        - Make it genuinely fun and challenging — the kind of workout people talk about afterwards
+        - EXERCISE VARIETY: never use the same base movement in more than one section
+        - NEVER repeat the same exercise as multiple entries in the exercises array — use rounds instead
+        #{@session_notes.present? ? "\n        *** REMINDER — ATHLETE'S SESSION FOCUS (HIGHEST PRIORITY): \"#{@session_notes}\" ***" : ""}
+      RULES
+    else
+      time_budget     = build_time_budget
+      structure_rule  = build_session_structure
+      core_rule       = core_section_rule
+      sport_rule      = sport_purity_rule
+      pace_limits     = pace_limit_rule
+      equipment_rule  = build_equipment_rule
+
+      sections << <<~RULES
+        Use the create_workout tool. Requirements:
+        #{structure_rule}
+        #{time_budget}
+        #{warmup_cooldown_rule}
+        - Main sets: do NOT set duration_mins on main sets — let the reps, rounds, and format define the work. Only amrap and emom sections need a duration_mins (their time cap).
+        #{core_rule}
+        #{sport_rule}
+        #{pace_limits}
+        #{equipment_rule}
+        - Give it a punchy, memorable name (2-4 words) — creative, not generic
+        - Be specific with reps, distances, and weights
+        - Rep counts should be clean numbers (even or multiples of 5)
+        - NEVER use numbered block prefixes like "Block 1:", "Block 2:" in section names — use creative, descriptive names instead
+        - Make it genuinely fun and challenging — the kind of workout people talk about afterwards
+        - EXERCISE VARIETY: never use the same base movement in more than one section
+        - NEVER repeat the same exercise as multiple entries in the exercises array — use rounds instead
+        #{@session_notes.present? ? "\n        *** REMINDER — ATHLETE'S SESSION FOCUS (HIGHEST PRIORITY): \"#{@session_notes}\" ***" : ""}
+      RULES
     end
 
     sections.join("\n")
@@ -966,7 +1017,7 @@ class WorkoutLLMGenerator
         * emom — two distinct styles, set emom_style accordingly:
           - circuit (emom_style: "circuit"): all exercises done together each minute, rest for the remainder. Max 2 exercises (3 only if all bodyweight). The work must be completable in ~40 seconds to leave rest. HARD REP CAP per minute: beginner ≤8, intermediate ≤12, advanced ≤16 total reps across all exercises. CARDIO MACHINE BAN: Do NOT include SkiErg, Rowing Machine, or Air/Assault Bike in a circuit EMOM — they take too long and leave no time for the other exercise(s). Use cardio machines in rotating EMOMs instead, where they get a full minute. E.g. "EMOM 10: 5 thrusters + 5 burpees". Set duration_mins for the total time cap.
           - rotating (emom_style: "rotating"): THE CONTINUOUS CIRCUIT — a different exercise each minute, cycling non-stop through the full duration. Each exercise fills its own minute — no reps, no calories, no distance, no duration on exercises. Do NOT add minute-assignment notes like "Min 1, 3, 5:" — exercises just rotate in order. Coaching notes only (e.g. "explosive hip extension"). duration_mins MUST be a multiple of the exercise count. *** FOR THIS SESSION use: #{cc_config} *** Mix one cardio machine + strength/skill movements + an active recovery or core exercise for best effect. The cardio minute is the "recovery" — keep it to a sustainable hard effort, not a sprint.
-        * amrap — clock-driven main set. Complete as many rounds as possible in the time cap. Scores rounds+reps. Great for mixed-modal circuits, testing work capacity. E.g. "AMRAP 12: 10 KB swings + 8 box jumps + 6 burpees". Use freely — this is underused and highly effective.
+        * amrap — clock-driven main set. Complete as many rounds as possible in the time cap. Scores rounds+reps. Great for mixed-modal circuits, testing work capacity. MINIMUM 3 exercises — an AMRAP with 1 or 2 exercises makes no sense (you'd just do the same thing over and over). E.g. "AMRAP 12: 10 KB swings + 8 box jumps + 6 burpees". Use freely — this is underused and highly effective.
         * for_time — race the clock with minimal or no rest between rounds. The goal is to complete all the work as fast as possible and record the finishing time. Always set rounds explicitly (3–5 rounds typical) so the athlete knows the full volume up front. Do NOT set rest_secs (or set it to 0) — the athlete chooses when to breathe. E.g. "5 rounds for time: 20 cal SkiErg + 20 KB swings + 12 box jumps", "3 rounds for time: 400m row + 10 burpees". Single-exercise for_time (e.g. 100 cal row for time) can use rounds: 1.
         * hundred — "The Centurion": exactly 100 reps of a single exercise, done for time. Set reps: 100 on the one exercise. A genuinely brutal and satisfying finisher for ANY session type — not just Functional Muscle. Works for: KB swings, wall balls, box jumps, push-ups, burpees, thrusters, air squats, sit-ups, rowing calories, ski calories. Use it as a punchy end to a main set when you want one last gut-check. Not just a gimmick — it's a legitimate conditioning tool.
         * rounds — structured circuit with planned rest between rounds. The athlete works, rests a set time, then goes again — pacing is controlled, not a race. Good for strength work and conditioning where recovery matters. ALWAYS set rounds explicitly (e.g. rounds: 5 for 5×5 strength, rounds: 3 for a conditioning circuit) and set rest_secs (30–90s) for recovery between rounds.
@@ -982,7 +1033,7 @@ class WorkoutLLMGenerator
         * matrix — progressive exercise combinations. List 3–5 exercises in order. The section builds up then strips back: for 3 exercises: A, A+B, A+B+C, B+C, C. For 4: A, A+B, A+B+C, A+B+C+D, B+C+D, C+D, D. For 5: A, A+B, A+B+C, A+B+C+D, A+B+C+D+E, B+C+D+E, C+D+E, D+E, E. IMPORTANT: all exercises must use the same metric — either all reps (same count each) or all duration_s (same seconds each). Prefer duration_s: 30 for each exercise most of the time — this is the most common Metafit style. Set rest_secs for the rest between each combination (typically 30–60s).
       - EXERCISE VARIETY ACROSS THE SESSION: never use the same base movement in more than one section. If Back Squat appears in one section, do NOT use Back Squat (or Paused Back Squat, or any squat variation on a barbell) in another section — pick a different compound like Front Squat, Deadlift, or Overhead Press instead. The whole session should expose the athlete to as many different movement patterns as possible.
       - NEVER repeat the same exercise as multiple entries in the exercises array. This is a critical mistake — do NOT list "Bench Press (Set 1)", "Bench Press (Set 2)", "Bench Press (Set 3)" as three separate entries. Instead, use a single entry and set rounds: 3 on the section. Notes like "Set 1:", "Set 2:" in exercise notes are forbidden.
-      - SINGLE-EXERCISE SECTIONS are valid and often better than circuits, especially for strength and power work. A section with just one exercise is perfectly correct: e.g. '5 × 5 Deadlift (heavy)', 'EMOM 10: 8 Thrusters', '4 × 8 Romanian Deadlift'. Do not feel obligated to bundle every movement into a multi-exercise circuit. HOWEVER: a single-exercise section MUST always use multiple sets (rounds: 3 minimum) or a timed modality (emom/amrap/for_time). BANNED: a section with 1 exercise and rounds ≤ 2 (or no rounds). This is always wrong. Every section must represent real training volume, not a single isolated set.
+      - SINGLE-EXERCISE SECTIONS are valid and often better than circuits, especially for strength and power work. A section with just one exercise is perfectly correct: e.g. '5 × 5 Deadlift (heavy)', 'EMOM 10: 8 Thrusters', '4 × 8 Romanian Deadlift'. Do not feel obligated to bundle every movement into a multi-exercise circuit. HOWEVER: a single-exercise section MUST always use multiple sets (rounds: 3 minimum) or a timed modality (emom/for_time). BANNED: a section with 1 exercise and rounds ≤ 2 (or no rounds). This is always wrong. Every section must represent real training volume, not a single isolated set. ALSO BANNED: AMRAP with fewer than 3 exercises — an AMRAP needs variety to cycle through.
       - NEVER describe the real programming in the notes instead of the structure. If you want 5 × 60m sprints, set rounds: 5 and distance_m: 60 — do NOT set rounds: 1 with "5 × 60m sprints" in the notes. The notes field is for coaching cues only (e.g. "explosive hip drive", "keep chest tall"). The structure (rounds, reps, distance_m, duration_s, rest_secs) must always reflect the actual work.
       - NEVER list the same exercise more than once in a section's exercises array. If you need the same movement repeated (e.g. 5 × 25m Freestyle), use rounds: 5 with a single exercise entry — not 5 separate entries. Duplicate entries are always wrong.
       #{@session_notes.present? ? "\n      *** REMINDER — ATHLETE'S SESSION FOCUS (HIGHEST PRIORITY): \"#{@session_notes}\" — The exercises you select MUST clearly reflect this focus. If the athlete asked for sleds, use sleds heavily. If they asked for strength, programme heavy barbell work. Do not just change the name — change the actual exercises. ***" : ""}
@@ -1163,7 +1214,7 @@ class WorkoutLLMGenerator
     <<~BUDGET
       - *** TIME BUDGET (CRITICAL — sessions MUST fit within #{@duration_mins} minutes) ***
         Warm-up: #{warmup_mins} min | Cool-down: #{cooldown_mins} min | Working time: #{working_mins} min.
-        At ~15 min per main section, you have room for #{main_sections} main section#{"s" if main_sections > 1}.
+        At ~15 min per main section, you have room for EXACTLY #{main_sections} main section#{"s" if main_sections > 1}.
         Finisher: #{finisher}
         TIMING GUIDE per format (use these to stay on budget):
         - AMRAP / EMOM: duration_mins IS the time — set it to fit the budget exactly.
@@ -1173,7 +1224,8 @@ class WorkoutLLMGenerator
         - Ladder/Mountain: count the rungs × ~1.5 min each (including rest). 6 rungs ≈ 9 min, 8 rungs ≈ 12 min, 10 rungs ≈ 15 min.
         - Hundred: ~4–6 min depending on the exercise.
         - Single-exercise strength (e.g. 5×5): ~2 min per set including rest. 5 sets ≈ 10 min.
-        Add up your sections — if the total exceeds #{working_mins} min, cut a section or reduce rounds/duration. NEVER exceed the budget.
+        ADD UP your sections — if the total exceeds #{working_mins} min, cut a section or reduce rounds/duration. NEVER exceed the budget.
+        SECTION COUNT CHECK: warm-up (1) + #{main_sections} main + #{finisher.start_with?("Yes") ? "finisher (1) + " : ""}cool-down (1) = #{2 + main_sections + (finisher.start_with?("Yes") ? 1 : 0)} total sections. If you have more sections than this, you have too many — remove sections until you match this count.
     BUDGET
   end
 
@@ -1299,19 +1351,19 @@ class WorkoutLLMGenerator
 
         - OTHER BLOCKS: Choose from [A]–[I] below to fill the session within the time budget. Do NOT always use the continuous circuit block — it should appear in roughly half of sessions at most.
 
-        [A] CONTINUOUS CIRCUIT — format: emom, emom_style: rotating, #{cc}. One cardio machine (ski/row/bike) + one KB or barbell movement per exercise slot + optionally one abs or bodyweight movement. NO reps, calories, distance, or duration on any exercise — each fills its full minute. Coaching notes only. Do NOT label exercises with minute numbers.
+        [A] CONTINUOUS CIRCUIT — format: emom, emom_style: rotating, #{cc}. One cardio machine (ski/row/bike) + one KB or barbell movement per exercise slot + optionally one abs or bodyweight movement. NO reps, calories, distance, or duration on any exercise — each fills its full minute. Coaching notes only. Do NOT label exercises with minute numbers. CARDIO MACHINE PACE GUIDE (1 minute of work): beginner 8 cal, intermediate 10 cal, advanced 12 cal — mention this target in the coaching notes only, not as a calories field.
 
         [B] INTERVAL CIRCUIT — format: rounds, rounds: 5. 2–3 exercises performed every 2 minutes (add this to section notes). Include specific reps and weights. E.g. 20 KB swings + 10 slams + 5 thrusters.
 
         [C] 10-1 LADDER — format: ladder, start: 10, end: 1, step: 1. ALWAYS exactly 3 exercises from contrasting movement patterns (push + pull + legs, or swing + slam + squat etc). VARY the exercises every session — do NOT default to KB Swings / Wall Balls / Box Jumps. Draw from this pool: KB Swings, Goblet Squats, KB Clean and Press, Thrusters, Upright Rows, Bent Over Rows, Renegade Rows, Burpees, Box Jumps, Step-ups, Jump Squats, Slam Ball, Push Press, Devil Press, DB Lunges, Plate Good Mornings, KB Deadlifts, Pull-ups, Ring Rows, Dips, Push-ups. Pick 3 that contrast (one cardio/plyometric, one push, one pull or hinge).
 
-        [D] CARDIO INTERVALS — format: rounds, rounds: 5. 1 min hard / 1 min rest on a single machine. Ski (target 10 cal/min), Row (target 200m/min), Bike (10–15 cal).
+        [D] CARDIO INTERVALS — format: rounds, rounds: 5. 1 min hard / 1 min rest on a single machine. Calorie targets per minute: beginner 8 cal, intermediate 10 cal, advanced 12 cal. Row alternative: 150–200m per minute.
 
         [E] EVERY-2-MIN EMOM — format: emom, emom_style: circuit, duration_mins: 10. ALWAYS exactly 3 exercises done together at the start of every 2-minute window, rest for remainder. Reps are always multiples of 5. MINIMUM 25 total reps across all 3 exercises — never use 5/5/5 or any combination that totals less than 25. Use varied rep schemes: 15/10/5 (descending), 5/10/20 (ascending), 10/10/10 (even), 10/15/5. Total work per round should take 45–60 seconds leaving 60–75 seconds rest. E.g. 5 clean and press + 10 KB swings + 15 box jumps every 2 mins. Or: 10 thrusters + 10 burpees + 20 sit-ups every 2 mins.
 
-        [F] 20-20 BLOCK — format: rounds, rounds: 10. Every 2 mins: 20 cal cardio + 20 reps of a punchy movement (KB swings, slams, jump squats). 20-minute total block. Only use for 75+ min sessions.
+        [F] 20-20 BLOCK — format: rounds, rounds: 10. Every 2 mins: cardio cal target (beginner 8, intermediate 10, advanced 12) + 20 reps of a punchy movement (KB swings, slams, jump squats). 20-minute total block. Only use for 75+ min sessions.
 
-        [G] DEATH RACE — format: rounds, rounds: 5. 10–15 cal bike + 10 burpees. All out.
+        [G] DEATH RACE — format: rounds, rounds: 5. Bike cal target (beginner 8, intermediate 10, advanced 12) + 10 burpees. All out.
 
         [H] TABATA — Use 2 exercises per tabata (ABABABAB = 4 rounds each) — this is the standard format. Standard tabatas: EVERY exercise MUST be a compound (two movements fused into one flowing rep, name must contain "and", "with", "to", or "+"). Each tabata gets DIFFERENT compound pairs — never repeat the same compound in one session. You are encouraged to INVENT new combinations — the goal is creative, flowing pairings that contrast muscle groups. Some examples to spark ideas (don't just copy these): "Squat Curl and Press", "KB Swing with Side Lunge", "Wood Chop with Reverse Lunge", "Bent Over Row to Deadlift", "Side Lunge and Lateral Raise", "Lunge and Overhead Tricep Extension", "Hop onto Box and Bicep Curl", "Clean and Lateral Lunge", "Squat Jump and Shoulder Press", "Plate Halo and Twist", "Push Up to T-Rotation", "Renegade Row to Deadlift", "Reverse Lunge and High Pull", "Squat and Rainbow Press", "Gorilla Row and Jump Squat", "Devil Press and Box Step", "KB Clean and Pivot Press", "Bent Over Row and Clean and Press". CARDIO MACHINE TABATA (use occasionally — at most once per session): one of the two exercises may be a cardio machine (Assault Bike, Rowing Machine, or Ski Erg) — pair it with a compound movement. Example pairings: Assault Bike + Squat Curl and Press, Rowing Machine + Wood Chop with Reverse Lunge, Ski Erg + KB Swing with Side Lunge. Do NOT set reps or calories on the machine exercise — it's a 20s burst, the interval is the constraint. Single compound movements alone (burpees, KB swings, mountain climbers without a second movement) are never acceptable.
 
@@ -1455,7 +1507,7 @@ class WorkoutLLMGenerator
     else
       "- Cool-down (MANDATORY — EVERY workout must end with a cool-down as the FINAL section): 5 minutes, format: straight, duration_mins: 5, 4–6 stretches. Use the Cool-Down Approach specified above."
     end
-    cooldown += " Name it something creative (e.g. \"Wind Down\", \"Decompress\", \"Reset\", \"Melt\"). Choose stretches that match what was trained — leg-heavy session = hip flexors, quads, hamstrings; upper body = chest opener, lats, shoulders. Vary the stretches each time — do NOT always default to child's pose. No reps, no duration_s — every exercise uses notes only: \"#{breaths} deep breaths\" or \"#{breaths} deep breaths each side\" for unilateral stretches."
+    cooldown += " Give it a creative name (e.g. \"Decompress\", \"Wind Down\", \"Reset\", \"Melt\"). There must be exactly ONE cool-down section and it must be the LAST section — do not add a second stretch or recovery section anywhere else. Choose stretches that match what was trained — leg-heavy session = hip flexors, quads, hamstrings; upper body = chest opener, lats, shoulders. Vary the stretches each time — do NOT always default to child's pose. No reps, no duration_s — every exercise uses notes only: \"#{breaths} deep breaths\" or \"#{breaths} deep breaths each side\" for unilateral stretches."
 
     "#{warmup}\n      #{cooldown}"
   end
@@ -1468,23 +1520,39 @@ class WorkoutLLMGenerator
              "Do NOT set duration_mins on main sections."
     end
 
-    if @duration_mins < 30
-      return "- Session structure: Warm-up (3 min) → 1 main set → Cool-down (2 min). " \
-             "This is a short session — keep it tight. No finisher. 1 main set only. " \
+    if @duration_mins <= 30
+      warmup_mins = 3
+      cooldown_mins = 2
+      working_mins = @duration_mins - warmup_mins - cooldown_mins
+      return "- *** SESSION STRUCTURE (MANDATORY — follow this exactly) ***: " \
+             "Warm-up (#{warmup_mins} min) → 1 main section → short finisher (Tabata 4 min or similar) → Cool-down (#{cooldown_mins} min). " \
+             "This is a SHORT session (#{@duration_mins} min). You have only #{working_mins} minutes of working time. " \
+             "EXACTLY 1 main section — do NOT add more. No activation section, no 'wake up', no 'ease in' — just the warm-up. " \
+             "No core/abs section. Total sections in the workout: 4 (warm-up, main, finisher, cool-down). " \
              "Do NOT set duration_mins on the main set."
     end
 
-    # Base of 1 main set for 30 min, +1 set per additional 15 min
-    # e.g. 30→1, 45→2, 60→3, 75→4
-    main_sets = [ 1 + ((@duration_mins - 30) / 15.0).floor, 1 ].max
+    warmup_mins = 5
+    cooldown_mins = 5
+    working_mins = @duration_mins - warmup_mins - cooldown_mins
 
-    set_word = main_sets == 1 ? "1 main set" : "#{main_sets} main sets"
+    # 1 main set per 15 min of working time
+    # e.g. 45 min → 35 working → 2 main sets, 60 min → 50 working → 3, 75 min → 65 working → 4
+    main_sets = [ (working_mins / 15.0).floor, 1 ].max
+    finisher_fits = (working_mins - (main_sets * 15)) >= 4
 
-    "- Session structure: Warm-up (5 min) → #{set_word} → Finisher → Cool-down (5 min). " \
-    "The rule is: 30 min = 1 main set, then add 1 more set for every additional 15 minutes (45 min = 2 sets, 60 min = 3 sets, 75 min = 4 sets). " \
-    "The Finisher is always present — a short punchy section (Tabata = 4 min, or a for_time sprint). " \
-    "DO NOT add more main sets than #{main_sets} — rest and transitions between exercises fill the remaining time naturally. " \
-    "Do NOT set duration_mins on main sets or try to make section durations add up to #{@duration_mins}."
+    set_word = main_sets == 1 ? "1 main section" : "#{main_sets} main sections"
+    finisher_text = finisher_fits ? " → Finisher (Tabata 4 min or short for_time sprint)" : ""
+    total_sections = 2 + main_sets + (finisher_fits ? 1 : 0) # warm-up + mains + finisher? + cool-down
+
+    "- *** SESSION STRUCTURE (MANDATORY — follow this exactly) ***: " \
+    "Warm-up (#{warmup_mins} min) → #{set_word}#{finisher_text} → Cool-down (#{cooldown_mins} min). " \
+    "You have #{working_mins} minutes of working time. " \
+    "DO NOT add more than #{main_sets} main section#{"s" if main_sets > 1}. " \
+    "Do NOT add activation sections, 'wake up' sections, 'ease in' sections, or any other warm-up-like sections — there is ONE warm-up. " \
+    "Do NOT add 'decompress', 'wind down', or other cool-down-like sections before the actual cool-down — there is ONE cool-down at the end. " \
+    "Total sections in the workout: #{total_sections} (warm-up + #{main_sets} main#{"s" if main_sets > 1}#{finisher_fits ? " + finisher" : ""} + cool-down). " \
+    "Do NOT set duration_mins on main sets."
   end
 
   def build_remix_prompt

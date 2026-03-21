@@ -7,11 +7,11 @@
     <div>
       <h1 class="text-2xl font-bold tracking-tight">Generate Workout</h1>
       <% if Current.user.pro_features? %>
-        <p class="text-gray-400 mt-0.5 text-sm">Describe the session you want and we'll build it.</p>
+        <p class="text-gray-400 mt-0.5 text-sm">Pick your session type and focus, and we'll build it.</p>
       <% elsif user_at_limit %>
         <p class="text-red-400 mt-0.5 text-sm font-medium">You've used all <%= Current.user.generation_limit %> generations this week.</p>
       <% else %>
-        <p class="text-gray-400 mt-0.5 text-sm">Describe the session you want and we'll build it.</p>
+        <p class="text-gray-400 mt-0.5 text-sm">Pick your session type and focus, and we'll build it.</p>
       <% end %>
     </div>
     <button type="button"
@@ -26,13 +26,60 @@
 
   <%= form_with url: workouts_path, data: { controller: "generate-form", action: "submit->generate-form#showSpinner" } do |f| %>
 
-    <%# Session Type — text input %>
+    <%# Session Type — featured tiles + custom input %>
+    <% featured_types = [
+      { name: "Maximum Voltage",   icon: "muscle",      desc: "The ultimate all-round workout" },
+      { name: "Transformer",       icon: "strength",    desc: "Heavy lifts, structured sets" },
+      { name: "Alternator",        icon: "alternator",  desc: "Machine cardio + floor strength" },
+      { name: "Circuit Breaker",   icon: "circuit",     desc: "Fast, functional circuits with minimal rest" },
+      { name: "Dynamo",            icon: "dynamo",      desc: "Bodyweight HIIT — no equipment needed" },
+      { name: "Tread & Shred",     icon: "treadmill",   desc: "Treadmill intervals + floor strength" },
+      { name: "Iron Engine",       icon: "kettlebell",  desc: "Kettlebell flows, swings & grinds" },
+      { name: "Ohm",               icon: "ohm",         desc: "Yoga, pilates & mobility" }
+    ] %>
     <div class="mb-6">
-      <p class="text-sm font-semibold text-gray-300 uppercase tracking-wide mb-2">Session Type</p>
-      <%= text_field_tag :activity, nil,
-          placeholder: "e.g. Maximum Voltage, HIIT, Functional Muscle, Tread & Shred…",
-          class: "w-full bg-zinc-800 border border-zinc-600 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-lime-400 transition-colors",
-          autocomplete: "off" %>
+      <p class="text-sm font-semibold text-gray-300 uppercase tracking-wide mb-3">Session Type</p>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+        <% featured_types.each do |ft| %>
+          <label class="cursor-pointer">
+            <%= radio_button_tag "activity", ft[:name], false,
+                id: "activity_#{ft[:name].parameterize}",
+                class: "peer sr-only",
+                data: { generate_form_target: "pill", action: "change->generate-form#pillSelected" } %>
+            <div class="h-full border-2 border-zinc-600 rounded-xl p-3 peer-checked:border-lime-400 peer-checked:bg-lime-400/10 peer-checked:text-lime-400 text-gray-500 transition-all text-center">
+              <div class="mb-1">
+                <% case ft[:icon] %>
+                <% when "muscle" %>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mx-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h1m16 0h1M6.5 9.5 5 7m13.5 2.5L20 7M9 12a3 3 0 0 1 6 0m-6 0H6.5a2 2 0 0 0 0 4H9m6 0h2.5a2 2 0 0 0 0-4H15m-6 4v2m6-2v2"/></svg>
+                <% when "strength" %>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mx-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="9" width="3" height="6" rx="1"/><rect x="19" y="9" width="3" height="6" rx="1"/><rect x="5" y="7" width="2" height="10" rx="0.5"/><rect x="17" y="7" width="2" height="10" rx="0.5"/><line x1="7" y1="12" x2="17" y2="12"/></svg>
+                <% when "alternator" %>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mx-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><polyline points="7 15 3 19 7 23"/><line x1="21" y1="5" x2="9" y2="5"/><line x1="3" y1="19" x2="15" y2="19"/></svg>
+                <% when "circuit" %>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mx-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                <% when "dynamo" %>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mx-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48 2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48 2.83-2.83"/><circle cx="12" cy="12" r="3"/></svg>
+                <% when "treadmill" %>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mx-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3a1 1 0 1 0 2 0 1 1 0 0 0-2 0"/><path d="M14 7l-2 9 4-2 3 5"/><path d="M9 9l-3 12"/><path d="M3 21h18"/><path d="M12 7l-4 4 2 1"/></svg>
+                <% when "kettlebell" %>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mx-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a4 4 0 0 0-4 4c0 1.1.4 2 1.1 2.7L8 10a6 6 0 1 0 8 0l-1.1-1.3A3.98 3.98 0 0 0 16 6a4 4 0 0 0-4-4z"/><path d="M10 6a2 2 0 1 1 4 0"/></svg>
+                <% when "ohm" %>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mx-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2"/><path d="M12 8c-2.2 0-4 1.8-4 4s1.8 4 4 4 4-1.8 4-4-1.8-4-4-4"/><path d="M12 6v2m0 8v2"/></svg>
+                <% end %>
+              </div>
+              <p class="font-bold text-xs text-white leading-tight"><%= ft[:name] %></p>
+              <p class="text-[10px] leading-tight mt-0.5"><%= ft[:desc] %></p>
+            </div>
+          </label>
+        <% end %>
+      </div>
+
+      <div class="mt-3">
+        <%= text_field_tag :custom_activity, nil,
+            placeholder: "Or type any workout style…",
+            class: "w-full bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-lime-400 transition-colors",
+            data: { generate_form_target: "customInput", action: "input->generate-form#customTyped" } %>
+      </div>
     </div>
 
     <%# Duration %>
@@ -57,22 +104,29 @@
       </div>
     </div>
 
-    <%# Difficulty — text input %>
-    <div class="mb-6">
-      <p class="text-sm font-semibold text-gray-300 uppercase tracking-wide mb-2">Difficulty</p>
-      <%= f.text_field :difficulty, value: "intermediate",
-          placeholder: "e.g. beginner, intermediate, advanced",
-          class: "w-full bg-zinc-800 border border-zinc-600 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-lime-400 transition-colors",
-          autocomplete: "off" %>
-    </div>
-
     <%# Session Notes — free text %>
     <div class="mb-6">
       <p class="text-sm font-semibold text-gray-300 uppercase tracking-wide mb-1">Session Notes</p>
-      <p class="text-xs text-gray-500 mb-2">Injuries, equipment, intensity, focus — anything that should shape this session.</p>
+      <p class="text-xs text-gray-500 mb-3">Injuries, equipment, intensity, focus — anything that should shape this session.</p>
       <%= text_field_tag :session_notes, nil,
           placeholder: "e.g. injured knee · hotel gym · zone 2 only · upper body · no running",
-          class: "w-full bg-zinc-800 border border-zinc-600 rounded-xl px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-lime-400 transition-colors" %>
+          class: "w-full bg-zinc-800 border border-zinc-600 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-lime-400 transition-colors" %>
+    </div>
+
+    <%# Difficulty %>
+    <div class="mb-6">
+      <p class="text-sm font-semibold text-gray-300 uppercase tracking-wide mb-3">Difficulty</p>
+      <div class="grid grid-cols-3 gap-3">
+        <% [["beginner", "Beginner", "Building base fitness"], ["intermediate", "Intermediate", "Regular training"], ["advanced", "Advanced", "Competition prep"]].each do |value, label, desc| %>
+          <label class="relative cursor-pointer">
+            <%= f.radio_button :difficulty, value, class: "peer sr-only", checked: value == "intermediate" %>
+            <div class="border-2 border-zinc-600 rounded-xl p-3 peer-checked:border-lime-400 peer-checked:bg-lime-400/10 transition-all text-center">
+              <p class="font-semibold text-sm"><%= label %></p>
+              <p class="text-gray-500 text-xs mt-0.5"><%= desc %></p>
+            </div>
+          </label>
+        <% end %>
+      </div>
     </div>
 
     <% unless user_at_limit %>

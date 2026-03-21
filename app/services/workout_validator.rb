@@ -78,9 +78,12 @@ class WorkoutValidator
     fix_redundant_section_notes(sections)
     fix_rotating_emom_reps(sections)
     fix_emom_notes(sections)
+    dedup_warmup_sections(sections)
+    dedup_cooldown_sections(sections)
     check_cooldown(sections)
 
     fix_warmup_format(sections)
+    fix_amrap_minimum_exercises(sections)
 
     if @main_tag_slug == "functional-muscle"
       fix_fm_remove_activation(sections)
@@ -255,7 +258,8 @@ class WorkoutValidator
   # Skips warm-up, cool-down, tabata, emom, amrap, for_time, ladder, mountain.
   SINGLE_SET_EXEMPT   = %w[tabata emom amrap for_time ladder mountain matrix hundred].freeze
   KNOWN_FORMATS       = %w[rounds tabata emom amrap for_time ladder mountain matrix hundred].freeze
-  WARMUP_COOLDOWN_PATTERN = /warm|cool|stretch|recovery/i
+  WARMUP_COOLDOWN_PATTERN = /warm|cool|stretch|recovery|wake.?up|ease.?in|activation|decompress|melt|reset|ease.?down|unwind/i
+  WARMUP_NAME_PATTERN = /\bwarm|wake.?up|ease.?in|activation|loosen|mobilit/i.freeze
   ABS_PILATES_PATTERN     = /abs|core|pilates|hundred/i
 
   def fix_single_set_sections(sections)
@@ -287,6 +291,22 @@ class WorkoutValidator
         section["rounds"] = 3
         @fixes << "'#{section["name"]}': single exercise with #{rounds} round(s) → 3 rounds"
       end
+    end
+  end
+
+  # AMRAP with fewer than 3 exercises is nonsensical — you'd just repeat the same
+  # movement continuously. Convert to for_time (rounds: 3) which makes more sense.
+  def fix_amrap_minimum_exercises(sections)
+    sections.each do |section|
+      next unless section["format"] == "amrap"
+      exercises = Array(section["exercises"])
+      next if exercises.size >= 3
+
+      duration = section["duration_mins"]
+      section["format"] = "for_time"
+      section["rounds"] = 3
+      section.delete("duration_mins")
+      @fixes << "'#{section["name"]}': AMRAP with #{exercises.size} exercise(s) → converted to 3 rounds for_time"
     end
   end
 
@@ -964,7 +984,47 @@ class WorkoutValidator
   # Ensure a cool-down exists as the LAST section. If a cooldown-like section
   # exists mid-workout, leave it (it's a mid-session refresher) but still ensure
   # the final section is a proper cooldown. If none exists anywhere, inject one.
-  COOLDOWN_NAME_PATTERN = /\bcool|stretch|recovery\s*flow|wind.?down/i.freeze
+  COOLDOWN_NAME_PATTERN = /\bcool|stretch|recovery\s*flow|wind.?down|decompress|melt|reset|ease.?down|unwind/i.freeze
+
+  # If the LLM generated multiple warm-up-like sections at the start, keep only the first one.
+  def dedup_warmup_sections(sections)
+    return if sections.size < 2
+
+    # Find all leading sections that look like warm-ups
+    leading_warmups = []
+    sections.each do |s|
+      break unless s["name"].to_s.match?(WARMUP_NAME_PATTERN)
+      leading_warmups << s
+    end
+
+    return if leading_warmups.size <= 1
+
+    # Keep only the first one, remove the rest
+    leading_warmups[1..].each do |dupe|
+      sections.delete(dupe)
+      @fixes << "Removed duplicate warm-up section '#{dupe["name"]}'"
+    end
+  end
+
+  # If the LLM generated multiple cool-down/stretch sections at the end, keep only the last one.
+  def dedup_cooldown_sections(sections)
+    return if sections.size < 2
+
+    # Find all trailing sections that look like cool-downs
+    trailing_cooldowns = []
+    sections.reverse_each do |s|
+      break unless s["name"].to_s.match?(COOLDOWN_NAME_PATTERN)
+      trailing_cooldowns.unshift(s)
+    end
+
+    return if trailing_cooldowns.size <= 1
+
+    # Keep only the last one, remove the rest
+    trailing_cooldowns[0..-2].each do |dupe|
+      sections.delete(dupe)
+      @fixes << "Removed duplicate cool-down section '#{dupe["name"]}'"
+    end
+  end
 
   def check_cooldown(sections)
     breaths = @duration_mins <= 30 ? 5 : 10
