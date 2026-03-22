@@ -3,11 +3,9 @@
 <% liked      = liked_workout_ids.include?(workout.id) %>
 <% like_count = workout.workout_likes.size %>
 <% is_own     = workout_log.user == Current.user %>
+<% in_library = local_assigns[:library_workout_ids] ? library_workout_ids.include?(workout.id) : is_own %>
 
 <% sections = structure.is_a?(Hash) ? Array(structure["sections"]) : [] %>
-<% session_tags = workout_log.tags %>
-<% workout_tags = workout.tags %>
-<% display_tags = session_tags.any? ? session_tags : workout_tags %>
 <% goal = structure.is_a?(Hash) ? structure["goal"] : nil %>
 
 <div class="bg-zinc-800 sm:border sm:border-zinc-600/70 sm:rounded-2xl overflow-hidden shadow-sm hover:border-gray-600 hover:shadow-md transition-all duration-200">
@@ -48,14 +46,6 @@
       <% end %>
     </div>
 
-    <%# Tags %>
-    <% if display_tags.any? %>
-      <div class="flex items-center gap-1.5 mt-2 flex-wrap">
-        <% display_tags.first(3).each do |tag| %>
-          <%= link_to "##{tag.name}", feed_path(tag_id: tag.id), class: "text-xs bg-violet-500/15 border border-violet-400/40 text-violet-400 hover:text-white hover:border-violet-400 px-2 py-0.5 rounded-full font-semibold flex-shrink-0 transition-colors" %>
-        <% end %>
-      </div>
-    <% end %>
 
   </div>
 
@@ -108,13 +98,15 @@
             </svg>
           </button>
         <% end %>
-        <%= button_to save_workout_path(workout), method: :post,
-              form: { class: "contents" },
-              class: "text-gray-500 hover:text-gray-300 transition-colors p-2 cursor-pointer",
-              title: "Save to library" do %>
-          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
-          </svg>
+        <% unless in_library %>
+          <%= button_to save_workout_path(workout), method: :post,
+                form: { class: "contents" },
+                class: "text-gray-500 hover:text-gray-300 transition-colors p-2 cursor-pointer",
+                title: "Save to My Workouts" do %>
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+            </svg>
+          <% end %>
         <% end %>
         <button type="button"
                 onclick="event.stopPropagation(); document.getElementById('share_dialog_workout_<%= workout.id %>').showModal()"
@@ -137,13 +129,13 @@
   </div>
 
   <%# ── Show/Hide Workout toggle ── %>
-  <details class="group/details">
-    <summary class="bg-zinc-900 border-t border-zinc-700/50 px-4 py-2.5 list-none cursor-pointer select-none text-center [&::-webkit-details-marker]:hidden">
-      <span class="show-label inline-flex items-center gap-1.5 text-gray-500 text-xs font-bold uppercase tracking-wide hover:text-gray-300 transition-colors">
+  <details data-controller="details-toggle">
+    <summary class="bg-zinc-900 border-t border-zinc-700/50 px-4 py-2.5 list-none cursor-pointer select-none text-center">
+      <span data-details-toggle-target="showLabel" class="inline-flex items-center gap-1.5 text-gray-500 text-xs font-bold uppercase tracking-wide hover:text-gray-300 transition-colors">
         Show Workout
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
       </span>
-      <span class="hide-label hidden items-center gap-1.5 text-gray-400 text-xs font-bold uppercase tracking-wide hover:text-gray-300 transition-colors">
+      <span data-details-toggle-target="hideLabel" style="display:none" class="items-center gap-1.5 text-gray-400 text-xs font-bold uppercase tracking-wide hover:text-gray-300 transition-colors">
         Hide Workout
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
       </span>

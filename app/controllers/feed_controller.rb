@@ -32,5 +32,8 @@ class FeedController < ApplicationController
     @next_page     = @page + 1
     workout_ids    = @workout_logs.map(&:workout_id)
     @liked_workout_ids = WorkoutLike.where(user: Current.user, workout_id: workout_ids).pluck(:workout_id).to_set
+    owned_ids = Current.user.workouts.where(id: workout_ids).pluck(:id)
+    saved_source_ids = Current.user.workouts.where(source_workout_id: workout_ids).pluck(:source_workout_id)
+    @library_workout_ids = (owned_ids + saved_source_ids).to_set
   end
 end

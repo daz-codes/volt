@@ -173,12 +173,6 @@
         <span class="text-xs bg-zinc-700/50 border border-lime-400/30 text-lime-400 px-2.5 py-1 rounded-full font-semibold"><%= @activity_filter %></span>
         <%= link_to "✕ clear", library_path, class: "text-xs text-gray-500 hover:text-gray-300 transition-colors" %>
       </div>
-    <% elsif @tag %>
-      <div class="flex items-center gap-2 mb-4">
-        <span class="text-sm text-gray-400">Tagged:</span>
-        <span class="text-xs bg-violet-500/15 border border-violet-400/40 text-violet-400 px-2.5 py-1 rounded-full font-semibold">#<%= @tag.name %></span>
-        <%= link_to "✕ clear", library_path, class: "text-xs text-gray-500 hover:text-gray-300 transition-colors" %>
-      </div>
     <% end %>
     <div class="space-y-3">
       <% @workouts.each do |workout| %>
@@ -218,17 +212,10 @@
               <p class="text-sky-200 text-xs font-medium mt-1 leading-relaxed"><%= summary_text %></p>
             <% end %>
 
-            <% if workout.tags.any? %>
-              <div class="flex items-center gap-1.5 mt-2 flex-wrap">
-                <% workout.tags.first(3).each do |tag| %>
-                  <%= link_to "##{tag.name}", library_path(tag_id: tag.id), class: "text-xs bg-violet-500/15 border border-violet-400/40 text-violet-400 hover:text-white hover:border-violet-400 px-2 py-0.5 rounded-full font-semibold transition-colors" %>
-                <% end %>
-              </div>
-            <% end %>
           </div>
 
           <%# Footer %>
-          <details class="group">
+          <details data-controller="details-toggle">
             <summary class="bg-zinc-900 border-t border-zinc-700 px-4 py-3 list-none cursor-pointer select-none">
               <%# Row 1: actions %>
               <div class="flex items-center gap-2 mb-2.5">
@@ -252,9 +239,9 @@
               <%# Row 2: show workout + pdf + delete %>
               <div class="flex items-center justify-between">
                 <% if lib_sections.any? %>
-                  <span class="text-gray-600 text-xs font-bold uppercase tracking-wide group-open:text-gray-400 transition-colors">
-                    <span class="group-open:hidden">Show Workout</span>
-                    <span class="hidden group-open:inline">Hide Workout</span>
+                  <span class="text-gray-600 text-xs font-bold uppercase tracking-wide transition-colors">
+                    <span data-details-toggle-target="showLabel">Show Workout</span>
+                    <span data-details-toggle-target="hideLabel" style="display:none">Hide Workout</span>
                   </span>
                 <% else %>
                   <span></span>

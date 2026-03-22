@@ -30,7 +30,7 @@
     <% else %>
       <div class="space-y-4">
         <% @workout_logs.each do |wl| %>
-          <%= render "feed/workout_log_card", workout_log: wl, liked_workout_ids: @liked_workout_ids %>
+          <%= render "feed/workout_log_card", workout_log: wl, liked_workout_ids: @liked_workout_ids, library_workout_ids: @library_workout_ids %>
         <% end %>
       </div>
 
@@ -48,7 +48,7 @@
   <%= turbo_frame_tag "feed_page_#{@page}" do %>
     <div class="space-y-4 mt-4">
       <% @workout_logs.each do |wl| %>
-        <%= render "feed/workout_log_card", workout_log: wl, liked_workout_ids: @liked_workout_ids %>
+        <%= render "feed/workout_log_card", workout_log: wl, liked_workout_ids: @liked_workout_ids, library_workout_ids: @library_workout_ids %>
       <% end %>
     </div>
 

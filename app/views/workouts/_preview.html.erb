@@ -26,13 +26,6 @@
             <%= workout.difficulty.capitalize %>
           </span>
         </div>
-        <% if workout.tags.any? %>
-          <div class="flex flex-wrap gap-1.5 mt-2">
-            <% workout.tags.each do |tag| %>
-              <%= link_to "##{tag.name}", library_path(tag_id: tag.id), class: "text-xs bg-violet-500/15 border border-violet-400/40 text-violet-400 hover:text-white hover:border-violet-400 px-2.5 py-0.5 rounded-full font-semibold transition-colors" %>
-            <% end %>
-          </div>
-        <% end %>
       </div>
 
       <%# Single circle — distance for distance sports, time otherwise %>
