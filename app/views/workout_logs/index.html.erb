@@ -4,12 +4,18 @@
   <div class="max-w-2xl mx-auto">
 
     <%# Header %>
-    <div class="flex items-center gap-3 mb-6">
-      <%= render "shared/avatar", user: Current.user, classes: "w-10 h-10 text-sm" %>
-      <div>
-        <p class="text-white font-black text-lg leading-tight tracking-tight" style="font-family: 'Jost', sans-serif"><%= Current.user.display %></p>
-        <p class="text-gray-500 text-xs font-semibold uppercase tracking-widest">Workout Log</p>
+    <div class="flex items-center justify-between mb-6">
+      <div class="flex items-center gap-3">
+        <%= render "shared/avatar", user: Current.user, classes: "w-10 h-10 text-sm" %>
+        <div>
+          <p class="text-white font-black text-lg leading-tight tracking-tight" style="font-family: 'Jost', sans-serif"><%= Current.user.display %></p>
+          <p class="text-gray-500 text-xs font-semibold uppercase tracking-widest">Training Log</p>
+        </div>
       </div>
+      <%= link_to profile_path, class: "flex items-center gap-1.5 text-gray-400 hover:text-white text-xs font-bold transition-colors" do %>
+        View Profile
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      <% end %>
     </div>
 
     <% if @workout_logs.empty? %>

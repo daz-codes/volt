@@ -9,7 +9,7 @@
           data: { turbo_frame: "_top" },
           form: { class: "contents" },
           class: "flex-1 text-center bg-volt hover:bg-volt/80 active:opacity-90 text-zinc-950 font-black py-3 rounded-xl text-sm transition-colors uppercase tracking-wide cursor-pointer" do %>
-        Do this
+        Post
       <% end %>
       <%= button_to persist_preview_workout_path(token: @preview_token, intent: "save"), method: :post,
           data: { turbo_frame: "_top" },

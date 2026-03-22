@@ -103,7 +103,8 @@
       "Bash(PATH=\"/opt/homebrew/bin:/Users/daz/.local/share/mise/installs/ruby/3.4.7/bin:$PATH\" rm:*)",
       "Bash(mise current:*)",
       "Bash(mise ls:*)",
-      "Bash(mise trust:*)"
+      "Bash(mise trust:*)",
+      "Bash(bundle exec:*)"
     ]
   }
 }

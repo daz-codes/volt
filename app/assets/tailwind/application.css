@@ -18,3 +18,19 @@ dialog::backdrop {
   background-color: rgba(0, 0, 0, 0.75);
   backdrop-filter: blur(2px);
 }
+
+/* Hide default disclosure triangle on <summary> elements */
+summary::-webkit-details-marker {
+  display: none;
+}
+summary::marker {
+  content: "";
+}
+
+/* Show/Hide workout toggle — swap labels when details is open */
+details[open] .show-label {
+  display: none !important;
+}
+details[open] .hide-label {
+  display: inline-flex !important;
+}

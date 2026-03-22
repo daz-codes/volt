@@ -74,7 +74,7 @@
     <button type="button"
             onclick="document.getElementById('complete_workout_<%= workout.id %>').showModal()"
             class="sm:flex-1 text-center bg-volt hover:bg-volt/80 active:opacity-90 text-zinc-950 font-black py-3 rounded-xl text-sm transition-colors uppercase tracking-wide shadow-sm shadow-volt/20 cursor-pointer">
-      Do this
+      Post
     </button>
     <% if own_workout %>
       <%= link_to "Edit", edit_workout_path(workout),
@@ -96,7 +96,7 @@
         Saved
       <% end %>
     <% else %>
-      <%= button_to "Save to Library", save_workout_path(workout), method: :post,
+      <%= button_to "Save to My Workouts", save_workout_path(workout), method: :post,
           data: { turbo_frame: "_top" },
           form: { class: "contents" },
           class: "text-center py-3 px-4 border border-zinc-600 hover:border-gray-500 text-gray-300 hover:text-white font-bold rounded-xl text-sm transition-colors cursor-pointer" %>
