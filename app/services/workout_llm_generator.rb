@@ -542,6 +542,7 @@ class WorkoutLLMGenerator
   # structural rules (time budget, session structure, warm-up/cool-down, difficulty).
   def build_example_prompt(example_workouts)
     main_name = @activity || "general fitness"
+    recent_names = fetch_recent_workout_names
 
     examples_json = example_workouts.map do |w|
       {
@@ -655,7 +656,7 @@ class WorkoutLLMGenerator
         #{sport_rule}
         #{pace_limits}
         #{equipment_rule}
-        - Give it a punchy, memorable name (2-4 words) — creative, not generic
+        - Give it a punchy, memorable name — something a gym community would actually call it. Be creative and unpredictable: draw from feelings, imagery, places, days, animals, weather, mythology, slang — anything vivid. NEVER use the session type name as the workout name — "#{main_name}" is the TYPE of session, not the name. The name must be original and creative. BANNED WORDS in workout names: Voltage, Maximum, Transformer, Dynamo, Alternator, Circuit Breaker, Tread & Shred, Iron Engine, Ohm — these are session type brands, not workout names. #{recent_names.any? ? "The user's recent workout names are: #{recent_names.map { |n| "\"#{n}\"" }.join(", ")}. Do NOT reuse any word or theme from these." : ""}
         - Be specific with reps, distances, and weights
         - Rep counts should be clean numbers (even or multiples of 5)
         - NEVER use numbered block prefixes like "Block 1:", "Block 2:" in section names — use creative, descriptive names instead
@@ -682,7 +683,7 @@ class WorkoutLLMGenerator
         #{sport_rule}
         #{pace_limits}
         #{equipment_rule}
-        - Give it a punchy, memorable name (2-4 words) — creative, not generic
+        - Give it a punchy, memorable name — something a gym community would actually call it. Be creative and unpredictable: draw from feelings, imagery, places, days, animals, weather, mythology, slang — anything vivid. NEVER use the session type name as the workout name — "#{main_name}" is the TYPE of session, not the name. The name must be original and creative. BANNED WORDS in workout names: Voltage, Maximum, Transformer, Dynamo, Alternator, Circuit Breaker, Tread & Shred, Iron Engine, Ohm — these are session type brands, not workout names. #{recent_names.any? ? "The user's recent workout names are: #{recent_names.map { |n| "\"#{n}\"" }.join(", ")}. Do NOT reuse any word or theme from these." : ""}
         - Be specific with reps, distances, and weights
         - Rep counts should be clean numbers (even or multiples of 5)
         - NEVER use numbered block prefixes like "Block 1:", "Block 2:" in section names — use creative, descriptive names instead
