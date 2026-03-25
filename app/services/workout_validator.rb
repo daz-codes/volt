@@ -1026,47 +1026,14 @@ class WorkoutValidator
     end
   end
 
+  # Trust the LLM to always include a cool-down as the last section (the prompt
+  # requires it). We no longer inject a fallback cool-down, which caused duplicates
+  # when the LLM used creative section names. We still clean up the last section's
+  # exercises (strip reps/durations, add breath notes) since it should be a stretch.
   def check_cooldown(sections)
     breaths = @duration_mins <= 30 ? 5 : 10
-
     last = sections.last
-    last_is_cooldown = last && last["name"].to_s.match?(COOLDOWN_NAME_PATTERN)
-
-    unless last_is_cooldown
-      # Inject a varied cooldown — rotate through different options
-      cooldown_options = [
-        [
-          { "name" => "Pigeon Pose", "notes" => "#{breaths} deep breaths each side" },
-          { "name" => "Seated Forward Fold", "notes" => "#{breaths} deep breaths" },
-          { "name" => "Lying Spinal Twist", "notes" => "#{breaths} deep breaths each side" }
-        ],
-        [
-          { "name" => "World's Greatest Stretch", "notes" => "#{breaths} deep breaths each side" },
-          { "name" => "Child's Pose with Arms Extended", "notes" => "#{breaths} deep breaths" },
-          { "name" => "Supine Figure-Four Stretch", "notes" => "#{breaths} deep breaths each side" }
-        ],
-        [
-          { "name" => "Downward Dog", "notes" => "#{breaths} deep breaths" },
-          { "name" => "Low Lunge Hip Opener", "notes" => "#{breaths} deep breaths each side" },
-          { "name" => "Butterfly Stretch", "notes" => "#{breaths} deep breaths" }
-        ],
-        [
-          { "name" => "Cat-Cow", "notes" => "#{breaths} deep breaths" },
-          { "name" => "Thread the Needle", "notes" => "#{breaths} deep breaths each side" },
-          { "name" => "Standing Quad Stretch", "notes" => "#{breaths} deep breaths each side" }
-        ]
-      ]
-
-      cooldown = {
-        "name" => "Cool-Down",
-        "format" => "straight",
-        "duration_mins" => @duration_mins <= 30 ? 2 : 5,
-        "exercises" => cooldown_options.sample
-      }
-      sections << cooldown
-      @fixes << "Injected missing cool-down as final section"
-      return
-    end
+    return unless last
 
     Array(last["exercises"]).each do |ex|
       stripped = []
