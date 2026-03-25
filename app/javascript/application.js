@@ -4,3 +4,8 @@ import "controllers"
 import "chartkick"
 import "Chart"
 import "chartjs-adapter-date-fns"
+
+// Register PWA service worker
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("/service-worker", { scope: "/" })
+}
