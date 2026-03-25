@@ -1494,12 +1494,12 @@ class WorkoutLLMGenerator
     bodyweight_only = @activity_slug.in?(BODYWEIGHT_ONLY_SLUGS)
     warmup = if @duration_mins <= 30
       if bodyweight_only
-        "- Warm-up: 3 minutes (format: straight, duration_mins: 3). Keep it simple — 3–4 bodyweight activation exercises (e.g. jumping jacks, arm circles, leg swings, air squats). No equipment, no cardio machines."
+        "- Warm-up (MANDATORY — EVERY workout must START with a warm-up as the FIRST section): 3 minutes (format: straight, duration_mins: 3). Keep it simple — 3–4 bodyweight activation exercises (e.g. jumping jacks, arm circles, leg swings, air squats). No equipment, no cardio machines. Give it a creative name — do NOT just call it \"Warm-Up\"."
       else
-        "- Warm-up: 3 minutes (format: straight, duration_mins: 3). Keep it simple — 1 exercise, steady cardio only."
+        "- Warm-up (MANDATORY — EVERY workout must START with a warm-up as the FIRST section): 3 minutes (format: straight, duration_mins: 3). Keep it simple — 1 exercise, steady cardio only. Give it a creative name — do NOT just call it \"Warm-Up\"."
       end
     else
-      "- Warm-up: 5 minutes (format: straight, duration_mins: 5). Use the Warm-Up Approach specified above — follow it exactly."
+      "- Warm-up (MANDATORY — EVERY workout must START with a warm-up as the FIRST section): 5 minutes (format: straight, duration_mins: 5). Use the Warm-Up Approach specified above — follow it exactly. Give it a creative name — do NOT just call it \"Warm-Up\"."
     end
 
     breaths = @duration_mins <= 30 ? 5 : 10

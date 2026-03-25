@@ -1091,31 +1091,14 @@ class WorkoutValidator
     end
   end
 
-  # The first section is always the warm-up and should be format: straight
-  # with no rounds. If the LLM omitted a warm-up entirely, inject a default.
+  # The first section is always the warm-up — ensure it uses format: straight
+  # with no rounds. We trust the LLM to always include a warm-up (the prompt
+  # requires it) so we no longer inject a fallback row warm-up, which caused
+  # duplicates when the LLM used creative section names.
   def fix_warmup_format(sections)
-    first = sections.first
-    has_warmup = first && (
-      first["name"].to_s.downcase.match?(/warm|primer|activation|ignition|mobilit/) ||
-      sections.index(first) == 0 && first["format"] == "straight" && first["duration_mins"].to_i <= 5
-    )
-
-    unless has_warmup
-      warmup_mins = @duration_mins <= 30 ? 3 : 5
-      warmup = {
-        "name" => "Warm-Up",
-        "format" => "straight",
-        "duration_mins" => warmup_mins,
-        "exercises" => [
-          { "name" => "Easy Row", "duration_s" => warmup_mins * 60, "notes" => "Light pace, get the blood flowing" }
-        ]
-      }
-      sections.unshift(warmup)
-      @fixes << "Injected missing warm-up section (#{warmup_mins} min)"
-      return
-    end
-
     warmup = sections.first
+    return unless warmup
+
     if warmup["format"] != "straight"
       old_format = warmup["format"]
       warmup["format"] = "straight"
