@@ -28,6 +28,8 @@ class User < ApplicationRecord
   has_many :shares_sent,     class_name: "Share", foreign_key: :sender_id,    dependent: :destroy
   has_many :shares_received, class_name: "Share", foreign_key: :recipient_id, dependent: :destroy
 
+  has_one_attached :avatar
+
   normalizes :email_address, with: ->(e) { e.strip.downcase }
   normalizes :username, with: ->(u) { u.presence }  # treat blank as nil
 

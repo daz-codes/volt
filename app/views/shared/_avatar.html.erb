@@ -1,5 +1,9 @@
 <%# Locals: user, classes (optional — override size/text) %>
 <% sz = local_assigns[:classes] || "w-7 h-7 text-xs" %>
-<div class="<%= sz %> rounded-full bg-lime-400 flex items-center justify-center flex-shrink-0 shadow-sm shadow-lime-400/30">
-  <span class="font-black text-zinc-900 leading-none" style="font-family: 'Jost', sans-serif"><%= user.initials %></span>
-</div>
+<% if user.avatar.attached? %>
+  <%= image_tag user.avatar, class: "#{sz} rounded-full object-cover flex-shrink-0" %>
+<% else %>
+  <div class="<%= sz %> rounded-full bg-lime-400 flex items-center justify-center flex-shrink-0 shadow-sm shadow-lime-400/30">
+    <span class="font-black text-zinc-900 leading-none" style="font-family: 'Jost', sans-serif"><%= user.initials %></span>
+  </div>
+<% end %>

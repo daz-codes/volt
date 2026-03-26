@@ -15,6 +15,19 @@
 
   <%= form_with model: @user, url: profile_path, method: :patch do |f| %>
 
+    <%# ── Avatar ── %>
+    <div class="mb-10">
+      <h2 class="text-xs font-black uppercase tracking-widest text-gray-500 mb-4">Avatar</h2>
+      <div class="flex items-center gap-5">
+        <%= render "shared/avatar", user: @user, classes: "w-20 h-20 text-3xl" %>
+        <div class="flex-1">
+          <%= f.file_field :avatar, accept: "image/*",
+              class: "block w-full text-sm text-gray-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-zinc-700 file:text-gray-300 hover:file:bg-zinc-600 file:cursor-pointer file:transition-colors" %>
+          <p class="text-gray-600 text-xs mt-2">JPG, PNG or WebP. Will be shown on your posts and profile.</p>
+        </div>
+      </div>
+    </div>
+
     <%# ── Identity ── %>
     <div class="mb-10">
       <h2 class="text-xs font-black uppercase tracking-widest text-gray-500 mb-4">Identity</h2>
