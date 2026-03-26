@@ -1,0 +1,41 @@
+<% content_for :title, "#{@profile_user.display} — Workouts" %>
+
+<div class="max-w-2xl mx-auto">
+  <div class="flex items-center gap-3 mb-6">
+    <%= link_to user_path(@profile_user), class: "text-gray-400 hover:text-white transition-colors" do %>
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    <% end %>
+    <div>
+      <h1 class="text-lg font-black tracking-tight" style="font-family: 'Jost', sans-serif">Workouts</h1>
+      <p class="text-gray-500 text-xs"><%= @profile_user.display %></p>
+    </div>
+  </div>
+
+  <% if @workouts.any? %>
+    <div class="space-y-2">
+      <% @workouts.each do |workout| %>
+        <%= link_to workout_path(workout), class: "block bg-zinc-800 sm:border sm:border-zinc-600/70 sm:rounded-xl px-4 py-3 hover:bg-zinc-700/50 transition-colors" do %>
+          <div class="flex items-center justify-between">
+            <div class="min-w-0 flex-1">
+              <p class="text-white font-bold text-sm truncate"><%= workout.name %></p>
+              <div class="flex items-center gap-2 mt-0.5">
+                <% if workout.activity %>
+                  <span class="text-xs text-lime-400 font-semibold"><%= workout.activity.name %></span>
+                  <span class="text-gray-600 text-xs">&middot;</span>
+                <% end %>
+                <span class="text-gray-500 text-xs"><%= workout.difficulty&.capitalize %></span>
+                <span class="text-gray-600 text-xs">&middot;</span>
+                <span class="text-gray-500 text-xs"><%= workout.duration_mins %> min</span>
+              </div>
+            </div>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-600 flex-shrink-0"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="bg-zinc-800 sm:border sm:border-zinc-600/70 sm:rounded-2xl p-12 text-center">
+      <p class="text-gray-600 text-sm">No workouts yet.</p>
+    </div>
+  <% end %>
+</div>

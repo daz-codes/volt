@@ -497,7 +497,7 @@ class WorkoutValidator
 
       # Build progression from ladder values
       sv = section["start"].to_f; ev = section["end"].to_f
-      step = [section["step"].to_f, 1.0].max
+      step = [ section["step"].to_f, 1.0 ].max
 
       vals = []
       if section["format"] == "ladder"
@@ -520,7 +520,7 @@ class WorkoutValidator
       if is_incline
         # Incline ladder: 1 min at each incline %, 1 min flat between
         # Cap incline at sensible max (15%) and ensure values make sense as %
-        vals = vals.map { |v| [v, 15].min }
+        vals = vals.map { |v| [ v, 15 ].min }
         total_mins = vals.size * 2
         total_secs = total_mins * 60
         pace_note = "#{vals.first}%→#{vals.last}% incline, 1 min at each grade (keep pace at 10–12 km/h) with 1 min flat (0%) between"
@@ -545,7 +545,7 @@ class WorkoutValidator
       first_ex["duration_s"] = total_secs
       %w[reps calories distance_m weight_kg].each { |k| first_ex.delete(k) }
       first_ex["notes"] = pace_note
-      section["exercises"] = [first_ex]
+      section["exercises"] = [ first_ex ]
 
       label = is_incline ? "incline" : "speed"
       @fixes << "'#{section["name"]}': treadmill #{label} ladder → straight (#{vals.join(" → ")}#{is_incline ? "%" : " km/h"}, #{total_mins} min)"
@@ -778,7 +778,7 @@ class WorkoutValidator
 
   # FM: warm-up must be a single cardio machine exercise (bike/row/ski), 5 mins, straight format.
   # If multiple exercises are found in the warm-up, trim to the first one.
-  FM_CARDIO_MACHINES = ["Easy Row", "Easy Ride", "Easy Ski"].freeze
+  FM_CARDIO_MACHINES = [ "Easy Row", "Easy Ride", "Easy Ski" ].freeze
 
   def fix_fm_warmup(sections)
     warmup = sections.find { |s| s["name"].to_s.match?(/warm/i) }
@@ -1092,7 +1092,7 @@ class WorkoutValidator
         if ex["name"].to_s.match?(/twist|pigeon|flexor|lunge.*stretch|thread|side|single|one.?leg|scorpion/i)
           breath_note = "#{breaths} deep breaths each side"
         end
-        ex["notes"] = [breath_note, notes.presence].compact.join(". ")
+        ex["notes"] = [ breath_note, notes.presence ].compact.join(". ")
         @fixes << "Cool-down: added '#{breath_note}' to '#{ex["name"]}'"
       end
     end

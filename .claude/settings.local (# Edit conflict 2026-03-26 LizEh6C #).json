@@ -107,12 +107,7 @@
       "Bash(bundle exec:*)",
       "Bash(PATH=\"/opt/homebrew/bin:/Users/daz/.local/share/mise/installs/ruby/3.4.7/bin:$PATH\" bin/bundler-audit:*)",
       "Bash(PATH=\"/opt/homebrew/bin:/Users/daz/.local/share/mise/installs/ruby/3.4.7/bin:$PATH\" bundle update:*)",
-      "Bash(PATH=\"/opt/homebrew/bin:/Users/daz/.local/share/mise/installs/ruby/3.4.7/bin:$PATH\" gem install:*)",
-      "Bash(xcode-select:*)",
-      "Bash(PATH=\"/usr/bin:/opt/homebrew/bin:/Users/daz/.local/share/mise/installs/ruby/3.4.7/bin:$PATH\" bundle update:*)",
-      "Bash(PATH=\"/opt/homebrew/bin:/Users/daz/.local/share/mise/installs/ruby/3.4.7/bin:/usr/bin:$PATH\" bundle update:*)",
-      "Bash(PATH=\"/opt/homebrew/bin:/Users/daz/.local/share/mise/installs/ruby/3.4.7/bin:/usr/bin:$PATH\" gem install:*)",
-      "Bash(PATH=\"/opt/homebrew/bin:/Users/daz/.local/share/mise/installs/ruby/3.4.7/bin:$PATH\" bin/rails test:system:*)"
+      "Bash(PATH=\"/opt/homebrew/bin:/Users/daz/.local/share/mise/installs/ruby/3.4.7/bin:$PATH\" gem install:*)"
     ]
   }
 }

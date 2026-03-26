@@ -27,18 +27,18 @@
       </div>
 
       <div class="grid grid-cols-3 gap-3 text-center">
-        <div class="bg-zinc-700/40 rounded-xl py-3">
+        <%= link_to workouts_user_path(@profile_user), class: "bg-zinc-700/40 rounded-xl py-3 hover:bg-zinc-600/40 transition-colors" do %>
           <p class="text-2xl font-black text-white"><%= @workout_count %></p>
           <p class="text-gray-500 text-xs uppercase tracking-wide mt-0.5">Workouts</p>
-        </div>
-        <div class="bg-zinc-700/40 rounded-xl py-3">
+        <% end %>
+        <%= link_to followers_user_path(@profile_user), class: "bg-zinc-700/40 rounded-xl py-3 hover:bg-zinc-600/40 transition-colors" do %>
           <p class="text-2xl font-black text-white"><%= @follower_count %></p>
           <p class="text-gray-500 text-xs uppercase tracking-wide mt-0.5">Followers</p>
-        </div>
-        <div class="bg-zinc-700/40 rounded-xl py-3">
+        <% end %>
+        <%= link_to following_user_path(@profile_user), class: "bg-zinc-700/40 rounded-xl py-3 hover:bg-zinc-600/40 transition-colors" do %>
           <p class="text-2xl font-black text-white"><%= @following_count %></p>
           <p class="text-gray-500 text-xs uppercase tracking-wide mt-0.5">Following</p>
-        </div>
+        <% end %>
       </div>
     </div>
 

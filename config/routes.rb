@@ -61,6 +61,11 @@ Rails.application.routes.draw do
 
   resources :users, only: [ :index, :show ] do
     collection { post :contacts_search }
+    member do
+      get :followers
+      get :following
+      get :workouts
+    end
   end
   resources :follows, only: [ :create, :destroy ]
   resources :shares, only: :create do

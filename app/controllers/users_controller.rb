@@ -23,6 +23,28 @@ class UsersController < ApplicationController
     @unmatched_count = (emails - matched_emails - [ Current.user.email_address ]).size
   end
 
+  # GET /users/:id/followers
+  def followers
+    @profile_user = User.find(params[:id])
+    @follows = @profile_user.follows_as_following.accepted.includes(:follower).order(accepted_at: :desc)
+    @users = @follows.map(&:follower)
+  end
+
+  # GET /users/:id/following
+  def following
+    @profile_user = User.find(params[:id])
+    @follows = @profile_user.follows_as_follower.accepted.includes(:following).order(accepted_at: :desc)
+    @users = @follows.map(&:following)
+  end
+
+  # GET /users/:id/workouts
+  def workouts
+    @profile_user = User.find(params[:id])
+    @workouts = @profile_user.workouts.where(status: "active")
+                             .includes(:activity, :workout_likes)
+                             .order(created_at: :desc)
+  end
+
   # GET /users/:id
   def show
     @profile_user = User.find(params[:id])
@@ -34,7 +56,7 @@ class UsersController < ApplicationController
 
     @follow_state   = Current.user.follow_state_for(@profile_user)
     @follow         = Current.user.follows_as_follower.find_by(following: @profile_user)
-    @workout_count  = @profile_user.workout_logs.count
+    @workout_count  = @profile_user.workouts.where(status: "active").count
     @follower_count = @profile_user.follows_as_following.accepted.count
     @following_count = @profile_user.follows_as_follower.accepted.count
 
