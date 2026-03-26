@@ -529,13 +529,36 @@ class WorkoutLLMGenerator
     Workout.where(id: ids.sample(3))
   end
 
-  # Fetches the 5 most-liked workouts matching the current tags for use as few-shot examples.
-  # Unlike fetch_context (which samples 3 randomly from top 20), this returns the actual top 5
-  # ordered by like count, so the user's multi-likes act as quality weighting.
+  # Fetches the 5 most-liked workouts matching the current activity for use as few-shot examples.
+  # Resolves activity aliases so e.g. "Maximum Voltage" also finds "Functional Muscle" examples.
   def fetch_top_liked_examples
     return Workout.left_joins(:workout_likes).group(:id).order(Arel.sql("COUNT(workout_likes.id) DESC")).limit(5) unless @activity
 
-    Workout.most_liked_with_activity(@activity, limit: 5)
+    # Try the exact activity name first
+    results = Workout.most_liked_with_activity(@activity, limit: 5)
+    return results if results.any?
+
+    # Fall back to sibling activities that share the same canonical slug
+    sibling_names = activity_sibling_names
+    return results if sibling_names.empty?
+
+    Workout.joins(:activity)
+           .where(activities: { name: sibling_names })
+           .left_joins(:workout_likes)
+           .group(:id)
+           .order(Arel.sql("COUNT(DISTINCT workout_likes.id) DESC"))
+           .limit(5)
+  end
+
+  # Returns activity names that share the same canonical slug as @activity.
+  # E.g. for "Maximum Voltage" (canonical: functional-muscle),
+  # finds all Activity records whose name parameterizes to a sibling slug.
+  def activity_sibling_names
+    canonical = @activity_slug
+    sibling_slugs = ACTIVITY_ALIASES.select { |_, v| v == canonical }.keys
+    sibling_slugs << canonical
+
+    Activity.pluck(:name).select { |n| sibling_slugs.include?(n.parameterize) }.reject { |n| n == @activity }
   end
 
   # Builds the prompt using example workouts as style references plus the full
@@ -585,6 +608,14 @@ class WorkoutLLMGenerator
     # Sport-specific context file (Deka, Hyrox, etc.)
     sport_context = load_sport_context([ @activity ].compact)
     sections << sport_context if sport_context.present?
+
+    # For unknown programs (no context file), fire a research call so the LLM
+    # knows the session structure, exercises, and feel of the program.
+    unless sport_context.present?
+      research = research_unknown_program
+      research_context = build_program_research_context(research)
+      sections << research_context if research_context.present?
+    end
 
     # Add race-accurate reference weights for event sessions (Hyrox, Deka, etc.)
     if event_session?
@@ -1330,7 +1361,9 @@ class WorkoutLLMGenerator
 
       SECTION NAMES: Give every section a short, punchy name — NEVER prefix with "Block 1:", "Block 2:", or any number. Numeric prefixes are banned. Tabatas: use fun creative names like "The Burner", "Sweat & Twist", "Ignition", "The Grind", "Pulse Raiser", "Chaos Round" — never "Tabata 1" or the exercise name. Metabolic blocks: use evocative names like "The Grind Loop", "Cardio Blitz", "The Ladder". Strength: "Upper Body Strength", "Lower Body Strength". The section name must accurately describe what's in it — don't call it "Abs Finisher" if the exercise is plate serves or bicep curls; call it "Functional Finisher" or "The Hundred" instead. Only use "Abs Finisher" or "Core 100" when the exercises are actual abs movements.
 
-      1. WARM-UP (always first): format: straight, duration_mins: 5. ONE exercise only — a single cardio machine (assault bike, rower, or ski erg) at easy pace. No mobility, no activation, no circuits. One machine, 5 mins.
+      *** CRITICAL: THE FIRST SECTION MUST BE A WARM-UP AND THE LAST SECTION MUST BE A COOL-DOWN. NEVER SKIP EITHER ONE. ***
+
+      1. WARM-UP (MANDATORY — must be the FIRST section): format: straight, duration_mins: 5. ONE exercise only — pick one at random: "Easy Row" (Rowing Machine), "Easy Ride" (Assault Bike), or "Easy Ski" (Ski Erg) at easy pace. No mobility, no activation, no circuits. One machine, 5 mins. Give it a creative name.
 
       2. METABOLIC BLOCKS (always before strength): Build the metabolic section according to the SESSION SHAPE given above — it tells you exactly how many tabatas to include. Do not add extra tabatas beyond the count specified.
 
@@ -1382,7 +1415,9 @@ class WorkoutLLMGenerator
         Sit-ups, Crunches, Overhead crunches, Leg raises, Alternating toe touches, V-ups, Bicycle crunches, Russian twists, Flutter kicks, Hollow holds (timed), Dead bugs, Plank shoulder taps, Mountain climbers (slow), Side plank dips.
         Choose exercises that contrast what was already hit in the metabolic blocks. If the session had lots of KB swings and hip work, lean towards upper-abs and rotation. If it was push-heavy, choose leg raises and lower-abs work.
 
-      6. COOL-DOWN (always last): format: straight, duration_mins: 5. Simple stretch, 2–3 holds only.
+      6. COOL-DOWN (MANDATORY — must be the LAST section): format: straight, duration_mins: 5. 3–4 stretches targeting muscles worked in the session. No reps — use notes like "10 deep breaths" or "10 deep breaths each side". Give it a creative name (e.g. "Melt", "Fade Out", "Wind Down").
+
+      *** REMINDER: You MUST include exactly 6 phases: (1) Warm-Up, (2) Metabolic blocks, (3) Upper Body Strength, (4) Lower Body Strength, (5) Abs/Pilates 100, (6) Cool-Down. The warm-up and cool-down are NOT optional — every FM session starts with a 5-min cardio machine warm-up and ends with a 5-min stretch cool-down. ***
 
       BANNED in Functional Muscle: activation blocks, mobility warm-up sequences, AMRAP, single sets of any weighted exercise, any rep scheme other than 5×10 or 5×5 for the strength sections, reps on 12-min rotating EMOM exercises, powerlifting-style main sets.
     RULE

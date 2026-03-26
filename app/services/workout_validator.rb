@@ -92,6 +92,7 @@ class WorkoutValidator
       fix_fm_merge_strength_sections(sections)
       fix_fm_strength_sets(sections)
       fix_fm_warmup(sections)
+      fix_fm_cooldown(sections)
       fix_fm_strip_machine_suffix(sections)
       fix_fm_trim_metabolic_blocks(sections)
       fix_fm_ensure_abs(sections)
@@ -777,9 +778,26 @@ class WorkoutValidator
 
   # FM: warm-up must be a single cardio machine exercise (bike/row/ski), 5 mins, straight format.
   # If multiple exercises are found in the warm-up, trim to the first one.
+  FM_CARDIO_MACHINES = ["Easy Row", "Easy Ride", "Easy Ski"].freeze
+
   def fix_fm_warmup(sections)
     warmup = sections.find { |s| s["name"].to_s.match?(/warm/i) }
-    return unless warmup
+
+    # If the LLM omitted the warm-up entirely, inject one as the first section
+    unless warmup
+      machine = FM_CARDIO_MACHINES.sample
+      warmup = {
+        "name" => "Warm-Up",
+        "format" => "straight",
+        "duration_mins" => 5,
+        "exercises" => [
+          { "name" => machine, "duration_s" => 300, "notes" => "Light pace, get the blood flowing" }
+        ]
+      }
+      sections.unshift(warmup)
+      @fixes << "FM: injected missing warm-up (#{machine}, 5 min)"
+      return
+    end
 
     exercises = Array(warmup["exercises"])
     if exercises.size > 1
@@ -792,6 +810,28 @@ class WorkoutValidator
       warmup["duration_mins"] = 5
       @fixes << "FM warm-up duration #{old} → 5 mins"
     end
+  end
+
+  # FM: ensure a cool-down exists as the last section.
+  # If the LLM omitted it, inject a simple stretch.
+  def fix_fm_cooldown(sections)
+    last = sections.last
+    has_cooldown = last && last["name"].to_s.match?(/cool|stretch|melt|wind.?down|fade|decompress|reset|unwind/i)
+    return if has_cooldown
+
+    breaths = 10
+    cooldown = {
+      "name" => "Cool-Down",
+      "format" => "straight",
+      "duration_mins" => 5,
+      "exercises" => [
+        { "name" => "Pigeon Pose", "notes" => "#{breaths} deep breaths each side" },
+        { "name" => "Seated Forward Fold", "notes" => "#{breaths} deep breaths" },
+        { "name" => "Lying Spinal Twist", "notes" => "#{breaths} deep breaths each side" }
+      ]
+    }
+    sections << cooldown
+    @fixes << "FM: injected missing cool-down (5 min stretch)"
   end
 
   # FM: remove non-compound exercises from tabata sections.
