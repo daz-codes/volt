@@ -35,7 +35,8 @@ class WorkoutLLMGenerator
     "metafit"            => "metafit.md",
     "metafit-bodyweight" => "metafit.md",
     "barrys"             => "barrys.md",
-    "f45"                => "f45.md"
+    "f45"                => "f45.md",
+    "kettlebell"         => "kettlebell.md"
   }.freeze
 
   CONTEXT_DIR = Rails.root.join("app", "llm_context").freeze

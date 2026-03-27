@@ -123,10 +123,10 @@ Side Raises, Shoulder Press, Bicep Curls, Tricep Extensions, DB Lunges, DB Star 
 Plate Good Morning, Plate Good Morning with Twist, Plate Serve (front raise to overhead), Plate Press, Overhead Crunches
 
 **Bodyweight**
-Burpees, Box Jumps, Jump Squats, 360 Jump Squats, Squat Jacks, Jumping Lunges, Mountain Climbers, Clap Press-ups, Australian Pull-ups, Wall Handstand
+Burpees, Box Jumps, Jump Squats, 360 Jump Squats, Squat Jacks, Jumping Lunges, Mountain Climbers, Clap Press-ups, Australian Pull-ups, Wall Handstand, Jump Rope (singles or doubles — use for cardio intervals, continuous circuits, and active recovery instead of jumping jacks)
 
-**Cardio Machines**
-Assault Bike, Rowing Machine, SkiErg — used for timed intervals with calorie or distance targets
+**Cardio Machines and Tools**
+Assault Bike, Rowing Machine, SkiErg — used for timed intervals with calorie or distance targets. Jump Rope (singles or doubles) — use for cardio intervals, continuous circuit minutes, warm-ups, and active recovery. Prefer jump rope over jumping jacks for low-impact cardio.
 
 **Abs**
 Sit-ups, Overhead Crunches, Leg Raises, Alternating Toe Touches, Pilates-style movements

@@ -25,13 +25,13 @@ Battle Ropes (alternating waves, slams, spirals), Cable Row, Cable Face Pull, La
 DB Romanian Deadlift, DB Bench Press, DB Row, DB Shoulder Press, DB Reverse Lunge, DB Step-up, DB Lateral Raise
 
 **Bodyweight and gymnastics**
-Ring Row, Ring Dip, Pull-ups, Chin-ups, Push-ups, Dips, Box Jumps, Box Step-overs, Broad Jumps, Plank Variations, L-sit
+Ring Row, Ring Dip, Pull-ups, Chin-ups, Push-ups, Dips, Box Jumps, Box Step-overs, Broad Jumps, Plank Variations, L-sit, Jump Rope (singles or doubles — excellent low-impact cardio between strength blocks, use instead of jumping jacks)
 
 **Medicine balls**
 Wall Ball, Med Ball Slam, Med Ball Russian Twist, Med Ball Clean
 
-**Machines (use sparingly for intervals or warm-ups)**
-Rowing, SkiErg, Assault Bike — great for conditioning intervals within a functional circuit.
+**Machines and cardio tools (use sparingly for intervals or warm-ups)**
+Rowing, SkiErg, Assault Bike — great for conditioning intervals within a functional circuit. Jump Rope — a versatile cardio option for intervals, warm-ups, or active recovery. Prefer jump rope over jumping jacks.
 
 ## Session Structure
 Warm-up → Main circuit (2–4 blocks, each with a distinct focus) → Optional finisher → Cool-down stretches.
