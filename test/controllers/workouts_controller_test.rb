@@ -18,6 +18,12 @@ class WorkoutsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "library excludes workouts that belong to a program" do
+    get library_path
+    assert_response :success
+    assert_no_match workouts(:hyrox_session).name, response.body
+  end
+
   test "library filters by activity" do
     get library_path, params: { activity: "Hyrox" }
     assert_response :success
@@ -49,8 +55,9 @@ class WorkoutsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "destroy removes owned workout" do
+    standalone = workouts(:strength_session)
     assert_difference "Workout.count", -1 do
-      delete workout_path(@workout)
+      delete workout_path(standalone)
     end
   end
 end

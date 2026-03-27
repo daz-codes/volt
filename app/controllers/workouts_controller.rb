@@ -13,6 +13,7 @@ class WorkoutsController < ApplicationController
     else
       @programs  = Current.user.programs.order(created_at: :desc)
       @workouts  = Current.user.workouts
+                         .where.not(id: ProgramWorkout.where.not(workout_id: nil).select(:workout_id))
                          .includes(:tags, :activity)
                          .order(created_at: :desc)
       if params[:activity].present?

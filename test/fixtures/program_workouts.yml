@@ -1,1 +1,6 @@
-# empty
+hyrox_week1_session1:
+  program: hyrox_program
+  workout: hyrox_session
+  week_number: 1
+  session_number: 1
+  status: complete
