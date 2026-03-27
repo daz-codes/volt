@@ -15,6 +15,8 @@ class Program < ApplicationRecord
   validates :difficulty,        inclusion: { in: DIFFICULTIES }
   validates :status,            inclusion: { in: STATUSES }
 
+  before_destroy :cleanup_workouts, prepend: true
+
   scope :for_user, ->(user) { where(user: user).order(created_at: :desc) }
 
   def complete? = status == "complete"
@@ -25,5 +27,21 @@ class Program < ApplicationRecord
     program_workouts.includes(:workout)
                     .order(:week_number, :session_number)
                     .group_by(&:week_number)
+  end
+
+  private
+
+  def cleanup_workouts
+    workout_ids = program_workouts.where.not(workout_id: nil).pluck(:workout_id)
+    return if workout_ids.empty?
+
+    deletable_ids = Workout.where(id: workout_ids)
+                           .left_joins(:workout_logs)
+                           .where(workout_logs: { id: nil })
+                           .pluck(:id)
+    return if deletable_ids.empty?
+
+    program_workouts.where(workout_id: deletable_ids).destroy_all
+    Workout.where(id: deletable_ids).destroy_all
   end
 end
