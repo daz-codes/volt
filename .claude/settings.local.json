@@ -113,7 +113,19 @@
       "Bash(PATH=\"/opt/homebrew/bin:/Users/daz/.local/share/mise/installs/ruby/3.4.7/bin:/usr/bin:$PATH\" bundle update:*)",
       "Bash(PATH=\"/opt/homebrew/bin:/Users/daz/.local/share/mise/installs/ruby/3.4.7/bin:/usr/bin:$PATH\" gem install:*)",
       "Bash(PATH=\"/opt/homebrew/bin:/Users/daz/.local/share/mise/installs/ruby/3.4.7/bin:$PATH\" bin/rails test:system:*)",
-      "WebFetch(domain:raw.githubusercontent.com)"
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(PATH=\"/opt/homebrew/bin:/Users/daz/.local/share/mise/installs/ruby/3.4.7/bin:$PATH\" bin/rails test test/controllers/programs_controller_test.rb 2>&1)",
+      "Bash(PATH=\"/opt/homebrew/bin:/Users/daz/.local/share/mise/installs/ruby/3.4.7/bin:$PATH\" bin/rails test test/services/workout_validator_test.rb 2>&1)",
+      "Bash(PATH=\"/opt/homebrew/bin:/Users/daz/.local/share/mise/installs/ruby/3.4.7/bin:$PATH\" bin/rails test test/controllers/workouts_controller_test.rb -n \"test_library_excludes_workouts_that_belong_to_a_program\")",
+      "Bash(PATH=\"/opt/homebrew/bin:/Users/daz/.local/share/mise/installs/ruby/3.4.7/bin:$PATH\" bin/rails test test/controllers/workouts_controller_test.rb 2>&1)",
+      "Bash(PATH=\"/opt/homebrew/bin:/Users/daz/.local/share/mise/installs/ruby/3.4.7/bin:$PATH\" bin/rails test test/models/program_test.rb 2>&1)",
+      "Bash(PATH=\"/opt/homebrew/bin:/Users/daz/.local/share/mise/installs/ruby/3.4.7/bin:$PATH\" git stash)",
+      "Bash(bin/rails test:*)",
+      "Bash(PATH=\"/opt/homebrew/bin:/Users/daz/.local/share/mise/installs/ruby/3.4.7/bin:$PATH\" bin/rails db:schema:dump RAILS_ENV=test)",
+      "Bash(grep -A 20 'create_table \"\"\"\"program_workouts\"\"\"\"' db/schema.rb)",
+      "Bash(PATH=\"/opt/homebrew/bin:/Users/daz/.local/share/mise/installs/ruby/3.4.7/bin:$PATH\")",
+      "Bash(bin/rails routes:*)",
+      "Bash(bin/rails db:test:prepare)"
     ]
   }
 }

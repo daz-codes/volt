@@ -484,7 +484,10 @@ class WorkoutLLMGenerator
   def generate_data
     if @source_workout
       prompt       = build_remix_prompt
-      call_llm(prompt)
+      workout_data = call_llm(prompt)
+      workout_data = validate_and_fix(workout_data)
+      workout_data = collapse_duplicate_exercises(workout_data)
+      collapse_set_notation(workout_data)
     else
       example_workouts = fetch_top_liked_examples
       prompt           = build_example_prompt(example_workouts)

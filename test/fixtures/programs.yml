@@ -1,1 +1,18 @@
-# empty
+hyrox_program:
+  user: one
+  activity: hyrox
+  name: 4-Week Hyrox Program
+  weeks_count: 4
+  sessions_per_week: 3
+  duration_mins: 45
+  difficulty: intermediate
+  status: complete
+
+no_activity_program:
+  user: one
+  name: 4-Week Custom Program
+  weeks_count: 4
+  sessions_per_week: 3
+  duration_mins: 45
+  difficulty: intermediate
+  status: building

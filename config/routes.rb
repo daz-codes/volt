@@ -36,7 +36,11 @@ Rails.application.routes.draw do
       post  :swap_exercise
     end
   end
-  resources :programs, only: [ :new, :create, :show, :destroy ]
+  resources :programs, only: [ :new, :create, :show, :destroy ] do
+    member do
+      post :retry_slot
+    end
+  end
   get "library", to: "workouts#index", as: :library
   get "workout_log", to: "workout_logs#index", as: :workout_log_index
   get "calendar",     to: "workout_logs#calendar",     as: :calendar

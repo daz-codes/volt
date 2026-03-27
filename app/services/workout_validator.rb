@@ -156,6 +156,7 @@ class WorkoutValidator
       return if dur.zero? || (dur % n).zero?
       snapped = ((dur.to_f / n).ceil * n)
       section["duration_mins"] = snapped
+      section.delete("notes") # LLM notes often contain stale fractional round calculations
       @fixes << "EMOM rotating '#{section["name"]}': duration_mins #{dur} → #{snapped} (must be multiple of #{n} exercises)"
     else
       # circuit — cap at 3 exercises

@@ -1,6 +1,6 @@
 class ProgramsController < ApplicationController
   before_action :require_authentication
-  before_action :set_program, only: [ :show, :destroy ]
+  before_action :set_program, only: [ :show, :destroy, :retry_slot ]
 
   def new
     @program    = Program.new(weeks_count: 4, sessions_per_week: 3, duration_mins: 45, difficulty: "intermediate")
@@ -39,6 +39,18 @@ class ProgramsController < ApplicationController
   def destroy
     @program.destroy!
     redirect_to library_path, notice: "Program deleted."
+  end
+
+  def retry_slot
+    pw = @program.program_workouts.find(params[:program_workout_id])
+
+    unless pw.failed?
+      redirect_to program_path(@program) and return
+    end
+
+    pw.update!(status: "pending", workout: nil)
+    RetryProgramSlotJob.perform_later(pw.id)
+    redirect_to program_path(@program), notice: "Retrying generation…"
   end
 
   private

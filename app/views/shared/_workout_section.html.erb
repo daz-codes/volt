@@ -57,7 +57,8 @@
      detail_parts << "#{section["duration_mins"]} min" if section["duration_mins"]
      if section["emom_style"] == "rotating"
        n = Array(section["exercises"]).size
-       rounds_each = n > 0 && section["duration_mins"].to_i > 0 ? section["duration_mins"].to_i / n : nil
+       dur = section["duration_mins"].to_i
+       rounds_each = n > 0 && dur > 0 && (dur % n).zero? ? dur / n : nil
        detail_parts << (rounds_each ? "#{n} exercises · #{rounds_each} rounds each — fill each minute" : "#{n} exercises · fill each minute")
        ["Continuous Circuit", detail_parts.join(" · ").presence]
      else
