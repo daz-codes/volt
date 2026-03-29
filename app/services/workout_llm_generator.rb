@@ -1,6 +1,3 @@
-require "net/http"
-require "json"
-
 # WorkoutLLMGenerator uses Claude Haiku (via Anthropic API tool use) to generate
 # a structured workout plan based on community context and user preferences.
 #
@@ -14,6 +11,8 @@ require "json"
 #
 # Returns a persisted Workout record or raises WorkoutGenerationError.
 class WorkoutLLMGenerator
+  include AnthropicApi
+
   # Maps tag slugs/names to context files in app/llm_context/
   CONTEXT_TAG_MAP = {
     "hyrox"              => "hyrox.md",
@@ -365,7 +364,6 @@ class WorkoutLLMGenerator
     }
   }.freeze
 
-  API_URI = URI("https://api.anthropic.com/v1/messages").freeze
   MODEL   = "claude-haiku-4-5-20251001".freeze
 
   # Lightweight tool used by the research pass (first prompt) to return structured
@@ -2081,66 +2079,19 @@ class WorkoutLLMGenerator
 
   def call_llm(prompt, tools: [ TOOL_DEFINITION ], tool_choice: { type: "any" }, max_tokens: 4096)
     @llm_calls ||= []
-    api_key = ENV.fetch("ANTHROPIC_API_KEY") { raise WorkoutGenerationError, "ANTHROPIC_API_KEY not configured" }
 
-    body = {
-      model:       MODEL,
-      max_tokens:  max_tokens,
-      tools:       tools,
+    result = call_anthropic_api(
+      messages:   [ { role: "user", content: prompt } ],
+      tools:      tools,
       tool_choice: tool_choice,
-      messages:    [ { role: "user", content: prompt } ]
-    }
+      model:      MODEL,
+      max_tokens: max_tokens
+    )
 
-    http              = Net::HTTP.new(API_URI.host, API_URI.port)
-    http.use_ssl      = true
-    http.open_timeout = 10
-    http.read_timeout = 60
-
-    request = Net::HTTP::Post.new(API_URI.path)
-    request["Content-Type"]      = "application/json"
-    request["x-api-key"]         = api_key
-    request["anthropic-version"] = "2023-06-01"
-    request.body = body.to_json
-
-    retries = 0
-    begin
-      response = http.request(request)
-      unless response.code.to_i == 200
-        case response.code.to_i
-        when 529, 503
-          raise WorkoutGenerationError, :overloaded
-        when 429
-          raise WorkoutGenerationError, :rate_limited
-        when 500, 502
-          raise WorkoutGenerationError, :server_error
-        else
-          raise WorkoutGenerationError, "Failed to generate workout (error #{response.code}). Please try again."
-        end
-      end
-    rescue WorkoutGenerationError => e
-      if e.message.to_sym.in?(%i[overloaded rate_limited server_error]) && retries < 5
-        # 5, 10, 20, 30, 30 seconds — Anthropic outages typically clear within a minute
-        wait = [ 5 * (2 ** retries), 30 ].min
-        Rails.logger.warn "LLM call #{e.message} — retry #{retries + 1}/5 after #{wait}s"
-        sleep wait
-        retries += 1
-        retry
-      end
-      raise WorkoutGenerationError, case e.message.to_sym
-      when :overloaded    then "The AI is overloaded right now."
-      when :rate_limited  then "Too many requests right now."
-      when :server_error  then "The AI service is temporarily unavailable."
-      else e.message
-      end
-    end
-
-    parsed     = JSON.parse(response.body)
-    tool_block = parsed["content"].find { |b| b["type"] == "tool_use" }
-    raise WorkoutGenerationError, "No workout returned by LLM" unless tool_block
-
-    @llm_calls << { prompt: prompt, response: tool_block["input"] }
-
-    tool_block["input"]
+    @llm_calls << { prompt: prompt, response: result }
+    result
+  rescue AnthropicApi::ApiError => e
+    raise WorkoutGenerationError, e.message
   end
 
   def create_workout(data)
