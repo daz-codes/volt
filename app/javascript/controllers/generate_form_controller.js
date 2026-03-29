@@ -38,4 +38,11 @@ export default class extends Controller {
         'Generating workout\u2026' +
       '</span>'
   }
+
+  submitOnFileSelect(event) {
+    if (event.target.files.length > 0) {
+      this.showSpinner()
+      event.target.form.requestSubmit()
+    }
+  }
 }
