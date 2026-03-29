@@ -299,6 +299,43 @@ class WorkoutsController < ApplicationController
     redirect_to library_path, notice: "\"#{@workout.name}\" deleted."
   end
 
+  # POST /workouts/scan
+  def scan
+    unless params[:image].present?
+      redirect_to root_path, alert: "Please upload an image."
+      return
+    end
+
+    if Current.user.generation_limit_reached?
+      redirect_to root_path, alert: "You've used all #{Current.user.generation_limit} generations this week. Upgrade to Pro for unlimited workouts."
+      return
+    end
+
+    workout = Workout.scan_from_image(image: params[:image], user: Current.user)
+
+    token = SecureRandom.urlsafe_base64(16)
+    Rails.cache.write("workout_preview:#{token}", {
+      attrs: {
+        name: workout.name,
+        activity_id: workout.activity_id,
+        duration_mins: workout.duration_mins,
+        difficulty: workout.difficulty,
+        structure: workout.structure,
+        session_notes: nil
+      },
+      debug_info: nil,
+      group_tag_name: nil
+    }, expires_in: 1.hour)
+
+    Current.user.generation_uses.create!
+    redirect_to preview_workout_path(token: token)
+  rescue Scannable::ScanError => e
+    redirect_to root_path, alert: e.message
+  rescue => e
+    Rails.logger.error "Workout scan failed: #{e.class}: #{e.message}\n#{e.backtrace.first(5).join("\n")}"
+    redirect_to root_path, alert: "Something went wrong scanning your workout. Please try again."
+  end
+
   private
 
   def set_owned_workout
