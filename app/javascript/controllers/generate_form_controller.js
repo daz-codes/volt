@@ -27,22 +27,32 @@ export default class extends Controller {
     }
   }
 
-  showSpinner() {
-    this.submitBtnTarget.disabled = true
-    this.submitBtnTarget.innerHTML =
-      '<span class="inline-flex items-center justify-center gap-2">' +
-        '<svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">' +
-          '<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>' +
-          '<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>' +
-        '</svg>' +
-        'Generating workout\u2026' +
-      '</span>'
+  showSpinner(label = "Generating workout\u2026") {
+    if (this.hasSubmitBtnTarget) {
+      this.submitBtnTarget.disabled = true
+      this.submitBtnTarget.innerHTML =
+        '<span class="inline-flex items-center justify-center gap-2">' +
+          '<svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">' +
+            '<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>' +
+            '<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>' +
+          '</svg>' +
+          label +
+        '</span>'
+    }
   }
 
   submitOnFileSelect(event) {
-    if (event.target.files.length > 0) {
-      this.showSpinner()
-      event.target.form.requestSubmit()
+    const file = event.target.files[0]
+    if (!file) return
+
+    const MAX_SIZE = 5 * 1024 * 1024
+    if (file.size > MAX_SIZE) {
+      alert("Image must be under 5MB. Please choose a smaller file.")
+      event.target.value = ""
+      return
     }
+
+    this.showSpinner("Scanning workout\u2026")
+    event.target.form.requestSubmit()
   }
 }
