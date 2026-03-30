@@ -49,7 +49,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                   <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
                 </svg>
-                Generate
+                Workout
               </button>
               <%= link_to calendar_path, class: "flex items-center gap-1.5 border border-zinc-600 hover:border-gray-500 text-gray-300 hover:text-white text-xs font-bold px-3 py-2 rounded-xl transition-colors" do %>
                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -196,13 +196,28 @@
       </div>
     </footer>
 
-    <%# Generate workout modal — pre-rendered, shown/hidden via dialog controller %>
-    <dialog class="w-full max-w-2xl rounded-2xl border border-gray-600 bg-zinc-900 text-white p-0 shadow-2xl"
-            data-dialog-target="modal"
-            data-action="click->dialog#backdropClick">
-      <% if authenticated? %>
+    <% if authenticated? %>
+      <%# Workout chooser — pick Generate, Build, or Scan %>
+      <dialog class="w-full max-w-sm rounded-2xl border border-gray-600 bg-zinc-900 text-white p-0 shadow-2xl"
+              data-dialog-target="chooser"
+              data-action="click->dialog#backdropClick">
+        <%= render "workouts/chooser_modal" %>
+      </dialog>
+
+      <%# Generate workout modal — full form %>
+      <dialog class="w-full max-w-2xl rounded-2xl border border-gray-600 bg-zinc-900 text-white p-0 shadow-2xl"
+              data-dialog-target="generateModal"
+              data-action="click->dialog#backdropClick">
         <%= render "workouts/generate_modal" %>
+      </dialog>
+
+      <%# Hidden scan form — outside dialogs to avoid DOM issues %>
+      <%= form_with url: scan_workouts_path, multipart: true, id: "scan-workout-form", class: "hidden",
+                    data: { controller: "generate-form" } do %>
+        <input type="file" name="image" id="scan-file-input"
+               accept="image/jpeg,image/png,image/gif,image/webp"
+               data-action="change->generate-form#submitOnFileSelect">
       <% end %>
-    </dialog>
+    <% end %>
   </body>
 </html>

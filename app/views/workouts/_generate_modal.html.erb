@@ -173,27 +173,6 @@
 
   <% end %>
 
-  <%# Scan a workout photo — separate form posting to /workouts/scan %>
-  <% unless user_at_limit %>
-    <div class="relative my-4">
-      <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-zinc-700"></div></div>
-      <div class="relative flex justify-center"><span class="bg-zinc-900 px-3 text-xs text-gray-500 uppercase tracking-wide">or</span></div>
-    </div>
-
-    <%= form_with url: scan_workouts_path, multipart: true, data: { controller: "generate-form", action: "submit->generate-form#showSpinner" } do %>
-      <label class="flex items-center justify-center gap-2 w-full border-2 border-dashed border-zinc-600 hover:border-lime-400/50 rounded-xl py-3.5 cursor-pointer transition-colors group"
-             data-generate-form-target="scanLabel">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-500 group-hover:text-lime-400 transition-colors" aria-hidden="true">
-          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-          <circle cx="12" cy="13" r="4"/>
-        </svg>
-        <span class="text-sm font-bold text-gray-400 group-hover:text-lime-400 transition-colors">Scan a workout photo</span>
-        <input type="file" name="image" accept="image/jpeg,image/png,image/gif,image/webp"
-               class="sr-only" data-action="change->generate-form#submitOnFileSelect">
-      </label>
-    <% end %>
-  <% end %>
-
   <%# Upgrade CTAs — outside the form so button_to works (no nested forms) %>
   <% if user_at_limit %>
     <div class="bg-zinc-800 border border-zinc-600 rounded-xl p-4 mb-4 text-center">
