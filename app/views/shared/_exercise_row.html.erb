@@ -95,7 +95,7 @@
       <% if exercise["weight_kg"].to_f > 0 %>
         <span class="text-xs font-bold text-sky-200"><%= exercise["weight_kg"] %>kg</span>
       <% end %>
-      <% if !is_tabata && exercise["notes"].present? %>
+      <% if exercise["notes"].present? %>
         <% breath_match = exercise["notes"].match(/\A(\d+\s+deep breaths(?:\s+each side)?)\b\.?\s*/i)
            if breath_match
              breath_text = breath_match[1]
