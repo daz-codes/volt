@@ -27,7 +27,8 @@ export default class extends Controller {
     }
   }
 
-  showSpinner(label = "Generating workout\u2026") {
+  showSpinner(labelOrEvent = null) {
+    const label = (typeof labelOrEvent === "string") ? labelOrEvent : "Generating workout\u2026"
     if (this.hasSubmitBtnTarget) {
       this.submitBtnTarget.disabled = true
       this.submitBtnTarget.innerHTML =

@@ -59,9 +59,9 @@ module Scannable
     end
 
     def call_scan_api(base64_data, media_type)
-      api_client = Class.new { include AnthropicApi }.new
+      @api_client ||= Class.new { include AnthropicApi }.new
 
-      api_client.call_anthropic_api(
+      @api_client.call_anthropic_api(
         system: SCAN_SYSTEM_PROMPT,
         messages: [
           {
