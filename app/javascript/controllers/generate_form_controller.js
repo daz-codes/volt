@@ -42,17 +42,4 @@ export default class extends Controller {
     }
   }
 
-  submitOnFileSelect(event) {
-    const file = event.target.files[0]
-    if (!file) return
-
-    const MAX_SIZE = 5 * 1024 * 1024
-    if (file.size > MAX_SIZE) {
-      alert("Image must be under 5MB. Please choose a smaller file.")
-      event.target.value = ""
-      return
-    }
-
-    event.target.closest("form").requestSubmit()
-  }
 }
