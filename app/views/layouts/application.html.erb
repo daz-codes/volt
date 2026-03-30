@@ -212,11 +212,10 @@
       </dialog>
 
       <%# Hidden scan form — outside dialogs to avoid DOM issues %>
-      <%= form_with url: scan_workouts_path, multipart: true, id: "scan-workout-form", class: "hidden",
-                    data: { controller: "generate-form" } do %>
+      <%= form_with url: scan_workouts_path, multipart: true, id: "scan-workout-form", class: "hidden" do %>
         <input type="file" name="image" id="scan-file-input"
                accept="image/jpeg,image/png,image/gif,image/webp"
-               data-action="change->generate-form#submitOnFileSelect">
+               data-action="change->dialog#handleScan">
       <% end %>
     <% end %>
   </body>

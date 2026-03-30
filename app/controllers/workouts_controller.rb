@@ -127,8 +127,11 @@ class WorkoutsController < ApplicationController
 
     Rails.cache.delete("workout_preview:#{params[:token]}")
 
-    if params[:intent] == "log"
+    case params[:intent]
+    when "log"
       redirect_to workout_path(workout, do_this: true)
+    when "edit"
+      redirect_to edit_workout_path(workout)
     else
       redirect_to workout_path(workout), notice: "\"#{workout.name}\" saved to your library."
     end
