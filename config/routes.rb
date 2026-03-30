@@ -24,6 +24,9 @@ Rails.application.routes.draw do
   post "workouts/preview/:token/swap_exercise", to: "workouts#swap_preview_exercise", as: :swap_preview_exercise
 
   resources :workouts, only: [ :new, :create, :show, :edit, :update, :destroy ] do
+    collection do
+      post :scan
+    end
     member do
       get   :log
       get   :export_pdf

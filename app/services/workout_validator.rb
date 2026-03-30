@@ -1075,6 +1075,7 @@ class WorkoutValidator
     breaths = @duration_mins <= 30 ? 5 : 10
     last = sections.last
     return unless last
+    return unless last["name"].to_s.match?(COOLDOWN_NAME_PATTERN)
 
     Array(last["exercises"]).each do |ex|
       stripped = []

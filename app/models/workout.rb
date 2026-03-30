@@ -1,4 +1,6 @@
 class Workout < ApplicationRecord
+  include Scannable
+
   belongs_to :user
   belongs_to :source_workout, class_name: "Workout", optional: true
   belongs_to :activity, optional: true
