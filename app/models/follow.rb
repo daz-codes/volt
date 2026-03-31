@@ -1,4 +1,6 @@
 class Follow < ApplicationRecord
+  include Notifiable
+
   belongs_to :follower,  class_name: "User"
   belongs_to :following, class_name: "User"
 
@@ -11,7 +13,7 @@ class Follow < ApplicationRecord
     self.accepted_at  = Time.current
   end
 
-  after_create_commit :notify_new_follower
+  notifies action: :new_follower, recipient: :following, actor: :follower
 
   scope :accepted, -> { where(status: "accepted") }
 
@@ -19,14 +21,5 @@ class Follow < ApplicationRecord
 
   def cannot_follow_self
     errors.add(:follower_id, "can't follow yourself") if follower_id == following_id
-  end
-
-  def notify_new_follower
-    Notification.create!(
-      recipient:  following,
-      actor:      follower,
-      notifiable: self,
-      action:     "new_follower"
-    )
   end
 end
