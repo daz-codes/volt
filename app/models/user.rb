@@ -18,13 +18,13 @@ class User < ApplicationRecord
 
   attr_accessor :skip_password_validation
   has_many :identities, dependent: :destroy
-  has_many :sessions, dependent: :destroy
+  has_many :sessions, dependent: :delete_all
   has_many :comments, dependent: :destroy
   has_many :workouts, dependent: :destroy
   has_many :workout_logs, dependent: :destroy
   has_many :programs, dependent: :destroy
   has_many :challenge_entries, dependent: :destroy
-  has_many :notifications, foreign_key: :recipient_id, dependent: :destroy
+  has_many :notifications, foreign_key: :recipient_id, dependent: :delete_all
 
   has_many :shares_sent,     class_name: "Share", foreign_key: :sender_id,    dependent: :destroy
   has_many :shares_received, class_name: "Share", foreign_key: :recipient_id, dependent: :destroy
