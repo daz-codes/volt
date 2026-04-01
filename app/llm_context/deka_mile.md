@@ -17,10 +17,10 @@ RAM Reverse Lunges, Row, Box Jump / Step Over, Med Ball Sit-up Throw, SkiErg, Fa
 These develop the same physical qualities but are NOT competition movements. Use 2–3 per session to add variety — they should never outnumber or overshadow the primary exercises.
 
 **Legs and running support**
-Goblet Squats, Bulgarian Split Squats, Split Squats (loaded), Jumping Lunges, Reverse Lunges (loaded), Step-ups, Hip Thrust, Calf Raises (weighted)
+Goblet Squats, Bulgarian Split Squats, Split Squats (loaded), Jumping Lunges, Reverse Lunges (loaded), Step-ups, Hip Thrust, Calf Raises (weighted), Devil Press
 
 **Posterior chain and carries**
-KB Swings, Romanian Deadlift, Good Morning
+KB Swings, Romanian Deadlift, Good Morning, Clean and Press (DB or KB)
 
 **Pulling and grip**
 DB Row, Ring Row, Cable Row, Band Pull-aparts, Lat Pulldown
@@ -35,6 +35,7 @@ Plank Holds, Hollow Body, Dead Bug
 Warm-up (include easy running) → Main set (anchor zones + running intervals + primary/secondary exercises) → Cool-down stretches.
 
 ## Coaching Notes
+- **Single-exercise sessions are valid.** A focused workout built around one movement (e.g. 5 rounds of 20 thrusters with rest) is a legitimate session — don't feel obligated to add variety for its own sake.
 - Mile pace work is critical — include at least one running block per session, ideally paired with zone work immediately after.
 - Prioritise primary (competition) exercises — they should make up the majority of the session.
 - Secondary exercises fill gaps and add variety but should not dominate.

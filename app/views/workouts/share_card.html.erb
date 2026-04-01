@@ -1,0 +1,212 @@
+<%# Standalone Instagram share card — no layout, self-contained styles %>
+<%
+  sections = @workout.structure.is_a?(Hash) ? Array(@workout.structure["sections"]) : []
+  main_sections = sections.reject { |s|
+    s["name"].to_s.match?(/warm.?up|cool.?down|stretch|recovery|primer|activation|mobility/i)
+  }
+%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Jost:wght@700;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #09090b;
+    font-family: 'Jost', system-ui, sans-serif;
+    display: flex;
+    justify-content: center;
+    padding: 24px 0;
+  }
+
+  .card {
+    width: 390px;
+    min-height: 488px;
+    background: #18181b;
+    display: flex;
+    flex-direction: column;
+    padding: 32px 28px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 30% 20%, rgba(163,230,53,0.04) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .header-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 4px;
+  }
+
+  .type-label {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: #71717a;
+  }
+
+  .duration {
+    font-size: 14px;
+    font-weight: 900;
+    color: #a1a1aa;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    white-space: nowrap;
+  }
+
+  .workout-name {
+    font-size: 36px;
+    font-weight: 900;
+    text-transform: uppercase;
+    color: #fafafa;
+    letter-spacing: -0.5px;
+    line-height: 1;
+    margin-bottom: 20px;
+  }
+
+  .divider {
+    height: 3px;
+    background: linear-gradient(90deg, #a3e635 0%, transparent 100%);
+    margin-bottom: 20px;
+    border-radius: 2px;
+  }
+
+  .sections-list {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    margin-bottom: 24px;
+  }
+
+  .section-block {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .section-label {
+    font-size: 13px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 2.5px;
+    color: #a3e635;
+  }
+
+  .exercise-line {
+    font-size: 18px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #e4e4e7;
+    letter-spacing: 0.5px;
+    line-height: 1.3;
+  }
+
+  .footer {
+    margin-top: auto;
+    padding-top: 16px;
+    border-top: 1px solid #27272a;
+  }
+
+  .brand {
+    font-size: 18px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    color: #a3e635;
+  }
+</style>
+</head>
+<body>
+<div class="card">
+
+  <div class="header-row">
+    <% if @workout.activity.present? %>
+      <span class="type-label"><%= @workout.activity.name %></span>
+    <% end %>
+    <span class="duration"><%= @workout.duration_mins %> min</span>
+  </div>
+  <div class="workout-name"><%= @workout.name %></div>
+
+  <div class="divider"></div>
+
+  <div class="sections-list">
+    <% main_sections.each do |section| %>
+      <%
+        fmt = section["format"].to_s
+        is_ladder = %w[ladder mountain].include?(fmt)
+        rounds = section["rounds"]
+
+        # Build section type label
+        label = case fmt
+                when "tabata"   then "Tabata"
+                when "emom"     then "EMOM #{section["duration_mins"]}min"
+                when "amrap"    then "AMRAP #{section["duration_mins"]}min"
+                when "rounds"   then rounds && rounds > 1 ? "#{rounds} Rounds" : nil
+                when "for_time" then "For Time"
+                when "ladder"   then "Ladder"
+                when "mountain" then "Mountain"
+                when "hundred"  then "100 Reps"
+                when "matrix"   then "Matrix"
+                end
+
+        # Build exercise lines
+        ex_lines = Array(section["exercises"]).map do |ex|
+          name = ex["name"].to_s.gsub(/\s*\([\d.]+kg.*?\)\s*/, '').strip
+          parts = []
+          if ex["reps"]
+            unit = name.match?(/carry|sled|prowler|drag|shuttle|farmer/i) ? "m" : ""
+            parts << "#{ex["reps"]}#{unit}"
+          end
+          parts << "#{ex["distance_m"]}m" if ex["distance_m"]
+          parts << "#{ex["calories"]} cal" if ex["calories"]
+          if ex["duration_s"]
+            dm = ex["duration_s"] / 60; dr = ex["duration_s"] % 60
+            parts << (dm > 0 ? "#{dm}min#{dr > 0 ? " #{dr}s" : ""}" : "#{ex["duration_s"]}s")
+          end
+          metric = parts.join(" · ")
+
+          if is_ladder
+            sv = section["start"]; ev = section["end"]; st = section["step"]
+            if section["format"] == "mountain"
+              "#{name} #{sv}–#{section["peak"]}–#{ev}"
+            else
+              "#{name} #{sv}–#{ev} (steps of #{st.to_i})"
+            end
+          elsif metric.present?
+            "#{metric} #{name}"
+          else
+            name
+          end
+        end
+      %>
+      <div class="section-block">
+        <% if label.present? %>
+          <div class="section-label"><%= label %></div>
+        <% end %>
+        <% ex_lines.each do |line| %>
+          <div class="exercise-line"><%= line.upcase %></div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="footer">
+    <span class="brand">Volt</span>
+  </div>
+
+</div>
+</body>
+</html>

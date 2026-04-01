@@ -413,7 +413,7 @@ class WorkoutLLMGenerator
                   rounds:             { type: "integer" },
                   rest_secs:          { type: "integer", description: "Rest in seconds after each round. Must be 30, 45, or 60 only." },
                   emom_style:         { type: "string", enum: %w[circuit rotating], description: "EMOM sections only. circuit=all exercises done together each minute (max 3 exercises, rep cap applies). rotating=one exercise per minute cycling through the list (duration_mins must be a multiple of exercise count)." },
-                  notes:              { type: "string" },
+                  notes:              { type: "string", description: "Section-level coaching context only. Never put programming details (sets, reps, distances) here — use the structure fields." },
                   varies:             { type: "string", enum: %w[reps calories kg distance_m], description: "What changes each rung (ladder/mountain only). CRITICAL: every exercise in this section must share this metric — do not mix rep-based, distance-based, and calorie-based exercises in the same ladder/mountain." },
                   start:              { type: "number", description: "Starting value for ladder/mountain" },
                   end:                { type: "number", description: "Ending value for ladder/mountain" },
@@ -432,7 +432,7 @@ class WorkoutLLMGenerator
                         distance_m:  { type: "integer", description: "Distance in metres for ONE execution of this exercise row. For 'rounds' sections this is the PER-ROUND distance — the system multiplies by the rounds count automatically, so NEVER pre-multiply. E.g. in a 3-round section '3×100m Freestyle per round' → distance_m: 100 (not 300). For non-rounds sections (straight, for_time, amrap) this is the full total: '4×100m Freestyle' → distance_m: 400. For swimming: only use 25, 50, or multiples of 100 — never 75, 125, 150, 175 etc." },
                         duration_s:  { type: "integer" },
                         weight_kg:   { type: "number" },
-                        notes:       { type: "string" }
+                        notes:       { type: "string", description: "Form cues and intensity guidance ONLY (e.g. 'explosive hip drive', 'slow tempo', 'moderate weight'). NEVER put sets, rounds, reps, distances, weights, or programming details here — use the structure fields instead." }
                       }
                     }
                   }
@@ -690,7 +690,7 @@ class WorkoutLLMGenerator
         #{pace_limits}
         #{equipment_rule}
         - Give it a punchy, memorable name — something a gym community would actually call it. Be creative and unpredictable: draw from feelings, imagery, places, days, animals, weather, mythology, slang — anything vivid. NEVER use the session type name as the workout name — "#{main_name}" is the TYPE of session, not the name. The name must be original and creative. BANNED WORDS in workout names: Voltage, Maximum, Transformer, Dynamo, Alternator, Circuit Breaker, Tread & Shred, Iron Engine, Ohm — these are session type brands, not workout names. #{recent_names.any? ? "The user's recent workout names are: #{recent_names.map { |n| "\"#{n}\"" }.join(", ")}. Do NOT reuse any word or theme from these." : ""}
-        - Be specific with reps, distances, and weights
+        - Be specific with reps and distances. For WEIGHTS and SPEEDS, use relative effort cues instead of absolute numbers (e.g. "light — sustainable across all reps", "heavy — last 2 reps should be a struggle", "start at your fastest sustainable pace"). Only use specific weights if the athlete has known working weights in their Athlete Context
         - Rep counts should be clean numbers (even or multiples of 5)
         - NEVER use numbered block prefixes like "Block 1:", "Block 2:" in section names — use creative, descriptive names instead
         - Make it genuinely fun and challenging — the kind of workout people talk about afterwards
@@ -717,7 +717,7 @@ class WorkoutLLMGenerator
         #{pace_limits}
         #{equipment_rule}
         - Give it a punchy, memorable name — something a gym community would actually call it. Be creative and unpredictable: draw from feelings, imagery, places, days, animals, weather, mythology, slang — anything vivid. NEVER use the session type name as the workout name — "#{main_name}" is the TYPE of session, not the name. The name must be original and creative. BANNED WORDS in workout names: Voltage, Maximum, Transformer, Dynamo, Alternator, Circuit Breaker, Tread & Shred, Iron Engine, Ohm — these are session type brands, not workout names. #{recent_names.any? ? "The user's recent workout names are: #{recent_names.map { |n| "\"#{n}\"" }.join(", ")}. Do NOT reuse any word or theme from these." : ""}
-        - Be specific with reps, distances, and weights
+        - Be specific with reps and distances. For WEIGHTS and SPEEDS, use relative effort cues instead of absolute numbers (e.g. "light — sustainable across all reps", "heavy — last 2 reps should be a struggle", "start at your fastest sustainable pace"). Only use specific weights if the athlete has known working weights in their Athlete Context
         - Rep counts should be clean numbers (even or multiples of 5)
         - NEVER use numbered block prefixes like "Block 1:", "Block 2:" in section names — use creative, descriptive names instead
         - Make it genuinely fun and challenging — the kind of workout people talk about afterwards
@@ -849,7 +849,7 @@ class WorkoutLLMGenerator
         ## Difficulty: Beginner
         This is a beginner session — scale everything accordingly:
         - **Reps per set:** 10–15 for bodyweight/conditioning; 8–12 for weighted strength work
-        - **Weights:** ~50–60% of 1RM for barbell lifts; light dumbbells (5–10kg); bodyweight where possible
+        - **Weights:** light — the athlete should feel confident and in control throughout. Cue "light" on all weighted exercises. Bodyweight where possible
         - **Rest:** 90–120s between strength sets; 60–90s between conditioning intervals
         - **Movement complexity:** stick to simple, low-skill movements — goblet squats not back squats, dumbbell rows not cleans, ring rows not muscle-ups. No Olympic lifting.
         - **Volume:** keep total working sets low (2–3 per exercise). Do not stack too many exercises per section.
@@ -861,7 +861,7 @@ class WorkoutLLMGenerator
         ## Difficulty: Intermediate
         This is an intermediate session — the athlete can handle solid effort and moderate complexity:
         - **Reps per set:** 8–12 for strength; 12–20 for conditioning; higher for bodyweight
-        - **Weights:** ~65–75% of 1RM for barbell lifts; moderate dumbbells/kettlebells (12–24kg)
+        - **Weights:** moderate — challenging but controlled. Cue "moderate — you should complete all reps with good form, last 2–3 reps feel tough"
         - **Rest:** 60–90s between strength sets; 45–60s between conditioning intervals
         - **Movement complexity:** barbell squats, deadlifts, press variations fine. Simple kettlebell and gymnastics skills (kipping pull-ups, box jumps, KB swings) are appropriate. Avoid heavy Olympic lifting unless the session specifically calls for it.
         - **Volume:** 3–4 working sets per exercise. Sections can have 2–4 exercises.
@@ -873,7 +873,7 @@ class WorkoutLLMGenerator
         ## Difficulty: Advanced
         This is an advanced session — the athlete is well-conditioned and can handle high volume, heavy loads, and complex movements:
         - **Reps per set:** 5–8 for heavy strength (85–90% 1RM); 15–25 for conditioning; higher for lighter bodyweight work
-        - **Weights:** ~75–90% of 1RM for heavy work; RX competition weights for conditioning (e.g. 24kg KB, 20kg wall ball); heavy carries and sleds
+        - **Weights:** heavy — the last 1–2 reps should be a real struggle. Cue "heavy" for strength work, "moderate-to-heavy" for conditioning. Competition athletes should use race-weight equipment where applicable
         - **Rest:** 45–60s between conditioning sets; 90–120s only for true max-effort lifts
         - **Movement complexity:** all barbell movements including cleans, snatches, thrusters at moderate-heavy loads. Gymnastics (strict muscle-ups, handstand push-ups, toes-to-bar). Complex kettlebell work.
         - **Volume:** 4–5 working sets. Sections can be dense with 3–5 exercises. Total working time should feel relentless.
@@ -1039,7 +1039,7 @@ class WorkoutLLMGenerator
       #{core_rule}
       #{training_rule}
       - Rep counts and calorie targets must be "clean" numbers — even numbers (2, 4, 6, 8, 10, 12, 16, 20…) or multiples of 5 (5, 10, 15, 20, 25…). Never use odd, awkward counts like 13, 7, 11, 17, or 19. When scaling from competition volumes, round to the nearest clean number.
-      - Be specific with reps, distances, and weights
+      - Be specific with reps and distances. For WEIGHTS and SPEEDS, use relative effort cues instead of absolute numbers (e.g. "light — sustainable across all reps", "heavy — last 2 reps should be a struggle", "start at your fastest sustainable pace"). Only use specific weights if the athlete has known working weights in their Athlete Context
       - SECTION NAMES MUST BE ACCURATE: never mention an exercise or activity in a section name unless it actually appears in that section's exercises. "Run + Station" must contain running. "Sled Circuit" must contain sled work. If unsure, use a generic evocative name instead.
       - NEVER use numbered block prefixes like "Block 1:", "Block 2:", "Block 3:" or "Part 1:", "Part 2:" in section names. Use creative, descriptive names instead.
       - Give it a punchy, memorable name — something a gym community would actually call it. Be creative and unpredictable: draw from feelings, imagery, places, days, animals, weather, mythology, slang — anything vivid. Actively vary the style each time (e.g. a cheeky two-worder one time, a dramatic three-worder the next, a dry/ironic name after that). NEVER use the session type name as the workout name — "#{main_name}" is the TYPE of session, not the name. The name must be original and creative. BANNED WORDS in workout names: Voltage, Maximum, Transformer, Dynamo, Alternator, Circuit Breaker, Tread & Shred, Iron Engine, Ohm — these are session type brands, not workout names. #{recent_names.any? ? "The user's recent workout names are: #{recent_names.map { |n| "\"#{n}\"" }.join(", ")}. Do NOT reuse any word or theme from these." : ""}
@@ -1062,13 +1062,13 @@ class WorkoutLLMGenerator
           - mountain: ascend then descend. E.g. start:5 peak:15 end:5 step:5 = 5,10,15,10,5 reps. Great for barbell strength work (Bears, cleans, deadlifts).
           IMPORTANT: Always set rest_between_rungs (30–60s) on ladder/mountain sections — athletes need recovery between rungs.
           - INVALID: mixing reps, distance, and calorie exercises in the same ladder.
-          - INVALID: using ladder format for treadmill speed/pace changes — speeds are not reps or distances. For treadmill pace work (speed ladders, fartlek, pace builds), use format: straight with a single exercise. Protocol: 1 min at each speed + 1 min easy jog (10 km/h) between = 2 min per speed. E.g. 5 speeds (12→16 km/h) = 10 min total. Set duration_s for the total time. Notes: "12→16 km/h, 1 min at each speed with 1 min easy jog (10 km/h) between". ONE exercise only — do not add a separate recovery jog exercise.
+          - INVALID: using ladder format for treadmill speed/pace changes — speeds are not reps or distances. For treadmill pace work (speed ladders, fartlek, pace builds), use format: straight with a single exercise. Protocol: describe the pattern using RELATIVE effort cues, not absolute speeds. E.g. "Start at your fastest sustainable pace, drop 0.5 km/h each minute with 1 min easy jog between" or "Build from easy jog to sprint over 5 rounds, adding 0.5 km/h each round". Set duration_s for the total time. NEVER prescribe absolute treadmill speeds — athletes vary hugely. Use cues like "easy jog", "moderate pace", "hard effort", "sprint", "fastest sustainable pace". ONE exercise only — do not add a separate recovery jog exercise.
         * straight — fixed sets with rest. Use for simple warm-ups or isolated single exercises.
         * matrix — progressive exercise combinations. List 3–5 exercises in order. The section builds up then strips back: for 3 exercises: A, A+B, A+B+C, B+C, C. For 4: A, A+B, A+B+C, A+B+C+D, B+C+D, C+D, D. For 5: A, A+B, A+B+C, A+B+C+D, A+B+C+D+E, B+C+D+E, C+D+E, D+E, E. IMPORTANT: all exercises must use the same metric — either all reps (same count each) or all duration_s (same seconds each). Prefer duration_s: 30 for each exercise most of the time — this is the most common Metafit style. Set rest_secs for the rest between each combination (typically 30–60s).
       - EXERCISE VARIETY ACROSS THE SESSION: never use the same base movement in more than one section. If Back Squat appears in one section, do NOT use Back Squat (or Paused Back Squat, or any squat variation on a barbell) in another section — pick a different compound like Front Squat, Deadlift, or Overhead Press instead. The whole session should expose the athlete to as many different movement patterns as possible.
       - NEVER repeat the same exercise as multiple entries in the exercises array. This is a critical mistake — do NOT list "Bench Press (Set 1)", "Bench Press (Set 2)", "Bench Press (Set 3)" as three separate entries. Instead, use a single entry and set rounds: 3 on the section. Notes like "Set 1:", "Set 2:" in exercise notes are forbidden.
       - SINGLE-EXERCISE SECTIONS are valid and often better than circuits, especially for strength and power work. A section with just one exercise is perfectly correct: e.g. '5 × 5 Deadlift (heavy)', 'EMOM 10: 8 Thrusters', '4 × 8 Romanian Deadlift'. Do not feel obligated to bundle every movement into a multi-exercise circuit. HOWEVER: a single-exercise section MUST always use multiple sets (rounds: 3 minimum) or a timed modality (emom/for_time). BANNED: a section with 1 exercise and rounds ≤ 2 (or no rounds). This is always wrong. Every section must represent real training volume, not a single isolated set. ALSO BANNED: AMRAP with fewer than 3 exercises — an AMRAP needs variety to cycle through.
-      - NEVER describe the real programming in the notes instead of the structure. If you want 5 × 60m sprints, set rounds: 5 and distance_m: 60 — do NOT set rounds: 1 with "5 × 60m sprints" in the notes. The notes field is for coaching cues only (e.g. "explosive hip drive", "keep chest tall"). The structure (rounds, reps, distance_m, duration_s, rest_secs) must always reflect the actual work.
+      - NEVER describe the real programming in the notes instead of the structure. If you want 5 × 60m sprints, set rounds: 5 and distance_m: 60 — do NOT set rounds: 1 with "5 × 60m sprints" in the notes. The notes field is ONLY for form cues and intensity guidance (e.g. "explosive hip drive", "keep chest tall", "slow controlled tempo", "moderate weight"). BANNED from notes: number of sets or rounds (use rounds field), rep counts (use reps field), distances (use distance_m field), calorie targets (use calories field), weight amounts (use weight_kg field), descending/ascending patterns (use ladder/mountain format), any description of what the athlete should do structurally. The structure fields must always reflect the actual work — notes just tell the athlete HOW to do it, not WHAT to do.
       - NEVER list the same exercise more than once in a section's exercises array. If you need the same movement repeated (e.g. 5 × 25m Freestyle), use rounds: 5 with a single exercise entry — not 5 separate entries. Duplicate entries are always wrong.
       #{@session_notes.present? ? "\n      *** REMINDER — ATHLETE'S SESSION FOCUS (HIGHEST PRIORITY): \"#{@session_notes}\" — The exercises you select MUST clearly reflect this focus. If the athlete asked for sleds, use sleds heavily. If they asked for strength, programme heavy barbell work. Do not just change the name — change the actual exercises. ***" : ""}
       RULES
@@ -1359,7 +1359,7 @@ class WorkoutLLMGenerator
 
       *** CONTINUOUS CIRCUIT DURATION FOR THIS SESSION (pre-determined — do not change): #{cc} ***
 
-      WEIGHTS: These are high-intensity metabolic sessions. Keep weights light and sustainable. Tabata/metabolic compound exercises: 8–12kg dumbbells, 12–16kg kettlebells. Bear Mountain barbell: 20–30kg only. Strength sets (5×10): sensible working weight — e.g. 40–60kg leg press, 20–30kg shoulder press, 15–25kg side raises. Do NOT prescribe heavy barbell weights (40kg+) for tabata or metabolic blocks. Do NOT prescribe 60kg+ for any strength section.
+      WEIGHTS: Use effort-based cues so athletes self-select appropriate load. Tabata/metabolic compound exercises: "light — sustainable across all 8 rounds" (notes: "light DB" or "light KB"). Bear Mountain barbell: "moderate — you should complete all reps without form breakdown". Strength sets (5×10): "working weight — the last 2 reps of each set should feel challenging but doable". Do NOT prescribe heavy weights for tabata or metabolic blocks — cue "light" or "moderate" and let the athlete choose. If the athlete has known working weights in their Athlete Context, reference those as a starting point.
 
       SECTION NAMES: Give every section a short, punchy name — NEVER prefix with "Block 1:", "Block 2:", or any number. Numeric prefixes are banned. Tabatas: use fun creative names like "The Burner", "Sweat & Twist", "Ignition", "The Grind", "Pulse Raiser", "Chaos Round" — never "Tabata 1" or the exercise name. Metabolic blocks: use evocative names like "The Grind Loop", "Cardio Blitz", "The Ladder". Strength: "Upper Body Strength", "Lower Body Strength". The section name must accurately describe what's in it — don't call it "Abs Finisher" if the exercise is plate serves or bicep curls; call it "Functional Finisher" or "The Hundred" instead. Only use "Abs Finisher" or "Core 100" when the exercises are actual abs movements.
 
@@ -1387,23 +1387,23 @@ class WorkoutLLMGenerator
 
         - OTHER BLOCKS: Choose from [A]–[I] below to fill the session within the time budget. Do NOT always use the continuous circuit block — it should appear in roughly half of sessions at most.
 
-        [A] CONTINUOUS CIRCUIT — format: emom, emom_style: rotating, #{cc}. One cardio machine (ski/row/bike) + one KB or barbell movement per exercise slot + optionally one abs or bodyweight movement. NO reps, calories, distance, or duration on any exercise — each fills its full minute. Coaching notes only. Do NOT label exercises with minute numbers. CARDIO MACHINE PACE GUIDE (1 minute of work): beginner 8 cal, intermediate 10 cal, advanced 12 cal — mention this target in the coaching notes only, not as a calories field.
+        [A] CONTINUOUS CIRCUIT — format: emom, emom_style: rotating, #{cc}. One cardio machine (ski/row/bike) + one KB or barbell movement per exercise slot + optionally one abs or bodyweight movement. NO reps, calories, distance, or duration on any exercise — each fills its full minute. Coaching notes only. Do NOT label exercises with minute numbers. For the cardio machine minute, add a coaching note like "steady sustainable effort" — do not prescribe calorie targets.
 
         [B] INTERVAL CIRCUIT — format: rounds, rounds: 5. 2–3 exercises performed every 2 minutes (add this to section notes). Include specific reps and weights. E.g. 20 KB swings + 10 slams + 5 thrusters.
 
         [C] 10-1 LADDER — format: ladder, start: 10, end: 1, step: 1. ALWAYS exactly 3 exercises from contrasting movement patterns (push + pull + legs, or swing + slam + squat etc). VARY the exercises every session — do NOT default to KB Swings / Wall Balls / Box Jumps. Draw from this pool: KB Swings, Goblet Squats, KB Clean and Press, Thrusters, Upright Rows, Bent Over Rows, Renegade Rows, Burpees, Box Jumps, Step-ups, Jump Squats, Slam Ball, Push Press, Devil Press, DB Lunges, Plate Good Mornings, KB Deadlifts, Pull-ups, Ring Rows, Dips, Push-ups. Pick 3 that contrast (one cardio/plyometric, one push, one pull or hinge).
 
-        [D] CARDIO INTERVALS — format: rounds, rounds: 5. 1 min hard / 1 min rest on a single machine. Calorie targets per minute: beginner 8 cal, intermediate 10 cal, advanced 12 cal. Row alternative: 150–200m per minute.
+        [D] CARDIO INTERVALS — format: rounds, rounds: 5. 1 min hard / 1 min rest on a single machine. Use effort cues in notes: "hard effort — a pace you can barely sustain for the full minute". Do not prescribe calorie targets.
 
         [E] EVERY-2-MIN EMOM — format: emom, emom_style: circuit, duration_mins: 10. ALWAYS exactly 3 exercises done together at the start of every 2-minute window, rest for remainder. Reps are always multiples of 5. MINIMUM 25 total reps across all 3 exercises — never use 5/5/5 or any combination that totals less than 25. Use varied rep schemes: 15/10/5 (descending), 5/10/20 (ascending), 10/10/10 (even), 10/15/5. Total work per round should take 45–60 seconds leaving 60–75 seconds rest. E.g. 5 clean and press + 10 KB swings + 15 box jumps every 2 mins. Or: 10 thrusters + 10 burpees + 20 sit-ups every 2 mins.
 
-        [F] 20-20 BLOCK — format: rounds, rounds: 10. Every 2 mins: cardio cal target (beginner 8, intermediate 10, advanced 12) + 20 reps of a punchy movement (KB swings, slams, jump squats). 20-minute total block. Only use for 75+ min sessions.
+        [F] 20-20 BLOCK — format: rounds, rounds: 10. Every 2 mins: hard cardio sprint + 20 reps of a punchy movement (KB swings, slams, jump squats). Use effort cues for the machine: "hard sustainable effort — you need to be ready for the swings". 20-minute total block. Only use for 75+ min sessions.
 
-        [G] DEATH RACE — format: rounds, rounds: 5. Bike cal target (beginner 8, intermediate 10, advanced 12) + 10 burpees. All out.
+        [G] DEATH RACE — format: rounds, rounds: 5. Bike sprint (30–45 seconds all-out) + 10 burpees. Everything you have.
 
         [H] TABATA — Use 2 exercises per tabata (ABABABAB = 4 rounds each) — this is the standard format. Standard tabatas: EVERY exercise MUST be a compound (two movements fused into one flowing rep, name must contain "and", "with", "to", or "+"). Each tabata gets DIFFERENT compound pairs — never repeat the same compound in one session. You are encouraged to INVENT new combinations — the goal is creative, flowing pairings that contrast muscle groups. Some examples to spark ideas (don't just copy these): "Squat Curl and Press", "KB Swing with Side Lunge", "Wood Chop with Reverse Lunge", "Bent Over Row to Deadlift", "Side Lunge and Lateral Raise", "Lunge and Overhead Tricep Extension", "Hop onto Box and Bicep Curl", "Clean and Lateral Lunge", "Squat Jump and Shoulder Press", "Plate Halo and Twist", "Push Up to T-Rotation", "Renegade Row to Deadlift", "Reverse Lunge and High Pull", "Squat and Rainbow Press", "Gorilla Row and Jump Squat", "Devil Press and Box Step", "KB Clean and Pivot Press", "Bent Over Row and Clean and Press". CARDIO MACHINE TABATA (use occasionally — at most once per session): one of the two exercises may be a cardio machine (Assault Bike, Rowing Machine, or Ski Erg) — pair it with a compound movement. Example pairings: Assault Bike + Squat Curl and Press, Rowing Machine + Wood Chop with Reverse Lunge, Ski Erg + KB Swing with Side Lunge. Do NOT set reps or calories on the machine exercise — it's a 20s burst, the interval is the constraint. Single compound movements alone (burpees, KB swings, mountain climbers without a second movement) are never acceptable.
 
-        [I] BEAR MOUNTAIN — format: mountain, start: 1, peak: 5, end: 1, step: 1 (1-2-3-4-5-4-3-2-1 reps = 25 bears total). One exercise only: "Bear" (clean → press → front squat → press → back squat = 1 rep). Use a moderate barbell weight (20–30kg). Rest as needed between rungs. Takes approximately 10 minutes.
+        [I] BEAR MOUNTAIN — format: mountain, start: 1, peak: 5, end: 1, step: 1 (1-2-3-4-5-4-3-2-1 reps = 25 bears total). One exercise only: "Bear" (clean → press → front squat → press → back squat = 1 rep). Use notes: "moderate barbell — choose a weight where the press is challenging but all reps are clean". Rest as needed between rungs. Takes approximately 10 minutes.
 
       3. UPPER BODY STRENGTH (after all metabolic blocks): MANDATORY — must be present in every session. ONE section only, named "Upper Body Strength". format: rounds, rounds: 5, rest_secs: 60, reps: 10. Exactly ONE exercise — pick one at random from this list each time: Low Row, Lat Pulldown, Bench Press, Shoulder Press, Chest Fly, Reverse Fly, Side Raises, Front Raises. Do NOT default to Lat Pulldown or Shoulder Press — every option is equally valid. One exercise, 5 rounds, 10 reps. Nothing else.
 
@@ -1614,7 +1614,7 @@ class WorkoutLLMGenerator
       Use the create_workout tool. Requirements:
       - Total duration close to #{@duration_mins} minutes
       - Same training focus as the source but a clearly distinct session
-      - Be specific with reps, distances, and weights
+      - Be specific with reps and distances. For WEIGHTS and SPEEDS, use relative effort cues instead of absolute numbers (e.g. "light — sustainable across all reps", "heavy — last 2 reps should be a struggle", "start at your fastest sustainable pace"). Only use specific weights if the athlete has known working weights in their Athlete Context
       - Do not include a workout_type field
       - The name MUST be completely original — do NOT reuse or rephrase "#{@source_workout.name}"
       - You may use ladder or mountain sections for variety, but ONLY when all exercises share the same metric AND the step size is realistic:

@@ -5,12 +5,13 @@
 <% is_tabata     = local_assigns.fetch(:is_tabata, section["format"] == "tabata") %>
 <% swappable     = local_assigns.fetch(:swappable, false) %>
 <% preview_token = local_assigns.fetch(:preview_token, nil) %>
+<% persisted_workout = workout&.persisted? ? workout : nil %>
 <% dom_id = if swappable && preview_token
                "preview_exercise_#{preview_token}_#{section_index}_#{exercise_index}"
-             elsif swappable && workout
-               "exercise_#{workout.id}_#{section_index}_#{exercise_index}"
+             elsif swappable && persisted_workout
+               "exercise_#{persisted_workout.id}_#{section_index}_#{exercise_index}"
              end %>
-<% swap_can_show = swappable && (workout || preview_token) %>
+<% swap_can_show = swappable && (persisted_workout || preview_token) %>
 <% matched_benchmark = benchmark_for_exercise(exercise["name"]) %>
 
 <div <% if dom_id %>id="<%= dom_id %>"<% end %> class="px-3 py-2.5 border-t border-zinc-700/50 <%= matched_benchmark ? 'bg-amber-400/10 border-l-2 border-l-amber-400' : '' %>"
@@ -40,7 +41,7 @@
     <% if swap_can_show %>
       <% swap_path = preview_token ?
            swap_preview_exercise_path(token: preview_token) :
-           swap_exercise_workout_path(workout) %>
+           swap_exercise_workout_path(persisted_workout) %>
       <%= button_to swap_path,
             params: { section_index: section_index, exercise_index: exercise_index },
             method: :post,
@@ -95,7 +96,7 @@
       <% if exercise["weight_kg"].to_f > 0 %>
         <span class="text-xs font-bold text-sky-200"><%= exercise["weight_kg"] %>kg</span>
       <% end %>
-      <% if !is_tabata && exercise["notes"].present? %>
+      <% if exercise["notes"].present? %>
         <% breath_match = exercise["notes"].match(/\A(\d+\s+deep breaths(?:\s+each side)?)\b\.?\s*/i)
            if breath_match
              breath_text = breath_match[1]

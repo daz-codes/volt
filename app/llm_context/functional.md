@@ -22,7 +22,7 @@ Sled Push, Sled Pull (belt or strap), Farmer's Carry (KB, DB, or trap bar), Fron
 Battle Ropes (alternating waves, slams, spirals), Cable Row, Cable Face Pull, Landmine Press, Landmine Rotation, TRX Row, TRX Push-up, TRX Fallout
 
 **Dumbbells**
-DB Romanian Deadlift, DB Bench Press, DB Row, DB Shoulder Press, DB Reverse Lunge, DB Step-up, DB Lateral Raise
+DB Romanian Deadlift, DB Bench Press, DB Row, DB Shoulder Press, DB Reverse Lunge, DB Step-up, DB Lateral Raise, Devil Press
 
 **Bodyweight and gymnastics**
 Ring Row, Ring Dip, Pull-ups, Chin-ups, Push-ups, Dips, Box Jumps, Box Step-overs, Broad Jumps, Plank Variations, L-sit, Jump Rope (singles or doubles — excellent low-impact cardio between strength blocks, use instead of jumping jacks)

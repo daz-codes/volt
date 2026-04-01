@@ -85,21 +85,21 @@
           <% fmt = section["format"] %>
           <div data-format-field="rounds" class="flex items-center gap-2 mb-3" <%= "style=display:none" unless fmt == "rounds" %>>
             <input name="sections[<%= si %>][rounds]" type="number" min="1" placeholder="Number of rounds"
-              value="<%= section["rounds"] %>"
+              value="<%= section["rounds"] %>" <%= "disabled" unless fmt == "rounds" %>
               class="w-40 bg-zinc-800 border border-zinc-600 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-lime-400 transition-colors">
             <input name="sections[<%= si %>][rest_secs]" type="number" min="0" placeholder="Rest between rounds (secs)"
-              value="<%= section["rest_secs"] %>"
+              value="<%= section["rest_secs"] %>" <%= "disabled" unless fmt == "rounds" %>
               class="w-48 bg-zinc-800 border border-zinc-600 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-lime-400 transition-colors">
           </div>
           <div data-format-field="amrap" class="mb-3" <%= "style=display:none" unless fmt == "amrap" %>>
             <input name="sections[<%= si %>][duration_mins]" type="number" min="1" placeholder="Duration (minutes)"
-              value="<%= section["duration_mins"] %>"
+              value="<%= section["duration_mins"] %>" <%= "disabled" unless fmt == "amrap" %>
               class="w-44 bg-zinc-800 border border-zinc-600 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-lime-400 transition-colors">
           </div>
           <div data-format-field="emom" class="mb-3" <%= "style=display:none" unless fmt == "emom" %>>
             <div class="flex items-center gap-3">
               <input name="sections[<%= si %>][duration_mins]" type="number" min="1" placeholder="Duration (minutes)"
-                value="<%= section["duration_mins"] %>"
+                value="<%= section["duration_mins"] %>" <%= "disabled" unless fmt == "emom" %>
                 class="w-44 bg-zinc-800 border border-zinc-600 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-lime-400 transition-colors">
               <p class="text-xs text-gray-500">Every Minute On the Minute — list the exercises done each minute.</p>
             </div>

@@ -20,7 +20,7 @@ These develop the same physical qualities but are NOT competition movements. Use
 KB Swings, Romanian Deadlift, Hip Thrust, Box Jumps, Good Morning, Step-ups (heavy)
 
 **Pressing and upper body**
-Push Press, Landmine Press, DB Bench Press, Push-ups, Dips, Battle Ropes
+Push Press, Landmine Press, DB Bench Press, Push-ups, Dips, Battle Ropes, Devil Press
 
 **Pulling and grip**
 Ring Rows, Lat Pulldown, DB Row, Cable Row, Band Pull-aparts, Dead Hangs
@@ -42,6 +42,7 @@ Every Hyrox session MUST include treadmill running. The race is 8×1km runs — 
 Treadmill running should appear early and throughout the session, not tacked on as an afterthought.
 
 ## Coaching Notes
+- **Single-exercise sessions are valid.** A focused workout built around one movement (e.g. 5 rounds of 20 thrusters with rest) is a legitimate session — don't feel obligated to add variety for its own sake.
 - Anchor movements should appear in the main working sets, calibrated to race-appropriate weight/distance.
 - Prioritise primary (competition) exercises — they should make up the majority of the session.
 - Secondary exercises fill gaps and add variety but should not dominate.

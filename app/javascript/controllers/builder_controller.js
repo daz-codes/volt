@@ -31,7 +31,9 @@ export default class extends Controller {
     const section = event.currentTarget.closest("[data-section-id]")
     const format  = event.currentTarget.value
     section.querySelectorAll("[data-format-field]").forEach(el => {
-      el.style.display = el.dataset.formatField === format ? "" : "none"
+      const show = el.dataset.formatField === format
+      el.style.display = show ? "" : "none"
+      el.querySelectorAll("input, select").forEach(input => input.disabled = !show)
     })
   }
 

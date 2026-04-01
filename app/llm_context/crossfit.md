@@ -26,7 +26,7 @@ Rowing, SkiErg, Assault Bike / Echo Bike — use for warm-ups, AMRAP elements, o
 KB Swing (Russian or American), KB Snatch, KB Clean + Press, KB Turkish Get-up (TGU), KB Goblet Squat, KB Farmer's Carry
 
 **Dumbbells**
-DB Hang Clean, DB Thruster, DB Snatch, DB Lunges, DB Push Press, DB Row, DB Bench Press
+DB Hang Clean, DB Thruster, DB Snatch, DB Lunges, DB Push Press, DB Row, DB Bench Press, Devil Press
 
 **Bodyweight / Gymnastics**
 Push-ups, Pike Push-ups, Dips, Burpees, Jump Rope (single, double-under), Wall Walk, V-ups, Hollow Body Hold
@@ -40,4 +40,4 @@ For shorter sessions (under 30 min): drop the strength block, go straight to the
 - Name the stimulus: "This is an aerobic grind — pace it." or "This is a sprint — go out hot."
 - For For Time workouts: prescribe a realistic time cap (usually 15–25 min for mixed modal).
 - For AMRAP workouts: suggest a rep/round target to aim for.
-- Weight suggestions should challenge but allow unbroken sets (or minimal breaks) for most athletes.
+- Use effort cues for weight: "moderate — you should be able to go unbroken or with minimal breaks" for conditioning, "heavy — last 1–2 reps should be a struggle" for strength. Let athletes self-select based on their level.

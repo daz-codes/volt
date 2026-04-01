@@ -31,6 +31,19 @@ module Scannable
     - Set the activity field to the detected workout style (CrossFit, HIIT, etc.).
     - If the image does NOT contain a workout, return a structure with an empty sections array.
     - Best-guess anything unclear rather than skipping it.
+
+    CRITICAL — structure vs notes:
+    - ALL structural information MUST go in the structure fields, NEVER in exercise notes.
+    - Number of sets/rounds → use the "rounds" field on the section, not in exercise notes.
+    - Descending/ascending patterns (e.g. 300m, 200m, 100m) → use format "ladder" with
+      start, end, step, and varies fields. Do NOT list each distance as a separate exercise
+      or describe the pattern in notes.
+    - Exercise notes are ONLY for form cues and intensity guidance (e.g. "slow pace",
+      "explosive hip drive", "keep chest tall"). Never put "3 sets", "2 rounds",
+      "descending", or rep/distance schemes in the notes field.
+    - If a section has multiple rounds of the same exercise, set rounds on the section —
+      do NOT duplicate the exercise in the exercises array.
+    - One exercise entry per distinct exercise. Use the section's rounds field for repetition.
   PROMPT
 
   class_methods do

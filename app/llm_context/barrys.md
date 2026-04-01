@@ -28,7 +28,7 @@ Generate the floor work based on today's focus day, or pick a focus if not speci
 ## Treadmill Block Protocol
 Barry's uses three named pace bands called out by the instructor:
 - **Base Pace** — comfortable, conversational jog. Recovery and default speed between efforts.
-- **Push Pace** — moderately hard. Uncomfortable but holdable for 1–2 min. Usually +1–2 mph above base.
+- **Push Pace** — moderately hard. Uncomfortable but holdable for 1–2 min. Typically 1–2 notches above base on the treadmill.
 - **All Out / Red Line** — maximum sprint. 30–60 seconds only. Everything you have.
 
 Typical treadmill block structure (~12 min):
@@ -47,7 +47,7 @@ Dumbbell-focused. 3–4 exercises per block, 3–4 sets each, moderate to heavy 
 
 Use `rounds` or `straight` format for floor blocks.
 
-**Typical weights:** 8–15 kg (lighter for higher reps / isolation), 15–25 kg (heavier compound movements). Always prescribe a specific weight.
+**Weight guidance:** Use effort-based cues rather than absolute numbers. For isolation and higher-rep exercises: "light — you should be able to complete all reps with control." For compound movements: "moderate-to-heavy — the last 2–3 reps should feel challenging." If the athlete has known working weights (see Athlete Context), use those as a starting point.
 
 ## Exercise Bank by Focus Day
 
@@ -68,7 +68,7 @@ Weighted Sit-up, Russian Twist, Bicycle Crunch, Leg Raise, Dead Bug, Plank Hold,
 
 ## Coaching Style
 - Instructor-led, very high energy with short rest and constant motivation
-- Weights are always specified — athletes are never left to guess
+- Weights use effort cues so athletes self-select appropriate load
 - Rest between floor sets is short (15–30s), just time to reset
 - Modifications offered but the default is high intensity
 - "Give me everything you've got" for the all-out treadmill sprints

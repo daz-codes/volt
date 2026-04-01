@@ -82,7 +82,7 @@ A Bear is: clean → press → front squat → press → back squat (one rep). B
 20 calories on a cardio machine + 20 reps of a punchy exercise (KB swings, slams, jump squats), repeating on a 2-minute interval for 20 minutes total. High volume, paced effort. Not all-out — sustainable across 10 rounds.
 
 **Death Race**
-5 rounds of: bike cals (10–15) + 10 burpees. All-out effort. Short, brutal. Used as a warm-up finisher or standalone conditioning block.
+5 rounds of: bike sprint (30–45 seconds all-out) + 10 burpees. Short, brutal. Used as a warm-up finisher or standalone conditioning block.
 
 **Hyrox Continuous Circuit**
 3–4 rounds of 3–4 exercises, each 1 minute long, run continuously. Uses cardio machines, KB movements, and active recovery. Example: 1 min assault bike / 1 min high pulls / 1 min boxer shuffle × 4.
@@ -102,11 +102,11 @@ That's it. One machine, 5×10, per section.
 100 reps total, ~5 minutes, present in nearly every session. Can be a single exercise for time (hundred format), a circuit of 4–5 abs exercises × 20–25 reps each, or a rounds block (5×20, 4×25, 2×50). Abs menu: sit-ups, crunches, overhead crunches, leg raises, alternating toe touches, V-ups, bicycle crunches, Russian twists, flutter kicks, hollow holds, dead bugs, plank shoulder taps, mountain climbers (slow), side plank dips. Pilates-style single-exercise options: wall ball slams, lateral raises (light), plate serves, bicep curls (light).
 
 **Calorie Interval Work**
-Cardio machine intervals with specific output targets (not just effort):
-- Ski: target 10 cal/min
-- Row: target 200m/min (15 cal = hard effort)
-- Bike: 10–15 cal sprints on EMOM or timed intervals
-Work-to-rest ratios: 1:1 (1 min hard / 1 min rest) or mountain format (30s / 1min / 2min / 1min / 30s).
+Cardio machine intervals using effort-based cues:
+- Ski: "hard effort — aim for a pace you can barely hold for the full minute"
+- Row: "strong pulls — sustainable but uncomfortable"
+- Bike: "sprint effort — everything you have" for short intervals, "steady grind" for longer ones
+Work-to-rest ratios: 1:1 (1 min hard / 1 min rest) or mountain format (30s / 1min / 2min / 1min / 30s). Let athletes self-select their calorie targets based on their fitness level.
 
 ## Movement Vocabulary
 
@@ -162,13 +162,13 @@ These are real Functional Muscle sessions. Use them to understand the look, feel
 **Session B**
 - Warm-up
 - Continuous Circuit 12 min (3×4): 1 min ski / 1 min KB swings / 1 min abs
-- Ski intervals: 1 min hard / 1 min rest × 5, target 10 cal/min
+- Ski intervals: 1 min hard / 1 min rest × 5, hard sustainable effort
 - 100 biceps + 100 side raises + 100 plate serves
 - Tabata: good mornings alternating with child pose to cobra
 
 **Session C**
 - Warm-up: 20 squat jumps + 10 KB swings + 5 clean and press every 2 mins for 10 mins
-- Row intervals: 1 min hard / 1 min rest × 5, target 200m/min
+- Row intervals: 1 min hard / 1 min rest × 5, strong sustainable pulls
 - Tabata: plate good morning with twist alternating with row and press
 
 **Session D**
@@ -177,13 +177,13 @@ These are real Functional Muscle sessions. Use them to understand the look, feel
 - Tabata: child pose to cobra alternating good morning with twist
 - 30 clean and press for time
 - Tabata: devil press alternating thruster
-- Bike EMOM: 10 cal per minute for 5 mins
+- Bike EMOM: hard sprint each minute for 5 mins, rest remainder
 - Tabata: 360 jump squats alternating gorilla rows
 - Abs + stretch
 
 **Session E**
 - Warm-up
-- Death race: 5 rounds — 10/15 cal bike + 10 burpees
+- Death race: 5 rounds — hard bike sprint + 10 burpees
 - Continuous Circuit 15 min (3×5): 1 min jump squats / 1 min slams / 1 min overhead crunches
 - 5×10 leg extensions
 - 5×10 shoulder press
@@ -194,7 +194,7 @@ These are real Functional Muscle sessions. Use them to understand the look, feel
 - Tabata DB star jumps / Tabata side-to-side DB touches / Tabata DB lunges (three separate tabatas)
 - 10-1: swings, deadlifts, calf raises
 - 5×5 bears
-- Bike sprints: 10/15 cal EMOM for 5 mins
+- Bike sprints: hard effort EMOM for 5 mins
 - Pilates 100
 
 **Key patterns to replicate:**
@@ -211,6 +211,6 @@ These are real Functional Muscle sessions. Use them to understand the look, feel
 - Tabata pairings should contrast muscle groups — never two pressing movements back to back.
 - In continuous circuits, the cardio minute is the recovery — keep it to a sustainable hard effort, not a sprint.
 - Bear Mountain: the press is the limiting factor — choose weight based on overhead capacity, not squat strength.
-- 20-20 blocks: the cardio and the KB should both feel like a 7/10 effort — if the swings feel easy, the ski was too easy.
+- 20-20 blocks: both the cardio and the KB should feel sustainably hard — if the swings feel easy, the machine effort was too easy.
 - Strength finishers (5×10) use controlled tempo — not chasing reps, building quality volume.
 - Death Race: the burpees pace the bike — go hard on the bike but don't blow up before the burpees.

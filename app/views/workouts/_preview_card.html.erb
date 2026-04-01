@@ -61,22 +61,24 @@
     <% end %>
   </div>
 
-  <%# Actions — desktop %>
-  <div class="hidden sm:flex bg-zinc-900 border-t border-zinc-700 px-5 py-4 flex-col sm:flex-row gap-3">
-    <%= button_to persist_preview_workout_path(token: preview_token, intent: "log"), method: :post,
-        data: { turbo_frame: "_top" },
-        form: { class: "contents" },
-        class: "sm:flex-1 text-center bg-volt hover:bg-volt/80 active:opacity-90 text-zinc-950 font-black py-3 rounded-xl text-sm transition-colors uppercase tracking-wide shadow-sm shadow-volt/20 cursor-pointer" do %>
-      Post
-    <% end %>
-    <%= button_to persist_preview_workout_path(token: preview_token, intent: "save"), method: :post,
-        data: { turbo_frame: "_top" },
-        form: { class: "contents" },
-        class: "flex items-center justify-center gap-1.5 py-3 px-4 border border-lime-400 text-lime-400 hover:bg-lime-400 hover:text-zinc-950 font-bold rounded-xl text-sm transition-colors cursor-pointer" do %>
-      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-      Save
-    <% end %>
-  </div>
+  <% if preview_token %>
+    <%# Actions — desktop %>
+    <div class="hidden sm:flex bg-zinc-900 border-t border-zinc-700 px-5 py-4 flex-col sm:flex-row gap-3">
+      <%= button_to persist_preview_workout_path(token: preview_token, intent: "log"), method: :post,
+          data: { turbo_frame: "_top" },
+          form: { class: "contents" },
+          class: "sm:flex-1 text-center bg-volt hover:bg-volt/80 active:opacity-90 text-zinc-950 font-black py-3 rounded-xl text-sm transition-colors uppercase tracking-wide shadow-sm shadow-volt/20 cursor-pointer" do %>
+        Post
+      <% end %>
+      <%= button_to persist_preview_workout_path(token: preview_token, intent: "save"), method: :post,
+          data: { turbo_frame: "_top" },
+          form: { class: "contents" },
+          class: "flex items-center justify-center gap-1.5 py-3 px-4 border border-lime-400 text-lime-400 hover:bg-lime-400 hover:text-zinc-950 font-bold rounded-xl text-sm transition-colors cursor-pointer" do %>
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Save
+      <% end %>
+    </div>
+  <% end %>
 
 </div>
 

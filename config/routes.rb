@@ -30,6 +30,7 @@ Rails.application.routes.draw do
     member do
       get   :log
       get   :export_pdf
+      get   :share_card
       patch :save_template
       post  :like, to: "workout_likes#toggle"
       post  :clone
@@ -78,6 +79,8 @@ Rails.application.routes.draw do
   resources :shares, only: :create do
     collection { get :search_users }
   end
+
+  get "sunday/workout", to: "workouts#sunday", as: :sunday_workout
 
   get "privacy", to: "pages#privacy", as: :privacy
   get "terms",   to: "pages#terms",   as: :terms

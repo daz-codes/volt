@@ -20,13 +20,13 @@ These develop the same physical qualities but are NOT competition movements. Use
 Goblet Squats, Bulgarian Split Squats, Split Squats (loaded), Jumping Lunges, Reverse Lunges (loaded), Step-ups (weighted), Hip Thrust, KB Deadlift
 
 **Posterior chain and carries**
-KB Swings, Romanian Deadlift, Good Morning, Sandbag Carry
+KB Swings, Romanian Deadlift, Good Morning, Sandbag Carry, Clean and Press (DB or KB)
 
 **Pulling and grip**
 DB Row, Cable Row, Ring Row, Lat Pulldown, Band Pull-aparts, Dead Hangs
 
 **Pushing and upper body**
-Push Press, DB Bench Press, Landmine Press, Push-ups
+Push Press, DB Bench Press, Landmine Press, Push-ups, Devil Press
 
 **Core and stability**
 Plank Holds, Hollow Body Hold, Ab Wheel, Pallof Press
@@ -35,6 +35,7 @@ Plank Holds, Hollow Body Hold, Ab Wheel, Pallof Press
 Warm-up → Main set (anchor zones + primary/secondary exercises) → Optional machine conditioning block → Cool-down stretches.
 
 ## Coaching Notes
+- **Single-exercise sessions are valid.** A focused workout built around one movement (e.g. 5 rounds of 20 thrusters with rest) is a legitimate session — don't feel obligated to add variety for its own sake.
 - NO running in Deka Strong sessions — replace any running impulses with machine intervals (SkiErg, row, or bike).
 - Prioritise primary (competition) exercises — they should make up the majority of the session.
 - Secondary exercises fill gaps and add variety but should not dominate.

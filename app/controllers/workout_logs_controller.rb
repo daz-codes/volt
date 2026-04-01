@@ -61,6 +61,7 @@ class WorkoutLogsController < ApplicationController
                           .where(completed_at: @first.beginning_of_month..@first.end_of_month)
                           .group("DATE(completed_at)")
                           .count
+                          .transform_keys { |k| k.is_a?(String) ? Date.parse(k) : k }
   end
 
   def calendar_day

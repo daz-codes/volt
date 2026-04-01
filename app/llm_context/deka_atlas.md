@@ -13,16 +13,16 @@ These are the actual Deka Atlas race stations. They should form the backbone of 
 
 Barbell Thrusters, Bar-Facing Burpees Over Bar, Surrender Lunges (weighted), Single Arm DB Ground to Overhead (alternating), Dumbbell Bear Crawl, Weighted Sit-ups, Farmer's Carry, DB Shoulder to Overhead Press, Jump Rope Single Unders, Atlas Shoulder to Carry
 
-⚠️ WEIGHT RULE: All overhead pressing in Deka Atlas training uses DUMBBELLS at race weight — 22.5kg per hand (peak) / 15kg per hand (foundation). Do NOT use barbell push press or barbell overhead press. The race zones are all dumbbell-based — train with the implements you'll race with.
+⚠️ WEIGHT RULE: All overhead pressing in Deka Atlas training uses DUMBBELLS at race weight. If the athlete has known working weights or race division weights in their Athlete Context, use those. Otherwise, cue "race weight" or "competition weight" — the athlete knows their division. Do NOT use barbell push press or barbell overhead press. The race zones are all dumbbell-based — train with the implements you'll race with.
 
 ## Secondary Exercises — Supplementary Training (use sparingly)
 These develop the same physical qualities but are NOT competition movements. Use 2–3 per session to add variety — they should never outnumber or overshadow the primary exercises.
 
 **Overhead strength and endurance**
-DB Arnold Press, Landmine Press, Single-Arm DB Overhead Press, Kettlebell Press, Overhead Hold (static, timed)
+DB Arnold Press, Landmine Press, Single-Arm DB Overhead Press, Kettlebell Press, Overhead Hold (static, timed), Renegade Rows
 
 **Loaded movement**
-Overhead Walking Lunge, Overhead Squat, Suitcase Carry, Overhead Carry (plate or KB)
+Overhead Walking Lunge, Overhead Squat, Suitcase Carry, Overhead Carry (plate or KB), Devil Press
 
 **Carries and grip**
 Plate Pinch Carry, Suitcase Carry
@@ -40,9 +40,10 @@ SkiErg, Rowing, Air Bike — for conditioning intervals without shoulder bias
 Warm-up (shoulder mobility focus: band pull-aparts, shoulder circles, light overhead work) → Main set (anchor zones + primary/secondary exercises) → Optional shoulder endurance finisher → Cool-down stretches.
 
 ## Coaching Notes
+- **Single-exercise sessions are valid.** A focused workout built around one movement (e.g. 5 rounds of 20 thrusters with rest) is a legitimate session — don't feel obligated to add variety for its own sake.
 - Shoulder pre-fatigue is the theme — sequence overhead pressing before carries to simulate accumulated fatigue.
 - Prioritise primary (competition) exercises — they should make up the majority of the session.
 - Secondary exercises fill gaps and add variety but should not dominate.
 - Overhead holds (static) build the endurance needed for the Atlas Shoulder to Carry zone.
 - Heavy carries should be as heavy as possible while maintaining posture — grip failure before muscular failure is a warning sign.
-- ALL pressing is dumbbell-based at race weights. Never prescribe barbell push press — the event uses dumbbells exclusively. Ignore general strength benchmarks for overhead work; use race weights instead.
+- ALL pressing is dumbbell-based at race weight. Never prescribe barbell push press — the event uses dumbbells exclusively. Cue "race weight" and let the athlete select their division-appropriate load.

@@ -1,5 +1,5 @@
 class WorkoutsController < ApplicationController
-  before_action :require_authentication
+  before_action :require_authentication, except: [ :sunday ]
   before_action :set_owned_workout, only: [ :edit, :update, :clone ]
   rate_limit to: 10, within: 3.minutes, only: :create
 
@@ -273,6 +273,11 @@ class WorkoutsController < ApplicationController
     send_data pdf_data, filename: filename, type: "application/pdf", disposition: "attachment"
   end
 
+  def share_card
+    @workout = Workout.find(params[:id])
+    render layout: false
+  end
+
   # GET /workouts/:id/log
   def log
     @workout = Workout.find(params[:id])
@@ -335,6 +340,44 @@ class WorkoutsController < ApplicationController
   rescue => e
     Rails.logger.error "Workout scan failed: #{e.class}: #{e.message}\n#{e.backtrace.first(5).join("\n")}"
     redirect_to root_path, alert: "Something went wrong scanning your workout. Please try again."
+  end
+
+  # GET /sunday/workout — one-tap Sunday workout (no login required)
+  def sunday
+    user = Current.user || User.new
+
+    generator = WorkoutLLMGenerator.new(
+      user:          user,
+      activity:      "Sunday Workout",
+      duration_mins: 60,
+      difficulty:    "intermediate"
+    )
+    result = generator.generate
+
+    attrs = result[:attrs]
+    @workout = Workout.new(attrs)
+    @workout.activity = Activity.find_by(id: attrs[:activity_id]) if attrs[:activity_id]
+    @debug_info = result[:debug_info]
+
+    if Current.user
+      token = SecureRandom.urlsafe_base64(16)
+      Rails.cache.write("workout_preview:#{token}", result, expires_in: 1.hour)
+      Current.user.generation_uses.create!
+      @preview_token = token
+    end
+
+    render :preview
+  rescue WorkoutLLMGenerator::WorkoutGenerationError, StandardError => e
+    Rails.logger.error "Sunday workout failed: #{e.class}: #{e.message}" unless e.is_a?(WorkoutLLMGenerator::WorkoutGenerationError)
+    @error = "Something went wrong generating your Sunday workout. Please try again."
+    render inline: <<~HTML, layout: "application"
+      <div class="max-w-2xl mx-auto text-center py-20">
+        <p class="text-4xl mb-4">&#9889;</p>
+        <h2 class="text-xl font-black mb-2 text-white">Workout Generation Failed</h2>
+        <p class="text-gray-400 text-sm mb-6"><%= @error %></p>
+        <%= link_to "Try Again", sunday_workout_path, class: "bg-volt hover:bg-volt/80 text-zinc-950 font-black px-6 py-3 rounded-xl transition-colors" %>
+      </div>
+    HTML
   end
 
   private

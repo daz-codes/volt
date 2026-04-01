@@ -125,7 +125,23 @@
       "Bash(grep -A 20 'create_table \"\"\"\"program_workouts\"\"\"\"' db/schema.rb)",
       "Bash(PATH=\"/opt/homebrew/bin:/Users/daz/.local/share/mise/installs/ruby/3.4.7/bin:$PATH\")",
       "Bash(bin/rails routes:*)",
-      "Bash(bin/rails db:test:prepare)"
+      "Bash(bin/rails db:test:prepare)",
+      "Bash(GIT_EDITOR=true git rebase --continue 2>&1)",
+      "Bash(PATH=\"/opt/homebrew/bin:/Users/daz/.local/share/mise/installs/ruby/3.4.7/bin:$PATH\" rails runner \"\nlogs = WorkoutLog.all\nputs \\\\\"Total workout logs: #{logs.count}\\\\\"\nlogs.each do |l|\n  puts \\\\\"  id=#{l.id} user=#{l.user_id} completed_at=#{l.completed_at} workout=#{l.workout_id}\\\\\"\nend\n\")",
+      "Bash(PATH=\"/opt/homebrew/bin:/Users/daz/.local/share/mise/installs/ruby/3.4.7/bin:$PATH\" rails runner \"\nuser = User.find\\(2\\)\nfirst = Date.new\\(2026, 3, 1\\)\ncounts = user.workout_logs\n             .where\\(completed_at: first.beginning_of_month..first.end_of_month\\)\n             .group\\('DATE\\(completed_at\\)'\\)\n             .count\nputs 'Counts hash:'\ncounts.each { |k, v| puts \\\\\"  #{k.inspect} \\(#{k.class}\\) => #{v}\\\\\" }\n\")",
+      "Bash(PATH=\"/opt/homebrew/bin:/Users/daz/.local/share/mise/installs/ruby/3.4.7/bin:$PATH\" bin/rails test test/models/workout_test.rb)",
+      "Bash(PATH=\"/opt/homebrew/bin:/Users/daz/.local/share/mise/installs/ruby/3.4.7/bin:$PATH\" RAILS_ENV=test bin/rails db:test:prepare 2>&1)",
+      "Bash(PATH=\"/opt/homebrew/bin:/Users/daz/.local/share/mise/installs/ruby/3.4.7/bin:$PATH\" RAILS_ENV=test bin/rails db:create db:schema:load 2>&1)",
+      "Bash(PATH=\"/opt/homebrew/bin:/Users/daz/.local/share/mise/installs/ruby/3.4.7/bin:$PATH\" ruby -c app/services/workout_llm_generator.rb 2>&1)",
+      "Bash(PATH=\"/opt/homebrew/bin:/Users/daz/.local/share/mise/installs/ruby/3.4.7/bin:$PATH\" ruby -c app/models/concerns/scannable.rb 2>&1)",
+      "Bash(PATH=\"/opt/homebrew/bin:/Users/daz/.local/share/mise/installs/ruby/3.4.7/bin:$PATH\" ruby -c app/services/workout_llm_generator.rb)",
+      "Bash(PATH=\"/opt/homebrew/bin:/Users/daz/.local/share/mise/installs/ruby/3.4.7/bin:$PATH\" bin/rails runner \"w = Workout.where\\(status: 'active'\\).where.not\\(user_id: nil\\).order\\(id: :desc\\).limit\\(5\\).each { |w| puts \\\\\"#{w.id} | #{w.name} | #{w.activity&.name} | #{w.duration_mins}min | #{w.structure['sections']&.size} sections\\\\\" }\" 2>&1)",
+      "Bash(PATH=\"/opt/homebrew/bin:/Users/daz/.local/share/mise/installs/ruby/3.4.7/bin:$PATH\" bin/rails runner \"w = Workout.find\\(104\\); puts JSON.pretty_generate\\(w.structure\\)\" 2>&1)",
+      "Bash(PATH=\"/opt/homebrew/bin:$PATH\" which magick)",
+      "Bash(PATH=\"/opt/homebrew/bin:/Users/daz/.local/share/mise/installs/ruby/3.4.7/bin:$PATH\" ruby -e \"require ''mini_magick''; puts MiniMagick::VERSION\")",
+      "Bash(PATH=\"/opt/homebrew/bin:/Users/daz/.local/share/mise/installs/ruby/3.4.7/bin:$PATH\" bin/rails runner \"\nw = Workout.find\\(104\\)\ns = w.structure['sections'].find { |s| s['name'].match?\\(/split/i\\) }\nputs s['name']\nputs s['format']\nputs s['rounds']\ns['exercises'].each { |e| puts \\\\\"  #{e['name']} | dist=#{e['distance_m']} | reps=#{e['reps']} | cal=#{e['calories']}\\\\\" }\n\" 2>&1)",
+      "Bash(PATH=\"/opt/homebrew/bin:/Users/daz/.local/share/mise/installs/ruby/3.4.7/bin:$PATH\" bin/rails runner \"w = Workout.where\\('name ILIKE ?', '%gauntlet%'\\).first; if w; puts w.id; puts w.name; puts w.activity&.name; puts w.duration_mins; else; puts 'not found'; end\" 2>&1)",
+      "Bash(PATH=\"/opt/homebrew/bin:/Users/daz/.local/share/mise/installs/ruby/3.4.7/bin:$PATH\" bin/rails runner \"w = Workout.where\\('LOWER\\(name\\) LIKE ?', '%gauntlet%'\\).first; if w; puts w.id; else; puts 'not found'; end\" 2>&1)"
     ]
   }
 }

@@ -17,10 +17,10 @@ RAM Reverse Lunges, Row (500m), Box Jump / Step Over, Med Ball Sit-up Throw, Ski
 These develop the same physical qualities but are NOT competition movements. Use 2–3 per session to add variety — they should never outnumber or overshadow the primary exercises.
 
 **Legs and lower body**
-Goblet Squats, Bulgarian Split Squats, Split Squats (loaded), Jumping Lunges, Reverse Lunges (loaded), Step-ups (weighted), Hip Thrust, KB Deadlift
+Goblet Squats, Bulgarian Split Squats, Split Squats (loaded), Jumping Lunges, Reverse Lunges (loaded), Step-ups (weighted), Hip Thrust, KB Deadlift, Devil Press
 
 **Posterior chain and carries**
-KB Swings, Romanian Deadlift, Good Morning, Sandbag Carry, Sled Drag (belt)
+KB Swings, Romanian Deadlift, Good Morning, Sandbag Carry, Sled Drag (belt), Clean and Press (DB or KB)
 
 **Pulling and grip**
 DB Row, Cable Row, Ring Row, Lat Pulldown, Band Pull-aparts
@@ -35,6 +35,7 @@ Warm-up → Main set (anchor zones + treadmill run intervals + primary/secondary
 Every Deka Fit session MUST include at least 2 treadmill running intervals (500m–1km each) placed between station work. This is non-negotiable — running is the backbone of the race format (5km across 10 × 500m runs). Always use treadmill (not outdoor running). Place treadmill intervals between station clusters to replicate race transitions.
 
 ## Coaching Notes
+- **Single-exercise sessions are valid.** A focused workout built around one movement (e.g. 5 rounds of 20 thrusters with rest) is a legitimate session — don't feel obligated to add variety for its own sake.
 - Anchor zones should use race-accurate weights and distances from the prompt reference.
 - Prioritise primary (competition) exercises — they should make up the majority of the session.
 - Secondary exercises fill gaps and add variety but should not dominate.
