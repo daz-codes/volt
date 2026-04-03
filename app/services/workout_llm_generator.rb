@@ -405,9 +405,10 @@ class WorkoutLLMGenerator
               type: "array",
               items: {
                 type: "object",
-                required: %w[name format],
+                required: %w[name category format],
                 properties: {
                   name:               { type: "string" },
+                  category:           { type: "string", enum: %w[warm_up main finisher cool_down], description: "Section purpose: warm_up for warm-up/activation/mobility, main for primary working blocks, finisher for short burners at the end (tabata, hundred), cool_down for stretching/recovery/decompression" },
                   format:             { type: "string", enum: %w[straight amrap rounds emom tabata for_time ladder mountain matrix hundred], description: "straight=sets with rest, rounds=multiple rounds of the same set, amrap=as many rounds as possible in a time cap, emom=every minute on the minute, tabata=20s work/10s rest×8, for_time=complete prescribed reps/distance as fast as possible (record finishing time), ladder/mountain=reps/distance change each round, matrix=progressive exercise combination (add then remove exercises each round: A → A+B → A+B+C → B+C → C), hundred=100 reps of a single exercise for time (The Centurion)" },
                   duration_mins:      { type: "integer" },
                   rounds:             { type: "integer" },
@@ -1046,6 +1047,7 @@ class WorkoutLLMGenerator
       #{recent_fm_formats.present? ? "- RECENT SESSIONS — the user's recent Functional Muscle sessions were:\n#{recent_fm_formats.lines.map { |l| "        #{l}" }.join}\n      Use this to avoid repetition: pick different strength machines from the ones listed, pick a different Pilates 100 exercise, and vary the tabata compounds. Block types (12-min, ladder etc) can repeat if they fit — but machines and finisher should rotate." : ""}
       #{sport_rule}
       #{pace_limits}
+      - SECTION CATEGORY — every section MUST include a `category` field: `warm_up` for warm-up/activation/mobility sections, `main` for primary working blocks, `finisher` for short burners at the end (e.g. tabata, hundred, for_time finisher), `cool_down` for stretching/recovery/decompression. This field is required and must match the section's purpose regardless of what creative name you give it.
       - FORMAT SELECTION — choose the best format for each section. VARIETY IS MANDATORY: no two adjacent sections may share the same format, and across the full session you must use at least 3 different formats. Do not default to rounds and tabata for everything — ladders, amraps, rotating EMOMs, hundreds, and for_time efforts are equally valid and make sessions far more interesting. Here are the available formats:
         * tabata — high-intensity cardio bursts or bodyweight finishers. 20s on / 10s off × 8 rounds = exactly 4 minutes. Set duration_mins: 4. Do NOT set reps, calories, or distance_m on tabata exercises — the 20s interval is the only constraint. You may specify weight_kg where relevant. EXERCISE COUNT RULES: exercises in a tabata section must be exactly 1, 2, 4, or 8 (factors of 8). Multiple exercises ROTATE through the 8 rounds — 2 exercises = ABABABAB (4 rounds each), 4 exercises = ABCDABCD (2 rounds each), 8 exercises = each done once. Use a SEPARATE tabata section if you want two independent tabatas.
         * emom — two distinct styles, set emom_style accordingly:
