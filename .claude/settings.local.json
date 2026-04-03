@@ -160,7 +160,8 @@
       "Bash(magick -font \"Helvetica-Bold\" -pointsize 36 label:\"TEST\" /tmp/font-test2.png)",
       "Bash(magick -font \"/System/Library/Fonts/Supplemental/Arial Bold.ttf\" -pointsize 36 label:\"TEST\" /tmp/font-test4.png)",
       "Read(//tmp/**)",
-      "Bash(env)"
+      "Bash(env)",
+      "Bash(bin/rails workouts:backfill_categories:*)"
     ]
   }
 }
