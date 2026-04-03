@@ -108,9 +108,7 @@ module Workout::Exportable
   # Shared section extraction used by both share_card view and image generator
   def export_sections
     raw = structure.is_a?(Hash) ? Array(structure["sections"]) : []
-    main = raw.reject { |s|
-      s["name"].to_s.match?(/warm.?up|cool.?down|stretch|recovery|primer|activation|mobility/i)
-    }
+    main = raw.select { |s| %w[main finisher].include?(s["category"]) }
 
     main.map do |section|
       fmt = section["format"].to_s
