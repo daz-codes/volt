@@ -271,6 +271,9 @@ class WorkoutsController < ApplicationController
     image_data = @workout.generate_share_image
     filename = "volt-#{@workout.name.parameterize}-#{Date.today}.png"
     send_data image_data, filename: filename, type: "image/png", disposition: "attachment"
+  rescue => e
+    Rails.logger.error "Image export failed: #{e.class}: #{e.message}\n#{e.backtrace.first(5).join("\n")}"
+    redirect_to workout_path(@workout || params[:id]), alert: "Image export failed. Please try again."
   end
 
   # GET /workouts/:id/export_pdf
