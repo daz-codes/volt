@@ -45,6 +45,7 @@ class WorkoutValidator
 
   def validate_and_fix
     sections = Array(@data.dig("structure", "sections"))
+    ensure_section_categories(sections)
 
     sections.each_with_index do |section, idx|
       case section["format"]
@@ -103,6 +104,34 @@ class WorkoutValidator
   end
 
   private
+
+  # Assign a category to each section so downstream methods can rely on it.
+  # First pass infers from name patterns; second pass detects finishers.
+  def ensure_section_categories(sections)
+    # First pass: infer from name patterns
+    sections.each do |section|
+      next if Workout::CATEGORIES.include?(section["category"])
+
+      name = section["name"].to_s
+      section["category"] = if name.match?(Workout::WARMUP_NAME_PATTERN)
+        "warm_up"
+      elsif name.match?(Workout::COOLDOWN_NAME_PATTERN)
+        "cool_down"
+      else
+        "main"
+      end
+    end
+
+    # Second pass: detect finisher (last non-cool-down section with tabata/hundred/for_time format)
+    last_main_idx = sections.rindex { |s| s["category"] != "cool_down" }
+    if last_main_idx
+      candidate = sections[last_main_idx]
+      if %w[tabata hundred for_time].include?(candidate["format"]) && candidate["category"] == "main"
+        has_prior_main = sections[0...last_main_idx].any? { |s| s["category"] == "main" }
+        candidate["category"] = "finisher" if has_prior_main
+      end
+    end
+  end
 
   # EMOM circuit: total reps per minute must not exceed the difficulty cap.
   # Rotating EMOMs don't have a per-minute rep cap (each exercise fills its own minute).

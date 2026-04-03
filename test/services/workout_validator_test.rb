@@ -1,6 +1,74 @@
 require "test_helper"
 
 class WorkoutValidatorTest < ActiveSupport::TestCase
+  # -- Section category inference --
+
+  test "ensure_section_categories infers warm_up from name" do
+    data = build_workout_with_sections([
+      { "name" => "Gas Pedal", "format" => "straight", "exercises" => [{ "name" => "Jog" }] },
+      { "name" => "Main Block", "format" => "rounds", "rounds" => 3, "exercises" => [{ "name" => "Squat", "reps" => 10 }] }
+    ])
+    result = WorkoutValidator.new(data, difficulty: "intermediate", duration_mins: 60, main_tag_slug: "").validate_and_fix
+    sections = result.dig("structure", "sections")
+    assert_equal "main", sections[0]["category"]
+    assert_equal "main", sections[1]["category"]
+  end
+
+  test "ensure_section_categories infers warm_up from warm-up name" do
+    data = build_workout_with_sections([
+      { "name" => "Warm-Up", "format" => "straight", "exercises" => [{ "name" => "Jog" }] },
+      { "name" => "Main Block", "format" => "rounds", "rounds" => 3, "exercises" => [{ "name" => "Squat", "reps" => 10 }] }
+    ])
+    result = WorkoutValidator.new(data, difficulty: "intermediate", duration_mins: 60, main_tag_slug: "").validate_and_fix
+    sections = result.dig("structure", "sections")
+    assert_equal "warm_up", sections[0]["category"]
+    assert_equal "main", sections[1]["category"]
+  end
+
+  test "ensure_section_categories infers cool_down from name" do
+    data = build_workout_with_sections([
+      { "name" => "Main Block", "format" => "rounds", "rounds" => 3, "exercises" => [{ "name" => "Squat", "reps" => 10 }] },
+      { "name" => "Decompress", "format" => "straight", "exercises" => [{ "name" => "Stretch" }] }
+    ])
+    result = WorkoutValidator.new(data, difficulty: "intermediate", duration_mins: 60, main_tag_slug: "").validate_and_fix
+    sections = result.dig("structure", "sections")
+    assert_equal "main", sections[0]["category"]
+    assert_equal "cool_down", sections[1]["category"]
+  end
+
+  test "ensure_section_categories infers finisher for last tabata before cool-down" do
+    data = build_workout_with_sections([
+      { "name" => "Main Block", "format" => "rounds", "rounds" => 3, "exercises" => [{ "name" => "Squat", "reps" => 10 }] },
+      { "name" => "Final Push", "format" => "tabata", "duration_mins" => 4, "exercises" => [{ "name" => "Row" }] },
+      { "name" => "Cool-Down", "format" => "straight", "exercises" => [{ "name" => "Stretch" }] }
+    ])
+    result = WorkoutValidator.new(data, difficulty: "intermediate", duration_mins: 60, main_tag_slug: "").validate_and_fix
+    sections = result.dig("structure", "sections")
+    assert_equal "main", sections[0]["category"]
+    assert_equal "finisher", sections[1]["category"]
+    assert_equal "cool_down", sections[2]["category"]
+  end
+
+  test "ensure_section_categories preserves valid existing category" do
+    data = build_workout_with_sections([
+      { "name" => "Gas Pedal", "category" => "warm_up", "format" => "straight", "exercises" => [{ "name" => "Jog" }] },
+      { "name" => "Main Block", "category" => "main", "format" => "rounds", "rounds" => 3, "exercises" => [{ "name" => "Squat", "reps" => 10 }] }
+    ])
+    result = WorkoutValidator.new(data, difficulty: "intermediate", duration_mins: 60, main_tag_slug: "").validate_and_fix
+    sections = result.dig("structure", "sections")
+    assert_equal "warm_up", sections[0]["category"]
+    assert_equal "main", sections[1]["category"]
+  end
+
+  test "ensure_section_categories replaces invalid category" do
+    data = build_workout_with_sections([
+      { "name" => "Warm-Up", "category" => "bogus", "format" => "straight", "exercises" => [{ "name" => "Jog" }] }
+    ])
+    result = WorkoutValidator.new(data, difficulty: "intermediate", duration_mins: 60, main_tag_slug: "").validate_and_fix
+    sections = result.dig("structure", "sections")
+    assert_equal "warm_up", sections[0]["category"]
+  end
+
   # -- Rotating EMOM duration snapping --
 
   test "rotating EMOM duration snaps to nearest valid multiple of exercise count" do
@@ -37,6 +105,10 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
   end
 
   private
+
+  def build_workout_with_sections(sections)
+    { "structure" => { "sections" => sections } }
+  end
 
   def build_workout_with_rotating_emom(exercises:, duration_mins:, notes: nil)
     exercise_list = exercises.times.map do |i|
