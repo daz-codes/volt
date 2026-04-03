@@ -51,6 +51,13 @@ export default class extends Controller {
         <div class="flex items-center gap-2 mb-3">
           <input name="sections[${id}][name]" type="text" placeholder="Section name (e.g. Warm Up, Main Set)" required
             class="flex-1 bg-zinc-800 border border-zinc-600 rounded-xl px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-lime-400 transition-colors">
+          <select name="sections[${id}][category]"
+            class="bg-zinc-800 border border-zinc-600 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-lime-400 transition-colors">
+            <option value="warm_up">Warm-up</option>
+            <option value="main" selected>Main</option>
+            <option value="finisher">Finisher</option>
+            <option value="cool_down">Cool-down</option>
+          </select>
           <select name="sections[${id}][format]" data-action="change->builder#toggleFormat"
             class="bg-zinc-800 border border-zinc-600 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-lime-400 transition-colors">
             <option value="straight">Straight</option>

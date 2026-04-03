@@ -17,8 +17,9 @@ module Workout::StructureBuilder
 
     def build_section_from_params(s)
       section = {
-        "name"   => s[:name].to_s.strip,
-        "format" => valid_formats.include?(s[:format]) ? s[:format] : "straight"
+        "name"     => s[:name].to_s.strip,
+        "category" => Workout::CATEGORIES.include?(s[:category]) ? s[:category] : "main",
+        "format"   => valid_formats.include?(s[:format]) ? s[:format] : "straight"
       }
       section["rounds"]        = s[:rounds].to_i        if s[:rounds].present?
       section["duration_mins"] = s[:duration_mins].to_i if s[:duration_mins].present?
