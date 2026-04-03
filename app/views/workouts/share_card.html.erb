@@ -1,10 +1,5 @@
 <%# Standalone Instagram share card — no layout, self-contained styles %>
-<%
-  sections = @workout.structure.is_a?(Hash) ? Array(@workout.structure["sections"]) : []
-  main_sections = sections.reject { |s|
-    s["name"].to_s.match?(/warm.?up|cool.?down|stretch|recovery|primer|activation|mobility/i)
-  }
-%>
+<% export_sections = @workout.export_sections %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -143,60 +138,12 @@
   <div class="divider"></div>
 
   <div class="sections-list">
-    <% main_sections.each do |section| %>
-      <%
-        fmt = section["format"].to_s
-        is_ladder = %w[ladder mountain].include?(fmt)
-        rounds = section["rounds"]
-
-        # Build section type label
-        label = case fmt
-                when "tabata"   then "Tabata"
-                when "emom"     then "EMOM #{section["duration_mins"]}min"
-                when "amrap"    then "AMRAP #{section["duration_mins"]}min"
-                when "rounds"   then rounds && rounds > 1 ? "#{rounds} Rounds" : nil
-                when "for_time" then "For Time"
-                when "ladder"   then "Ladder"
-                when "mountain" then "Mountain"
-                when "hundred"  then "100 Reps"
-                when "matrix"   then "Matrix"
-                end
-
-        # Build exercise lines
-        ex_lines = Array(section["exercises"]).map do |ex|
-          name = ex["name"].to_s.gsub(/\s*\([\d.]+kg.*?\)\s*/, '').strip
-          parts = []
-          if ex["reps"]
-            unit = name.match?(/carry|sled|prowler|drag|shuttle|farmer/i) ? "m" : ""
-            parts << "#{ex["reps"]}#{unit}"
-          end
-          parts << "#{ex["distance_m"]}m" if ex["distance_m"]
-          parts << "#{ex["calories"]} cal" if ex["calories"]
-          if ex["duration_s"]
-            dm = ex["duration_s"] / 60; dr = ex["duration_s"] % 60
-            parts << (dm > 0 ? "#{dm}min#{dr > 0 ? " #{dr}s" : ""}" : "#{ex["duration_s"]}s")
-          end
-          metric = parts.join(" · ")
-
-          if is_ladder
-            sv = section["start"]; ev = section["end"]; st = section["step"]
-            if section["format"] == "mountain"
-              "#{name} #{sv}–#{section["peak"]}–#{ev}"
-            else
-              "#{name} #{sv}–#{ev} (steps of #{st.to_i})"
-            end
-          elsif metric.present?
-            "#{metric} #{name}"
-          else
-            name
-          end
-        end
-      %>
+    <% export_sections.each do |section| %>
       <div class="section-block">
-        <% if label.present? %>
-          <div class="section-label"><%= label %></div>
+        <% if section[:label].present? %>
+          <div class="section-label"><%= section[:label] %></div>
         <% end %>
-        <% ex_lines.each do |line| %>
+        <% section[:exercises].each do |line| %>
           <div class="exercise-line"><%= line.upcase %></div>
         <% end %>
       </div>

@@ -24,6 +24,16 @@ module Workout::Exportable
       # Canvas
       commands.push("-size", "#{CANVAS_WIDTH}x#{CANVAS_HEIGHT}", "xc:#{BG_COLOR}")
 
+      # Radial gradient overlay (lime tint, 4% opacity at top-left)
+      commands.push(
+        "(", "-size", "#{CANVAS_WIDTH}x#{CANVAS_HEIGHT}",
+        "radial-gradient:rgba(163,230,53,0.04)-transparent",
+        "-gravity", "NorthWest",
+        "-geometry", "+0+0",
+        ")",
+        "-composite"
+      )
+
       # Header row: activity type (left)
       if activity.present?
         commands.push("-fill", DIM_GRAY, "-font", font_bold, "-pointsize", "36",
@@ -159,10 +169,12 @@ module Workout::Exportable
 
   def resolve_font
     [
-      "/System/Library/Fonts/Supplemental/Arial Bold.ttf",
+      "/System/Library/Fonts/Supplemental/Helvetica Neue Bold.ttf",
+      "/System/Library/Fonts/HelveticaNeue.ttc",
+      "/System/Library/Fonts/Helvetica.ttc",
       "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
       "/usr/share/fonts/TTF/DejaVuSans-Bold.ttf"
-    ].find { |f| File.exist?(f) } || "Arial-Bold"
+    ].find { |f| File.exist?(f) } || "Helvetica-Bold"
   end
 
   def workout_name_pointsize
@@ -201,6 +213,6 @@ module Workout::Exportable
   end
 
   def safe(text)
-    text.encode("UTF-8")
+    text.encode("UTF-8").gsub("@", "\\@").gsub("%", "%%")
   end
 end
