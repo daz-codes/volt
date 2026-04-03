@@ -289,13 +289,11 @@ class WorkoutValidator
   # Skips warm-up, cool-down, tabata, emom, amrap, for_time, ladder, mountain.
   SINGLE_SET_EXEMPT   = %w[tabata emom amrap for_time ladder mountain matrix hundred].freeze
   KNOWN_FORMATS       = %w[rounds tabata emom amrap for_time ladder mountain matrix hundred].freeze
-  WARMUP_COOLDOWN_PATTERN = /warm|cool|stretch|recovery|wake.?up|ease.?in|activation|decompress|melt|reset|ease.?down|unwind/i
-  WARMUP_NAME_PATTERN = /\bwarm|wake.?up|ease.?in|activation|loosen|mobilit/i.freeze
   ABS_PILATES_PATTERN     = /abs|core|pilates|hundred/i
 
   def fix_single_set_sections(sections)
     sections.each do |section|
-      next if section["name"].to_s.match?(WARMUP_COOLDOWN_PATTERN)
+      next if %w[warm_up cool_down].include?(section["category"])
       next if section["name"].to_s.match?(ABS_PILATES_PATTERN)
 
       fmt = section["format"].to_s
@@ -348,7 +346,7 @@ class WorkoutValidator
 
   def fix_notes_as_programming(sections)
     sections.each do |section|
-      next if section["name"].to_s.match?(WARMUP_COOLDOWN_PATTERN)
+      next if %w[warm_up cool_down].include?(section["category"])
       Array(section["exercises"]).each do |ex|
         notes = ex["notes"].to_s
         next unless notes.match?(HIDDEN_ROUNDS_PATTERN)
@@ -784,7 +782,7 @@ class WorkoutValidator
   def fix_fm_strength_sets(sections)
     sections.each do |section|
       next if section["format"].to_s.in?(FM_STRENGTH_EXEMPT)
-      next if section["name"].to_s.match?(WARMUP_COOLDOWN_PATTERN)
+      next if %w[warm_up cool_down].include?(section["category"])
       next if section["name"].to_s.match?(ABS_PILATES_PATTERN)
 
       # Fix rounds to 5
@@ -811,13 +809,14 @@ class WorkoutValidator
   FM_CARDIO_MACHINES = [ "Easy Row", "Easy Ride", "Easy Ski" ].freeze
 
   def fix_fm_warmup(sections)
-    warmup = sections.find { |s| s["name"].to_s.match?(/warm/i) }
+    warmup = sections.find { |s| s["category"] == "warm_up" }
 
     # If the LLM omitted the warm-up entirely, inject one as the first section
     unless warmup
       machine = FM_CARDIO_MACHINES.sample
       warmup = {
         "name" => "Warm-Up",
+        "category" => "warm_up",
         "format" => "straight",
         "duration_mins" => 5,
         "exercises" => [
@@ -846,12 +845,13 @@ class WorkoutValidator
   # If the LLM omitted it, inject a simple stretch.
   def fix_fm_cooldown(sections)
     last = sections.last
-    has_cooldown = last && last["name"].to_s.match?(/cool|stretch|melt|wind.?down|fade|decompress|reset|unwind/i)
+    has_cooldown = last && last["category"] == "cool_down"
     return if has_cooldown
 
     breaths = 10
     cooldown = {
       "name" => "Cool-Down",
+      "category" => "cool_down",
       "format" => "straight",
       "duration_mins" => 5,
       "exercises" => [
@@ -988,10 +988,9 @@ class WorkoutValidator
     return if budget <= 0
 
     metabolic = sections.reject do |s|
-      name = s["name"].to_s
-      name.match?(WARMUP_COOLDOWN_PATTERN) ||
-        name.match?(ABS_PILATES_PATTERN) ||
-        name.match?(/strength/i)
+      %w[warm_up cool_down].include?(s["category"]) ||
+        s["name"].to_s.match?(ABS_PILATES_PATTERN) ||
+        s["name"].to_s.match?(/strength/i)
     end
 
     total = metabolic.sum { |s| fm_block_estimated_mins(s) }
@@ -1036,7 +1035,7 @@ class WorkoutValidator
     abs_sections = sections.select { |s| s["name"].to_s.match?(ABS_PILATES_PATTERN) || s["format"] == "hundred" }
     return if abs_sections.empty?
 
-    cooldown_idx = sections.index { |s| s["name"].to_s.match?(/cool|stretch/i) }
+    cooldown_idx = sections.index { |s| s["category"] == "cool_down" }
     target_idx   = cooldown_idx || sections.size
 
     # Check if all abs sections are already just before the cool-down — if so, nothing to do
@@ -1046,15 +1045,10 @@ class WorkoutValidator
 
     abs_sections.each { |s| sections.delete(s) }
     # Recalculate insert position after deletion
-    new_target = sections.index { |s| s["name"].to_s.match?(/cool|stretch/i) } || sections.size
+    new_target = sections.index { |s| s["category"] == "cool_down" } || sections.size
     sections.insert(new_target, *abs_sections)
     @fixes << "FM: moved abs section(s) to just before cool-down"
   end
-
-  # Ensure a cool-down exists as the LAST section. If a cooldown-like section
-  # exists mid-workout, leave it (it's a mid-session refresher) but still ensure
-  # the final section is a proper cooldown. If none exists anywhere, inject one.
-  COOLDOWN_NAME_PATTERN = /\bcool|stretch|recovery\s*flow|wind.?down|decompress|melt|reset|ease.?down|unwind/i.freeze
 
   # If the LLM generated multiple warm-up-like sections at the start, keep only the first one.
   def dedup_warmup_sections(sections)
@@ -1063,7 +1057,7 @@ class WorkoutValidator
     # Find all leading sections that look like warm-ups
     leading_warmups = []
     sections.each do |s|
-      break unless s["name"].to_s.match?(WARMUP_NAME_PATTERN)
+      break unless s["category"] == "warm_up"
       leading_warmups << s
     end
 
@@ -1083,7 +1077,7 @@ class WorkoutValidator
     # Find all trailing sections that look like cool-downs
     trailing_cooldowns = []
     sections.reverse_each do |s|
-      break unless s["name"].to_s.match?(COOLDOWN_NAME_PATTERN)
+      break unless s["category"] == "cool_down"
       trailing_cooldowns.unshift(s)
     end
 
@@ -1104,7 +1098,7 @@ class WorkoutValidator
     breaths = @duration_mins <= 30 ? 5 : 10
     last = sections.last
     return unless last
-    return unless last["name"].to_s.match?(COOLDOWN_NAME_PATTERN)
+    return unless last["category"] == "cool_down"
 
     Array(last["exercises"]).each do |ex|
       stripped = []
@@ -1134,7 +1128,7 @@ class WorkoutValidator
   # requires it) so we no longer inject a fallback row warm-up, which caused
   # duplicates when the LLM used creative section names.
   def fix_warmup_format(sections)
-    warmup = sections.first
+    warmup = sections.find { |s| s["category"] == "warm_up" }
     return unless warmup
 
     if warmup["format"] != "straight"
