@@ -29,6 +29,7 @@ Rails.application.routes.draw do
     end
     member do
       get   :log
+      get   :export_image
       get   :export_pdf
       get   :share_card
       patch :save_template

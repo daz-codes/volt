@@ -3,6 +3,7 @@ class Workout < ApplicationRecord
   include Workout::Status
   include Workout::Likeable
   include Workout::StructureBuilder
+  include Workout::Exportable
 
   belongs_to :user
   belongs_to :source_workout, class_name: "Workout", optional: true

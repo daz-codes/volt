@@ -247,15 +247,14 @@
                     </svg>
                     <span class="text-xs">Share</span>
                   </button>
-                  <% if Current.user.pro_features? %>
-                    <%= link_to export_pdf_workout_path(workout),
-                          data: { turbo: false },
-                          class: "flex items-center gap-1 text-gray-600 hover:text-gray-300 transition-colors",
-                          title: "Export workout as PDF" do %>
-                      <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                      <span class="text-xs">PDF</span>
-                    <% end %>
-                  <% end %>
+                  <button type="button"
+                          onclick="document.getElementById('export_dialog_<%= workout.id %>').showModal()"
+                          class="flex items-center gap-1 text-gray-600 hover:text-gray-300 transition-colors cursor-pointer"
+                          title="Export workout">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    <span class="text-xs">Export</span>
+                  </button>
+                  <%= render "shared/export_dialog", workout: workout %>
                   <%= button_to workout_path(workout), method: :delete,
                         form: { class: "contents" },
                         data: { turbo_confirm: "Delete \"#{workout.name}\"? This can't be undone." },
