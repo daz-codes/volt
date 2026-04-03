@@ -261,6 +261,18 @@ class WorkoutsController < ApplicationController
     redirect_to workout_path(old), alert: "Something went wrong. Please try again."
   end
 
+  # GET /workouts/:id/export_image
+  def export_image
+    unless Current.user.pro_features?
+      redirect_to workout_path(params[:id]), alert: "Image export is a Pro feature."
+      return
+    end
+    @workout = Workout.find(params[:id])
+    image_data = @workout.generate_share_image
+    filename = "volt-#{@workout.name.parameterize}-#{Date.today}.png"
+    send_data image_data, filename: filename, type: "image/png", disposition: "attachment"
+  end
+
   # GET /workouts/:id/export_pdf
   def export_pdf
     unless Current.user.pro_features?

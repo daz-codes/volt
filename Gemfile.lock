@@ -498,6 +498,7 @@ DEPENDENCIES
   jbuilder
   kamal
   matrix
+  mini_magick
   omniauth
   omniauth-apple
   omniauth-facebook

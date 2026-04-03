@@ -431,7 +431,7 @@ class WorkoutLLMGenerator
                         calories:    { type: "integer", description: "Calories target (e.g. assault bike, rower, ski erg)" },
                         distance_m:  { type: "integer", description: "Distance in metres for ONE execution of this exercise row. For 'rounds' sections this is the PER-ROUND distance — the system multiplies by the rounds count automatically, so NEVER pre-multiply. E.g. in a 3-round section '3×100m Freestyle per round' → distance_m: 100 (not 300). For non-rounds sections (straight, for_time, amrap) this is the full total: '4×100m Freestyle' → distance_m: 400. For swimming: only use 25, 50, or multiples of 100 — never 75, 125, 150, 175 etc." },
                         duration_s:  { type: "integer" },
-                        weight_kg:   { type: "number" },
+                        weight_kg:   { type: "number", description: "ONLY use for competition race weights (Hyrox/Deka zone weights) or when the athlete has known working weights in their Athlete Context. For everything else, leave null and put effort cues in notes instead (e.g. 'heavy', 'light', 'moderate')." },
                         notes:       { type: "string", description: "Form cues and intensity guidance ONLY (e.g. 'explosive hip drive', 'slow tempo', 'moderate weight'). NEVER put sets, rounds, reps, distances, weights, or programming details here — use the structure fields instead." }
                       }
                     }
@@ -1663,7 +1663,7 @@ class WorkoutLLMGenerator
       "  - #{name}: #{kg}kg"
     end.sort
 
-    "Known working weights (use these as the starting point — adjust slightly for intensity or format):\n#{lines.join("\n")}"
+    "Known working weights — use weight_kg for THESE exercises only (adjust slightly for intensity or format). For all other exercises, leave weight_kg null and use effort cues in notes instead:\n#{lines.join("\n")}"
   end
 
   # Produces a natural opening sentence describing the athlete.
