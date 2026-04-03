@@ -141,7 +141,26 @@
       "Bash(PATH=\"/opt/homebrew/bin:/Users/daz/.local/share/mise/installs/ruby/3.4.7/bin:$PATH\" ruby -e \"require ''mini_magick''; puts MiniMagick::VERSION\")",
       "Bash(PATH=\"/opt/homebrew/bin:/Users/daz/.local/share/mise/installs/ruby/3.4.7/bin:$PATH\" bin/rails runner \"\nw = Workout.find\\(104\\)\ns = w.structure['sections'].find { |s| s['name'].match?\\(/split/i\\) }\nputs s['name']\nputs s['format']\nputs s['rounds']\ns['exercises'].each { |e| puts \\\\\"  #{e['name']} | dist=#{e['distance_m']} | reps=#{e['reps']} | cal=#{e['calories']}\\\\\" }\n\" 2>&1)",
       "Bash(PATH=\"/opt/homebrew/bin:/Users/daz/.local/share/mise/installs/ruby/3.4.7/bin:$PATH\" bin/rails runner \"w = Workout.where\\('name ILIKE ?', '%gauntlet%'\\).first; if w; puts w.id; puts w.name; puts w.activity&.name; puts w.duration_mins; else; puts 'not found'; end\" 2>&1)",
-      "Bash(PATH=\"/opt/homebrew/bin:/Users/daz/.local/share/mise/installs/ruby/3.4.7/bin:$PATH\" bin/rails runner \"w = Workout.where\\('LOWER\\(name\\) LIKE ?', '%gauntlet%'\\).first; if w; puts w.id; else; puts 'not found'; end\" 2>&1)"
+      "Bash(PATH=\"/opt/homebrew/bin:/Users/daz/.local/share/mise/installs/ruby/3.4.7/bin:$PATH\" bin/rails runner \"w = Workout.where\\('LOWER\\(name\\) LIKE ?', '%gauntlet%'\\).first; if w; puts w.id; else; puts 'not found'; end\" 2>&1)",
+      "Bash(PATH=\"/opt/homebrew/bin:$PATH\" magick -list font)",
+      "Bash(PATH=\"/opt/homebrew/bin:$PATH\" magick identify -list font)",
+      "Bash(PATH=\"/opt/homebrew/bin:$PATH\" fc-list : family)",
+      "Bash(convert -list font)",
+      "Bash(magick -list font)",
+      "Bash(fc-list)",
+      "Bash(erb -x app/views/shared/_export_dialog.html.erb)",
+      "Bash(erb -x app/views/feed/_workout_log_card.html.erb)",
+      "Bash(erb -x app/views/workouts/index.html.erb)",
+      "Bash(erb -x app/views/workouts/_preview.html.erb)",
+      "Bash(erb -x app/views/workout_logs/show.html.erb)",
+      "Bash(GIT_DIR=/Users/daz/Library/CloudStorage/ProtonDrive-daz.codes@pm.me-folder/volt/.git GIT_WORK_TREE=/Users/daz/Library/CloudStorage/ProtonDrive-daz.codes@pm.me-folder/volt git stash)",
+      "Bash(magick identify:*)",
+      "Bash(magick -version)",
+      "Bash(magick -font \"Helvetica\" -pointsize 36 label:\"TEST\" /tmp/font-test.png)",
+      "Bash(magick -font \"Helvetica-Bold\" -pointsize 36 label:\"TEST\" /tmp/font-test2.png)",
+      "Bash(magick -font \"/System/Library/Fonts/Supplemental/Arial Bold.ttf\" -pointsize 36 label:\"TEST\" /tmp/font-test4.png)",
+      "Read(//tmp/**)",
+      "Bash(env)"
     ]
   }
 }
