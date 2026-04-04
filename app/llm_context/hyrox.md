@@ -13,6 +13,18 @@ These are the actual Hyrox race stations plus treadmill running. They should for
 
 SkiErg, Sled Push, Sled Pull, Burpee Broad Jumps, Rowing, Farmer's Carry, Sandbag Lunges, Wall Balls, Treadmill Running (1km intervals at race pace)
 
+## Exercise Variations — Training Alternatives
+Not every session needs the exact race version. Swap in these variations freely to add variety while training the same movement patterns and energy systems. Mix race-specific and variation exercises across sessions.
+
+**Burpee variations** (swap for Burpee Broad Jumps):
+Box Jump Burpees, Weight Plate Burpees, Bar-Facing Burpees, Dumbbell Burpees, Devil Press, Burpee Box Jump Overs, Lateral Burpees, Burpee Pull-ups, Chest-to-Floor Burpees, Tuck Jump Burpees
+
+**Lunge variations** (swap for Sandbag Lunges):
+Barbell Reverse Lunges, Dumbbell Walking Lunges, Overhead Lunges (DB or plate), Front Rack Lunges (KB or DB), Bulgarian Split Squats, Goblet Reverse Lunges, Deficit Reverse Lunges, Curtsy Lunges (weighted), Suitcase Lunges (single KB)
+
+**Wall Ball variations** (swap for Wall Balls):
+Thrusters (DB or barbell), Goblet Squat to Press, Med Ball Slams, Med Ball Clean and Press, Squat to Overhead Press
+
 ## Secondary Exercises — Supplementary Training (use sparingly)
 These develop the same physical qualities but are NOT competition movements. Use 2–3 per session to add variety and address weaknesses — they should never outnumber or overshadow the primary exercises.
 

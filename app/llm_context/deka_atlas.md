@@ -15,6 +15,15 @@ Barbell Thrusters, Bar-Facing Burpees Over Bar, Surrender Lunges (weighted), Sin
 
 ⚠️ WEIGHT RULE: All overhead pressing in Deka Atlas training uses DUMBBELLS at race weight. If the athlete has known working weights or race division weights in their Athlete Context, use those. Otherwise, cue "race weight" or "competition weight" — the athlete knows their division. Do NOT use barbell push press or barbell overhead press. The race zones are all dumbbell-based — train with the implements you'll race with.
 
+## Exercise Variations — Training Alternatives
+Not every session needs the exact race version. Swap in these variations freely to add variety while training the same movement patterns.
+
+**Burpee variations** (swap for Bar-Facing Burpees Over Bar):
+Box Jump Burpees, Weight Plate Burpees, Burpee Broad Jumps, Dumbbell Burpees, Devil Press, Lateral Burpees, Burpee Box Jump Overs, Chest-to-Floor Burpees, Tuck Jump Burpees
+
+**Lunge variations** (swap for Surrender Lunges):
+Overhead Lunges (DB), Front Rack Lunges (KB or DB), Goblet Reverse Lunges, Deficit Reverse Lunges, Walking Lunges (DB), Curtsy Lunges (weighted), Barbell Reverse Lunges
+
 ## Secondary Exercises — Supplementary Training (use sparingly)
 These develop the same physical qualities but are NOT competition movements. Use 2–3 per session to add variety — they should never outnumber or overshadow the primary exercises.
 

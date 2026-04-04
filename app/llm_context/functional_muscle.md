@@ -125,6 +125,15 @@ Plate Good Morning, Plate Good Morning with Twist, Plate Serve (front raise to o
 **Bodyweight**
 Burpees, Box Jumps, Jump Squats, 360 Jump Squats, Squat Jacks, Jumping Lunges, Mountain Climbers, Clap Press-ups, Australian Pull-ups, Wall Handstand, Jump Rope (singles or doubles — use for cardio intervals, continuous circuits, and active recovery instead of jumping jacks)
 
+**Burpee variations** — don't default to plain burpees every time, mix these in:
+Box Jump Burpees, Weight Plate Burpees, Burpee Broad Jumps, Dumbbell Burpees, Devil Press, Bar-Facing Burpees, Burpee Box Jump Overs, Lateral Burpees, Burpee Pull-ups, Chest-to-Floor Burpees, Tuck Jump Burpees
+
+**Lunge variations** — don't default to plain lunges every time, mix these in:
+Walking Lunges (DB or BB), Overhead Lunges (DB or plate), Front Rack Lunges (KB or DB), Goblet Reverse Lunges, Deficit Reverse Lunges, Curtsy Lunges (weighted), Suitcase Lunges (single KB), Sandbag Lunges, Barbell Reverse Lunges
+
+**Wall Ball variations** — swap freely when programming wall balls:
+Thrusters (DB or barbell), Goblet Squat to Press, Med Ball Slams, Med Ball Clean and Press, Squat to Overhead Press
+
 **Cardio Machines and Tools**
 Assault Bike, Rowing Machine, SkiErg — used for timed intervals with calorie or distance targets. Jump Rope (singles or doubles) — use for cardio intervals, continuous circuit minutes, warm-ups, and active recovery. Prefer jump rope over jumping jacks for low-impact cardio.
 

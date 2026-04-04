@@ -13,6 +13,15 @@ These are the actual Deka race zones. They should form the backbone of every ses
 
 RAM Reverse Lunges, Row, Box Jump / Step Over, Med Ball Sit-up Throw, SkiErg, Farmer's Carry, Air Bike, Dead Ball Yoke Over, Sled Push / Pull, RAM Weighted Burpees
 
+## Exercise Variations — Training Alternatives
+Not every session needs the exact race version. Swap in these variations freely to add variety while training the same movement patterns. Mix race-specific and variation exercises across sessions.
+
+**Burpee variations** (swap for RAM Weighted Burpees):
+Box Jump Burpees, Weight Plate Burpees, Burpee Broad Jumps, Dumbbell Burpees, Devil Press, Bar-Facing Burpees, Burpee Box Jump Overs, Lateral Burpees, Chest-to-Floor Burpees, Tuck Jump Burpees
+
+**Lunge variations** (swap for RAM Reverse Lunges):
+Barbell Reverse Lunges, Dumbbell Walking Lunges, Overhead Lunges (DB or plate), Front Rack Lunges (KB or DB), Goblet Reverse Lunges, Deficit Reverse Lunges, Curtsy Lunges (weighted), Suitcase Lunges (single KB), Sandbag Lunges
+
 ## Secondary Exercises — Supplementary Training (use sparingly)
 These develop the same physical qualities but are NOT competition movements. Use 2–3 per session to add variety — they should never outnumber or overshadow the primary exercises. No running — use machines for cardio.
 

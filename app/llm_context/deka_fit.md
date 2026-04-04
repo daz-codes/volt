@@ -13,6 +13,18 @@ These are the actual Deka Fit race zones plus treadmill running. They should for
 
 RAM Reverse Lunges, Row (500m), Box Jump / Step Over, Med Ball Sit-up Throw, SkiErg, Farmer's Carry, Air Bike, Dead Ball Yoke Over, Sled Push / Pull, RAM Weighted Burpees, Treadmill Running (500m–1km intervals)
 
+## Exercise Variations — Training Alternatives
+Not every session needs the exact race version. Swap in these variations freely to add variety while training the same movement patterns. Mix race-specific and variation exercises across sessions.
+
+**Burpee variations** (swap for RAM Weighted Burpees):
+Box Jump Burpees, Weight Plate Burpees, Burpee Broad Jumps, Dumbbell Burpees, Devil Press, Bar-Facing Burpees, Burpee Box Jump Overs, Lateral Burpees, Chest-to-Floor Burpees, Tuck Jump Burpees
+
+**Lunge variations** (swap for RAM Reverse Lunges):
+Barbell Reverse Lunges, Dumbbell Walking Lunges, Overhead Lunges (DB or plate), Front Rack Lunges (KB or DB), Goblet Reverse Lunges, Deficit Reverse Lunges, Curtsy Lunges (weighted), Suitcase Lunges (single KB), Sandbag Lunges
+
+**Box Jump variations** (swap for Box Jump / Step Over):
+Box Jumps (standard), Box Jump Overs, Step-ups (weighted), Lateral Box Step Overs, Jump Squats
+
 ## Secondary Exercises — Supplementary Training (use sparingly)
 These develop the same physical qualities but are NOT competition movements. Use 2–3 per session to add variety — they should never outnumber or overshadow the primary exercises.
 

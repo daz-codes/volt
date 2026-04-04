@@ -28,7 +28,7 @@ class ExerciseSwapService
         distance_m: { type: "integer", description: "Distance in metres" },
         duration_s: { type: "integer", description: "Duration in seconds" },
         weight_kg:  { type: "number",  description: "Load in kg" },
-        notes:      { type: "string",  description: "Coaching notes or cues" }
+        notes:      { type: "string",  description: "Brief form cue only, e.g. 'keep elbows high' or 'explosive hip drive'. One sentence max. Do NOT explain why this swap was chosen." }
       }
     }
   }.freeze
@@ -142,6 +142,7 @@ class ExerciseSwapService
     lines << "- Realistic gym equipment"
     lines << "- Keep roughly the same reps/weight/distance unless the swap naturally calls for a change"
     lines << "- Avoid the stated reason if one was given" if @reason
+    lines << "- Notes should be a short form cue only (e.g. 'keep elbows high'), NOT an explanation of why you chose this swap"
     lines << ""
     lines << "Use the replace_exercise tool to return the single replacement."
     lines.join("\n")
