@@ -34,7 +34,8 @@ class WorkoutLLMGenerator
     "metafit-bodyweight" => "metafit.md",
     "barrys"             => "barrys.md",
     "f45"                => "f45.md",
-    "kettlebell"         => "kettlebell.md"
+    "kettlebell"         => "kettlebell.md",
+    "volt-octathlon"     => "volt_octathlon.md"
   }.freeze
 
   CONTEXT_DIR = Rails.root.join("app", "llm_context").freeze
@@ -60,6 +61,10 @@ class WorkoutLLMGenerator
       "Single Arm DB Ground to Overhead (alternating)", "Dumbbell Bear Crawl",
       "Weighted Sit-ups", "Farmer's Carry", "DB Shoulder to Overhead Press",
       "Jump Rope Single Unders", "Atlas Shoulder to Carry"
+    ],
+    "volt-octathlon" => [
+      "Thrusters", "Rowing", "Slams", "SkiErg",
+      "KB Swings", "Assault Bike", "Devil Press", "Running"
     ]
   }.freeze
 
@@ -108,13 +113,25 @@ class WorkoutLLMGenerator
     "Atlas Shoulder to Carry"                        => { peak: "100m | 45kg (M) / 32kg (F)", foundation: "100m | 32kg (M) / 22.5kg (F)" }
   }.freeze
 
+  VOLT_OCTATHLON_REFERENCE = {
+    "Thrusters"    => "50 reps | 2 × 10kg DB",
+    "Rowing"       => "1000m",
+    "Slams"        => "50 reps | 10kg",
+    "SkiErg"       => "1000m",
+    "KB Swings"    => "50 reps | 20kg",
+    "Assault Bike" => "50 calories",
+    "Devil Press"  => "50 reps | 2 × 10kg DB",
+    "Running"      => "1000m"
+  }.freeze
+
   EVENT_REFERENCE = {
-    "hyrox"       => HYROX_REFERENCE,
-    "deka"        => DEKA_REFERENCE,
-    "deka-fit"    => DEKA_REFERENCE,
-    "deka-strong" => DEKA_REFERENCE,
-    "deka-mile"   => DEKA_REFERENCE,
-    "deka-atlas"  => DEKA_ATLAS_REFERENCE
+    "hyrox"          => HYROX_REFERENCE,
+    "deka"           => DEKA_REFERENCE,
+    "deka-fit"       => DEKA_REFERENCE,
+    "deka-strong"    => DEKA_REFERENCE,
+    "deka-mile"      => DEKA_REFERENCE,
+    "deka-atlas"     => DEKA_ATLAS_REFERENCE,
+    "volt-octathlon"  => VOLT_OCTATHLON_REFERENCE
   }.freeze
 
   # Weighted training emphasis options — sampled randomly each generation.
@@ -353,6 +370,11 @@ class WorkoutLLMGenerator
       primary: %w[for_time rounds emom],
       secondary: %w[amrap tabata ladder hundred mountain],
       guidance: "Hyrox sessions must include treadmill running — it's the backbone of the race (8 × 1km). For_time and rounds simulate race pacing. EMOMs build station endurance. Mix in AMRAPs, tabatas, ladders, and hundreds for training variety. MANDATORY: Every Hyrox session MUST include at least 2 treadmill running intervals (500m–1km each) placed between station blocks. Use treadmill, not outdoor running."
+    },
+    "volt-octathlon" => {
+      primary: %w[for_time rounds emom amrap],
+      secondary: %w[tabata ladder hundred mountain],
+      guidance: "Volt Octathlon sessions should blend race-specific station work with conditioning variety. The race is 8 stations back-to-back with no rest — train the ability to work under accumulated fatigue. Pair machine work (row, ski, bike) with strength movements (thrusters, swings, slams, devil press). For_time and rounds simulate race pacing. EMOMs build station endurance. Mix in AMRAPs, tabatas, ladders, and hundreds for training variety."
     },
     # ── General / fallback ──
 
@@ -1352,7 +1374,7 @@ class WorkoutLLMGenerator
 
         [G] DEATH RACE — format: rounds, rounds: 5. Bike sprint (30–45 seconds all-out) + 10 burpees. Everything you have.
 
-        [H] TABATA — Use 2 exercises per tabata (ABABABAB = 4 rounds each) — this is the standard format. Standard tabatas: EVERY exercise MUST be a compound (two movements fused into one flowing rep, name must contain "and", "with", "to", or "+"). Each tabata gets DIFFERENT compound pairs — never repeat the same compound in one session. You are encouraged to INVENT new combinations — the goal is creative, flowing pairings that contrast muscle groups. Some examples to spark ideas (don't just copy these): "Squat Curl and Press", "KB Swing with Side Lunge", "Wood Chop with Reverse Lunge", "Bent Over Row to Deadlift", "Side Lunge and Lateral Raise", "Lunge and Overhead Tricep Extension", "Hop onto Box and Bicep Curl", "Clean and Lateral Lunge", "Squat Jump and Shoulder Press", "Plate Halo and Twist", "Push Up to T-Rotation", "Renegade Row to Deadlift", "Reverse Lunge and High Pull", "Squat and Rainbow Press", "Gorilla Row and Jump Squat", "Devil Press and Box Step", "KB Clean and Pivot Press", "Bent Over Row and Clean and Press". CARDIO MACHINE TABATA (use occasionally — at most once per session): one of the two exercises may be a cardio machine (Assault Bike, Rowing Machine, or Ski Erg) — pair it with a compound movement. Example pairings: Assault Bike + Squat Curl and Press, Rowing Machine + Wood Chop with Reverse Lunge, Ski Erg + KB Swing with Side Lunge. Do NOT set reps or calories on the machine exercise — it's a 20s burst, the interval is the constraint. Single compound movements alone (burpees, KB swings, mountain climbers without a second movement) are never acceptable.
+        [H] TABATA — Use 2 exercises per tabata (ABABABAB = 4 rounds each) — this is the standard format. Standard tabatas: EVERY exercise MUST be a compound (two movements fused into one flowing rep, name must contain "and", "with", "to", or "+"). Each tabata gets DIFFERENT compound pairs — never repeat the same compound in one session. IMPORTANT: DO NOT recycle the same compound exercises across sessions — INVENT new ones every time. Pick any two movements from contrasting muscle groups (one upper, one lower; one push, one pull; one hinge, one press) and fuse them into a single flowing rep where the end of the first feeds into the start of the second. You have the full equipment list (KBs, DBs, barbells, plates, boxes, bodyweight) — combine freely. There are hundreds of valid compounds; create original ones rather than reusing familiar ones. A few concept examples: "Squat Curl and Press" (lower→upper chain), "KB Swing with Side Lunge" (hinge→lateral), "Wood Chop with Reverse Lunge" (rotation→lower). CARDIO MACHINE TABATA (use occasionally — at most once per session): one of the two exercises may be a cardio machine (Assault Bike, Rowing Machine, or Ski Erg) — pair it with a compound movement. Do NOT set reps or calories on the machine exercise — it's a 20s burst, the interval is the constraint. Single compound movements alone (burpees, KB swings, mountain climbers without a second movement) are never acceptable.
 
         [I] BEAR MOUNTAIN — format: mountain, start: 1, peak: 5, end: 1, step: 1 (1-2-3-4-5-4-3-2-1 reps = 25 bears total). One exercise only: "Bear" (clean → press → front squat → press → back squat = 1 rep). Use notes: "moderate barbell — choose a weight where the press is challenging but all reps are clean". Rest as needed between rungs. Takes approximately 10 minutes.
 
@@ -1410,6 +1432,16 @@ class WorkoutLLMGenerator
             * Sled: reduce load to 60–70% of competition weight
           Do NOT prescribe a full 1km SkiErg or Row as part of a multi-round circuit — reserve that for single-effort time trials.
       RULE
+    when "volt-octathlon"
+      <<~RULE.strip
+        - TRAINING REP COUNTS (Volt Octathlon): When using Octathlon station movements in multi-round sets (rounds ≥ 2), use 50–65% of competition reps — NOT full race amounts. Race = training reference only. Examples:
+            * Thrusters: race 50 reps → training 25–33/round
+            * Slams: race 50 reps → training 25–33/round
+            * KB Swings: race 50 reps → training 25–33/round
+            * Devil Press: race 50 reps → training 25–33/round
+            * Assault Bike: race 50 cal → training 25–33 cal/round
+          Machine distances (Row 1000m, SkiErg 1000m, Run 1000m) may keep full or reduced distance depending on session focus.
+      RULE
     end
   end
 
@@ -1466,6 +1498,19 @@ class WorkoutLLMGenerator
             7. 1km run → Sandbag Lunges 100m | Open: 20kg (M) / 10kg (F) | Pro: 30kg (M) / 20kg (F)
             8. 1km run → Wall Balls 100 reps | Open: 6kg to 10ft (M) / 4kg to 9ft (F) | Pro: 9kg to 10ft (M) / 6kg to 9ft (F)
           No warm-up/cool-down — this is a competition-day simulation.
+      RULE
+    when "volt-octathlon"
+      <<~RULE.strip
+        - RACE SIMULATION MODE (Volt Octathlon): Generate an exact Volt Octathlon event run-through. All 8 stations back-to-back, no rest between. Format as a single for_time section. Use full competition specs. Station order:
+            1. Initi8 — Thrusters: 50 reps | 2 × 10kg DB
+            2. Elev8 — Row: 1000m
+            3. Stimul8 — Slams: 50 reps | 10kg
+            4. Acceler8 — Ski: 1000m
+            5. Gravit8 — KB Swing: 50 reps | 20kg
+            6. Domin8 — Assault Bike: 50 calories
+            7. Anihil8 — Devil Press: 50 reps | 2 × 10kg DB
+            8. Termin8 — Run: 1000m
+          No warm-up/cool-down — this is a competition-day simulation. Record total time.
       RULE
     else
       "- RACE SIMULATION MODE: Generate a full event run-through for #{@activity} using competition-accurate reps, distances, and weights in race order. Format as for_time sections. No warm-up/cool-down."

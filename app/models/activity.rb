@@ -3,7 +3,8 @@ class Activity < ApplicationRecord
     "Alternator", "Tread & Shred", "Circuit Breaker", "Dynamo",
     "Transformer", "Ohm", "CrossFit", "Kettlebell", "Iron Engine",
     "Functional Muscle", "Maximum Voltage", "Sunday Workout",
-    "Hyrox", "Deka", "Deka Strong", "Deka Atlas"
+    "Hyrox", "Deka", "Deka Strong", "Deka Atlas",
+    "Volt Octathlon"
   ].freeze
 
   has_many :workouts

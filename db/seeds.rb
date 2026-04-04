@@ -174,6 +174,69 @@ else
       "goal"          => "If you can finish this not wrecked, you're ready for DEKA."
     }
   },
+  # Volt Octathlon
+  {
+    name:          "Octathlon Engine Builder",
+    activity:      "Volt Octathlon",
+    duration_mins: 40,
+    structure: {
+      "sections" => [
+        {
+          "name"         => "Warm-up",
+          "format"       => "straight",
+          "duration_mins" => 5,
+          "notes"        => "Easy row → light thrusters and swings to prime the movement patterns."
+        },
+        {
+          "name"      => "Station Intervals",
+          "format"    => "rounds",
+          "rounds"    => 4,
+          "rest_secs" => 90,
+          "exercises" => [
+            { "name" => "Thrusters",    "reps" => 25, "notes" => "2 × 10kg DB — unbroken if possible" },
+            { "name" => "Row",          "distance_m" => 500, "notes" => "~1:50 pace" },
+            { "name" => "KB Swings",    "reps" => 25, "notes" => "20kg — hip snap, not a squat" },
+            { "name" => "Assault Bike", "notes" => "25 cal — steady grind" }
+          ]
+        },
+        {
+          "name"    => "Devil Press Finisher",
+          "format"  => "for_time",
+          "exercises" => [
+            { "name" => "Devil Press", "reps" => 30, "notes" => "2 × 10kg DB — break into 3 sets of 10 if needed" }
+          ]
+        }
+      ],
+      "duration_mins" => 40,
+      "goal" => "Build the engine for Octathlon race day. Keep transitions fast — the race has no rest between stations."
+    }
+  },
+  {
+    name:          "The Full Volt Octathlon",
+    activity:      "Volt Octathlon",
+    duration_mins: 35,
+    structure: {
+      "sections" => [
+        {
+          "name"    => "Volt Octathlon",
+          "format"  => "for_time",
+          "notes"   => "All 8 stations, back-to-back, no rest. Record total time.",
+          "exercises" => [
+            { "name" => "Initi8 — Thrusters",     "reps" => 50, "notes" => "2 × 10kg DB" },
+            { "name" => "Elev8 — Row",             "distance_m" => 1000 },
+            { "name" => "Stimul8 — Slams",         "reps" => 50, "notes" => "10kg" },
+            { "name" => "Acceler8 — Ski",           "distance_m" => 1000 },
+            { "name" => "Gravit8 — KB Swing",      "reps" => 50, "notes" => "20kg" },
+            { "name" => "Domin8 — Assault Bike",   "calories" => 50 },
+            { "name" => "Anihil8 — Devil Press",   "reps" => 50, "notes" => "2 × 10kg DB" },
+            { "name" => "Termin8 — Run",           "distance_m" => 1000 }
+          ]
+        }
+      ],
+      "duration_mins" => 35,
+      "goal" => "Race simulation — go hard, record your time. This is the benchmark."
+    }
+  },
   # CrossFit
   {
     name:          "Thrusters and Pull-ups",

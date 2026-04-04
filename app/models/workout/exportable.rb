@@ -70,9 +70,9 @@ module Workout::Exportable
         break if y > CANVAS_HEIGHT - 120
 
         if section[:label].present?
-          commands.push("-fill", LIME, "-pointsize", "36",
+          commands.push("-fill", LIME, "-pointsize", "50",
                         "-annotate", "+56+#{y}", safe(section[:label].upcase))
-          y += 44
+          y += 58
         end
 
         if section[:description].present?
@@ -83,12 +83,12 @@ module Workout::Exportable
 
         section[:exercises].each do |line|
           break if y > CANVAS_HEIGHT - 120
-          commands.push("-fill", LIGHT_GRAY, "-pointsize", "50")
+          commands.push("-fill", LIGHT_GRAY, "-pointsize", "36")
 
-          wrapped = word_wrap(line.upcase, 50, CANVAS_WIDTH - 112)
+          wrapped = word_wrap(line.upcase, 36, CANVAS_WIDTH - 112)
           wrapped.each do |wl|
             commands.push("-annotate", "+56+#{y}", safe(wl))
-            y += 58
+            y += 44
           end
         end
 
@@ -100,6 +100,8 @@ module Workout::Exportable
       commands.push("-fill", BORDER_GRAY, "-draw", "rectangle 56,#{footer_y - 20} #{CANVAS_WIDTH - 56},#{footer_y - 19}")
       commands.push("-fill", LIME, "-pointsize", "50",
                     "-annotate", "+56+#{footer_y}", "VOLT")
+      commands.push("-fill", MID_GRAY, "-pointsize", "24",
+                    "-gravity", "NorthEast", "-annotate", "+56+#{footer_y + 14}", safe("made by VOLT \u00B7 energise your workout"))
 
       commands.push(tempfile.path)
 

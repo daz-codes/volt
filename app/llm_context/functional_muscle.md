@@ -11,48 +11,22 @@ Descending reps: 10, 9, 8 ... 1 across 2–3 paired exercises. Often combines a 
 **Tabata**
 20s work / 10s rest × 8 rounds. Typically alternates two exercises every interval. Compound "Alex Tabata" pairings are preferred — single movements that combine two patterns into one flowing rep. The end position of the first movement feeds naturally into the start of the second. Never pair two movements that fatigue the same muscle group.
 
-**RULE: Tabata sections in Functional Muscle workouts MUST use compound multi-movement exercises — never simple single-movement exercises like "KB Swings" or "Burpees" alone. Every Tabata exercise must combine two movements in one rep. EXCEPTION: occasionally one of the two tabata exercises may be a cardio machine (Assault Bike, Rowing Machine, or Ski Erg) paired with a compound movement. Choose from the list below or invent new combinations using these principles:**
-- Lower body + upper body in one rep (lunge + shoulder press, squat + curl + press)
-- Hinge + pull flowing together (bent over row → deadlift, swing → overhead press)
-- Rotation or lateral movement added to a standard lift (wood chop + reverse lunge, clean + pivot press)
-- Plyometric entry into a strength movement (hop onto box + side raise, jump in from plank + deadlift)
-- Invent new combinations freely — the list below is inspiration, not a limit
+**RULE: Tabata sections in Functional Muscle workouts MUST use compound multi-movement exercises — never simple single-movement exercises like "KB Swings" or "Burpees" alone. Every Tabata exercise must combine two movements in one rep. EXCEPTION: occasionally one of the two tabata exercises may be a cardio machine (Assault Bike, Rowing Machine, or Ski Erg) paired with a compound movement.**
 
-**Compound exercises for Tabata (MUST use these or similar):**
-- Squat, curl, press (one fluid movement)
-- Push up to T-rotation
-- Side lunge and side raise
-- Lunge and overhead tricep extension (single DB)
-- Squat to rainbow press
-- KB swing with lunge
-- KB swing with side lunge
-- Side lunge with overhead press
-- Wood chop with reverse lunge
-- Reverse lunge and single arm KB swing
-- Front drop squat with bicep curl
-- Reverse lunge, knee raise and bicep curl
-- KB swing then overhead press
-- Plate press overhead — left, centre, right
-- Plate get up and press
-- Plate halo and twist
-- Lateral steps on box with DB rows
-- Hop onto box and side raise
-- Reverse lunge and front raise
-- Hop onto box and bicep curl
-- Squat and overhead press to each side alternating
-- Reverse lunge, single arm swing across body
-- KB swing and side step
-- Bent over row to clean and press
-- Reverse lunge and DB high pull
-- Bent over row to deadlift
-- Bicep curl in squat then stand and overhead press
-- Press up position — side raise and row alternating arms
-- Clean and lateral lunge
-- Clean and pivot press (with rotation)
-- Renegade row, jump in and deadlift
-- Bent over row, clean and squat
-- Alternate overhead press and wide high pull
-- DB swings with two DBs alternating — one goes between the legs
+**How to invent compound Tabata exercises:** The end position of the first movement feeds naturally into the start of the second. Use any equipment from the Movement Vocabulary above. Combine movements from DIFFERENT muscle groups so one recovers while the other works. Apply any of these fusion patterns — mix and match freely to create original pairings every session:
+- **Lower + Upper:** Any lunge, squat, or step-up flowing into any press, curl, raise, or row
+- **Hinge + Pull/Press:** Any swing, deadlift, or good morning flowing into any row, clean, press, or high pull
+- **Rotation/Lateral + Lift:** Add a twist, wood chop, pivot, or lateral step to any standard lift
+- **Plyo + Strength:** Any jump, hop, or explosive entry flowing into a controlled strength movement
+- **Floor + Standing:** Any floor movement (push-up, renegade row, plank) transitioning into a standing movement (deadlift, jump, press)
+- **Carry/Locomotion + Lift:** Any step, shuffle, or walk combined with an upper body movement
+
+**The goal is to create NEW compound exercises every session — not to recycle the same ones.** You have the full Movement Vocabulary above and any standard gym equipment. Fuse any two contrasting movements into one flowing rep. There are hundreds of possible combinations. A few examples to illustrate the concept (do NOT default to these — invent your own):
+- Squat, curl, press (lower + upper chain)
+- KB swing with side lunge (hinge + lateral)
+- Wood chop with reverse lunge (rotation + lower)
+- Hop onto box and side raise (plyo + upper)
+- Renegade row, jump in and deadlift (floor + standing)
 
 Avoid pairing two exercises that hammer the same muscle group.
 
