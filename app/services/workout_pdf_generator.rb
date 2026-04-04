@@ -29,7 +29,7 @@ class WorkoutPdfGenerator
   end
 
   def draw_meta(pdf)
-    pills = [ "#{@workout.duration_mins} min", @workout.difficulty.capitalize ]
+    pills = [ "#{@workout.duration_mins} min" ]
     pills.unshift(@workout.activity.name) if @workout.activity.present?
 
     pdf.fill_color MID_GREY

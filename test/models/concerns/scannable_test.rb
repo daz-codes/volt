@@ -18,7 +18,6 @@ class ScannableTest < ActiveSupport::TestCase
     @valid_tool_response = {
       "name" => "Whiteboard AMRAP",
       "duration_mins" => 30,
-      "difficulty" => "intermediate",
       "activity" => "CrossFit",
       "structure" => {
         "goal" => "Complete as many rounds as possible",
@@ -47,19 +46,8 @@ class ScannableTest < ActiveSupport::TestCase
       assert_not workout.persisted?
       assert_equal "Whiteboard AMRAP", workout.name
       assert_equal 30, workout.duration_mins
-      assert_equal "intermediate", workout.difficulty
       assert_equal @user, workout.user
       assert workout.structure.present?
-    end
-  end
-
-  test "scan_from_image defaults difficulty when missing" do
-    response = @valid_tool_response.merge("difficulty" => nil)
-    image = fixture_file_upload("workout_screenshot.jpg", "image/jpeg")
-
-    stub_method(Workout, :call_scan_api, response) do
-      workout = Workout.scan_from_image(image: image, user: @user)
-      assert_equal "intermediate", workout.difficulty
     end
   end
 

@@ -22,7 +22,6 @@ class WorkoutsControllerScanTest < ActionDispatch::IntegrationTest
     @valid_response = {
       "name" => "Scanned AMRAP",
       "duration_mins" => 30,
-      "difficulty" => "intermediate",
       "activity" => "CrossFit",
       "structure" => {
         "sections" => [

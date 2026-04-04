@@ -58,10 +58,10 @@ module Program::WorkoutBuilder
 
     workout = if source
       WorkoutLLMGenerator.call(user: user, source_workout: source, duration_mins: duration_mins,
-                               difficulty: difficulty, session_notes: pw.session_notes)
+                               session_notes: pw.session_notes)
     else
       WorkoutLLMGenerator.call(user: user, activity: activity&.name, duration_mins: duration_mins,
-                               difficulty: difficulty, session_notes: pw.session_notes)
+                               session_notes: pw.session_notes)
     end
 
     pw.update!(workout: workout, status: "complete")

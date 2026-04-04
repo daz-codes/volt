@@ -12,7 +12,6 @@ class RetryProgramSlotJob < ApplicationJob
       user:          program.user,
       activity:      program.activity&.name,
       duration_mins: program.duration_mins,
-      difficulty:    program.difficulty,
       session_notes: pw.session_notes
     )
 

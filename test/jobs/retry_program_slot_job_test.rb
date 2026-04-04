@@ -7,7 +7,7 @@ class RetryProgramSlotJobTest < ActiveJob::TestCase
     program = Program.create!(
       user: user, activity: activity, name: "Test",
       weeks_count: 2, sessions_per_week: 2,
-      duration_mins: 45, difficulty: "intermediate",
+      duration_mins: 45,
       status: "complete"
     )
     pw = program.program_workouts.create!(
@@ -16,7 +16,7 @@ class RetryProgramSlotJobTest < ActiveJob::TestCase
 
     workout = Workout.create!(
       user: user, name: "Generated", duration_mins: 45,
-      difficulty: "intermediate", status: "active",
+      status: "active",
       structure: { "sections" => [] }
     )
 
@@ -39,7 +39,7 @@ class RetryProgramSlotJobTest < ActiveJob::TestCase
     program = Program.create!(
       user: user, activity: activity, name: "Test",
       weeks_count: 2, sessions_per_week: 2,
-      duration_mins: 45, difficulty: "intermediate",
+      duration_mins: 45,
       status: "complete"
     )
     pw = program.program_workouts.create!(

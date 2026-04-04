@@ -6,11 +6,11 @@ class ProgramTest < ActiveSupport::TestCase
     program = Program.create!(
       user: user, name: "Test Program", weeks_count: 2,
       sessions_per_week: 2, duration_mins: 45,
-      difficulty: "intermediate", status: "complete"
+      status: "complete"
     )
     workout = Workout.create!(
       user: user, name: "Program Workout", duration_mins: 45,
-      difficulty: "intermediate", status: "active",
+      status: "active",
       structure: { "sections" => [] }
     )
     program.program_workouts.create!(
@@ -28,11 +28,11 @@ class ProgramTest < ActiveSupport::TestCase
     program = Program.create!(
       user: user, name: "Test Program", weeks_count: 2,
       sessions_per_week: 2, duration_mins: 45,
-      difficulty: "intermediate", status: "complete"
+      status: "complete"
     )
     workout = Workout.create!(
       user: user, name: "Logged Workout", duration_mins: 45,
-      difficulty: "intermediate", status: "active",
+      status: "active",
       structure: { "sections" => [] }
     )
     program.program_workouts.create!(
@@ -54,7 +54,7 @@ class ProgramTest < ActiveSupport::TestCase
     program = Program.create!(
       user: user, name: "Test Program", weeks_count: 2,
       sessions_per_week: 2, duration_mins: 45,
-      difficulty: "intermediate", status: "complete"
+      status: "complete"
     )
     program.program_workouts.create!(
       week_number: 1, session_number: 1, status: "failed"

@@ -8,7 +8,7 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
       { "name" => "Gas Pedal", "format" => "straight", "exercises" => [{ "name" => "Jog" }] },
       { "name" => "Main Block", "format" => "rounds", "rounds" => 3, "exercises" => [{ "name" => "Squat", "reps" => 10 }] }
     ])
-    result = WorkoutValidator.new(data, difficulty: "intermediate", duration_mins: 60, main_tag_slug: "").validate_and_fix
+    result = WorkoutValidator.new(data, duration_mins: 60, main_tag_slug: "").validate_and_fix
     sections = result.dig("structure", "sections")
     assert_equal "main", sections[0]["category"]
     assert_equal "main", sections[1]["category"]
@@ -19,7 +19,7 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
       { "name" => "Warm-Up", "format" => "straight", "exercises" => [{ "name" => "Jog" }] },
       { "name" => "Main Block", "format" => "rounds", "rounds" => 3, "exercises" => [{ "name" => "Squat", "reps" => 10 }] }
     ])
-    result = WorkoutValidator.new(data, difficulty: "intermediate", duration_mins: 60, main_tag_slug: "").validate_and_fix
+    result = WorkoutValidator.new(data, duration_mins: 60, main_tag_slug: "").validate_and_fix
     sections = result.dig("structure", "sections")
     assert_equal "warm_up", sections[0]["category"]
     assert_equal "main", sections[1]["category"]
@@ -30,7 +30,7 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
       { "name" => "Main Block", "format" => "rounds", "rounds" => 3, "exercises" => [{ "name" => "Squat", "reps" => 10 }] },
       { "name" => "Decompress", "format" => "straight", "exercises" => [{ "name" => "Stretch" }] }
     ])
-    result = WorkoutValidator.new(data, difficulty: "intermediate", duration_mins: 60, main_tag_slug: "").validate_and_fix
+    result = WorkoutValidator.new(data, duration_mins: 60, main_tag_slug: "").validate_and_fix
     sections = result.dig("structure", "sections")
     assert_equal "main", sections[0]["category"]
     assert_equal "cool_down", sections[1]["category"]
@@ -42,7 +42,7 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
       { "name" => "Final Push", "format" => "tabata", "duration_mins" => 4, "exercises" => [{ "name" => "Row" }] },
       { "name" => "Cool-Down", "format" => "straight", "exercises" => [{ "name" => "Stretch" }] }
     ])
-    result = WorkoutValidator.new(data, difficulty: "intermediate", duration_mins: 60, main_tag_slug: "").validate_and_fix
+    result = WorkoutValidator.new(data, duration_mins: 60, main_tag_slug: "").validate_and_fix
     sections = result.dig("structure", "sections")
     assert_equal "main", sections[0]["category"]
     assert_equal "finisher", sections[1]["category"]
@@ -54,7 +54,7 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
       { "name" => "Gas Pedal", "category" => "warm_up", "format" => "straight", "exercises" => [{ "name" => "Jog" }] },
       { "name" => "Main Block", "category" => "main", "format" => "rounds", "rounds" => 3, "exercises" => [{ "name" => "Squat", "reps" => 10 }] }
     ])
-    result = WorkoutValidator.new(data, difficulty: "intermediate", duration_mins: 60, main_tag_slug: "").validate_and_fix
+    result = WorkoutValidator.new(data, duration_mins: 60, main_tag_slug: "").validate_and_fix
     sections = result.dig("structure", "sections")
     assert_equal "warm_up", sections[0]["category"]
     assert_equal "main", sections[1]["category"]
@@ -64,7 +64,7 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
     data = build_workout_with_sections([
       { "name" => "Warm-Up", "category" => "bogus", "format" => "straight", "exercises" => [{ "name" => "Jog" }] }
     ])
-    result = WorkoutValidator.new(data, difficulty: "intermediate", duration_mins: 60, main_tag_slug: "").validate_and_fix
+    result = WorkoutValidator.new(data, duration_mins: 60, main_tag_slug: "").validate_and_fix
     sections = result.dig("structure", "sections")
     assert_equal "warm_up", sections[0]["category"]
   end
@@ -74,7 +74,7 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
   test "rotating EMOM duration snaps to nearest valid multiple of exercise count" do
     workout_data = build_workout_with_rotating_emom(exercises: 4, duration_mins: 15)
 
-    validator = WorkoutValidator.new(workout_data, difficulty: "intermediate", duration_mins: 60, main_tag_slug: "")
+    validator = WorkoutValidator.new(workout_data, duration_mins: 60, main_tag_slug: "")
     result = validator.validate_and_fix
 
     section = result.dig("structure", "sections").first
@@ -84,7 +84,7 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
   test "rotating EMOM duration unchanged when already valid" do
     workout_data = build_workout_with_rotating_emom(exercises: 3, duration_mins: 12)
 
-    validator = WorkoutValidator.new(workout_data, difficulty: "intermediate", duration_mins: 60, main_tag_slug: "")
+    validator = WorkoutValidator.new(workout_data, duration_mins: 60, main_tag_slug: "")
     result = validator.validate_and_fix
 
     section = result.dig("structure", "sections").first
@@ -97,7 +97,7 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
       notes: "Rotating EMOM: Exercise A, Exercise B, Exercise C, Exercise D. 4-minute cycle × 3.75 rounds."
     )
 
-    validator = WorkoutValidator.new(workout_data, difficulty: "intermediate", duration_mins: 60, main_tag_slug: "")
+    validator = WorkoutValidator.new(workout_data, duration_mins: 60, main_tag_slug: "")
     result = validator.validate_and_fix
 
     section = result.dig("structure", "sections").first

@@ -1,13 +1,8 @@
 require "test_helper"
 
 class WorkoutTest < ActiveSupport::TestCase
-  test "validates difficulty inclusion" do
-    workout = Workout.new(difficulty: "impossible", duration_mins: 60, user: users(:one))
-    assert_not workout.valid?
-  end
-
   test "validates duration_mins is positive" do
-    workout = Workout.new(difficulty: "intermediate", duration_mins: 0, user: users(:one))
+    workout = Workout.new(duration_mins: 0, user: users(:one))
     assert_not workout.valid?
   end
 
@@ -17,7 +12,7 @@ class WorkoutTest < ActiveSupport::TestCase
   end
 
   test "activity_name returns nil without activity" do
-    workout = Workout.new(user: users(:one), difficulty: "intermediate", duration_mins: 60)
+    workout = Workout.new(user: users(:one), duration_mins: 60)
     assert_nil workout.activity_name
   end
 

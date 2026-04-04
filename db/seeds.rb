@@ -48,7 +48,6 @@ if json_path.exist?
       name:          w["name"],
       activity:      w["activity"] || activity_from_tag_names(w["tags"] || []),
       duration_mins: w["duration_mins"],
-      difficulty:    w["difficulty"],
       structure:     w["structure"]
     }
   end
@@ -59,7 +58,6 @@ else
     name:          "Engine + Carries",
     activity:      "Deka",
     duration_mins: 30,
-    difficulty:    "intermediate",
     structure: {
       "sections" => [
         {
@@ -88,7 +86,6 @@ else
     name:          "Legs + Core + Bike Burn",
     activity:      "Deka",
     duration_mins: 35,
-    difficulty:    "intermediate",
     structure: {
       "sections" => [
         {
@@ -118,7 +115,6 @@ else
     name:          "DEKA Simulation Intervals",
     activity:      "Deka",
     duration_mins: 40,
-    difficulty:    "intermediate",
     structure: {
       "sections" => [
         {
@@ -157,7 +153,6 @@ else
     name:          "Half-DEKA Test",
     activity:      "Deka",
     duration_mins: 20,
-    difficulty:    "intermediate",
     structure: {
       "sections" => [
         {
@@ -184,7 +179,6 @@ else
     name:          "Thrusters and Pull-ups",
     activity:      "CrossFit",
     duration_mins: 30,
-    difficulty:    "intermediate",
     structure: {
       "sections" => [
         { "name" => "Warm-up", "format" => "straight", "duration_mins" => 5,
@@ -209,7 +203,6 @@ else
     name:          "Death by Deadlifts",
     activity:      "CrossFit",
     duration_mins: 45,
-    difficulty:    "advanced",
     structure: {
       "sections" => [
         { "name" => "Warm-up", "format" => "straight", "duration_mins" => 8,
@@ -238,7 +231,6 @@ else
     name:          "KB Complex + Carries",
     activity:      "Functional Fitness",
     duration_mins: 40,
-    difficulty:    "intermediate",
     structure: {
       "sections" => [
         { "name" => "Warm-up", "format" => "straight", "duration_mins" => 7,
@@ -269,7 +261,6 @@ else
     name:          "Sled + Ropes + Rings",
     activity:      "Functional Fitness",
     duration_mins: 45,
-    difficulty:    "intermediate",
     structure: {
       "sections" => [
         { "name" => "Warm-up", "format" => "straight", "duration_mins" => 8,
@@ -296,7 +287,6 @@ else
     name:          "Tabata Assault",
     activity:      "HIIT",
     duration_mins: 30,
-    difficulty:    "intermediate",
     structure: {
       "sections" => [
         { "name" => "Warm-up", "format" => "straight", "duration_mins" => 7,
@@ -323,7 +313,6 @@ else
     name:          "30-30 Machine Intervals",
     activity:      "HIIT",
     duration_mins: 35,
-    difficulty:    "intermediate",
     structure: {
       "sections" => [
         { "name" => "Warm-up", "format" => "straight", "duration_mins" => 6,
@@ -351,7 +340,6 @@ else
     name:          "Push-Pull EMOM",
     activity:      "Bodyweight",
     duration_mins: 30,
-    difficulty:    "intermediate",
     structure: {
       "sections" => [
         { "name" => "Warm-up", "format" => "straight", "duration_mins" => 6,
@@ -377,7 +365,6 @@ else
     name:          "Jump and Grind",
     activity:      "Bodyweight",
     duration_mins: 35,
-    difficulty:    "intermediate",
     structure: {
       "sections" => [
         { "name" => "Warm-up", "format" => "straight", "duration_mins" => 7,
@@ -405,7 +392,6 @@ else
     name:          "Double Red",
     activity:      "Tread & Shred",
     duration_mins: 50,
-    difficulty:    "intermediate",
     structure: {
       "sections" => [
         { "name" => "Warm-up Jog", "format" => "straight", "duration_mins" => 5,
@@ -451,7 +437,6 @@ else
     name:          "Lights Out",
     activity:      "Tread & Shred",
     duration_mins: 60,
-    difficulty:    "advanced",
     structure: {
       "sections" => [
         { "name" => "Warm-up Jog", "format" => "straight", "duration_mins" => 5,

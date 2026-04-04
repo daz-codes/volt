@@ -13,7 +13,6 @@ class Workout < ApplicationRecord
   has_many :tags, through: :taggings
   has_many :shares, as: :shareable, dependent: :destroy
 
-  DIFFICULTIES = %w[beginner intermediate advanced].freeze
   FORMATS     = %w[straight rounds amrap emom tabata for_time ladder mountain matrix hundred].freeze
   CATEGORIES  = %w[warm_up main finisher cool_down].freeze
 
@@ -22,7 +21,6 @@ class Workout < ApplicationRecord
 
   def self.valid_formats = FORMATS
 
-  validates :difficulty, inclusion: { in: DIFFICULTIES }
   validates :duration_mins, numericality: { greater_than: 0 }
 
   def activity_slug

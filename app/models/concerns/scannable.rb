@@ -97,8 +97,7 @@ module Scannable
       raise ScanError, e.message
     end
 
-    # Lazily build the scan tool definition — TOOL_DEFINITION references
-    # Workout::DIFFICULTIES which isn't available at Scannable load time.
+    # Lazily build the scan tool definition, adding an activity property for scanning.
     def scan_tool
       @scan_tool ||= WorkoutLLMGenerator::TOOL_DEFINITION.deep_dup.tap do |tool|
         tool[:input_schema][:properties][:activity] = {
@@ -112,11 +111,10 @@ module Scannable
       sections = Array(data.dig("structure", "sections"))
       raise ScanError, "No workout found in that image." if sections.empty?
 
-      difficulty = Workout::DIFFICULTIES.include?(data["difficulty"]) ? data["difficulty"] : "intermediate"
       duration_mins = data["duration_mins"].to_i.positive? ? data["duration_mins"].to_i : 45
 
       # Run through validator for structural fixes
-      validator = WorkoutValidator.new(data, difficulty: difficulty, duration_mins: duration_mins, main_tag_slug: nil)
+      validator = WorkoutValidator.new(data, duration_mins: duration_mins, main_tag_slug: nil)
       validator.validate_and_fix
 
       activity_name = data["activity"].presence
@@ -125,7 +123,6 @@ module Scannable
       Workout.new(
         user: user,
         name: data["name"].presence || "Scanned Workout",
-        difficulty: difficulty,
         duration_mins: duration_mins,
         activity: activity,
         structure: data["structure"],

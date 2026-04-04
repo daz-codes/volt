@@ -3,7 +3,7 @@
 # any violations it can resolve without another API call.
 #
 # Usage:
-#   validator    = WorkoutValidator.new(workout_data, difficulty: "intermediate", duration_mins: 45)
+#   validator    = WorkoutValidator.new(workout_data, duration_mins: 45)
 #   workout_data = validator.validate_and_fix
 #   validator.fixes.each    { |msg| Rails.logger.info("[WorkoutValidator] Fixed: #{msg}") }
 #   validator.warnings.each { |msg| Rails.logger.warn("[WorkoutValidator] Warn:  #{msg}") }
@@ -12,11 +12,7 @@
 class WorkoutValidator
   # Max total work units (reps + calories combined) within a single EMOM circuit minute.
   # Calories count the same as reps for timing purposes.
-  EMOM_REP_CAPS = {
-    "beginner"     => 10,
-    "intermediate" => 15,
-    "advanced"     => 20
-  }.freeze
+  EMOM_REP_CAP = 15
 
   # Cardio machines in circuit EMOMs: hard cap of 10 cal per exercise.
   # On a SkiErg, Air Bike, or Rowing Machine you can't hit more than ~10 cal/min
@@ -34,9 +30,8 @@ class WorkoutValidator
 
   attr_reader :fixes, :warnings
 
-  def initialize(workout_data, difficulty:, duration_mins:, main_tag_slug: nil)
+  def initialize(workout_data, duration_mins:, main_tag_slug: nil)
     @data          = workout_data
-    @difficulty    = difficulty
     @duration_mins = duration_mins.to_i
     @main_tag_slug = main_tag_slug.to_s
     @fixes         = []
@@ -133,12 +128,12 @@ class WorkoutValidator
     end
   end
 
-  # EMOM circuit: total reps per minute must not exceed the difficulty cap.
+  # EMOM circuit: total reps per minute must not exceed the rep cap.
   # Rotating EMOMs don't have a per-minute rep cap (each exercise fills its own minute).
   # Also enforces a per-exercise calorie cap for cardio machines (max 10 cal).
   def fix_emom_reps(section, idx)
     return if section["emom_style"] == "rotating"
-    cap       = EMOM_REP_CAPS[@difficulty] || 20
+    cap       = EMOM_REP_CAP
     exercises = Array(section["exercises"])
     changed   = []
 
@@ -582,7 +577,7 @@ class WorkoutValidator
 
   # Deka Atlas: convert barbell push press → DB push press at race weights.
   # The event is entirely dumbbell-based — barbell push press is never correct.
-  ATLAS_DB_PRESS_WEIGHT = { "advanced" => 22.5, "intermediate" => 17.5, "beginner" => 15 }.freeze
+  ATLAS_DB_PRESS_WEIGHT = 17.5
 
   def fix_atlas_barbell_press(sections)
     return unless @main_tag_slug == "deka-atlas"
@@ -591,7 +586,7 @@ class WorkoutValidator
         next unless ex["name"].to_s.match?(/push\s*press.*barbell|barbell.*push\s*press|strict\s*press.*barbell|barbell.*strict\s*press|overhead\s*press.*barbell|barbell.*overhead\s*press/i)
         old_name = ex["name"]
         ex["name"] = "DB Push Press"
-        ex["weight_kg"] = ATLAS_DB_PRESS_WEIGHT.fetch(@difficulty, 22.5)
+        ex["weight_kg"] = ATLAS_DB_PRESS_WEIGHT
         @fixes << "'#{section["name"]}': #{old_name} → DB Push Press at #{ex["weight_kg"]}kg (Deka Atlas = dumbbells only)"
       end
     end
@@ -599,18 +594,18 @@ class WorkoutValidator
 
   # Cap overhead pressing weights at sensible maximums for conditioning work.
   # Even strong athletes shouldn't be push pressing 60kg+ in a circuit context.
-  OHP_WEIGHT_CAPS = { "beginner" => 30, "intermediate" => 40, "advanced" => 50 }.freeze
+  OHP_WEIGHT_CAP = 40
   OHP_PATTERN = /push\s*press|strict\s*press|overhead\s*press|shoulder\s*press|jerk/i.freeze
 
   def fix_overhead_weight_cap(sections)
-    cap = OHP_WEIGHT_CAPS.fetch(@difficulty, 50)
+    cap = OHP_WEIGHT_CAP
     sections.each do |section|
       Array(section["exercises"]).each do |ex|
         next unless ex["name"].to_s.match?(OHP_PATTERN)
         next unless ex["weight_kg"].to_f > cap
         old_weight = ex["weight_kg"]
         ex["weight_kg"] = cap
-        @fixes << "'#{section["name"]}': #{ex["name"]} #{old_weight}kg → #{cap}kg (overhead cap for #{@difficulty})"
+        @fixes << "'#{section["name"]}': #{ex["name"]} #{old_weight}kg → #{cap}kg (overhead cap)"
       end
     end
   end

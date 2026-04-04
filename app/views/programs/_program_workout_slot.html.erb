@@ -49,7 +49,6 @@
               <p class="text-lime-400 font-black text-sm uppercase tracking-wide leading-none"><%= workout.activity&.name %></p>
             <% end %>
             <div class="flex items-center gap-1.5">
-              <span class="text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border border-gray-600 bg-zinc-700/50 text-gray-300"><%= workout.difficulty.capitalize %></span>
               <div class="flex flex-col items-center justify-center w-10 h-10 rounded-full bg-volt shadow-sm shadow-volt/25 flex-shrink-0">
                 <span class="text-zinc-950 font-black text-sm leading-none"><%= workout.duration_mins %></span>
                 <span class="text-zinc-800 text-[7px] font-bold leading-none mt-0.5 uppercase tracking-wide">min</span>
@@ -88,7 +87,6 @@
             <% if workout.activity.present? %>
               <span class="text-lime-400 text-[10px] font-black uppercase tracking-wide"><%= workout.activity&.name %></span>
             <% end %>
-            <span class="text-xs font-bold px-2 py-0.5 rounded-full border border-gray-600 bg-zinc-700/50 text-gray-300"><%= workout.difficulty.capitalize %></span>
             <span class="text-gray-600 text-xs"><%= workout.duration_mins %> min</span>
           </div>
           <% if goal.present? %>

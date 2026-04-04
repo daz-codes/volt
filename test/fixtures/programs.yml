@@ -5,7 +5,7 @@ hyrox_program:
   weeks_count: 4
   sessions_per_week: 3
   duration_mins: 45
-  difficulty: intermediate
+
   status: complete
 
 no_activity_program:
@@ -14,5 +14,5 @@ no_activity_program:
   weeks_count: 4
   sessions_per_week: 3
   duration_mins: 45
-  difficulty: intermediate
+
   status: building

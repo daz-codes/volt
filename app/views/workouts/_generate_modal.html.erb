@@ -105,9 +105,20 @@
       <div class="mt-3">
         <%= text_field_tag :custom_activity, nil,
             placeholder: "Or type any workout style…",
+            maxlength: 100,
             class: "w-full bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-lime-400 transition-colors",
             data: { generate_form_target: "customInput", action: "input->generate-form#customTyped" } %>
       </div>
+    </div>
+
+    <%# Session Notes — free text %>
+    <div class="mb-6">
+      <p class="text-sm font-semibold text-gray-300 uppercase tracking-wide mb-1">Training Notes</p>
+      <p class="text-xs text-gray-500 mb-3">Injuries, equipment, intensity, focus — anything that should shape this session.</p>
+      <%= text_area_tag :session_notes, nil,
+          placeholder: "e.g. injured knee, hotel gym, zone 2 only, upper body focus, no running, heavy deadlifts today…",
+          rows: 3,
+          class: "w-full bg-zinc-800 border border-zinc-600 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-lime-400 transition-colors resize-none" %>
     </div>
 
     <%# Duration %>
@@ -129,31 +140,6 @@
           <span>5 min</span>
           <span>2 hrs</span>
         </div>
-      </div>
-    </div>
-
-    <%# Session Notes — free text %>
-    <div class="mb-6">
-      <p class="text-sm font-semibold text-gray-300 uppercase tracking-wide mb-1">Session Notes</p>
-      <p class="text-xs text-gray-500 mb-3">Injuries, equipment, intensity, focus — anything that should shape this session.</p>
-      <%= text_field_tag :session_notes, nil,
-          placeholder: "e.g. injured knee · hotel gym · zone 2 only · upper body · no running",
-          class: "w-full bg-zinc-800 border border-zinc-600 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-lime-400 transition-colors" %>
-    </div>
-
-    <%# Difficulty %>
-    <div class="mb-6">
-      <p class="text-sm font-semibold text-gray-300 uppercase tracking-wide mb-3">Difficulty</p>
-      <div class="grid grid-cols-3 gap-3">
-        <% [["beginner", "Beginner", "Building base fitness"], ["intermediate", "Intermediate", "Regular training"], ["advanced", "Advanced", "Competition prep"]].each do |value, label, desc| %>
-          <label class="relative cursor-pointer">
-            <%= f.radio_button :difficulty, value, class: "peer sr-only", checked: value == "intermediate" %>
-            <div class="border-2 border-zinc-600 rounded-xl p-3 peer-checked:border-lime-400 peer-checked:bg-lime-400/10 transition-all text-center">
-              <p class="font-semibold text-sm"><%= label %></p>
-              <p class="text-gray-500 text-xs mt-0.5"><%= desc %></p>
-            </div>
-          </label>
-        <% end %>
       </div>
     </div>
 

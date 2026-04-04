@@ -32,12 +32,11 @@
       <%= workout.name.presence || "Untitled Workout" %>
     </p>
 
-    <%# Row 3: Activity type, difficulty, duration, sweat rating %>
+    <%# Row 3: Activity type, duration, sweat rating %>
     <div class="flex items-center gap-2 mt-2 flex-wrap">
       <% if workout.activity.present? %>
         <span class="text-volt font-black text-xs uppercase tracking-wide"><%= workout.activity.name %></span>
       <% end %>
-      <span class="text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border border-gray-600 bg-zinc-700/50 text-gray-300"><%= workout.difficulty.capitalize %></span>
       <span class="text-xs font-bold text-gray-300"><%= workout.duration_mins %> min</span>
       <div class="flex gap-px flex-shrink-0">
         <% 5.times do |i| %>

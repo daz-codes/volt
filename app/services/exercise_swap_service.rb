@@ -42,9 +42,9 @@ class ExerciseSwapService
 
   # Swap without persisting — returns { replacement:, updated_structure: }
   # Used for preview workouts held in cache.
-  def self.call_without_persist(structure:, activity_name:, difficulty:, tags: [], section_index:, exercise_index:, reason: nil)
-    workout_stub = Struct.new(:structure, :activity_name, :difficulty, :tags, keyword_init: true)
-                         .new(structure: structure, activity_name: activity_name, difficulty: difficulty, tags: tags)
+  def self.call_without_persist(structure:, activity_name:, tags: [], section_index:, exercise_index:, reason: nil)
+    workout_stub = Struct.new(:structure, :activity_name, :tags, keyword_init: true)
+                         .new(structure: structure, activity_name: activity_name, tags: tags)
     svc = new(workout_stub, section_index, exercise_index, reason)
     section  = Array(structure["sections"])[section_index]  or raise SwapError, "Section not found"
     exercise = Array(section["exercises"])[exercise_index] or raise SwapError, "Exercise not found"
@@ -127,7 +127,7 @@ class ExerciseSwapService
     lines = []
     lines << "You are a personal trainer. Suggest a replacement for one exercise in a workout."
     lines << ""
-    lines << "Workout: #{@workout.activity_name.presence || workout_tags.presence || "custom"} · #{@workout.difficulty}"
+    lines << "Workout: #{@workout.activity_name.presence || workout_tags.presence || "custom"}"
     lines << "Section: \"#{section["name"]}\" (format: #{section["format"]})"
     lines << "Other exercises in section: #{other_names.join(", ")}" if other_names.any?
     lines << ""

@@ -158,22 +158,6 @@
       </div>
     </div>
 
-    <%# Difficulty %>
-    <div class="mb-8">
-      <p class="text-sm font-bold text-gray-300 uppercase tracking-wide mb-4">Difficulty</p>
-      <div class="grid grid-cols-3 gap-3">
-        <% [["beginner", "Beginner", "Building base"], ["intermediate", "Intermediate", "Regular training"], ["advanced", "Advanced", "Competition prep"]].each do |value, label, desc| %>
-          <label class="cursor-pointer">
-            <%= f.radio_button :difficulty, value, class: "peer sr-only", checked: @program.difficulty == value %>
-            <div class="border-2 border-zinc-600 rounded-xl p-3 peer-checked:border-lime-400 peer-checked:bg-lime-400/10 transition-all text-center">
-              <p class="font-black text-sm"><%= label %></p>
-              <p class="text-gray-500 text-xs mt-0.5"><%= desc %></p>
-            </div>
-          </label>
-        <% end %>
-      </div>
-    </div>
-
     <%# Session focus — dynamically matches sessions_per_week %>
     <div class="mb-10">
       <p class="text-sm font-bold text-gray-300 uppercase tracking-wide mb-1">Session Focus <span class="text-gray-600 normal-case font-normal">(optional)</span></p>

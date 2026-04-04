@@ -31,7 +31,7 @@ class WorkoutsController < ApplicationController
 
   # GET /workouts/new  — manual builder
   def new
-    @workout = Workout.new(difficulty: "intermediate", duration_mins: 60)
+    @workout = Workout.new(duration_mins: 60)
   end
 
   # POST /workouts
@@ -66,7 +66,6 @@ class WorkoutsController < ApplicationController
       name:          "#{@workout.name} (copy)",
       activity_id:   @workout.activity_id,
       session_notes: @workout.session_notes,
-      difficulty:    @workout.difficulty,
       duration_mins: @workout.duration_mins,
       status:        "active",
       structure:     @workout.structure,
@@ -82,8 +81,7 @@ class WorkoutsController < ApplicationController
     generator = WorkoutLLMGenerator.new(
       user:           Current.user,
       source_workout: source,
-      duration_mins:  params[:duration_mins],
-      difficulty:     params[:difficulty]
+      duration_mins:  params[:duration_mins]
     )
     result = generator.generate
     token = SecureRandom.urlsafe_base64(16)
@@ -151,7 +149,6 @@ class WorkoutsController < ApplicationController
     result = ExerciseSwapService.call_without_persist(
       structure:      attrs[:structure],
       activity_name:  Activity.find_by(id: attrs[:activity_id])&.name,
-      difficulty:     attrs[:difficulty],
       section_index:  section_index,
       exercise_index: exercise_index,
       reason:         params[:reason].presence
@@ -196,7 +193,6 @@ class WorkoutsController < ApplicationController
       name:           source.name,
       activity_id:    source.activity_id,
       session_notes:  source.session_notes,
-      difficulty:     source.difficulty,
       duration_mins:  source.duration_mins,
       status:         "active",
       structure:      source.structure,
@@ -247,8 +243,7 @@ class WorkoutsController < ApplicationController
       user:          Current.user,
       activity:      old.activity_name,
       session_notes: old.session_notes,
-      duration_mins: old.duration_mins,
-      difficulty:    old.difficulty
+      duration_mins: old.duration_mins
     )
     result = generator.generate
     token = SecureRandom.urlsafe_base64(16)
@@ -340,7 +335,6 @@ class WorkoutsController < ApplicationController
         name: workout.name,
         activity_id: workout.activity_id,
         duration_mins: workout.duration_mins,
-        difficulty: workout.difficulty,
         structure: workout.structure,
         session_notes: nil
       },
@@ -364,8 +358,7 @@ class WorkoutsController < ApplicationController
     generator = WorkoutLLMGenerator.new(
       user:          user,
       activity:      "Sunday Workout",
-      duration_mins: 60,
-      difficulty:    "intermediate"
+      duration_mins: 60
     )
     result = generator.generate
 
@@ -402,7 +395,7 @@ class WorkoutsController < ApplicationController
   end
 
   def manual_workout_params
-    params.permit(:name, :duration_mins, :difficulty)
+    params.permit(:name, :duration_mins)
   end
 
   def create_manual
@@ -434,7 +427,6 @@ class WorkoutsController < ApplicationController
       session_notes: session_notes,
       group_tag_name: group_tag_name,
       duration_mins: params[:duration_mins],
-      difficulty:    params[:difficulty]
     )
     result = generator.generate
 
@@ -445,7 +437,7 @@ class WorkoutsController < ApplicationController
     redirect_to preview_workout_path(token: token)
   rescue WorkoutLLMGenerator::WorkoutGenerationError => e
     Rails.logger.warn "LLM generation failed (#{e.message}) — attempting fallback workout"
-    fallback = find_fallback_workout(activity, params[:difficulty])
+    fallback = find_fallback_workout(activity)
     if fallback
       redirect_to workout_path(fallback), alert: "#{e.message} Here's a popular workout to get you moving — try generating again when the AI is back."
     else
@@ -458,16 +450,10 @@ class WorkoutsController < ApplicationController
 
   # When the LLM is unavailable, find a popular existing workout with the same activity
   # to show the user instead of an error page.
-  def find_fallback_workout(activity_name, difficulty)
+  def find_fallback_workout(activity_name)
     scope = Workout.where(status: "active").where.not(structure: nil)
 
     if activity_name.present?
-      match = scope.joins(:activity)
-                   .where(activities: { name: activity_name }, difficulty: difficulty.presence || "intermediate")
-                   .order("RANDOM()")
-                   .first
-      return match if match
-
       match = scope.joins(:activity).where(activities: { name: activity_name }).order("RANDOM()").first
       return match if match
     end

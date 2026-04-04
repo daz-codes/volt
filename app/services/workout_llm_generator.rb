@@ -5,8 +5,7 @@
 #   workout = WorkoutLLMGenerator.call(
 #     user:          current_user,
 #     activity:      "Hyrox",
-#     duration_mins: 30,
-#     difficulty:    "intermediate"
+#     duration_mins: 30
 #   )
 #
 # Returns a persisted Workout record or raises WorkoutGenerationError.
@@ -391,11 +390,10 @@ class WorkoutLLMGenerator
     description: "Create a structured workout plan in the required JSON format.",
     input_schema: {
       type: "object",
-      required: %w[name duration_mins difficulty structure],
+      required: %w[name duration_mins structure],
       properties: {
         name:          { type: "string",  description: "Punchy, imaginative workout name (2-4 words). Draw from a wide range of styles: feelings ('Tuesday's Regret', 'Happy Lungs'), imagery ('Desert Rain', 'Two Left Feet'), irony ('Light and Easy', 'Quick One'), structure ('The Long Way Round', 'Death By Threes'), mythology/slang ('The Minotaur', 'Fried Eggs'), or anything else vivid and memorable. Avoid over-relying on clichéd gym words like Iron, Gauntlet, Grinder, Thunder, Beast, Inferno, Blitz, Crusher, Destroyer, Titan — they can work occasionally but should not be your default. Avoid generic names like 'Full Body Workout'." },
         duration_mins: { type: "integer", description: "Total workout duration in minutes" },
-        difficulty:    { type: "string",  enum: Workout::DIFFICULTIES },
         structure: {
           type: "object",
           required: [ "sections" ],
@@ -446,18 +444,17 @@ class WorkoutLLMGenerator
     }
   }.freeze
 
-  def self.call(user:, duration_mins:, difficulty:, activity: nil, group_tag_name: nil, source_workout: nil, session_notes: nil, **_legacy)
-    new(user: user, activity: activity, group_tag_name: group_tag_name, duration_mins: duration_mins, difficulty: difficulty, source_workout: source_workout, session_notes: session_notes).call
+  def self.call(user:, duration_mins:, activity: nil, group_tag_name: nil, source_workout: nil, session_notes: nil, **_legacy)
+    new(user: user, activity: activity, group_tag_name: group_tag_name, duration_mins: duration_mins, source_workout: source_workout, session_notes: session_notes).call
   end
 
-  def initialize(user:, duration_mins:, difficulty:, activity: nil, group_tag_name: nil, source_workout: nil, session_notes: nil, **_legacy)
+  def initialize(user:, duration_mins:, activity: nil, group_tag_name: nil, source_workout: nil, session_notes: nil, **_legacy)
     @user           = user
     @activity       = activity.presence
     raw_slug        = @activity&.parameterize
     @activity_slug  = ACTIVITY_ALIASES[raw_slug] || raw_slug
     @group_tag_name = group_tag_name.presence
     @duration_mins  = duration_mins.to_i
-    @difficulty     = difficulty
     @source_workout = source_workout
     @session_notes  = session_notes.presence
   end
@@ -565,7 +562,7 @@ class WorkoutLLMGenerator
   end
 
   # Builds the prompt using example workouts as style references plus the full
-  # structural rules (time budget, session structure, warm-up/cool-down, difficulty).
+  # structural rules (time budget, session structure, warm-up/cool-down).
   def build_example_prompt(example_workouts)
     main_name = @activity || "general fitness"
     recent_names = fetch_recent_workout_names
@@ -575,7 +572,6 @@ class WorkoutLLMGenerator
         name: w.name,
         activity: w.activity,
         duration_mins: w.duration_mins,
-        difficulty: w.difficulty,
         structure: w.structure
       }
     end
@@ -590,11 +586,8 @@ class WorkoutLLMGenerator
     sections << user_context if user_context.present?
 
     sections << <<~TASK
-      Generate a #{@duration_mins}-minute #{@difficulty} #{main_name} session.
+      Generate a #{@duration_mins}-minute #{main_name} session.
     TASK
-
-    # Difficulty scaling (rep ranges, weights, rest, complexity)
-    sections << build_difficulty_guidance
 
     if example_workouts.any?
       sections << <<~EXAMPLES
@@ -843,49 +836,6 @@ class WorkoutLLMGenerator
     workout_data
   end
 
-  def build_difficulty_guidance
-    case @difficulty
-    when "beginner"
-      <<~DIFF
-        ## Difficulty: Beginner
-        This is a beginner session — scale everything accordingly:
-        - **Reps per set:** 10–15 for bodyweight/conditioning; 8–12 for weighted strength work
-        - **Weights:** light — the athlete should feel confident and in control throughout. Cue "light" on all weighted exercises. Bodyweight where possible
-        - **Rest:** 90–120s between strength sets; 60–90s between conditioning intervals
-        - **Movement complexity:** stick to simple, low-skill movements — goblet squats not back squats, dumbbell rows not cleans, ring rows not muscle-ups. No Olympic lifting.
-        - **Volume:** keep total working sets low (2–3 per exercise). Do not stack too many exercises per section.
-        - **EMOM:** ≤6 total reps per minute across all exercises
-        - **Intensity:** comfortable effort, never redline. Focus on learning the movements.
-      DIFF
-    when "intermediate"
-      <<~DIFF
-        ## Difficulty: Intermediate
-        This is an intermediate session — the athlete can handle solid effort and moderate complexity:
-        - **Reps per set:** 8–12 for strength; 12–20 for conditioning; higher for bodyweight
-        - **Weights:** moderate — challenging but controlled. Cue "moderate — you should complete all reps with good form, last 2–3 reps feel tough"
-        - **Rest:** 60–90s between strength sets; 45–60s between conditioning intervals
-        - **Movement complexity:** barbell squats, deadlifts, press variations fine. Simple kettlebell and gymnastics skills (kipping pull-ups, box jumps, KB swings) are appropriate. Avoid heavy Olympic lifting unless the session specifically calls for it.
-        - **Volume:** 3–4 working sets per exercise. Sections can have 2–4 exercises.
-        - **EMOM:** ≤9 total reps per minute across all exercises
-        - **Intensity:** strong effort, should feel hard but sustainable. Some redline moments in finishers are fine.
-      DIFF
-    when "advanced"
-      <<~DIFF
-        ## Difficulty: Advanced
-        This is an advanced session — the athlete is well-conditioned and can handle high volume, heavy loads, and complex movements:
-        - **Reps per set:** 5–8 for heavy strength (85–90% 1RM); 15–25 for conditioning; higher for lighter bodyweight work
-        - **Weights:** heavy — the last 1–2 reps should be a real struggle. Cue "heavy" for strength work, "moderate-to-heavy" for conditioning. Competition athletes should use race-weight equipment where applicable
-        - **Rest:** 45–60s between conditioning sets; 90–120s only for true max-effort lifts
-        - **Movement complexity:** all barbell movements including cleans, snatches, thrusters at moderate-heavy loads. Gymnastics (strict muscle-ups, handstand push-ups, toes-to-bar). Complex kettlebell work.
-        - **Volume:** 4–5 working sets. Sections can be dense with 3–5 exercises. Total working time should feel relentless.
-        - **EMOM:** ≤12 total reps per minute across all exercises
-        - **Intensity:** should be genuinely hard. Redline in finishers and for-time sections is expected and appropriate.
-      DIFF
-    else
-      ""
-    end
-  end
-
   def build_training_emphasis
     emphasis = TRAINING_EMPHASES.sample
     "## Training Emphasis: #{emphasis[:label]}\n#{emphasis[:instruction]}"
@@ -940,7 +890,7 @@ class WorkoutLLMGenerator
       " Anchor movements for this session (must appear in the main set): #{selected_stations.join(", ")}. Supplement freely with exercises from the #{main_name} training toolkit."
     end
 
-    task_sentence = "Generate a #{@duration_mins}-minute #{@difficulty} #{main_name} session.#{station_constraint}"
+    task_sentence = "Generate a #{@duration_mins}-minute #{main_name} session.#{station_constraint}"
 
     sections = []
 
@@ -950,7 +900,6 @@ class WorkoutLLMGenerator
       #{task_sentence}
     BASE
 
-    sections << build_difficulty_guidance
     sections << build_training_emphasis
     sections << build_warmup_cooldown unless skip_warmup_cooldown?
 
@@ -978,7 +927,7 @@ class WorkoutLLMGenerator
     if context_workouts.any?
       context_json = context_workouts.map do |w|
         { name: w.name, activity: w.activity, duration_mins: w.duration_mins,
-          difficulty: w.difficulty, structure: w.structure }
+          structure: w.structure }
       end.to_json
       sections << <<~COMMUNITY
         Here are #{context_workouts.size} popular community workouts for FORMAT INSPIRATION ONLY — do not copy their station/exercise selection:
@@ -1599,7 +1548,6 @@ class WorkoutLLMGenerator
     source_json = {
       activity:      @source_workout.activity_name,
       duration_mins: @source_workout.duration_mins,
-      difficulty:    @source_workout.difficulty,
       structure:     @source_workout.structure
     }.to_json
 
@@ -1608,7 +1556,7 @@ class WorkoutLLMGenerator
 
       If the user is doing a run, don't add any gym exercises, just use running and dynamic stretches.
 
-      Generate a #{@duration_mins}-minute #{@difficulty} workout inspired by this existing workout:
+      Generate a #{@duration_mins}-minute workout inspired by this existing workout:
       #{source_json}
 
       Draw on its movement patterns, energy systems, and overall feel — but this must be a genuinely different session. Swap exercises, change rep schemes, restructure sections, or shift the emphasis. Someone who does both workouts back-to-back should feel like they trained differently.
@@ -1919,19 +1867,11 @@ class WorkoutLLMGenerator
     "Race-accurate reference for this session's stations (weights / distances):\n#{lines.join("\n")}"
   end
 
-  # If the reference is a Hash with peak/foundation keys, select based on difficulty.
-  # Advanced = peak weights, beginner = foundation, intermediate = both shown.
+  # If the reference is a Hash with peak/foundation keys, show both options.
   def resolve_station_ref(ref)
     return ref unless ref.is_a?(Hash)
 
-    case @difficulty
-    when "advanced"
-      "#{ref[:peak]} (Peak)"
-    when "beginner"
-      "#{ref[:foundation]} (Foundation)"
-    else
-      "Peak: #{ref[:peak]} | Foundation: #{ref[:foundation]} — use a weight between the two"
-    end
+    "Peak: #{ref[:peak]} | Foundation: #{ref[:foundation]} — use a weight between the two"
   end
 
   # Activity slugs that are inherently bodyweight-only programs.
@@ -1980,7 +1920,7 @@ class WorkoutLLMGenerator
   end
 
   def validate_and_fix(workout_data)
-    validator = WorkoutValidator.new(workout_data, difficulty: @difficulty, duration_mins: @duration_mins, main_tag_slug: @activity_slug || "")
+    validator = WorkoutValidator.new(workout_data, duration_mins: @duration_mins, main_tag_slug: @activity_slug || "")
     result    = validator.validate_and_fix
     validator.fixes.each    { |msg| Rails.logger.info("[WorkoutValidator] Fixed: #{msg}") }
     validator.warnings.each { |msg| Rails.logger.warn("[WorkoutValidator] Warn:  #{msg}") }
@@ -2121,7 +2061,6 @@ class WorkoutLLMGenerator
       activity_id:   activity_record&.id,
       session_notes: @session_notes,
       duration_mins: data["duration_mins"].to_i.positive? ? data["duration_mins"] : @duration_mins,
-      difficulty:    Workout::DIFFICULTIES.include?(data["difficulty"]) ? data["difficulty"] : @difficulty,
       structure:     data["structure"]
     }
   end

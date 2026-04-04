@@ -4,7 +4,7 @@ class ProgramsController < ApplicationController
   rate_limit to: 5, within: 3.minutes, only: :create
 
   def new
-    @program    = Program.new(weeks_count: 4, sessions_per_week: 3, duration_mins: 45, difficulty: "intermediate")
+    @program    = Program.new(weeks_count: 4, sessions_per_week: 3, duration_mins: 45)
     @activities = recent_activities_for_user
   end
 
@@ -61,7 +61,7 @@ class ProgramsController < ApplicationController
   end
 
   def program_params
-    params.expect(program: [ :weeks_count, :sessions_per_week, :duration_mins, :difficulty ])
+    params.expect(program: [ :weeks_count, :sessions_per_week, :duration_mins ])
   end
 
   def recent_activities_for_user

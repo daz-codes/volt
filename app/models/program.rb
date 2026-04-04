@@ -9,13 +9,10 @@ class Program < ApplicationRecord
   has_many :shares, as: :shareable, dependent: :destroy
 
   STATUSES     = %w[pending building complete failed].freeze
-  DIFFICULTIES = %w[beginner intermediate advanced].freeze
-
   validates :name,              presence: true
   validates :weeks_count,       inclusion: { in: 2..16 }
   validates :sessions_per_week, inclusion: { in: 2..5 }
   validates :duration_mins,     numericality: { greater_than: 0 }
-  validates :difficulty,        inclusion: { in: DIFFICULTIES }
   validates :status,            inclusion: { in: STATUSES }
 
   SESSION_FOCUSES = [
@@ -103,10 +100,10 @@ class Program < ApplicationRecord
 
     workout = if source
       WorkoutLLMGenerator.call(user: user, source_workout: source, duration_mins: duration_mins,
-                               difficulty: difficulty, session_notes: pw.session_notes)
+                               session_notes: pw.session_notes)
     else
       WorkoutLLMGenerator.call(user: user, activity: activity&.name, duration_mins: duration_mins,
-                               difficulty: difficulty, session_notes: pw.session_notes)
+                               session_notes: pw.session_notes)
     end
 
     pw.update!(workout: workout, status: "complete")
