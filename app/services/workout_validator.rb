@@ -61,6 +61,7 @@ class WorkoutValidator
     fix_for_time_rounds(sections)
     fix_alternating_reps(sections)
     fix_clean_rep_counts(sections)
+    fix_clean_distances(sections)
     fix_rest_secs(sections)
     fix_single_set_sections(sections)
     fix_tabata_exercise_metrics(sections)
@@ -136,6 +137,24 @@ class WorkoutValidator
     cap       = EMOM_REP_CAP
     exercises = Array(section["exercises"])
     changed   = []
+
+    # Zero pass: convert distance_m to calories on cardio machines in circuit EMOMs.
+    # Distance targets (250m ski, 500m row) are impossible within a shared minute.
+    exercises.each do |ex|
+      next unless ex["distance_m"].to_i > 0
+      if ex["name"].to_s.match?(CARDIO_MACHINE_PATTERN)
+        old_dist = ex["distance_m"]
+        ex.delete("distance_m")
+        ex["calories"] = EMOM_CARDIO_CAL_CAP
+        changed << "#{ex["name"]} #{old_dist}m → #{EMOM_CARDIO_CAL_CAP} cal (distance too long for circuit EMOM)"
+      else
+        # Non-machine distance in a circuit EMOM is also suspect — strip it
+        old_dist = ex["distance_m"]
+        ex.delete("distance_m")
+        ex["reps"] ||= 10
+        changed << "#{ex["name"]} #{old_dist}m → #{ex["reps"]} reps (distance invalid in circuit EMOM)"
+      end
+    end
 
     # First pass: clamp cardio machine calories independently
     exercises.each do |ex|
@@ -275,6 +294,38 @@ class WorkoutValidator
     down = (n - 1).downto(1).find { |v| v % 2 == 0 || v % 5 == 0 }
     up   = (n + 1).upto(n + 5).find { |v| v % 2 == 0 || v % 5 == 0 }
     [ down, up ].compact.min_by { |v| (v - n).abs }
+  end
+
+  # Snap distance_m to clean round numbers.
+  # Treadmill/running: multiples of 100 (e.g. 180m → 200m).
+  # Everything else: multiples of 50, occasionally 25 (e.g. 125m stays, 180m → 200m).
+  RUNNING_PATTERN = /treadmill|run|jog|sprint/i
+
+  def fix_clean_distances(sections)
+    sections.each do |section|
+      Array(section["exercises"]).each do |ex|
+        val = ex["distance_m"].to_i
+        next if val <= 0
+
+        if ex["name"].to_s.match?(RUNNING_PATTERN)
+          clean = nearest_clean_distance(val, 100)
+        else
+          clean = nearest_clean_distance(val, 25)
+        end
+        next if clean == val
+
+        ex["distance_m"] = clean
+        @fixes << "'#{ex["name"]}' in '#{section["name"]}': distance #{val}m → #{clean}m (snapped to round number)"
+      end
+    end
+  end
+
+  def nearest_clean_distance(n, step)
+    return n if (n % step).zero?
+    down = (n / step) * step
+    up   = down + step
+    # Prefer the closer one; tie goes up
+    (n - down) <= (up - n) ? down : up
   end
 
   # Any non-exempt section with rounds missing/zero is almost certainly a mistake.

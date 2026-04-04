@@ -21,12 +21,43 @@ Descending reps: 10, 9, 8 ... 1 across 2–3 paired exercises. Often combines a 
 - **Floor + Standing:** Any floor movement (push-up, renegade row, plank) transitioning into a standing movement (deadlift, jump, press)
 - **Carry/Locomotion + Lift:** Any step, shuffle, or walk combined with an upper body movement
 
-**The goal is to create NEW compound exercises every session — not to recycle the same ones.** You have the full Movement Vocabulary above and any standard gym equipment. Fuse any two contrasting movements into one flowing rep. There are hundreds of possible combinations. A few examples to illustrate the concept (do NOT default to these — invent your own):
-- Squat, curl, press (lower + upper chain)
-- KB swing with side lunge (hinge + lateral)
-- Wood chop with reverse lunge (rotation + lower)
-- Hop onto box and side raise (plyo + upper)
-- Renegade row, jump in and deadlift (floor + standing)
+**Balance proven compounds with new inventions.** For each tabata, pick SOME exercises from the proven list below AND invent SOME new ones using the fusion patterns above. Aim for roughly half known, half invented across a session — don't only pick from the list and don't only invent.
+
+**Proven compound exercises (pick from these freely):**
+- Squat, curl, press (one fluid movement)
+- Push up to T-rotation
+- Side lunge and side raise
+- Lunge and overhead tricep extension (single DB)
+- Squat to rainbow press
+- KB swing with lunge
+- KB swing with side lunge
+- Side lunge with overhead press
+- Wood chop with reverse lunge
+- Reverse lunge and single arm KB swing
+- Front drop squat with bicep curl
+- Reverse lunge, knee raise and bicep curl
+- KB swing then overhead press
+- Plate press overhead — left, centre, right
+- Plate get up and press
+- Plate halo and twist
+- Lateral steps on box with DB rows
+- Hop onto box and side raise
+- Reverse lunge and front raise
+- Hop onto box and bicep curl
+- Squat and overhead press to each side alternating
+- Reverse lunge, single arm swing across body
+- KB swing and side step
+- Bent over row to clean and press
+- Reverse lunge and DB high pull
+- Bent over row to deadlift
+- Bicep curl in squat then stand and overhead press
+- Press up position — side raise and row alternating arms
+- Clean and lateral lunge
+- Clean and pivot press (with rotation)
+- Renegade row, jump in and deadlift
+- Bent over row, clean and squat
+- Alternate overhead press and wide high pull
+- DB swings with two DBs alternating — one goes between the legs
 
 Avoid pairing two exercises that hammer the same muscle group.
 
