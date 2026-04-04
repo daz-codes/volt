@@ -4,6 +4,9 @@ module User::FollowGraph
   included do
     has_many :follows_as_follower,  class_name: "Follow", foreign_key: :follower_id,  dependent: :destroy
     has_many :follows_as_following, class_name: "Follow", foreign_key: :following_id, dependent: :destroy
+
+    has_many :following, through: :follows_as_follower, source: :following
+    has_many :followers, through: :follows_as_following, source: :follower
   end
 
   # IDs of users this user is accepted-following (for feed query)
