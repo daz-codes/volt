@@ -124,6 +124,15 @@
         <%= render "shared/export_dialog", workout: workout %>
       </div>
     </div>
+    <% if like_count > 0 %>
+      <span id="liked_by_<%= workout.id %>">
+        <%= link_to likers_workout_path(workout), class: "text-gray-500 text-xs hover:text-gray-300 transition-colors px-3 pb-1" do %>
+          Liked by <%= pluralize(like_count, "person") %>
+        <% end %>
+      </span>
+    <% else %>
+      <span id="liked_by_<%= workout.id %>"></span>
+    <% end %>
   </div>
 
   <%# ── Show/Hide Workout toggle ── %>

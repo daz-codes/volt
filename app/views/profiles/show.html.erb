@@ -29,6 +29,22 @@
     <% end %>
   </div>
 
+  <%# Stats %>
+  <div class="grid grid-cols-3 gap-3 text-center mb-8">
+    <div class="bg-zinc-800 border border-zinc-700 rounded-xl py-3">
+      <p class="text-2xl font-black text-white"><%= @workout_count %></p>
+      <p class="text-gray-500 text-xs uppercase tracking-wide mt-0.5">Workouts</p>
+    </div>
+    <%= link_to followers_user_path(@user), class: "bg-zinc-800 border border-zinc-700 rounded-xl py-3 hover:border-zinc-500 transition-colors" do %>
+      <p class="text-2xl font-black text-white"><%= @follower_count %></p>
+      <p class="text-gray-500 text-xs uppercase tracking-wide mt-0.5">Followers</p>
+    <% end %>
+    <%= link_to following_user_path(@user), class: "bg-zinc-800 border border-zinc-700 rounded-xl py-3 hover:border-zinc-500 transition-colors" do %>
+      <p class="text-2xl font-black text-white"><%= @following_count %></p>
+      <p class="text-gray-500 text-xs uppercase tracking-wide mt-0.5">Following</p>
+    <% end %>
+  </div>
+
   <%# Plan section %>
   <div class="mb-8">
     <h2 class="text-xs font-black uppercase tracking-widest text-gray-500 mb-4">Plan</h2>

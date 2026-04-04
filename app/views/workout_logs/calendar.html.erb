@@ -4,6 +4,7 @@
 <% next_month = @first.next_month %>
 <% today      = Date.current %>
 <% offset     = (@first.wday - 1) % 7 %>
+<% last_day   = @first.end_of_month %>
 
 <div class="max-w-2xl mx-auto">
 
@@ -37,26 +38,42 @@
       <% end %>
     </div>
 
-    <%# Just the days with workouts, as compact pills %>
-    <div class="px-4 py-3">
-      <% workout_days = (@first..@first.end_of_month).select { |d| (@counts[d] || 0) > 0 } %>
-      <% if workout_days.any? %>
-        <div class="flex flex-wrap gap-1.5">
-          <% workout_days.each do |day| %>
-            <% is_today = day == today %>
-            <%= link_to calendar_day_path(date: day),
-                  data: { turbo_frame: "calendar_day" },
-                  class: "flex flex-col items-center justify-center w-9 h-9 rounded-lg bg-volt hover:bg-volt/80 transition-colors #{is_today ? 'ring-2 ring-white ring-offset-1 ring-offset-zinc-800' : ''}" do %>
-              <span class="text-zinc-950 font-black text-xs leading-none"><%= day.day %></span>
-              <span class="text-zinc-700 text-[8px] font-bold leading-none mt-0.5 uppercase"><%= day.strftime("%a") %></span>
-            <% end %>
-          <% end %>
-        </div>
-      <% else %>
-        <p class="text-gray-600 text-xs">No workouts logged this month.</p>
+    <%# Day-of-week headers %>
+    <div class="grid grid-cols-7 px-2 pt-3 pb-1">
+      <% %w[Mon Tue Wed Thu Fri Sat Sun].each do |day_name| %>
+        <div class="text-center text-gray-600 text-[10px] font-bold uppercase tracking-wider"><%= day_name %></div>
       <% end %>
     </div>
 
+    <%# Calendar grid %>
+    <div class="grid grid-cols-7 gap-1 px-2 pb-3">
+      <%# Empty cells for offset %>
+      <% offset.times do %>
+        <div></div>
+      <% end %>
+
+      <% (@first..last_day).each do |day| %>
+        <% count    = @counts[day] || 0 %>
+        <% has_workout = count > 0 %>
+        <% is_today = day == today %>
+        <% is_future = day > today %>
+
+        <% if has_workout %>
+          <%= link_to calendar_day_path(date: day),
+                data: { turbo_frame: "calendar_day" },
+                class: "flex flex-col items-center justify-center aspect-square rounded-lg bg-volt hover:bg-volt/80 transition-colors #{is_today ? 'ring-2 ring-white ring-offset-1 ring-offset-zinc-800' : ''}" do %>
+            <span class="text-zinc-950 font-black text-xs leading-none"><%= day.day %></span>
+            <% if count > 1 %>
+              <span class="text-zinc-700 text-[8px] font-bold leading-none mt-0.5"><%= count %></span>
+            <% end %>
+          <% end %>
+        <% else %>
+          <div class="flex items-center justify-center aspect-square rounded-lg <%= is_today ? 'ring-2 ring-white ring-offset-1 ring-offset-zinc-800' : '' %>">
+            <span class="<%= is_future ? 'text-zinc-700' : 'text-gray-500' %> text-xs font-medium"><%= day.day %></span>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
 
   </div>
 

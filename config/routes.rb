@@ -34,6 +34,7 @@ Rails.application.routes.draw do
       get   :share_card
       patch :save_template
       post  :like, to: "workout_likes#toggle"
+      get   :likers, to: "workout_likes#index"
       post  :clone
       post  :remix
       post  :save

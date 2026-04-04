@@ -100,6 +100,13 @@
     color: #a3e635;
   }
 
+  .section-description {
+    font-size: 11px;
+    font-weight: 700;
+    color: #71717a;
+    letter-spacing: 0.5px;
+  }
+
   .exercise-line {
     font-size: 18px;
     font-weight: 700;
@@ -142,6 +149,9 @@
       <div class="section-block">
         <% if section[:label].present? %>
           <div class="section-label"><%= section[:label] %></div>
+        <% end %>
+        <% if section[:description].present? %>
+          <div class="section-description"><%= section[:description] %></div>
         <% end %>
         <% section[:exercises].each do |line| %>
           <div class="exercise-line"><%= line.upcase %></div>

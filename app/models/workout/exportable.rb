@@ -34,20 +34,23 @@ module Workout::Exportable
         "-composite"
       )
 
+      # Set bold weight for all text (needed for .ttc collection fonts)
+      commands.push("-font", font_bold, "-weight", "Bold")
+
       # Header row: activity type (left)
       if activity.present?
-        commands.push("-fill", DIM_GRAY, "-font", font_bold, "-pointsize", "36",
+        commands.push("-fill", DIM_GRAY, "-pointsize", "36",
                       "-gravity", "NorthWest", "-annotate", "+56+#{y}", safe(activity.name.upcase))
       end
 
       # Duration (right-aligned)
-      commands.push("-fill", MID_GRAY, "-font", font_bold, "-pointsize", "39",
+      commands.push("-fill", MID_GRAY, "-pointsize", "39",
                     "-gravity", "NorthEast", "-annotate", "+56+#{y}", safe("#{duration_mins} MIN"))
 
       y += 52
 
       # Workout name (large bold)
-      commands.push("-fill", WHITE, "-font", font_bold, "-pointsize", workout_name_pointsize.to_s,
+      commands.push("-fill", WHITE, "-pointsize", workout_name_pointsize.to_s,
                     "-gravity", "NorthWest")
       name_lines = word_wrap(name.upcase, workout_name_pointsize, CANVAS_WIDTH - 112)
       name_lines.each do |line|
@@ -67,14 +70,20 @@ module Workout::Exportable
         break if y > CANVAS_HEIGHT - 120
 
         if section[:label].present?
-          commands.push("-fill", LIME, "-font", font_bold, "-pointsize", "36",
+          commands.push("-fill", LIME, "-pointsize", "36",
                         "-annotate", "+56+#{y}", safe(section[:label].upcase))
           y += 44
         end
 
+        if section[:description].present?
+          commands.push("-fill", DIM_GRAY, "-pointsize", "28",
+                        "-annotate", "+56+#{y}", safe(section[:description]))
+          y += 36
+        end
+
         section[:exercises].each do |line|
           break if y > CANVAS_HEIGHT - 120
-          commands.push("-fill", LIGHT_GRAY, "-font", font_bold, "-pointsize", "50")
+          commands.push("-fill", LIGHT_GRAY, "-pointsize", "50")
 
           wrapped = word_wrap(line.upcase, 50, CANVAS_WIDTH - 112)
           wrapped.each do |wl|
@@ -89,7 +98,7 @@ module Workout::Exportable
       # Footer
       footer_y = CANVAS_HEIGHT - 80
       commands.push("-fill", BORDER_GRAY, "-draw", "rectangle 56,#{footer_y - 20} #{CANVAS_WIDTH - 56},#{footer_y - 19}")
-      commands.push("-fill", LIME, "-font", font_bold, "-pointsize", "50",
+      commands.push("-fill", LIME, "-pointsize", "50",
                     "-annotate", "+56+#{footer_y}", "VOLT")
 
       commands.push(tempfile.path)
@@ -113,20 +122,9 @@ module Workout::Exportable
     main.map do |section|
       fmt = section["format"].to_s
       is_ladder = %w[ladder mountain].include?(fmt)
+      ex_count = Array(section["exercises"]).size
 
-      label = case fmt
-              when "tabata"   then "Tabata"
-              when "emom"     then "EMOM #{section["duration_mins"]}min"
-              when "amrap"    then "AMRAP #{section["duration_mins"]}min"
-              when "rounds"
-                rounds = section["rounds"]
-                rounds && rounds > 1 ? "#{rounds} Rounds" : nil
-              when "for_time" then "For Time"
-              when "ladder"   then "Ladder"
-              when "mountain" then "Mountain"
-              when "hundred"  then "100 Reps"
-              when "matrix"   then "Matrix"
-              end
+      label, description = format_label_and_description(section, fmt, ex_count)
 
       exercises = Array(section["exercises"]).map do |ex|
         ex_name = ex["name"].to_s.gsub(/\s*\([\d.]+kg.*?\)\s*/, "").strip
@@ -146,12 +144,7 @@ module Workout::Exportable
         metric = parts.join(" \u00B7 ")
 
         if is_ladder
-          sv = section["start"]; ev = section["end"]
-          if fmt == "mountain"
-            "#{ex_name} #{sv}\u2013#{section["peak"]}\u2013#{ev}"
-          else
-            "#{ex_name} #{sv}\u2013#{ev} (steps of #{section["step"].to_i})"
-          end
+          ex_name
         elsif metric.present?
           "#{metric} #{ex_name}"
         else
@@ -159,19 +152,74 @@ module Workout::Exportable
         end
       end
 
-      { label: label, exercises: exercises }
+      { label: label, description: description, exercises: exercises }
     end
   end
 
   private
 
+  def format_label_and_description(section, fmt, ex_count)
+    rounds = section["rounds"]
+    rest = section["rest_secs"]
+    dur = section["duration_mins"]
+    style = section["emom_style"]
+
+    case fmt
+    when "tabata"
+      [ "Tabata", "8 rounds \u00B7 20s hard / 10s rest" ]
+    when "emom"
+      rotating = style == "rotating" || (style.blank? && ex_count > 1)
+      if rotating
+        cycles = dur && ex_count > 0 ? dur / ex_count : nil
+        desc = cycles && cycles > 1 ? "1 min of each exercise \u00B7 #{cycles} times through" : "1 min of each exercise"
+        [ "Continuous Circuit", desc ]
+      else
+        [ "EMOM #{dur}min", rest ? "#{rest}s rest each minute" : nil ]
+      end
+    when "amrap"
+      [ "AMRAP #{dur}min", "As many rounds as possible" ]
+    when "rounds"
+      label = rounds && rounds > 1 ? "#{rounds} Rounds" : nil
+      desc = rest && rest > 0 ? "#{rest}s rest after each round" : nil
+      [ label, desc ]
+    when "for_time"
+      desc = rounds && rounds > 1 ? "#{rounds} rounds \u00B7 race the clock" : "Race the clock"
+      [ "For Time", desc ]
+    when "ladder"
+      seq = ladder_sequence(section["start"], section["end"], section["step"])
+      [ "Ladder", "#{seq} reps of each exercise" ]
+    when "mountain"
+      seq = mountain_sequence(section["start"], section["peak"], section["end"], section["step"])
+      [ "Mountain", "#{seq} reps of each exercise" ]
+    when "hundred"
+      [ "100 Reps", "For time" ]
+    when "matrix"
+      [ "Matrix", "Build up, strip back" ]
+    else
+      [ nil, nil ]
+    end
+  end
+
+  def ladder_sequence(start_val, end_val, step)
+    sv = start_val.to_i; ev = end_val.to_i; st = step.to_i.nonzero? || 1
+    range = sv > ev ? sv.step(ev, -st.abs).to_a : sv.step(ev, st.abs).to_a
+    range.join("\u2013")
+  end
+
+  def mountain_sequence(start_val, peak_val, end_val, step)
+    sv = start_val.to_i; pk = peak_val.to_i; ev = end_val.to_i; st = step.to_i.nonzero? || 1
+    up = sv.step(pk, st.abs).to_a
+    down = (pk - st.abs).step(ev, -st.abs).to_a
+    (up + down).join("\u2013")
+  end
+
   def resolve_font
+    # Must be a dedicated bold .ttf — .ttc collections ignore -weight Bold
     [
-      "/System/Library/Fonts/Supplemental/Helvetica Neue Bold.ttf",
-      "/System/Library/Fonts/HelveticaNeue.ttc",
-      "/System/Library/Fonts/Helvetica.ttc",
       "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
-      "/usr/share/fonts/TTF/DejaVuSans-Bold.ttf"
+      "/usr/share/fonts/TTF/DejaVuSans-Bold.ttf",
+      "/System/Library/Fonts/Supplemental/Arial Bold.ttf",
+      "/System/Library/Fonts/Supplemental/Helvetica Neue Bold.ttf"
     ].find { |f| File.exist?(f) } || "Helvetica-Bold"
   end
 

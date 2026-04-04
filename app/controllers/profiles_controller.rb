@@ -10,6 +10,9 @@ class ProfilesController < ApplicationController
 
   def show
     @user = Current.user
+    @workout_count = @user.workout_logs.count
+    @follower_count = @user.followers.count
+    @following_count = @user.following.count
     entries = Current.user.fitness_test_entries.where(test_key: FitnessTests::BENCHMARK_KEYS)
     @best_by_key = FitnessTests::BENCHMARKS.each_with_object({}) do |test, h|
       relevant = entries.select { |e| e.test_key == test[:key] }

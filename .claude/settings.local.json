@@ -161,7 +161,11 @@
       "Bash(magick -font \"/System/Library/Fonts/Supplemental/Arial Bold.ttf\" -pointsize 36 label:\"TEST\" /tmp/font-test4.png)",
       "Read(//tmp/**)",
       "Bash(env)",
-      "Bash(bin/rails workouts:backfill_categories:*)"
+      "Bash(bin/rails workouts:backfill_categories:*)",
+      "Read(//System/Library/Fonts/**)",
+      "Bash(identify -list font)",
+      "Bash(convert -version)",
+      "Bash(python3 -c ':*)"
     ]
   }
 }

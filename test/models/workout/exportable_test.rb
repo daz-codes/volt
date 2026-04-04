@@ -168,28 +168,32 @@ class Workout::ExportableTest < ActiveSupport::TestCase
     assert_equal "5 Deadlift", sections.first[:exercises].first
   end
 
-  test "export_sections formats ladder exercises" do
+  test "export_sections formats ladder exercises as name only with sequence in description" do
     @workout.structure = {
       "sections" => [
         { "name" => "Block", "category" => "main", "format" => "ladder", "start" => 2, "end" => 10, "step" => 2,
           "exercises" => [{ "name" => "Burpee" }] }
-      ]
+    ]
     }
 
     sections = @workout.export_sections
-    assert_equal "Burpee 2\u201310 (steps of 2)", sections.first[:exercises].first
+    assert_equal "Burpee", sections.first[:exercises].first
+    assert_equal "Ladder", sections.first[:label]
+    assert_match(/2.*10.*reps/, sections.first[:description])
   end
 
-  test "export_sections formats mountain exercises" do
+  test "export_sections formats mountain exercises as name only with sequence in description" do
     @workout.structure = {
       "sections" => [
-        { "name" => "Block", "category" => "main", "format" => "mountain", "start" => 2, "end" => 2, "peak" => 10,
+        { "name" => "Block", "category" => "main", "format" => "mountain", "start" => 2, "end" => 2, "peak" => 10, "step" => 2,
           "exercises" => [{ "name" => "Kettlebell Swing" }] }
       ]
     }
 
     sections = @workout.export_sections
-    assert_equal "Kettlebell Swing 2\u201310\u20132", sections.first[:exercises].first
+    assert_equal "Kettlebell Swing", sections.first[:exercises].first
+    assert_equal "Mountain", sections.first[:label]
+    assert_match(/2.*10.*2.*reps/, sections.first[:description])
   end
 
   test "export_sections returns exercise name only when no metrics" do

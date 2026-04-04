@@ -59,30 +59,11 @@
   </div>
 
   <% is_ladder = %w[ladder mountain].include?(section["format"].to_s) %>
-  <% has_metric = exercise["distance_m"] || exercise["duration_s"] || exercise["weight_kg"] ||
-                  (!is_tabata && (exercise["calories"] || exercise["reps"])) %>
-  <% if has_metric || exercise["notes"].present? %>
+  <% has_metric = !is_ladder && (exercise["distance_m"] || exercise["duration_s"] || exercise["weight_kg"] ||
+                  (!is_tabata && (exercise["calories"] || exercise["reps"]))) %>
+  <% if has_metric || (!is_ladder && exercise["notes"].present?) %>
     <div class="flex items-center gap-1.5 mt-1 flex-wrap" <% if swap_can_show %>data-swap-exercise-target="details"<% end %>>
-      <%# For ladder/mountain sections, show the full sequence instead of just the start value %>
-      <% if is_ladder && (exercise["calories"] || exercise["reps"] || exercise["distance_m"] || exercise["duration_s"])
-           sv = section["start"].to_f; ev = section["end"].to_f; step = [section["step"].to_f, 1.0].max
-           varies = section["varies"].to_s
-           unit = { "reps" => "reps", "calories" => "cal", "kg" => "kg", "distance_m" => "m" }.fetch(varies, varies)
-           if exercise["name"].to_s.match?(/carry|sled|prowler|drag|shuttle|farmer/i) && varies == "reps"
-             unit = "m"
-           end
-           vals = []
-           if section["format"] == "ladder"
-             v = sv; if sv <= ev; while v <= ev + 0.001; vals << v; v += step; end; else; while v >= ev - 0.001; vals << v; v -= step; end; end
-           else
-             pk = section["peak"].to_f
-             v = sv; while v <= pk + 0.001; vals << v; v += step; end
-             v = pk - step; while v >= ev - 0.001; vals << v; v -= step; end
-           end
-           vals = vals.map { |v| v == v.to_i ? v.to_i : v }
-           seq = vals.map { |v| "#{v} #{unit}" }.join(" → ") %>
-        <span class="text-xs font-bold text-sky-200"><%= seq %></span>
-      <% elsif exercise["distance_m"] %>
+      <% if exercise["distance_m"] %>
         <span class="text-xs font-bold text-sky-200"><%= exercise["distance_m"] %>m</span>
       <% elsif !is_tabata && exercise["calories"] %>
         <span class="text-xs font-bold text-sky-200"><%= exercise["calories"] %> cal</span>
