@@ -63,13 +63,14 @@ class WorkoutsController < ApplicationController
   # POST /workouts/:id/clone
   def clone
     copy = Current.user.workouts.create!(
-      name:          "#{@workout.name} (copy)",
-      activity_id:   @workout.activity_id,
-      session_notes: @workout.session_notes,
-      duration_mins: @workout.duration_mins,
-      status:        "active",
-      structure:     @workout.structure,
-      source_workout: @workout
+      name:                "#{@workout.name} (copy)",
+      activity_id:         @workout.activity_id,
+      session_notes:       @workout.session_notes,
+      duration_mins:       @workout.duration_mins,
+      status:              "active",
+      structure:           @workout.structure,
+      original_structure:  @workout.original_structure || @workout.structure,
+      source_workout:      @workout
     )
     copy.tags = @workout.tags
     redirect_to edit_workout_path(copy), notice: "Workout cloned — make it your own."
@@ -117,7 +118,11 @@ class WorkoutsController < ApplicationController
       return
     end
 
-    workout = Current.user.workouts.create!(**cached[:attrs], status: "active")
+    workout = Current.user.workouts.create!(
+      **cached[:attrs],
+      status: "active",
+      original_structure: cached[:attrs][:structure]
+    )
 
     if cached[:group_tag_name].present?
       tag = Tag.find_or_create_by!(slug: cached[:group_tag_name].parameterize) { |t| t.name = cached[:group_tag_name] }
@@ -190,13 +195,14 @@ class WorkoutsController < ApplicationController
     end
 
     copy = Current.user.workouts.create!(
-      name:           source.name,
-      activity_id:    source.activity_id,
-      session_notes:  source.session_notes,
-      duration_mins:  source.duration_mins,
-      status:         "active",
-      structure:      source.structure,
-      source_workout: source
+      name:                source.name,
+      activity_id:         source.activity_id,
+      session_notes:       source.session_notes,
+      duration_mins:       source.duration_mins,
+      status:              "active",
+      structure:           source.structure,
+      original_structure:  source.original_structure || source.structure,
+      source_workout:      source
     )
     copy.tags = source.tags
     redirect_to library_path, notice: "\"#{copy.name}\" saved to your library."
@@ -402,6 +408,7 @@ class WorkoutsController < ApplicationController
     @workout = Current.user.workouts.build(manual_workout_params)
     @workout.structure    = Workout.structure_from_params(params[:sections])
     @workout.status       = "active"
+    @workout.original_structure = @workout.structure
 
     if @workout.save
       save_workout_tags(@workout)
