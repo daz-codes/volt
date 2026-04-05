@@ -5,7 +5,7 @@
 
 ## Overview
 
-A 5-level difficulty scaling system that lets users adjust any workout to their fitness level. Workouts default to a personalised difficulty based on the user's posting history, and can be scaled up or down from the workout show page. Scaling is server-side with Turbo frame replacement, using deterministic rules for moderate adjustments and targeted LLM calls for extreme levels.
+A 5-level difficulty scaling system that lets users adjust any workout to their fitness level. Workouts default to a personalised difficulty based on the user's posting history, and can be scaled up or down from the workout show page. Scaling is server-side with Turbo Frame replacement, using deterministic rules for moderate adjustments and targeted LLM calls for extreme levels.
 
 ## Difficulty Levels
 
@@ -21,13 +21,14 @@ A 5-level difficulty scaling system that lets users adjust any workout to their 
 
 ### workouts table
 
-Add `original_structure` (jsonb, nullable).
+Add `original_structure` (json, nullable).
 
 - Set when the workout is first created, generated, or scanned — identical to `structure` at creation time.
 - Never modified after initial set.
 - When a user scales and saves/edits a workout, `structure` updates to the scaled version; `original_structure` stays untouched.
 - For existing workouts predating this feature, `original_structure` is null — `structure` is treated as the level 3 source.
 - All scaling operations derive from `original_structure || structure`.
+- All workout creation paths must set `original_structure`: generate (`persist_preview`), scan, manual create (`create_manual`), clone, and save.
 
 ### workout_logs table
 
@@ -37,9 +38,9 @@ Add `difficulty_level` (integer, default 3).
 - Used to calculate the user's personalised default difficulty.
 - Existing workout logs default to 3.
 
-## Scaling Logic — Scalable Concern
+## Scaling Logic — Workout::Scalable Concern
 
-`app/models/concerns/scalable.rb`, included in the `Workout` model.
+`app/models/workout/scalable.rb`, included in the `Workout` model (following the existing `Workout::Exportable`, `Workout::Likeable` namespace pattern).
 
 ### Public API
 
@@ -47,11 +48,12 @@ Add `difficulty_level` (integer, default 3).
 workout.scale_to(level)
 # => Hash — a new structure scaled to the given level
 # Source: workout.original_structure || workout.structure
+# For level 3, returns (original_structure || structure).deep_dup unchanged.
 ```
 
 ### Deterministic Rules (Levels 2 and 4)
 
-Applied per section format. Warm-up and cool-down sections are **never scaled**.
+Applied per section format. Sections where `section["category"]` is `warm_up` or `cool_down` are **never scaled** — left untouched.
 
 | Format | Scale Down (level 2) | Scale Up (level 4) |
 |--------|---------------------|-------------------|
@@ -61,12 +63,13 @@ Applied per section format. Warm-up and cool-down sections are **never scaled**.
 | emom | Reduce duration by 2 min, reps by ~20% | Increase duration by 2 min, reps by ~20% |
 | tabata | No change (format is fixed 8 rounds) | No change |
 | hundred | 80 reps | 120 reps |
-| for_time | Reduce rounds by 1 or reps by ~20% | Add 1 round or increase reps by ~20% |
+| for_time | If rounds > 1, adjust rounds ±1. Otherwise, adjust exercise reps by ~20%. | Same logic, opposite direction. |
 | amrap | Reduce reps by ~20% | Increase reps by ~20% |
 | straight | Reduce reps by ~20% | Increase reps by ~20% |
+| matrix | No change (the pyramid structure is the format — scaling reps would break the pattern) | No change |
 
 Exercise-level adjustments:
-- **Reps:** multiply by 0.8 (down) or 1.2 (up), round to clean numbers (multiples of 5 preferred).
+- **Reps:** multiply by 0.8 (down) or 1.2 (up). Round to nearest multiple of 5 when result >= 10; otherwise round to nearest integer (minimum 1).
 - **Distances:** ±25%, snapped to round numbers (running: 100m multiples, other: 25m multiples).
 - **Calories:** ±20%, snapped to multiples of 5.
 - **Weight cues in notes:** shift language — "heavy" → "moderate" → "light-moderate" → "light" for scaling down; reverse for scaling up.
@@ -81,13 +84,15 @@ The prompt instructs the LLM to:
 - Adjust rep schemes, rounds, and distances.
 - Modify weight cues appropriately.
 - Keep the same overall session shape, section names, and section count.
-- Leave warm-up and cool-down untouched.
+- Leave warm-up and cool-down sections untouched.
 
 The LLM returns a complete replacement structure.
 
-## Personalised Default — HasDefaultDifficulty Concern
+**Error handling:** If the LLM call fails (timeout, rate limit, malformed response), fall back to the deterministic level 2 scaling (for level 1 attempts) or level 4 scaling (for level 5 attempts). Show a flash notice: "Couldn't fully scale — showing an approximate version."
 
-`app/models/concerns/has_default_difficulty.rb`, included in the `User` model.
+## Personalised Default — User::HasDefaultDifficulty Concern
+
+`app/models/user/has_default_difficulty.rb`, included in the `User` model (following the existing `User::Billing`, `User::FitnessTracking` namespace pattern).
 
 ### Public API
 
@@ -103,7 +108,7 @@ user.default_difficulty_level
 - Rounds to nearest integer, clamped to 1-5.
 - Returns 3 if no posting history.
 
-No caching — the query is cheap (20 rows, single user scope, indexed by user_id + completed_at).
+No caching — the query is cheap (20 rows, single user scope).
 
 ## Controller & Routing
 
@@ -119,10 +124,11 @@ end
 
 ### workouts#scale Action
 
+- Uses `Workout.find(params[:id])` — any user can scale any viewable workout (scaling is ephemeral, not persisted).
 - Receives `params[:direction]` ("up" or "down") and `params[:current_level]`.
 - Calculates target level (clamp 1-5).
 - Calls `@workout.scale_to(target_level)`.
-- Responds with Turbo Stream or Turbo Frame replacement of `workout_preview`, passing the scaled structure and current level to the preview partial.
+- Responds with a **Turbo Frame** response targeting `workout_preview`, rendering the preview partial with the scaled structure and current level as locals.
 
 The scaled structure is **ephemeral** — not persisted to the workout. It only persists when:
 - The user edits and saves the workout (updates `structure`).
@@ -130,7 +136,9 @@ The scaled structure is **ephemeral** — not persisted to the workout. It only 
 
 ### State Management
 
-The current difficulty level is tracked via **data attributes** on the difficulty control buttons — no session state. The Stimulus controller reads `data-difficulty-level` and sends it with each scale request. State resets naturally on navigation.
+The current difficulty level is tracked via **data attributes** on the difficulty control — no session state. The Stimulus controller reads `data-difficulty-level` and sends it with each scale request. State resets naturally on navigation.
+
+The hidden `difficulty_level` field in the complete workout dialog (which is rendered outside the Turbo Frame) must be updated by the Stimulus controller via a `levelValueChanged` callback, not by the server response.
 
 ## UI Design
 
@@ -147,20 +155,21 @@ The difficulty control appears in the workout header, right-aligned next to the 
 - "DIFFICULTY" label underneath the dots in small uppercase text.
 - `−` button disabled/faded at level 1; `+` button disabled/faded at level 5.
 - Both buttons submit POST to `scale_workout_path` via Turbo Frame targeting `workout_preview`.
+- Both buttons are disabled during **any** pending scale request (not just LLM calls) to prevent race conditions from rapid clicks.
 
 Appears in both mobile and desktop header areas.
 
 ### Stimulus Controller
 
 `difficulty_controller.js`:
-- Targets: dots, down button, up button.
+- Targets: dots, down button, up button, hidden difficulty field in post dialog.
 - Values: `level` (integer, initialised from server).
 - Actions: `scaleUp`, `scaleDown` — submit forms with direction and current level.
-- Updates dot fill state and button disabled state on connect (from server-rendered state).
+- `levelValueChanged` callback: updates dot fill state, button disabled state, and the hidden field in the post dialog.
 
 ### Loading State
 
-For levels 1 and 5 (LLM call), the scale button shows a loading indicator. The Turbo Frame response replaces the preview, resolving the loading state. Use `data-turbo-submits-with` pattern or disable buttons during submission.
+Both buttons disabled during any pending request. For levels 1 and 5 (LLM call, longer wait), a subtle loading indicator on the dots or buttons. The Turbo Frame response replaces the preview, resolving the state.
 
 ### Feed Cards
 
@@ -176,11 +185,12 @@ The complete workout dialog includes a hidden field `difficulty_level` set by th
 - `original_structure` is never modified after creation.
 - All scaling derives from `original_structure || structure` (fallback for pre-existing workouts).
 - If a user scales a workout and saves it via the edit page, `structure` updates but `original_structure` remains the level 3 source.
+- Clone and save actions must copy `original_structure` from the source workout.
 
 ## Migration Plan
 
 Two migrations:
-1. Add `original_structure` (jsonb) to `workouts` — nullable, no backfill needed.
+1. Add `original_structure` (json) to `workouts` — nullable, no backfill needed.
 2. Add `difficulty_level` (integer, default 3) to `workout_logs`.
 
 Existing workouts: `original_structure` stays null; `structure` treated as level 3 source.
@@ -189,16 +199,18 @@ Existing workout logs: default to 3.
 ## Files to Create/Modify
 
 ### New files
-- `app/models/concerns/scalable.rb` — scaling logic
-- `app/models/concerns/has_default_difficulty.rb` — user default calculation
+- `app/models/workout/scalable.rb` — scaling logic (Workout::Scalable)
+- `app/models/user/has_default_difficulty.rb` — user default calculation (User::HasDefaultDifficulty)
 - `app/javascript/controllers/difficulty_controller.js` — Stimulus controller
 - `db/migrate/TIMESTAMP_add_original_structure_to_workouts.rb`
 - `db/migrate/TIMESTAMP_add_difficulty_level_to_workout_logs.rb`
+- `test/models/workout/scalable_test.rb`
+- `test/models/user/has_default_difficulty_test.rb`
 
 ### Modified files
-- `app/models/workout.rb` — include Scalable
-- `app/models/user.rb` — include HasDefaultDifficulty
-- `app/controllers/workouts_controller.rb` — add `scale` action
+- `app/models/workout.rb` — include Workout::Scalable
+- `app/models/user.rb` — include User::HasDefaultDifficulty
+- `app/controllers/workouts_controller.rb` — add `scale` action; update `persist_preview`, `create_manual`, `clone`, and `save` to set `original_structure`
 - `config/routes.rb` — add scale route
 - `app/views/workouts/_preview.html.erb` — add difficulty control to header
 - `app/views/workouts/show.html.erb` — pass difficulty level, add to mobile header
