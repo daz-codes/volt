@@ -19,6 +19,7 @@
 
     <%= form_with url: workout_logs_path, method: :post, multipart: true, data: { turbo_frame: "_top" } do |f| %>
       <%= f.hidden_field :workout_id, value: workout.id %>
+      <input type="hidden" name="difficulty_level" value="3" id="difficulty_level_<%= workout.id %>">
 
       <%# Sweat rating %>
       <div class="mb-6" data-controller="sweat-rating">

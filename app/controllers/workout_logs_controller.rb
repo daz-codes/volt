@@ -24,12 +24,13 @@ class WorkoutLogsController < ApplicationController
     @workout = Workout.find(params[:workout_id])
 
     @workout_log = @workout.workout_logs.build(
-      user:         Current.user,
-      completed_at: Time.current,
-      sweat_rating: params[:workout_log][:sweat_rating].to_i,
-      notes:        params[:workout_log][:notes].presence,
-      location:     params[:workout_log][:location].presence,
-      visibility:   params[:workout_log][:private] == "1" ? "private" : "public"
+      user:             Current.user,
+      completed_at:     Time.current,
+      sweat_rating:     params[:workout_log][:sweat_rating].to_i,
+      notes:            params[:workout_log][:notes].presence,
+      location:         params[:workout_log][:location].presence,
+      visibility:       params[:workout_log][:private] == "1" ? "private" : "public",
+      difficulty_level: params[:difficulty_level].to_i.clamp(1, 5)
     )
 
     if @workout_log.save
