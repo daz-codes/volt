@@ -453,10 +453,16 @@ module Workout::Scalable
   end
 
   def scale_rounds_section(section, factors)
-    if section["rounds"].to_i > 1
+    has_rounds = section["rounds"].to_i > 1
+    is_for_time = section["format"] == "for_time"
+
+    if has_rounds
       section["rounds"] = [ section["rounds"].to_i + factors[:rounds], 2 ].max
     end
-    scale_exercises(section["exercises"], factors)
+
+    # For for_time: scale reps only when there aren't multiple rounds
+    # For rounds: always scale exercises
+    scale_exercises(section["exercises"], factors) unless is_for_time && has_rounds
   end
 
   def scale_ladder_section(section, factors)
@@ -804,10 +810,12 @@ def scale
 
   @scaled_structure = @workout.scale_to(@difficulty_level)
 
-  render partial: "workouts/preview",
-         locals: { workout: @workout, debug_info: nil,
-                   scaled_structure: @scaled_structure,
-                   difficulty_level: @difficulty_level }
+  render layout: false, inline: <<~ERB
+    <%= turbo_frame_tag "workout_preview" do %>
+      <%= render "workouts/preview", workout: @workout, debug_info: nil,
+            scaled_structure: @scaled_structure, difficulty_level: @difficulty_level %>
+    <% end %>
+  ERB
 end
 ```
 
@@ -999,10 +1007,12 @@ To:
 ```erb
 <%= turbo_frame_tag "workout_preview" do %>
   <% default_level = Current.user.default_difficulty_level %>
-  <% if default_level != 3 %>
+  <%# Clamp initial render to deterministic levels (2-4) to avoid LLM call on page load %>
+  <% initial_level = default_level.clamp(2, 4) %>
+  <% if initial_level != 3 %>
     <%= render "workouts/preview", workout: @workout, debug_info: @debug_info,
-          scaled_structure: @workout.scale_to(default_level),
-          difficulty_level: default_level %>
+          scaled_structure: @workout.scale_to(initial_level),
+          difficulty_level: initial_level %>
   <% else %>
     <%= render "workouts/preview", workout: @workout, debug_info: @debug_info,
           difficulty_level: 3 %>
