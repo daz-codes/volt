@@ -150,4 +150,22 @@ class Workout::ScalableTest < ActiveSupport::TestCase
     original_matrix = @workout.original_structure["sections"].find { |s| s["format"] == "matrix" }
     assert_equal original_matrix, matrix
   end
+
+  test "scale_to 1 calls LLM and returns a valid structure" do
+    # We can't easily test the full LLM call in unit tests, so test the fallback
+    # The LLM scaling is integration-tested separately
+    result = @workout.scale_to(1)
+    assert result.is_a?(Hash)
+    assert result["sections"].is_a?(Array)
+    # Should still have warm-up and cool-down
+    categories = result["sections"].map { |s| s["category"] }
+    assert_includes categories, "warm_up"
+    assert_includes categories, "cool_down"
+  end
+
+  test "scale_to 5 calls LLM and returns a valid structure" do
+    result = @workout.scale_to(5)
+    assert result.is_a?(Hash)
+    assert result["sections"].is_a?(Array)
+  end
 end

@@ -22,6 +22,23 @@ module Workout::Scalable
     "moderate" => "heavy", "working weight" => "moderate-heavy"
   }.freeze
 
+  SCALING_SYSTEM_PROMPT = <<~PROMPT
+    You are an expert personal trainer. You will receive a workout structure and a target difficulty level.
+    Your job is to scale the workout to match that level using the create_workout tool.
+
+    Rules:
+    - Keep the same overall session shape: same number of sections, same section names, same formats.
+    - Leave warm-up and cool-down sections EXACTLY as they are — do not modify them.
+    - For beginner scaling: substitute complex exercises for simpler alternatives (e.g. burpees → step-ups,
+      box jumps → step-ups, devil press → DB deadlifts), reduce reps significantly (~40-50% of original),
+      reduce rounds, use lighter weight cues, add more rest. The workout should feel accessible and safe.
+    - For elite scaling: substitute exercises for harder variations (e.g. box jumps → box jump burpees,
+      KB swings → KB snatch, push-ups → clap push-ups), increase reps (~30-40% above original),
+      add rounds, use heavier weight cues, reduce rest. The workout should feel brutal.
+    - Maintain the same equipment requirements — don't introduce equipment that wasn't in the original.
+    - Keep the same duration target.
+  PROMPT
+
   def scale_to(level)
     source = (original_structure || structure).deep_dup
     return source if level == 3
@@ -138,10 +155,48 @@ module Workout::Scalable
     exercise["notes"] = notes
   end
 
-  # Placeholder for Task 4 — LLM scaling
   def scale_with_llm(structure, level)
-    # Fall back to deterministic for now
+    api_client = Class.new { include AnthropicApi }.new
+
+    direction = level == 1 ? "beginner" : "elite"
     fallback_level = level == 1 ? 2 : 4
+
+    prompt = build_scaling_prompt(structure, direction)
+
+    result = api_client.call_anthropic_api(
+      system: SCALING_SYSTEM_PROMPT,
+      messages: [ { role: "user", content: prompt } ],
+      tools: [ WorkoutLLMGenerator::TOOL_DEFINITION ]
+    )
+
+    scaled = result.dig("structure") || structure
+    # Preserve original warm-up and cool-down
+    preserve_bookend_sections(structure, scaled)
+    scaled
+  rescue StandardError => _e
     scale_deterministic(structure, fallback_level)
+  end
+
+  def build_scaling_prompt(structure, direction)
+    <<~PROMPT
+      Scale this workout to #{direction} level. Return the full modified structure using the create_workout tool.
+
+      Original workout structure:
+      #{JSON.pretty_generate(structure)}
+
+      Remember: keep section names, formats, and structure the same. Only modify exercises, reps, rounds, and weight cues.
+      Warm-up and cool-down must remain exactly as they are.
+    PROMPT
+  end
+
+  def preserve_bookend_sections(original, scaled)
+    original_sections = original["sections"] || []
+    scaled_sections = scaled["sections"] || []
+
+    original_sections.each_with_index do |section, i|
+      if UNSCALED_CATEGORIES.include?(section["category"]) && scaled_sections[i]
+        scaled_sections[i] = section.deep_dup
+      end
+    end
   end
 end
