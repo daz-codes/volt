@@ -52,8 +52,8 @@ Rails.application.routes.draw do
   get "calendar",     to: "workout_logs#calendar",     as: :calendar
   get "calendar/day", to: "workout_logs#calendar_day", as: :calendar_day
 
-  resources :workout_logs, only: [ :create, :show ] do
-    resources :comments, only: [ :index, :create, :destroy ]
+  resources :workout_logs, only: [ :create, :show, :update, :destroy ] do
+    resources :comments, only: [ :index, :create, :destroy, :update ]
   end
 
   get "feed", to: "feed#index", as: :feed

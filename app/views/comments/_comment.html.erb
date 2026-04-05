@@ -1,19 +1,35 @@
-<div id="<%= dom_id(comment) %>" class="flex items-start gap-2.5 py-2.5 border-t border-zinc-700/40 first:border-t-0">
+<div id="<%= dom_id(comment) %>" class="flex items-start gap-2.5 py-2.5 border-t border-zinc-700/40 first:border-t-0" data-controller="inline-edit">
   <div class="flex-1 min-w-0">
     <div class="flex items-baseline gap-1.5 flex-wrap">
       <%= link_to comment.user.display, user_path(comment.user),
             class: "text-xs font-semibold text-gray-300 hover:text-lime-400 transition-colors" %>
       <span class="text-gray-700 text-xs"><%= time_ago_in_words(comment.created_at) %> ago</span>
     </div>
-    <p class="text-gray-400 text-sm mt-0.5 break-words"><%= comment.body %></p>
+    <%# Display mode %>
+    <p class="text-gray-400 text-sm mt-0.5 break-words" data-inline-edit-target="display"><%= comment.body %></p>
+    <%# Edit mode %>
+    <% if comment.user == Current.user %>
+      <div class="hidden mt-1" data-inline-edit-target="form">
+        <%= form_with url: workout_log_comment_path(comment.workout_log, comment), method: :patch do |f| %>
+          <%= f.text_area :body, value: comment.body, rows: 2,
+              class: "w-full bg-zinc-700 border border-zinc-600 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-lime-400 resize-none",
+              data: { inline_edit_target: "input", action: "keydown->inline-edit#keydown" } %>
+          <div class="flex items-center gap-2 mt-1.5">
+            <%= f.submit "Save", class: "text-xs font-semibold text-zinc-950 bg-volt hover:bg-volt/80 px-3 py-1 rounded-lg cursor-pointer transition-colors" %>
+            <button type="button" data-action="click->inline-edit#cancel" class="text-xs text-gray-500 hover:text-gray-300 cursor-pointer transition-colors">Cancel</button>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
   </div>
   <% if comment.user == Current.user %>
-    <%= button_to workout_log_comment_path(comment.workout_log, comment),
-          method: :delete,
-          class: "flex-shrink-0 text-gray-700 hover:text-red-500 transition-colors cursor-pointer mt-0.5" do %>
-      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-      </svg>
-    <% end %>
+    <div class="flex items-center gap-2 flex-shrink-0 mt-0.5">
+      <button type="button" data-action="click->inline-edit#edit"
+              class="text-gray-700 hover:text-gray-300 transition-colors cursor-pointer text-xs">edit</button>
+      <%= button_to workout_log_comment_path(comment.workout_log, comment),
+            method: :delete,
+            form: { data: { turbo_confirm: "Delete this comment?" } },
+            class: "flex-shrink-0 text-gray-700 hover:text-red-500 transition-colors cursor-pointer text-xs" do %>delete<% end %>
+    </div>
   <% end %>
 </div>

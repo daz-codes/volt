@@ -78,9 +78,10 @@
    when "for_time"
      ft_rounds = section["rounds"].to_i
      ft_rounds = [ft_rounds, 1].max
-     label = "#{ft_rounds} round#{"s" if ft_rounds > 1}"
-     detail = section["rest_secs"].to_i > 0 ? "#{section["rest_secs"]}s rest after each round" : nil
-     [label, detail]
+     detail_parts = []
+     detail_parts << "#{ft_rounds} round#{"s" if ft_rounds > 1}" if ft_rounds > 1
+     detail_parts << "#{section["rest_secs"]}s rest after each round" if section["rest_secs"].to_i > 0
+     ["For Time", detail_parts.join(" · ").presence]
    when "hundred"
      hundred_ex = Array(section["exercises"]).first
      hundred_label = hundred_ex&.dig("calories").to_i > 0 ? "100 Cal" : "100 Reps"

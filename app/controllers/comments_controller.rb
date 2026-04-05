@@ -31,6 +31,32 @@ class CommentsController < ApplicationController
     end
   end
 
+  def update
+    @comment = @workout_log.comments.find(params[:id])
+
+    unless @comment.user == Current.user
+      head :forbidden and return
+    end
+
+    if @comment.update(body: params[:comment][:body])
+      respond_to do |format|
+        format.turbo_stream
+        format.html { redirect_back fallback_location: root_path }
+      end
+    else
+      respond_to do |format|
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.replace(
+            dom_id(@comment),
+            partial: "comments/comment",
+            locals: { comment: @comment }
+          )
+        end
+        format.html { redirect_back fallback_location: root_path }
+      end
+    end
+  end
+
   def destroy
     @comment = @workout_log.comments.find(params[:id])
 

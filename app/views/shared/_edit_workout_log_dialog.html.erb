@@ -1,0 +1,91 @@
+<%# Locals: workout_log %>
+<dialog id="edit_workout_log_<%= workout_log.id %>"
+        class="w-full max-w-md rounded-2xl border border-zinc-600 bg-zinc-800 text-white p-0 shadow-2xl backdrop:bg-black/70"
+        onclick="if(event.target===this) this.close()">
+  <div class="px-6 py-6">
+
+    <div class="flex items-start justify-between mb-6">
+      <div class="min-w-0 pr-3">
+        <p class="text-gray-400 text-xs font-bold uppercase tracking-widest mb-1">Edit Post</p>
+        <h2 class="text-3xl tracking-tight leading-tight text-gray-300 font-jost uppercase"><%= workout_log.workout.name %></h2>
+      </div>
+      <button type="button" onclick="this.closest('dialog').close()"
+              class="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full text-gray-500 hover:text-white hover:bg-zinc-700 transition-colors outline-none">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <%= form_with url: workout_log_path(workout_log), method: :patch, multipart: true, data: { turbo_frame: "_top" } do |f| %>
+
+      <%# Sweat rating %>
+      <div class="mb-6" data-controller="sweat-rating">
+        <p class="text-sm font-bold text-gray-300 uppercase tracking-wide mb-3">Sweat Rating</p>
+        <div class="flex gap-3">
+          <% (1..5).each do |n| %>
+            <label class="cursor-pointer" data-value="<%= n %>"
+                   data-action="mouseenter->sweat-rating#highlight mouseleave->sweat-rating#reset">
+              <%= f.radio_button "workout_log[sweat_rating]", n,
+                  checked: workout_log.sweat_rating == n,
+                  class: "sr-only", required: true,
+                  data: { action: "change->sweat-rating#reset" } %>
+              <span class="text-3xl select-none transition-opacity <%= n <= workout_log.sweat_rating ? 'opacity-90' : 'opacity-25' %>" data-sweat-rating-target="drop">💧</span>
+            </label>
+          <% end %>
+        </div>
+        <p class="text-gray-600 text-xs mt-2">1 = light sweat &nbsp;·&nbsp; 5 = absolutely drenched</p>
+      </div>
+
+      <%# Notes %>
+      <div class="mb-4">
+        <label class="block text-sm font-bold text-gray-300 uppercase tracking-wide mb-2">Notes</label>
+        <%= f.text_area "workout_log[notes]", rows: 3,
+            value: workout_log.notes,
+            placeholder: "How did it feel? Any modifications?",
+            class: "w-full bg-zinc-700 border border-zinc-600 rounded-xl px-4 py-3 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-lime-400 resize-none" %>
+      </div>
+
+      <%# Location %>
+      <div class="mb-4" data-controller="geolocation">
+        <label class="block text-sm font-bold text-gray-300 uppercase tracking-wide mb-2">
+          Location <span class="text-gray-600 normal-case font-normal">(optional)</span>
+        </label>
+        <div class="flex gap-2">
+          <%= f.text_field "workout_log[location]",
+              value: workout_log.location,
+              placeholder: "e.g. CrossFit HQ, Gym name, City",
+              data: { geolocation_target: "input" },
+              class: "flex-1 bg-zinc-700 border border-zinc-600 rounded-xl px-4 py-2.5 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-lime-400" %>
+          <button type="button"
+                  data-geolocation-target="button"
+                  data-action="click->geolocation#detect"
+                  title="Use my location"
+                  class="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-xl border border-zinc-600 hover:border-lime-400 text-gray-400 hover:text-lime-400 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+            </svg>
+          </button>
+        </div>
+        <p data-geolocation-target="status" class="text-gray-600 text-xs mt-1.5 min-h-[1rem]"></p>
+      </div>
+
+      <%# Photo %>
+      <div class="mb-5">
+        <label class="block text-sm font-bold text-gray-300 uppercase tracking-wide mb-2">
+          Photo <span class="text-gray-600 normal-case font-normal">(optional)</span>
+        </label>
+        <% if workout_log.photo.attached? %>
+          <p class="text-gray-500 text-xs mb-2">Current photo attached. Upload a new one to replace it.</p>
+        <% end %>
+        <input type="file" name="workout_log[photo]" accept="image/*"
+               class="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-lime-400 file:text-zinc-950 hover:file:bg-lime-300 file:cursor-pointer cursor-pointer">
+      </div>
+
+      <%= f.submit "Save Changes",
+          class: "w-full bg-volt hover:bg-volt/80 active:opacity-90 text-zinc-950 font-black py-4 rounded-xl text-base transition-colors cursor-pointer uppercase tracking-wide shadow-sm shadow-volt/20",
+          data: { turbo_submits_with: "Saving…" } %>
+    <% end %>
+
+  </div>
+</dialog>

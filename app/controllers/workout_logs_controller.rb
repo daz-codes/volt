@@ -43,6 +43,29 @@ class WorkoutLogsController < ApplicationController
     end
   end
 
+  def update
+    @workout_log = Current.user.workout_logs.find(params[:id])
+
+    attrs = {
+      sweat_rating: params[:workout_log][:sweat_rating].to_i,
+      notes:        params[:workout_log][:notes].presence,
+      location:     params[:workout_log][:location].presence
+    }
+
+    if @workout_log.update(attrs)
+      @workout_log.photo.attach(params[:workout_log][:photo]) if params[:workout_log][:photo].present?
+      redirect_to root_path
+    else
+      redirect_to root_path, alert: "Could not update post."
+    end
+  end
+
+  def destroy
+    @workout_log = Current.user.workout_logs.find(params[:id])
+    @workout_log.destroy!
+    redirect_to root_path, notice: "Post deleted."
+  end
+
   def show
     @workout_log = WorkoutLog.find(params[:id])
     if @workout_log.visibility == "private" && @workout_log.user_id != Current.user.id

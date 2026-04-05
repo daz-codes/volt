@@ -11,8 +11,8 @@
 # validate_and_fix mutates the hash in place AND returns it.
 class WorkoutValidator
   # Max total work units (reps + calories combined) within a single EMOM circuit minute.
-  # Calories count the same as reps for timing purposes.
-  EMOM_REP_CAP = 15
+  # With max 2 exercises at 5 reps each, 10 is the realistic cap.
+  EMOM_REP_CAP = 10
 
   # Cardio machines in circuit EMOMs: hard cap of 10 cal per exercise.
   # On a SkiErg, Air Bike, or Rowing Machine you can't hit more than ~10 cal/min
@@ -202,10 +202,22 @@ class WorkoutValidator
       section.delete("notes") # LLM notes often contain stale fractional round calculations
       @fixes << "EMOM rotating '#{section["name"]}': duration_mins #{dur} → #{snapped} (must be multiple of #{n} exercises)"
     else
-      # circuit — cap at 3 exercises
-      return if exercises.size <= 3
-      section["exercises"] = exercises.first(3)
-      @fixes << "EMOM circuit '#{section["name"]}': trimmed to 3 exercises (was #{exercises.size})"
+      # circuit — cap at 2 exercises
+      if exercises.size > 2
+        section["exercises"] = exercises.first(2)
+        @fixes << "EMOM circuit '#{section["name"]}': trimmed to 2 exercises (was #{exercises.size})"
+        exercises = section["exercises"]
+      end
+
+      # Snap reps to 5 or 10 only
+      exercises.each do |ex|
+        reps = ex["reps"].to_i
+        next if reps <= 0
+        clean = reps <= 7 ? 5 : 10
+        next if clean == reps
+        ex["reps"] = clean
+        @fixes << "EMOM circuit '#{section["name"]}': #{ex["name"]} reps #{reps} → #{clean} (must be 5 or 10)"
+      end
     end
   end
 
@@ -389,12 +401,28 @@ class WorkoutValidator
   # and promote it to actual structure fields (rounds, distance_m, rest_secs).
   HIDDEN_ROUNDS_PATTERN = /(\d+)\s*[×x]\s*(\d+)\s*(m|reps?|cal)\b/i.freeze
   HIDDEN_REST_PATTERN   = /(\d+)\s*(?:s|sec|seconds?)\s*(?:rest|recovery|easy|glid)/i.freeze
+  # Catches "Repeat × 5", "repeat x 5", "× 5 rounds" etc buried in notes
+  REPEAT_PATTERN        = /repeat\s*[×x]\s*(\d+)|[×x]\s*(\d+)\s*(?:rounds?|times?)?/i.freeze
 
   def fix_notes_as_programming(sections)
     sections.each do |section|
       next if %w[warm_up cool_down].include?(section["category"])
       Array(section["exercises"]).each do |ex|
         notes = ex["notes"].to_s
+
+        # Check for "Repeat × N" pattern — extract rounds and clean notes
+        if notes.match?(REPEAT_PATTERN) && !notes.match?(HIDDEN_ROUNDS_PATTERN)
+          rmatch = notes.match(REPEAT_PATTERN)
+          repeat_val = (rmatch[1] || rmatch[2]).to_i
+          if repeat_val >= 2 && section["rounds"].to_i <= 1
+            section["rounds"] = repeat_val
+            ex["notes"] = notes.sub(REPEAT_PATTERN, "").sub(/\.\s*$/, "").strip
+            ex.delete("notes") if ex["notes"].empty?
+            @fixes << "'#{section["name"]}': extracted #{repeat_val} rounds from 'Repeat × #{repeat_val}' in notes"
+          end
+          next
+        end
+
         next unless notes.match?(HIDDEN_ROUNDS_PATTERN)
 
         match = notes.match(HIDDEN_ROUNDS_PATTERN)

@@ -122,6 +122,25 @@
   <div class="flex gap-3 mt-4">
     <%= link_to "Back to Feed", root_path,
         class: "flex-1 text-center border border-zinc-600 hover:border-gray-500 text-gray-300 hover:text-white font-bold py-3 rounded-xl text-sm transition-colors" %>
+    <% if @workout_log.user == Current.user %>
+      <button type="button"
+              onclick="document.getElementById('edit_workout_log_<%= @workout_log.id %>').showModal()"
+              class="flex items-center gap-1.5 border border-zinc-600 hover:border-gray-500 text-gray-300 hover:text-white font-bold py-3 px-4 rounded-xl text-sm transition-colors cursor-pointer"
+              title="Edit post">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+        </svg>
+        Edit
+      </button>
+      <%= button_to workout_log_path(@workout_log), method: :delete,
+            form: { data: { turbo_confirm: "Delete this post?" } },
+            class: "flex items-center gap-1.5 border border-zinc-600 hover:border-red-500 text-gray-300 hover:text-red-500 font-bold py-3 px-4 rounded-xl text-sm transition-colors cursor-pointer" do %>
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+        </svg>
+        Delete
+      <% end %>
+    <% end %>
     <button type="button"
             onclick="document.getElementById('export_dialog_<%= @workout.id %>').showModal()"
             class="flex items-center gap-1.5 border border-zinc-600 hover:border-gray-500 text-gray-300 hover:text-white font-bold py-3 px-4 rounded-xl text-sm transition-colors cursor-pointer"
@@ -131,5 +150,8 @@
     </button>
     <%= render "shared/export_dialog", workout: @workout %>
   </div>
+  <% if @workout_log.user == Current.user %>
+    <%= render "shared/edit_workout_log_dialog", workout_log: @workout_log %>
+  <% end %>
 
 </div>
