@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_04_05_093658) do
+ActiveRecord::Schema[8.2].define(version: 2026_04_05_212214) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -307,6 +307,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_04_05_093658) do
     t.integer "comments_count", default: 0, null: false
     t.datetime "completed_at", null: false
     t.datetime "created_at", null: false
+    t.integer "difficulty_level", default: 3, null: false
     t.string "location"
     t.text "notes"
     t.integer "sweat_rating", null: false
@@ -325,6 +326,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_04_05_093658) do
     t.datetime "created_at", null: false
     t.integer "duration_mins", null: false
     t.string "name"
+    t.json "original_structure"
     t.text "session_notes"
     t.integer "source_workout_id"
     t.string "status", default: "active", null: false
