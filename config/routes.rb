@@ -40,6 +40,7 @@ Rails.application.routes.draw do
       post  :save
       post  :regenerate
       post  :swap_exercise
+      post  :scale
     end
   end
   resources :programs, only: [ :new, :create, :show, :destroy ] do

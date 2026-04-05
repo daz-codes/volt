@@ -307,6 +307,28 @@ class WorkoutsController < ApplicationController
     @debug_info = Rails.cache.read("workout_llm_debug_#{@workout.id}")
   end
 
+  # POST /workouts/:id/scale
+  def scale
+    @workout = Workout.find(params[:id])
+    current_level = params[:current_level].to_i.clamp(1, 5)
+    direction = params[:direction]
+
+    @difficulty_level = if direction == "up"
+      [ current_level + 1, 5 ].min
+    else
+      [ current_level - 1, 1 ].max
+    end
+
+    @scaled_structure = @workout.scale_to(@difficulty_level)
+
+    render layout: false, inline: <<~ERB
+      <%= turbo_frame_tag "workout_preview" do %>
+        <%= render "workouts/preview", workout: @workout, debug_info: nil,
+              scaled_structure: @scaled_structure, difficulty_level: @difficulty_level %>
+      <% end %>
+    ERB
+  end
+
   # PATCH /workouts/:id/save_template
   def save_template
     @workout = Current.user.workouts.find(params[:id])
