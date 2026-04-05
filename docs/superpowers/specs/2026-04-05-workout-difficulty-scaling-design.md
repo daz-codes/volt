@@ -62,7 +62,7 @@ Applied per section format. Sections where `section["category"]` is `warm_up` or
 | mountain | Lower peak by 1-2 | Raise peak by 1-2 |
 | emom | Reduce duration by 2 min, reps by ~20% | Increase duration by 2 min, reps by ~20% |
 | tabata | No change (format is fixed 8 rounds) | No change |
-| hundred | 80 reps | 120 reps |
+| hundred | No change (100 is the format — athletes scale via weight choice) | No change |
 | for_time | If rounds > 1, adjust rounds ±1. Otherwise, adjust exercise reps by ~20%. | Same logic, opposite direction. |
 | amrap | Reduce reps by ~20% | Increase reps by ~20% |
 | straight | Reduce reps by ~20% | Increase reps by ~20% |
