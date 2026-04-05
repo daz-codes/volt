@@ -654,10 +654,17 @@ class WorkoutLLMGenerator
       sections << training_rule if training_rule
     end
 
+    # Occasionally give the session a unifying theme (applies to all activity types)
+    theme = session_theme
+    sections << theme if theme
+
     # Functional Muscle gets its full rule set — this is a specific class protocol
     if @activity_slug == "functional-muscle"
-      fm_archetype = fm_session_archetype
-      sections << fm_archetype if fm_archetype
+      # Skip the rigid archetype when a theme is active — the theme drives the session shape
+      unless theme
+        fm_archetype = fm_session_archetype
+        sections << fm_archetype if fm_archetype
+      end
 
       fm_rule = functional_muscle_rule
       sections << fm_rule if fm_rule
@@ -739,6 +746,7 @@ class WorkoutLLMGenerator
         - Make it genuinely fun and challenging — the kind of workout people talk about afterwards
         - EXERCISE VARIETY: never use the same base movement in more than one section
         - NEVER repeat the same exercise as multiple entries in the exercises array — use rounds instead
+        - GOAL ACCURACY: the goal field must ONLY reference formats, blocks, or structures that actually appear in the workout sections. Do not mention "mountain", "ladder", "circuit", "EMOM", "tabata", or any format that isn't present. If the workout has a ladder, you can mention it. If it doesn't, don't.
         #{@session_notes.present? ? "\n        *** REMINDER — ATHLETE'S SESSION FOCUS (HIGHEST PRIORITY): \"#{@session_notes}\" ***" : ""}
       RULES
     end
@@ -1288,6 +1296,32 @@ class WorkoutLLMGenerator
     "duration_mins: #{opt[:mins]}, exactly #{opt[:exercises]} exercises (#{opt[:exercises]} exercises × #{opt[:rounds]} rounds = #{opt[:mins]} min)"
   end
 
+  # ~15% chance of giving the session a unifying theme. Applies to ALL activity
+  # types. The theme is inspirational — the LLM adapts it to the activity's rules
+  # and formats. It can also invent its own variation on these ideas.
+  SESSION_THEME_IDEAS = [
+    "THE THREAD — pick one punishing connector exercise (e.g. 20 burpees, 15 devil press, 500m row, 200m run, 30 jump rope doubles) and make it appear between every main block as a recurring bridge. The connector is the same exercise and reps every time. Name these bridge sections the same thing (e.g. \"The Tax\", \"The Toll\"). The workout name should hint at the thread.",
+    "CENTURION — build each main section around 100 reps or 100 calories of something different. 100 KB swings for time, 100 cal row, 4×25 burpees, 5×20 wall balls. The hundred is the thread — mix equipment and formats but keep every block at 100. Name the workout something that nods to triple digits.",
+    "TABATA STORM — the entire main block is tabatas, back to back, building in intensity. Each tabata uses completely different movements. The first should be moderate, the last brutal. No other format — just wave after wave of tabatas.",
+    "RUN AND GUN — alternate cardio machine blasts (or running) with strength blocks. Cardio → strength → cardio → strength, repeating. The cardio is the thread — same machine or run distance each time. Each strength block uses a different format. The rhythm should feel relentless.",
+    "ACCUMULATOR — the workout grows. Round 1 has 1 exercise, round 2 adds another, round 3 adds another, until the final round stacks everything together. Pick 4–5 contrasting exercises. The growing volume is the challenge.",
+    "SINGLE TOOL — lock the entire main block to one piece of equipment (one KB, one barbell, one pair of DBs, or just bodyweight). Every section uses only that tool — the constraint forces creative programming across different formats.",
+  ].freeze
+
+  def session_theme
+    return nil if rand(100) >= 15
+
+    theme = SESSION_THEME_IDEAS.sample
+    <<~THEME.strip
+      ## Session Theme (optional creative direction)
+      This session has a unifying concept. Use it as inspiration — adapt it to fit the activity type and its rules. You can interpret it loosely or invent your own variation on the idea. The theme applies to the main working sections only (warm-up and cool-down should still follow normal rules).
+
+      Theme idea: #{theme}
+
+      Remember: the theme is a creative direction, not a rigid template. Adapt it to make a great #{@activity || "fitness"} session.
+    THEME
+  end
+
   # Randomly selects a session archetype for Functional Muscle so the LLM gets
   # a concrete structural directive rather than being asked to "vary" on its own.
   # Tabata frequency distribution: 40% = 1, 40% = 2, 15% = 3, 5% = 4.
@@ -1296,13 +1330,19 @@ class WorkoutLLMGenerator
 
     roll = rand(100)
     tabata_count = case roll
-    when  0..39 then 1
-    when 40..79 then 2
-    when 80..94 then 3
-    else             4
+    when  0..34 then 1
+    when 35..69 then 2
+    when 70..82 then 3
+    when 83..87 then 4
+    else             0  # no tabatas — structural variety
     end
 
     archetypes = {
+      0 => [
+        "LADDER DAY — Generate EXACTLY: 10-1 Ladder + Bear Mountain + Continuous Circuit. Total: ~30 min. STOP. No tabatas this session.",
+        "CIRCUIT GRINDER — Generate EXACTLY: Continuous Circuit + Cardio Intervals + Every-2-min EMOM. Total: ~30 min. STOP. No tabatas this session.",
+        "BEAR & INTERVALS — Generate EXACTLY: Bear Mountain + Cardio Intervals + Death Race. Total: ~26 min. STOP. No tabatas this session."
+      ],
       1 => [
         "BEAR & LADDER — Generate EXACTLY: Bear Mountain + 10-1 Ladder + 1 tabata. Total: 28 min. STOP. Do not add a continuous circuit or any other block.",
         "MACHINE DAY — Generate EXACTLY: Continuous Circuit + Cardio Intervals + 1 tabata. Total: ~26 min. STOP. No ladder, no Bear Mountain.",
@@ -1401,6 +1441,10 @@ class WorkoutLLMGenerator
       *** REMINDER: You MUST include exactly 6 phases: (1) Warm-Up, (2) Metabolic blocks, (3) Upper Body Strength, (4) Lower Body Strength, (5) Abs/Pilates 100, (6) Cool-Down. The warm-up and cool-down are NOT optional — every FM session starts with a 5-min cardio machine warm-up and ends with a 5-min stretch cool-down. ***
 
       BANNED in Functional Muscle: activation blocks, mobility warm-up sequences, AMRAP, single sets of any weighted exercise, any rep scheme other than 5×10 or 5×5 for the strength sections, reps on 12-min rotating EMOM exercises, powerlifting-style main sets.
+
+      GOAL ACCURACY (CRITICAL): The goal/description must ONLY reference formats and blocks that ACTUALLY APPEAR in the workout sections. If the session does not contain a mountain, do not mention "mountain". If it has no ladder, do not mention "ladder". If it has no circuit, do not mention "circuit". The goal describes what IS in the workout, not what could have been.
+
+      MINIMUM METABOLIC CONTENT: Follow the SESSION SHAPE directive above exactly — it defines exactly which blocks to include. For standard (non-themed) sessions, always include at least one structural block (continuous circuit, ladder, bear mountain, cardio intervals, death race, every-2-min EMOM, or 20-20) alongside any tabatas. A session with only tabatas and strength is too light unless the SESSION SHAPE explicitly specifies an all-tabata theme.
     RULE
   end
 

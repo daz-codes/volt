@@ -11,6 +11,12 @@ export default class extends Controller {
     this.sectionsListTarget.insertAdjacentHTML("beforeend", this.sectionTemplate(id))
   }
 
+  insertSectionAbove(event) {
+    const id = Date.now()
+    const section = event.currentTarget.closest("[data-section-id]")
+    section.insertAdjacentHTML("beforebegin", this.sectionTemplate(id))
+  }
+
   removeSection(event) {
     event.currentTarget.closest("[data-section-id]").remove()
   }
@@ -68,6 +74,12 @@ export default class extends Controller {
             <option value="ladder">Ladder</option>
             <option value="mountain">Mountain</option>
           </select>
+          <button type="button" data-action="builder#insertSectionAbove"
+            class="text-gray-600 hover:text-lime-400 transition-colors flex-shrink-0 p-1" aria-label="Insert section above" title="Insert section above">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/>
+            </svg>
+          </button>
           <button type="button" data-action="builder#removeSection"
             class="text-gray-600 hover:text-red-500 transition-colors flex-shrink-0 p-1" aria-label="Remove section">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

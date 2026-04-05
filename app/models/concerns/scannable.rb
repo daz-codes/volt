@@ -107,6 +107,35 @@ module Scannable
       end.freeze
     end
 
+    def ensure_warmup_and_cooldown(sections)
+      categories = sections.map { |s| s["category"].to_s.downcase }
+
+      unless categories.any? { |c| c == "warm_up" }
+        warmup = %w[Easy Row Easy Ride Easy Ski Easy Rope].sample
+        sections.unshift({
+          "name" => "Warm-Up",
+          "category" => "warm_up",
+          "format" => "straight",
+          "duration_mins" => 5,
+          "exercises" => [{ "name" => warmup, "notes" => "Easy pace" }]
+        })
+      end
+
+      unless categories.any? { |c| c == "cool_down" }
+        sections.push({
+          "name" => "Cool-Down",
+          "category" => "cool_down",
+          "format" => "straight",
+          "duration_mins" => 5,
+          "exercises" => [
+            { "name" => "Child Pose to Cobra", "notes" => "10 deep breaths" },
+            { "name" => "Wall Hamstring Stretch", "notes" => "10 deep breaths each side" },
+            { "name" => "Shoulder Stretch", "notes" => "10 deep breaths each side" }
+          ]
+        })
+      end
+    end
+
     def build_scanned_workout(data, user)
       sections = Array(data.dig("structure", "sections"))
       raise ScanError, "No workout found in that image." if sections.empty?
@@ -116,6 +145,9 @@ module Scannable
       # Run through validator for structural fixes
       validator = WorkoutValidator.new(data, duration_mins: duration_mins, main_tag_slug: nil)
       validator.validate_and_fix
+
+      # Add warm-up and cool-down if not present in the scanned image
+      ensure_warmup_and_cooldown(sections)
 
       activity_name = data["activity"].presence
       activity = activity_name ? Activity.find_or_create_by!(name: activity_name) : nil

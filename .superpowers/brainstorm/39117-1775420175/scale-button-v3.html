@@ -1,0 +1,115 @@
+<h2>Difficulty control — action bar, left-aligned</h2>
+<p class="subtitle">Filling dots with label, positioned alongside other action buttons. Does this nail it?</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">✓</div>
+    <div class="content">
+      <h3>Desktop action bar</h3>
+      <div style="background:#0a0a0a;border-top:1px solid #333;border-radius:0 0 12px 12px;padding:14px 16px;margin-top:12px;font-family:system-ui;color:#ccc;font-size:13px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+        <button style="background:#a3e635;color:#111;font-weight:900;padding:8px 20px;border-radius:10px;border:none;font-size:12px;text-transform:uppercase;">Post</button>
+        <button style="background:none;border:1px solid #555;color:#ccc;padding:8px 14px;border-radius:10px;font-size:12px;font-weight:700;">Edit</button>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <button style="background:none;border:1px solid #555;color:#999;width:28px;height:28px;border-radius:8px;font-size:14px;cursor:pointer;">−</button>
+          <div style="text-align:center;">
+            <div style="display:flex;gap:5px;align-items:center;">
+              <div style="width:7px;height:7px;border-radius:50%;background:#a3e635;"></div>
+              <div style="width:7px;height:7px;border-radius:50%;background:#a3e635;"></div>
+              <div style="width:9px;height:9px;border-radius:50%;background:#a3e635;box-shadow:0 0 6px #a3e635;"></div>
+              <div style="width:7px;height:7px;border-radius:50%;background:#555;"></div>
+              <div style="width:7px;height:7px;border-radius:50%;background:#555;"></div>
+            </div>
+            <div style="color:#666;font-size:8px;text-transform:uppercase;letter-spacing:1px;margin-top:3px;font-weight:700;">Difficulty</div>
+          </div>
+          <button style="background:none;border:1px solid #555;color:#999;width:28px;height:28px;border-radius:8px;font-size:14px;cursor:pointer;">+</button>
+        </div>
+        <button style="background:none;border:1px solid #555;color:#ccc;padding:8px 14px;border-radius:10px;font-size:12px;font-weight:700;margin-left:auto;">Duplicate</button>
+        <button style="background:none;border:1px solid #555;color:#ccc;padding:8px 14px;border-radius:10px;font-size:12px;font-weight:700;">Export</button>
+      </div>
+
+      <h3 style="margin-top:24px;">At different levels:</h3>
+
+      <div style="display:flex;flex-direction:column;gap:12px;margin-top:8px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="color:#666;font-size:11px;width:80px;text-align:right;">Level 1</span>
+          <button style="background:none;border:1px solid #555;color:#444;width:28px;height:28px;border-radius:8px;font-size:14px;cursor:not-allowed;opacity:0.4;">−</button>
+          <div style="text-align:center;">
+            <div style="display:flex;gap:5px;align-items:center;">
+              <div style="width:9px;height:9px;border-radius:50%;background:#a3e635;box-shadow:0 0 6px #a3e635;"></div>
+              <div style="width:7px;height:7px;border-radius:50%;background:#555;"></div>
+              <div style="width:7px;height:7px;border-radius:50%;background:#555;"></div>
+              <div style="width:7px;height:7px;border-radius:50%;background:#555;"></div>
+              <div style="width:7px;height:7px;border-radius:50%;background:#555;"></div>
+            </div>
+            <div style="color:#666;font-size:8px;text-transform:uppercase;letter-spacing:1px;margin-top:3px;font-weight:700;">Difficulty</div>
+          </div>
+          <button style="background:none;border:1px solid #555;color:#999;width:28px;height:28px;border-radius:8px;font-size:14px;cursor:pointer;">+</button>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="color:#666;font-size:11px;width:80px;text-align:right;">Level 2</span>
+          <button style="background:none;border:1px solid #555;color:#999;width:28px;height:28px;border-radius:8px;font-size:14px;cursor:pointer;">−</button>
+          <div style="text-align:center;">
+            <div style="display:flex;gap:5px;align-items:center;">
+              <div style="width:7px;height:7px;border-radius:50%;background:#a3e635;"></div>
+              <div style="width:9px;height:9px;border-radius:50%;background:#a3e635;box-shadow:0 0 6px #a3e635;"></div>
+              <div style="width:7px;height:7px;border-radius:50%;background:#555;"></div>
+              <div style="width:7px;height:7px;border-radius:50%;background:#555;"></div>
+              <div style="width:7px;height:7px;border-radius:50%;background:#555;"></div>
+            </div>
+            <div style="color:#666;font-size:8px;text-transform:uppercase;letter-spacing:1px;margin-top:3px;font-weight:700;">Difficulty</div>
+          </div>
+          <button style="background:none;border:1px solid #555;color:#999;width:28px;height:28px;border-radius:8px;font-size:14px;cursor:pointer;">+</button>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="color:#a3e635;font-size:11px;width:80px;text-align:right;font-weight:700;">Level 3 ★</span>
+          <button style="background:none;border:1px solid #555;color:#999;width:28px;height:28px;border-radius:8px;font-size:14px;cursor:pointer;">−</button>
+          <div style="text-align:center;">
+            <div style="display:flex;gap:5px;align-items:center;">
+              <div style="width:7px;height:7px;border-radius:50%;background:#a3e635;"></div>
+              <div style="width:7px;height:7px;border-radius:50%;background:#a3e635;"></div>
+              <div style="width:9px;height:9px;border-radius:50%;background:#a3e635;box-shadow:0 0 6px #a3e635;"></div>
+              <div style="width:7px;height:7px;border-radius:50%;background:#555;"></div>
+              <div style="width:7px;height:7px;border-radius:50%;background:#555;"></div>
+            </div>
+            <div style="color:#666;font-size:8px;text-transform:uppercase;letter-spacing:1px;margin-top:3px;font-weight:700;">Difficulty</div>
+          </div>
+          <button style="background:none;border:1px solid #555;color:#999;width:28px;height:28px;border-radius:8px;font-size:14px;cursor:pointer;">+</button>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="color:#666;font-size:11px;width:80px;text-align:right;">Level 4</span>
+          <button style="background:none;border:1px solid #555;color:#999;width:28px;height:28px;border-radius:8px;font-size:14px;cursor:pointer;">−</button>
+          <div style="text-align:center;">
+            <div style="display:flex;gap:5px;align-items:center;">
+              <div style="width:7px;height:7px;border-radius:50%;background:#a3e635;"></div>
+              <div style="width:7px;height:7px;border-radius:50%;background:#a3e635;"></div>
+              <div style="width:7px;height:7px;border-radius:50%;background:#a3e635;"></div>
+              <div style="width:9px;height:9px;border-radius:50%;background:#a3e635;box-shadow:0 0 6px #a3e635;"></div>
+              <div style="width:7px;height:7px;border-radius:50%;background:#555;"></div>
+            </div>
+            <div style="color:#666;font-size:8px;text-transform:uppercase;letter-spacing:1px;margin-top:3px;font-weight:700;">Difficulty</div>
+          </div>
+          <button style="background:none;border:1px solid #555;color:#999;width:28px;height:28px;border-radius:8px;font-size:14px;cursor:pointer;">+</button>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="color:#666;font-size:11px;width:80px;text-align:right;">Level 5</span>
+          <button style="background:none;border:1px solid #555;color:#999;width:28px;height:28px;border-radius:8px;font-size:14px;cursor:pointer;">−</button>
+          <div style="text-align:center;">
+            <div style="display:flex;gap:5px;align-items:center;">
+              <div style="width:7px;height:7px;border-radius:50%;background:#a3e635;"></div>
+              <div style="width:7px;height:7px;border-radius:50%;background:#a3e635;"></div>
+              <div style="width:7px;height:7px;border-radius:50%;background:#a3e635;"></div>
+              <div style="width:7px;height:7px;border-radius:50%;background:#a3e635;"></div>
+              <div style="width:9px;height:9px;border-radius:50%;background:#a3e635;box-shadow:0 0 6px #a3e635;"></div>
+            </div>
+            <div style="color:#666;font-size:8px;text-transform:uppercase;letter-spacing:1px;margin-top:3px;font-weight:700;">Difficulty</div>
+          </div>
+          <button style="background:none;border:1px solid #555;color:#444;width:28px;height:28px;border-radius:8px;font-size:14px;cursor:not-allowed;opacity:0.4;">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

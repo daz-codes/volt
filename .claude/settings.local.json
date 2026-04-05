@@ -165,7 +165,9 @@
       "Read(//System/Library/Fonts/**)",
       "Bash(identify -list font)",
       "Bash(convert -version)",
-      "Bash(python3 -c ':*)"
+      "Bash(python3 -c ':*)",
+      "Bash(/Users/daz/.claude/plugins/marketplaces/superpowers-ruby/scripts/start-server.sh:*)",
+      "Bash(/Users/daz/.claude/plugins/marketplaces/superpowers-ruby/skills/brainstorming/scripts/start-server.sh:*)"
     ]
   }
 }
