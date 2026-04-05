@@ -57,7 +57,17 @@
   </div>
 
   <%= turbo_frame_tag "workout_preview" do %>
-    <%= render "workouts/preview", workout: @workout, debug_info: @debug_info %>
+    <% default_level = Current.user.default_difficulty_level %>
+    <%# Clamp initial render to deterministic levels (2-4) to avoid LLM call on page load %>
+    <% initial_level = default_level.clamp(2, 4) %>
+    <% if initial_level != 3 %>
+      <%= render "workouts/preview", workout: @workout, debug_info: @debug_info,
+            scaled_structure: @workout.scale_to(initial_level),
+            difficulty_level: initial_level %>
+    <% else %>
+      <%= render "workouts/preview", workout: @workout, debug_info: @debug_info,
+            difficulty_level: 3 %>
+    <% end %>
   <% end %>
 
 </div>

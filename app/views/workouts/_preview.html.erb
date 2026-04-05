@@ -1,3 +1,5 @@
+<% difficulty_level = local_assigns[:difficulty_level] || 3 %>
+<% display_structure = local_assigns[:scaled_structure] || workout.structure %>
 <div class="mt-6 bg-zinc-800 border border-zinc-600/70 rounded-2xl overflow-hidden shadow-sm">
 
   <%# Header: name + meta %>
@@ -8,8 +10,8 @@
 
     <% main_slug = workout.activity_slug.to_s %>
     <% is_distance_sport = main_slug.match?(/\A(run|swim|row|ski|bike|cycl|jog|tri|duat)/) %>
-    <% total_distance_m = is_distance_sport && workout.structure.is_a?(Hash) ?
-         workout.structure["sections"].to_a.sum { |s| section_distance_m(s) } : 0 %>
+    <% total_distance_m = is_distance_sport && display_structure.is_a?(Hash) ?
+         display_structure["sections"].to_a.sum { |s| section_distance_m(s) } : 0 %>
     <% dist_value, dist_unit = if total_distance_m >= 1000
          [ (total_distance_m / 1000.0).round(1).to_s.delete_suffix(".0"), "km" ]
        elsif total_distance_m > 0
@@ -26,6 +28,39 @@
         </div>
       </div>
 
+    <%# Difficulty control %>
+    <div data-controller="difficulty"
+         data-difficulty-level-value="<%= difficulty_level %>"
+         data-difficulty-workout-id-value="<%= workout.id %>">
+      <div class="flex items-center gap-2">
+        <%= button_to scale_workout_path(workout), method: :post,
+              params: { direction: "down", current_level: difficulty_level },
+              data: { difficulty_target: "downBtn", turbo_frame: "workout_preview" },
+              form: { class: "contents" },
+              class: "flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-lg border border-zinc-600 text-gray-500 hover:text-white hover:border-gray-400 transition-colors cursor-pointer #{'opacity-40 cursor-not-allowed' if difficulty_level <= 1}",
+              disabled: difficulty_level <= 1 do %>
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <% end %>
+        <div class="text-center">
+          <div class="flex gap-1.5 items-center">
+            <% 5.times do |i| %>
+              <div data-difficulty-target="dot"
+                   class="w-2 h-2 rounded-full transition-colors <%= i < difficulty_level ? 'bg-volt' : 'bg-zinc-600' %>"></div>
+            <% end %>
+          </div>
+          <p class="text-gray-600 text-[8px] font-bold uppercase tracking-widest mt-1">Difficulty</p>
+        </div>
+        <%= button_to scale_workout_path(workout), method: :post,
+              params: { direction: "up", current_level: difficulty_level },
+              data: { difficulty_target: "upBtn", turbo_frame: "workout_preview" },
+              form: { class: "contents" },
+              class: "flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-lg border border-zinc-600 text-gray-500 hover:text-white hover:border-gray-400 transition-colors cursor-pointer #{'opacity-40 cursor-not-allowed' if difficulty_level >= 5}",
+              disabled: difficulty_level >= 5 do %>
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <% end %>
+      </div>
+    </div>
+
       <%# Single circle — distance for distance sports, time otherwise %>
       <% if is_distance_sport && dist_value %>
         <div class="flex flex-col items-center justify-center w-14 h-14 rounded-full bg-sky-500 shadow-md shadow-sky-500/20 flex-shrink-0">
@@ -40,13 +75,13 @@
       <% end %>
     </div>
 
-    <% if workout.structure.is_a?(Hash) && workout.structure["goal"].present? %>
-      <p class="text-gray-400 text-sm italic mt-3 leading-relaxed"><%= workout.structure["goal"] %></p>
+    <% if display_structure.is_a?(Hash) && display_structure["goal"].present? %>
+      <p class="text-gray-400 text-sm italic mt-3 leading-relaxed"><%= display_structure["goal"] %></p>
     <% end %>
   </div>
 
   <%# Sections %>
-  <% sections = workout.structure.is_a?(Hash) ? Array(workout.structure["sections"]) : [] %>
+  <% sections = display_structure.is_a?(Hash) ? Array(display_structure["sections"]) : [] %>
   <% swappable = Current.user == workout.user %>
   <div class="px-4 py-3 space-y-2">
     <% sections.each_with_index do |section, si| %>
