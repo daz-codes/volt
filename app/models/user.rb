@@ -7,6 +7,7 @@ class User < ApplicationRecord
   include User::FollowGraph
   include User::FitnessTracking
   include User::ExerciseWeightRecorder
+  include User::HasDefaultDifficulty
 
   validates :email_address, uniqueness: true
   validates :username, uniqueness: true, allow_nil: true,
