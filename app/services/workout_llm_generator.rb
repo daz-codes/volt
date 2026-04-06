@@ -251,7 +251,7 @@ class WorkoutLLMGenerator
     "circuit-breaker" => {
       primary: %w[amrap emom tabata for_time rounds],
       secondary: %w[ladder matrix hundred mountain],
-      guidance: "Circuit Breaker sessions thrive on variety and continuous effort. AMRAPs, EMOMs, tabatas, and for_time efforts should be the main formats. Mix in rounds for structured strength work. Ladders, matrices, and hundreds make great finishers. Keep rest short and transitions fast. Think F45 / functional fitness group training — high energy, fast transitions, minimal rest."
+      guidance: "Circuit Breaker sessions thrive on variety and continuous effort. AMRAPs, EMOMs, tabatas, and for_time efforts should be the main formats. Mix in rounds for structured strength work. Ladders, matrices, and hundreds make great finishers. Switchback ladders (cardio machine + functional movement, volumes trading places each round) and descending clusters (ladder format with 3 exercises) are excellent main sets — use them regularly. Keep rest short and transitions fast. Think F45 / functional fitness group training — high energy, fast transitions, minimal rest."
     },
     # Dynamo: HIIT / MetaFit — bodyweight-only high intensity
     "dynamo" => {
@@ -332,7 +332,7 @@ class WorkoutLLMGenerator
     "crossfit" => {
       primary: %w[amrap emom for_time rounds],
       secondary: %w[tabata ladder hundred mountain],
-      guidance: "CrossFit sessions should feature classic WOD formats: AMRAPs, EMOMs, and for_time efforts. Rounds work for strength components. The session should feel like a box class — varied, intense, and competitive."
+      guidance: "CrossFit sessions should feature classic WOD formats: AMRAPs, EMOMs, and for_time efforts. Rounds work for strength components. Switchback ladders and descending clusters are classic CrossFit programming — use them. The session should feel like a box class — varied, intense, and competitive."
     },
     "kettlebell" => {
       primary: %w[rounds emom for_time amrap],
@@ -374,7 +374,7 @@ class WorkoutLLMGenerator
     "volt-octathlon" => {
       primary: %w[for_time rounds emom amrap],
       secondary: %w[tabata ladder hundred mountain],
-      guidance: "Volt Octathlon sessions should blend race-specific station work with conditioning variety. The race is 8 stations back-to-back with no rest — train the ability to work under accumulated fatigue. Pair machine work (row, ski, bike) with strength movements (thrusters, swings, slams, devil press). For_time and rounds simulate race pacing. EMOMs build station endurance. Mix in AMRAPs, tabatas, ladders, and hundreds for training variety."
+      guidance: "Volt Octathlon sessions should blend race-specific station work with conditioning variety. The race is 8 stations back-to-back with no rest — train the ability to work under accumulated fatigue. Pair machine work (row, ski, bike) with strength movements (thrusters, swings, slams, devil press). For_time and rounds simulate race pacing. EMOMs build station endurance. Switchback ladders (e.g. Row cals + KB Swings, Assault Bike cals + Slams) are perfect for octathlon training. Mix in AMRAPs, tabatas, ladders, and hundreds for training variety."
     },
     # ── General / fallback ──
 
@@ -479,6 +479,7 @@ class WorkoutLLMGenerator
     @duration_mins  = duration_mins.to_i
     @source_workout = source_workout
     @session_notes  = session_notes.presence
+    @fm_selected_blocks = nil  # Set by fm_select_metabolic_blocks for post-gen compliance
   end
 
   # Returns a persisted Workout record. Used by remix/regenerate flows.
@@ -512,6 +513,8 @@ class WorkoutLLMGenerator
       workout_data     = call_llm(prompt)
       workout_data     = validate_and_fix(workout_data)
       workout_data     = collapse_duplicate_exercises(workout_data)
+      workout_data     = fm_enforce_blocks(workout_data)
+      workout_data     = general_enforce_formats(workout_data)
       collapse_set_notation(workout_data)
     end
   end
@@ -660,10 +663,10 @@ class WorkoutLLMGenerator
 
     # Functional Muscle gets its full rule set — this is a specific class protocol
     if @activity_slug == "functional-muscle"
-      # Skip the rigid archetype when a theme is active — the theme drives the session shape
+      # Skip block selection when a theme is active — the theme drives the session shape
       unless theme
-        fm_archetype = fm_session_archetype
-        sections << fm_archetype if fm_archetype
+        fm_blocks = fm_select_metabolic_blocks
+        sections << fm_blocks if fm_blocks
       end
 
       fm_rule = functional_muscle_rule
@@ -719,6 +722,7 @@ class WorkoutLLMGenerator
         - Make it genuinely fun and challenging — the kind of workout people talk about afterwards
         - EXERCISE VARIETY: never use the same base movement in more than one section
         - NEVER repeat the same exercise as multiple entries in the exercises array — use rounds instead
+        #{fm_blocks}
         #{@session_notes.present? ? "\n        *** REMINDER — ATHLETE'S SESSION FOCUS (HIGHEST PRIORITY): \"#{@session_notes}\" ***" : ""}
       RULES
     else
@@ -728,6 +732,7 @@ class WorkoutLLMGenerator
       sport_rule      = sport_purity_rule
       pace_limits     = pace_limit_rule
       equipment_rule  = build_equipment_rule
+      format_directive = select_section_formats
 
       sections << <<~RULES
         Use the create_workout tool. Requirements:
@@ -739,6 +744,7 @@ class WorkoutLLMGenerator
         #{sport_rule}
         #{pace_limits}
         #{equipment_rule}
+        #{format_directive}
         - Give it a punchy, memorable name — something a gym community would actually call it. Be creative and unpredictable: draw from feelings, imagery, places, days, animals, weather, mythology, slang — anything vivid. NEVER use the session type name as the workout name — "#{main_name}" is the TYPE of session, not the name. The name must be original and creative. BANNED WORDS in workout names: Voltage, Maximum, Transformer, Dynamo, Alternator, Circuit Breaker, Tread & Shred, Iron Engine, Ohm — these are session type brands, not workout names. #{recent_names.any? ? "The user's recent workout names are: #{recent_names.map { |n| "\"#{n}\"" }.join(", ")}. Do NOT reuse any word or theme from these." : ""}
         - Be specific with reps and distances. For WEIGHTS and SPEEDS, use relative effort cues instead of absolute numbers (e.g. "light — sustainable across all reps", "heavy — last 2 reps should be a struggle", "start at your fastest sustainable pace"). Only use specific weights if the athlete has known working weights in their Athlete Context
         - Rep counts should be clean numbers (even or multiples of 5)
@@ -997,7 +1003,7 @@ class WorkoutLLMGenerator
     training_rule       = training_rep_rule
     race_sim_rule       = race_simulation_rule
     func_muscle_rule    = functional_muscle_rule
-    fm_archetype        = fm_session_archetype
+    fm_blocks           = fm_select_metabolic_blocks
     equipment_rule      = build_equipment_rule
     station_rule    = if selected_stations
       "- ANCHOR MOVEMENTS: #{selected_stations.join(", ")} must be central to the main set. Complement them with toolkit exercises from the sport context — create a complete, varied workout, not a drill of the anchor movements repeated in every section."
@@ -1008,7 +1014,7 @@ class WorkoutLLMGenerator
     sections << <<~RULES
       Use the create_workout tool. Requirements:
       #{race_sim_rule}
-      #{fm_archetype}
+      #{fm_blocks}
       #{func_muscle_rule}
       #{structure_rule}
       #{station_rule}
@@ -1051,8 +1057,11 @@ class WorkoutLLMGenerator
           - INVALID: using ladder format for treadmill speed/pace changes — speeds are not reps or distances. For treadmill pace work (speed ladders, fartlek, pace builds), use format: straight with a single exercise. Protocol: describe the pattern using RELATIVE effort cues, not absolute speeds. E.g. "Start at your fastest sustainable pace, drop 0.5 km/h each minute with 1 min easy jog between" or "Build from easy jog to sprint over 5 rounds, adding 0.5 km/h each round". Set duration_s for the total time. NEVER prescribe absolute treadmill speeds — athletes vary hugely. Use cues like "easy jog", "moderate pace", "hard effort", "sprint", "fastest sustainable pace". ONE exercise only — do not add a separate recovery jog exercise.
         * straight — fixed sets with rest. Use for simple warm-ups or isolated single exercises.
         * matrix — progressive exercise combinations. List 3–5 exercises in order. The section builds up then strips back: for 3 exercises: A, A+B, A+B+C, B+C, C. For 4: A, A+B, A+B+C, A+B+C+D, B+C+D, C+D, D. For 5: A, A+B, A+B+C, A+B+C+D, A+B+C+D+E, B+C+D+E, C+D+E, D+E, E. IMPORTANT: all exercises must use the same metric — either all reps (same count each) or all duration_s (same seconds each). Prefer duration_s: 30 for each exercise most of the time — this is the most common Metafit style. Set rest_secs for the rest between each combination (typically 30–60s).
+      - PROGRAMMING PROTOCOLS — use these regularly for variety. They produce exciting, well-structured sessions that athletes love:
+        * SWITCHBACK LADDER: Pair a cardio machine with a functional movement. One starts high and decreases while the other starts low and increases — they "switch" across 4 rounds, so the athlete gets 100 reps/cals of each. E.g. "Row 40 cal → 10 Slams → Row 30 cal → 20 Slams → Row 20 cal → 30 Slams → Row 10 cal → 40 Slams". Great pairings: Row + KB Swings, Assault Bike + Thrusters, SkiErg + Wall Balls, Row + Slams, Assault Bike + Devil Press. Scale the starting point: 50/10, 40/10, or 30/10 depending on athlete level and session intensity. Represent as for_time with rounds: 1 — list each step as a separate exercise entry with its own target (this is the ONE case where repeating an exercise name is allowed, because each entry has a different rep/cal target). Name exercises distinctly: e.g. "Row", "Slams", "Row", "Slams" with calories/reps set differently on each.
+        * DESCENDING CLUSTER: 3 compound exercises performed at decreasing rep counts across rounds — e.g. 20 reps of each, then 10 reps of each, then 5 reps of each. Each cluster should take about 2 minutes. Use ladder format: start: 20, end: 5, step: 5 (gives 20→15→10→5, four rungs of all 3 exercises). Great for: thrusters + box jumps + burpees, KB swings + push-ups + air squats, wall balls + slams + devil press. Pair well with an EMOM time structure (every 2 mins) by using rest_between_rungs: 30–60 to fill the window.
       - EXERCISE VARIETY ACROSS THE SESSION: never use the same base movement in more than one section. If Back Squat appears in one section, do NOT use Back Squat (or Paused Back Squat, or any squat variation on a barbell) in another section — pick a different compound like Front Squat, Deadlift, or Overhead Press instead. The whole session should expose the athlete to as many different movement patterns as possible.
-      - NEVER repeat the same exercise as multiple entries in the exercises array. This is a critical mistake — do NOT list "Bench Press (Set 1)", "Bench Press (Set 2)", "Bench Press (Set 3)" as three separate entries. Instead, use a single entry and set rounds: 3 on the section. Notes like "Set 1:", "Set 2:" in exercise notes are forbidden.
+      - NEVER repeat the same exercise as multiple entries in the exercises array — UNLESS you are building a Switchback Ladder (see protocols above), where each entry has a different rep/cal target. Outside of switchback ladders, this is always a mistake. Do NOT list "Bench Press (Set 1)", "Bench Press (Set 2)" etc. — use rounds on the section instead.
       - SINGLE-EXERCISE SECTIONS are valid and often better than circuits, especially for strength and power work. A section with just one exercise is perfectly correct: e.g. '5 × 5 Deadlift (heavy)', 'EMOM 10: 8 Thrusters', '4 × 8 Romanian Deadlift'. Do not feel obligated to bundle every movement into a multi-exercise circuit. HOWEVER: a single-exercise section MUST always use multiple sets (rounds: 3 minimum) or a timed modality (emom/for_time). BANNED: a section with 1 exercise and rounds ≤ 2 (or no rounds). This is always wrong. Every section must represent real training volume, not a single isolated set. ALSO BANNED: AMRAP with fewer than 3 exercises — an AMRAP needs variety to cycle through.
       - NEVER describe the real programming in the notes instead of the structure. If you want 5 × 60m sprints, set rounds: 5 and distance_m: 60 — do NOT set rounds: 1 with "5 × 60m sprints" in the notes. The notes field is ONLY for form cues and intensity guidance (e.g. "explosive hip drive", "keep chest tall", "slow controlled tempo", "moderate weight"). BANNED from notes: number of sets or rounds (use rounds field), rep counts (use reps field), distances (use distance_m field), calorie targets (use calories field), weight amounts (use weight_kg field), descending/ascending patterns (use ladder/mountain format), any description of what the athlete should do structurally. The structure fields must always reflect the actual work — notes just tell the athlete HOW to do it, not WHAT to do.
       - NEVER list the same exercise more than once in a section's exercises array. If you need the same movement repeated (e.g. 5 × 25m Freestyle), use rounds: 5 with a single exercise entry — not 5 separate entries. Duplicate entries are always wrong.
@@ -1322,61 +1331,518 @@ class WorkoutLLMGenerator
     THEME
   end
 
-  # Randomly selects a session archetype for Functional Muscle so the LLM gets
-  # a concrete structural directive rather than being asked to "vary" on its own.
-  # Tabata frequency distribution: 40% = 1, 40% = 2, 15% = 3, 5% = 4.
-  def fm_session_archetype
+  # Cardio machines available for FM block assignment.
+  FM_CARDIO_MACHINES = %w[Row Assault\ Bike SkiErg Jump\ Rope].freeze
+
+  # Structural (non-tabata) blocks for FM sessions with time estimates.
+  FM_STRUCTURAL_BLOCKS = [
+    { key: :continuous_circuit,  label: "Continuous Circuit [A]",  time: nil, needs_machine: true },
+    { key: :interval_circuit,    label: "Interval Circuit [B]",    time: 10,  needs_machine: false },
+    { key: :ladder_10_1,         label: "10-1 Ladder [C]",         time: 12,  needs_machine: false },
+    { key: :cardio_intervals,    label: "Cardio Intervals [D]",    time: 10,  needs_machine: true },
+    { key: :every_2_min_emom,    label: "Every-2-min EMOM [E]",    time: 10,  needs_machine: false },
+    { key: :twenty20,            label: "Twenty20 [F]",            time: 10,  needs_machine: true },
+    { key: :death_race,          label: "Death Race [G]",          time: 8,   needs_machine: false },
+    { key: :bear_mountain,       label: "Bear Mountain [I]",       time: 10,  needs_machine: false },
+    { key: :switchback_ladder,   label: "Switchback Ladder [J]",   time: 10,  needs_machine: true },
+  ].freeze
+
+  # Ruby pre-selects the exact metabolic blocks for FM sessions so the LLM doesn't
+  # default to the same 2-3 block types every time. Returns a directive string.
+  def fm_select_metabolic_blocks
     return nil unless @activity_slug == "functional-muscle"
 
-    roll = rand(100)
-    tabata_count = case roll
-    when  0..34 then 1
-    when 35..69 then 2
-    when 70..82 then 3
-    when 83..87 then 4
-    else             0  # no tabatas — structural variety
+    budget = @duration_mins - 30 # Fixed: 5 warmup + 8 upper + 8 lower + 5 abs + 4 cooldown
+    return nil if budget < 6
+
+    # Tabata count — weighted distribution
+    tabata_count = fm_random_tabata_count
+    tabata_count = [ tabata_count, budget / 6 ].min
+    remaining = budget - (tabata_count * 6)
+
+    # Pre-select CC config in case it's chosen
+    cc_config = FM_CONTINUOUS_CIRCUIT_OPTIONS.sample
+
+    # Build pool with resolved times
+    pool = FM_STRUCTURAL_BLOCKS.map do |b|
+      time = b[:key] == :continuous_circuit ? cc_config[:mins] : b[:time]
+      b.merge(time: time, cc_config: b[:key] == :continuous_circuit ? cc_config : nil)
     end
 
-    archetypes = {
-      0 => [
-        "LADDER DAY — Generate EXACTLY: 10-1 Ladder + Bear Mountain + Continuous Circuit. Total: ~30 min. STOP. No tabatas this session.",
-        "CIRCUIT GRINDER — Generate EXACTLY: Continuous Circuit + Cardio Intervals + Every-2-min EMOM. Total: ~30 min. STOP. No tabatas this session.",
-        "BEAR & INTERVALS — Generate EXACTLY: Bear Mountain + Cardio Intervals + Death Race. Total: ~26 min. STOP. No tabatas this session."
-      ],
-      1 => [
-        "BEAR & LADDER — Generate EXACTLY: Bear Mountain + 10-1 Ladder + 1 tabata. Total: 28 min. STOP. Do not add a continuous circuit or any other block.",
-        "MACHINE DAY — Generate EXACTLY: Continuous Circuit + Cardio Intervals + 1 tabata. Total: ~26 min. STOP. No ladder, no Bear Mountain.",
-        "LADDER & CIRCUIT — Generate EXACTLY: 10-1 Ladder + Continuous Circuit + 1 tabata. Total: ~28 min. STOP. No Bear Mountain."
-      ],
-      2 => [
-        "CIRCUIT & TABATAS — Generate EXACTLY: Continuous Circuit + 2 tabatas. Total: ~24 min. STOP. No ladder, no Bear Mountain.",
-        "BEAR & TABATAS — Generate EXACTLY: Bear Mountain + 2 tabatas. Total: 22 min. STOP. No ladder, no continuous circuit.",
-        "LADDER & TABATAS — Generate EXACTLY: 10-1 Ladder + 2 tabatas. Total: 24 min. STOP. No Bear Mountain, no continuous circuit.",
-        "LADDER & CIRCUIT & TABATAS — Generate EXACTLY: 10-1 Ladder + Continuous Circuit + 2 tabatas. Total: ~28 min. STOP. No Bear Mountain."
-      ],
-      3 => [
-        "LADDER & 3 TABATAS — Generate EXACTLY: 10-1 Ladder + 3 tabatas. Total: 30 min. STOP. No Bear Mountain, no continuous circuit.",
-        "TRIPLE BURN — Generate EXACTLY: Continuous Circuit + 3 tabatas. Total: ~28 min. STOP. No ladder, no Bear Mountain.",
-        "DEATH RACE & 3 TABATAS — Generate EXACTLY: Death Race + 3 tabatas. Total: 26 min. STOP. No ladder, no Bear Mountain."
-      ],
-      4 => [
-        "TABATA HEAVY — Generate EXACTLY: 4 tabatas + 1 small block (death race OR every-2-min EMOM). Total: ~30 min. STOP. No ladder, no Bear Mountain, no continuous circuit."
-      ]
+    # Randomly select structural blocks to fill the budget
+    selected = []
+    pool.shuffle.each do |block|
+      break if remaining < 8
+      next if block[:time] > remaining
+      selected << block
+      remaining -= block[:time]
+    end
+
+    # Ensure at least one structural block — steal a tabata if needed
+    if selected.empty? && tabata_count > 1
+      tabata_count -= 1
+      remaining += 6
+      smallest = pool.select { |b| b[:time] <= remaining }.min_by { |b| b[:time] }
+      if smallest
+        selected << smallest
+        remaining -= smallest[:time]
+      end
+    elsif selected.empty? && remaining >= 8
+      smallest = pool.select { |b| b[:time] <= remaining }.min_by { |b| b[:time] }
+      if smallest
+        selected << smallest
+        remaining -= smallest[:time]
+      end
+    end
+
+    # Combine with tabatas, interleaved
+    tabatas = Array.new(tabata_count) { { key: :tabata, label: "Tabata [H]", time: 6, needs_machine: false } }
+    all_blocks = fm_interleave_blocks(selected, tabatas)
+
+    # Assign cardio machines — each machine used at most once
+    machines = FM_CARDIO_MACHINES.shuffle
+    all_blocks.each do |block|
+      next unless block[:needs_machine]
+      block[:machine] = machines.shift || FM_CARDIO_MACHINES.sample
+    end
+
+    @fm_selected_blocks = all_blocks
+    fm_format_block_directive(all_blocks, budget)
+  end
+
+  def fm_random_tabata_count
+    roll = rand(100)
+    case roll
+    when  0..11 then 0   # 12% — no tabatas, pure structural variety
+    when 12..46 then 1   # 35%
+    when 47..81 then 2   # 35%
+    when 82..94 then 3   # 13%
+    else             4   # 5%
+    end
+  end
+
+  # Spread tabatas evenly among structural blocks so they alternate.
+  def fm_interleave_blocks(structural, tabatas)
+    return tabatas if structural.empty?
+    return structural if tabatas.empty?
+
+    result = []
+    # Alternate: structural, tabata, structural, tabata, ...
+    max = [ structural.size, tabatas.size ].max
+    max.times do |i|
+      result << structural[i] if i < structural.size
+      result << tabatas[i] if i < tabatas.size
+    end
+    result
+  end
+
+  def fm_format_block_directive(blocks, total_budget)
+    lines = blocks.each_with_index.map do |block, i|
+      desc = case block[:key]
+      when :tabata
+        "Tabata — 2 compound exercises (ABABABAB pattern), 4 min"
+      when :continuous_circuit
+        cc = block[:cc_config]
+        "Continuous Circuit — rotating EMOM, #{cc[:mins]} min, #{cc[:exercises]} exercises × #{cc[:rounds]} rounds. Use #{block[:machine]} as the cardio minute"
+      when :interval_circuit
+        "Interval Circuit — rounds format, 5 rounds, 2–3 exercises every 2 min, 10 min"
+      when :ladder_10_1
+        "10-1 Ladder — ladder format, 3 contrasting exercises, start:10 end:1 step:1, ~12 min"
+      when :cardio_intervals
+        "Cardio Intervals — rounds format, 5 rounds, 1 min hard / 1 min rest on #{block[:machine]}, 10 min"
+      when :every_2_min_emom
+        "Every-2-min EMOM — circuit EMOM, 10 min, 3 exercises per 2-min window (15/10/5 or 10/10/10 etc.)"
+      when :twenty20
+        "Twenty20 — rounds format, 5 rounds, 20 cal #{block[:machine]} + 20 reps functional movement, 10 min"
+      when :death_race
+        "Death Race — rounds format, 5 rounds, 15 cal Assault Bike + 10 burpees, 8 min"
+      when :bear_mountain
+        "Bear Mountain — mountain 1-2-3-4-5-4-3-2-1 Bears (clean→press→front squat→press→back squat), 10 min"
+      when :switchback_ladder
+        "Switchback Ladder — for_time, #{block[:machine]} cals + functional movement reps, 40/10→30/20→20/30→10/40, 10 min"
+      end
+      "#{i + 1}. #{desc}"
+    end
+
+    total_time = blocks.sum { |b| b[:time] }
+
+    <<~DIRECTIVE.strip
+      - *** SESSION BLOCKS — THIS IS A HARD REQUIREMENT, NOT A SUGGESTION. You MUST build ALL of these blocks. Skipping any block is a critical failure. Build them in this exact order: ***
+      #{lines.join("\n")}
+      Total metabolic time: ~#{total_time} min (budget: #{total_budget} min). You MUST include ALL #{blocks.size} blocks listed above. Do NOT skip any. Do NOT add extras.
+    DIRECTIVE
+  end
+
+  # ── General format selection for non-FM sessions ──────────────────────────
+  # Ruby picks the format for each main section so the LLM can't default to
+  # the same 2-3 formats every time.
+
+  # Activities where Ruby should NOT pick formats (they have rigid structures).
+  SKIP_FORMAT_SELECTION_SLUGS = %w[functional-muscle tread-shred alternator ohm].freeze
+
+  # Format descriptions injected into the directive.
+  SECTION_FORMAT_DESC = {
+    "amrap"          => "AMRAP — as many rounds as possible in the time cap, 3+ exercises, set duration_mins",
+    "emom_rotating"  => "Rotating EMOM — different exercise each minute cycling through, no reps on exercises, set duration_mins",
+    "emom_circuit"   => "Circuit EMOM — 2-3 exercises done together each minute, rest remainder, set duration_mins",
+    "for_time"       => "For Time — race the clock, set rounds: 3-5, 2-4 exercises",
+    "rounds"         => "Rounds — structured circuit with rest between rounds, set rounds and rest_secs",
+    "tabata"         => "Tabata — 20s on / 10s off × 8, exactly 2 compound exercises",
+    "ladder"         => "Ladder — descending reps (e.g. 10→1), 2-3 exercises sharing the same metric",
+    "mountain"       => "Mountain — ascend then descend reps, great for heavy compound work",
+    "hundred"        => "The Hundred — 100 reps of one exercise for time",
+    "matrix"         => "Matrix — build up then strip back, 3-5 exercises with same metric",
+    "twenty20"       => "Twenty20 — 20 cal cardio machine + 20 reps functional movement × 5 rounds (format: rounds)",
+    "switchback"     => "Switchback Ladder — cardio cals + functional reps trading places: 40/10→30/20→20/30→10/40 (format: for_time, rounds: 1)",
+    "death_race"     => "Death Race — 15 cal Assault Bike + 10 burpees × 5 rounds (format: rounds)",
+  }.freeze
+
+  FINISHER_FORMATS = %w[tabata hundred for_time switchback death_race].freeze
+
+  def select_section_formats
+    return nil if @activity_slug.in?(SKIP_FORMAT_SELECTION_SLUGS)
+
+    affinity = format_affinity_for_activity
+    return nil unless affinity
+
+    # Calculate main section count (mirrors build_session_structure)
+    if skip_warmup_cooldown?
+      main_count = [ 1 + ((@duration_mins - 15) / 15.0).floor, 2 ].max - 2
+      include_finisher = false
+    elsif @duration_mins <= 30
+      main_count = 1
+      include_finisher = true
+    else
+      working_mins = @duration_mins - 10 # 5 warmup + 5 cooldown
+      main_count = [ (working_mins / 15.0).floor, 1 ].max
+      include_finisher = (working_mins - (main_count * 15)) >= 4
+    end
+
+    # Build weighted pool: primary 3×, secondary 1×
+    pool = []
+    affinity[:primary].each do |f|
+      if f == "emom"
+        pool.concat(%w[emom_rotating emom_circuit] * 2) # Split EMOM into both styles
+      else
+        3.times { pool << f }
+      end
+    end
+    affinity[:secondary].each do |f|
+      pool << (f == "emom" ? %w[emom_rotating emom_circuit].sample : f)
+    end
+
+    # Add protocol types if their underlying format is in the pool
+    has_rounds  = (affinity[:primary] + affinity[:secondary]).include?("rounds")
+    has_for_time = (affinity[:primary] + affinity[:secondary]).include?("for_time")
+    if has_rounds
+      pool.push("twenty20", "death_race")
+    end
+    if has_for_time
+      pool.push("switchback")
+    end
+
+    # Pick formats — no two adjacent the same
+    formats = []
+    main_count.times do
+      candidates = pool.reject { |f| f == formats.last }
+      formats << (candidates.any? ? candidates.sample : pool.sample)
+    end
+
+    # Pick finisher
+    finisher = nil
+    if include_finisher
+      finisher_pool = FINISHER_FORMATS.select { |f| pool.include?(f) || SECTION_FORMAT_DESC.key?(f) }
+      finisher = ((finisher_pool - [ formats.last ]).presence || finisher_pool).sample
+    end
+
+    # Assign cardio machines for protocols that need them
+    machines = FM_CARDIO_MACHINES.shuffle
+    machine_for = ->(fmt) {
+      fmt.in?(%w[twenty20 switchback emom_rotating]) ? (machines.shift || FM_CARDIO_MACHINES.sample) : nil
     }
 
-    "- SESSION SHAPE FOR THIS WORKOUT: #{archetypes[tabata_count].sample} Follow this shape while still obeying the full Functional Muscle rules below."
+    # Build directive
+    lines = formats.each_with_index.map do |fmt, i|
+      desc = SECTION_FORMAT_DESC[fmt] || fmt
+      machine = machine_for.call(fmt)
+      machine_note = machine ? " (use #{machine} for the cardio element)" : ""
+      "Main #{i + 1}: #{desc}#{machine_note}"
+    end
+
+    if finisher
+      desc = SECTION_FORMAT_DESC[finisher] || finisher
+      machine = machine_for.call(finisher)
+      machine_note = machine ? " (use #{machine})" : ""
+      lines << "Finisher: #{desc}#{machine_note}"
+    end
+
+    @general_selected_formats = { formats: formats, finisher: finisher }
+
+    <<~DIRECTIVE.strip
+      - *** SECTION FORMATS (pre-selected — you MUST use these exact formats for each main section, do not substitute): ***
+      #{lines.join("\n")}
+      Build each section using the specified format. Choose exercises, names, and rep schemes creatively within each format's rules.
+    DIRECTIVE
+  end
+
+  # After generation, check that non-FM sessions used the pre-selected formats.
+  # Inject Ruby-built sections for any missing formats.
+  def general_enforce_formats(workout_data)
+    return workout_data unless @general_selected_formats
+
+    sections = Array(workout_data.dig("structure", "sections"))
+    main_sections = sections.select { |s| s["category"].in?(%w[main finisher]) }
+    built_formats = main_sections.map { |s| format_key_for(s) }
+
+    expected = @general_selected_formats[:formats].dup
+    expected << @general_selected_formats[:finisher] if @general_selected_formats[:finisher]
+
+    # Find insertion point — before cool-down
+    insert_idx = sections.index { |s| s["category"] == "cool_down" || s["name"].to_s.match?(/cool.?down/i) } || sections.size
+
+    expected.each do |fmt|
+      normalized = normalize_format(fmt)
+      # Check if a section with this format exists
+      if built_formats.include?(normalized)
+        built_formats.delete_at(built_formats.index(normalized))
+        next
+      end
+
+      new_section = build_general_fallback(fmt)
+      next unless new_section
+
+      sections.insert(insert_idx, new_section)
+      insert_idx += 1
+      Rails.logger.info("[Format Enforce] Injected missing format: #{fmt}")
+    end
+
+    workout_data["structure"]["sections"] = sections
+    workout_data
+  end
+
+  private
+
+  def format_key_for(section)
+    fmt = section["format"].to_s
+    if fmt == "emom"
+      section["emom_style"] == "rotating" ? "emom_rotating" : "emom_circuit"
+    elsif fmt == "rounds" && section["exercises"]&.any? { |e| e["calories"] && e["calories"] == 20 } && section["rounds"] == 5
+      "twenty20" # Heuristic: 5 rounds with 20-cal exercise is likely a twenty20
+    elsif fmt == "for_time" && section["rounds"] == 1 && (section["exercises"]&.size || 0) >= 6
+      "switchback" # Heuristic: for_time with 1 round and 6+ exercises is likely switchback
+    else
+      fmt
+    end
+  end
+
+  def normalize_format(fmt)
+    case fmt
+    when "twenty20", "death_race" then "rounds"
+    when "switchback" then "for_time"
+    when "emom_rotating", "emom_circuit" then fmt # Keep split
+    else fmt
+    end
+  end
+
+  def build_general_fallback(fmt)
+    machine = FM_CARDIO_MACHINES.sample
+    movement = FM_FUNCTIONAL_MOVEMENTS.sample
+
+    case fmt
+    when "twenty20"
+      { "name" => "Twenty20", "category" => "main", "format" => "rounds", "rounds" => 5,
+        "exercises" => [
+          { "name" => machine, "calories" => 20, "notes" => "hard sustainable effort" },
+          { "name" => movement, "reps" => 20 }
+        ] }
+    when "switchback"
+      { "name" => "The Switchback", "category" => "main", "format" => "for_time", "rounds" => 1,
+        "exercises" => [
+          { "name" => machine, "calories" => 40 }, { "name" => movement, "reps" => 10 },
+          { "name" => machine, "calories" => 30 }, { "name" => movement, "reps" => 20 },
+          { "name" => machine, "calories" => 20 }, { "name" => movement, "reps" => 30 },
+          { "name" => machine, "calories" => 10 }, { "name" => movement, "reps" => 40 }
+        ] }
+    when "death_race"
+      { "name" => "Death Race", "category" => "main", "format" => "rounds", "rounds" => 5, "rest_secs" => 30,
+        "exercises" => [
+          { "name" => "Assault Bike", "calories" => 15, "notes" => "absolute max effort" },
+          { "name" => "Burpees", "reps" => 10, "notes" => "everything you have" }
+        ] }
+    when "emom_rotating"
+      exercises = ([ machine ] + FM_FUNCTIONAL_MOVEMENTS.sample(2)).map do |name|
+        { "name" => name, "notes" => name == machine ? "steady sustainable effort" : "controlled tempo" }
+      end
+      { "name" => "The Grind Loop", "category" => "main", "format" => "emom", "emom_style" => "rotating",
+        "duration_mins" => 12, "exercises" => exercises }
+    when "emom_circuit"
+      moves = FM_FUNCTIONAL_MOVEMENTS.sample(3)
+      { "name" => "Every Two Minutes", "category" => "main", "format" => "emom", "emom_style" => "circuit",
+        "duration_mins" => 10,
+        "exercises" => moves.each_with_index.map { |m, i| { "name" => m, "reps" => [ 15, 10, 5 ][i] } } }
+    when "ladder"
+      moves = FM_FUNCTIONAL_MOVEMENTS.sample(3)
+      { "name" => "The Descent", "category" => "main", "format" => "ladder",
+        "start" => 10, "end" => 1, "step" => 1, "rest_between_rungs" => 30,
+        "exercises" => moves.map { |m| { "name" => m } } }
+    when "mountain"
+      moves = FM_FUNCTIONAL_MOVEMENTS.sample(2)
+      { "name" => "Peak and Valley", "category" => "main", "format" => "mountain",
+        "start" => 5, "peak" => 15, "end" => 5, "step" => 5,
+        "exercises" => moves.map { |m| { "name" => m } } }
+    when "hundred"
+      { "name" => "The Hundred", "category" => "finisher", "format" => "hundred",
+        "exercises" => [ { "name" => movement, "reps" => 100 } ] }
+    when "tabata"
+      compounds = FM_COMPOUND_EXERCISES.sample(2)
+      { "name" => "The Burner", "category" => "finisher", "format" => "tabata", "duration_mins" => 4,
+        "exercises" => compounds.map { |c| { "name" => c } } }
+    when "amrap"
+      moves = FM_FUNCTIONAL_MOVEMENTS.sample(4)
+      { "name" => "Clock Chaser", "category" => "main", "format" => "amrap", "duration_mins" => 12,
+        "exercises" => moves.map { |m| { "name" => m, "reps" => [ 10, 12, 15, 20 ].sample } } }
+    when "for_time"
+      moves = FM_FUNCTIONAL_MOVEMENTS.sample(3)
+      { "name" => "Race the Clock", "category" => "main", "format" => "for_time", "rounds" => 4,
+        "exercises" => moves.map { |m| { "name" => m, "reps" => [ 10, 15, 20 ].sample } } }
+    when "rounds"
+      moves = FM_FUNCTIONAL_MOVEMENTS.sample(3)
+      { "name" => "The Circuit", "category" => "main", "format" => "rounds", "rounds" => 4, "rest_secs" => 60,
+        "exercises" => moves.map { |m| { "name" => m, "reps" => [ 10, 12, 15 ].sample } } }
+    when "matrix"
+      moves = FM_FUNCTIONAL_MOVEMENTS.sample(4)
+      { "name" => "The Matrix", "category" => "main", "format" => "matrix", "rest_secs" => 30,
+        "exercises" => moves.map { |m| { "name" => m, "duration_s" => 30 } } }
+    end
+  end
+
+  public
+
+  # Block key → format mapping for compliance checking.
+  FM_BLOCK_FORMAT_MAP = {
+    tabata: "tabata", bear_mountain: "mountain", ladder_10_1: "ladder",
+    continuous_circuit: "emom", cardio_intervals: "rounds", every_2_min_emom: "emom",
+    twenty20: "rounds", death_race: "rounds", interval_circuit: "rounds",
+    switchback_ladder: "for_time"
+  }.freeze
+
+  # Exercise pools for building missing blocks in Ruby.
+  FM_FUNCTIONAL_MOVEMENTS = %w[KB\ Swings Thrusters Slams Wall\ Balls Devil\ Press Box\ Jumps Burpees Goblet\ Squats].freeze
+  FM_COMPOUND_EXERCISES = [
+    "Squat Curl and Press", "KB Swing with Side Lunge", "Wood Chop with Reverse Lunge",
+    "Bent Over Row to Deadlift", "Clean and Pivot Press", "Push Up to T-Rotation",
+    "Plate Halo and Twist", "Renegade Row Jump In and Deadlift"
+  ].freeze
+
+  # After LLM generation, check if all requested FM blocks were built.
+  # If any are missing, inject Ruby-generated sections so the workout is complete.
+  def fm_enforce_blocks(workout_data)
+    return workout_data unless @fm_selected_blocks&.any?
+
+    sections = Array(workout_data.dig("structure", "sections"))
+    # Find the insertion point — after warm-up, before strength/abs/cool-down
+    insert_idx = sections.index { |s| s["name"].to_s.match?(/strength/i) } || sections.size
+
+    # Check which blocks the LLM already built (by format)
+    main_sections = sections.select { |s| s["category"] == "main" || s["format"].in?(%w[tabata mountain ladder for_time]) }
+    built_formats = main_sections.map { |s| s["format"] }
+
+    @fm_selected_blocks.each do |block|
+      expected_format = FM_BLOCK_FORMAT_MAP[block[:key]]
+      # Check if this block type exists. For tabatas, count them.
+      if block[:key] == :tabata
+        tabata_count = built_formats.count("tabata")
+        needed_tabatas = @fm_selected_blocks.count { |b| b[:key] == :tabata }
+        next if tabata_count >= needed_tabatas
+      else
+        next if built_formats.include?(expected_format) && block[:key] != :tabata
+      end
+
+      # Build and inject the missing block
+      new_section = fm_build_fallback_section(block)
+      next unless new_section
+
+      sections.insert(insert_idx, new_section)
+      insert_idx += 1
+      built_formats << new_section["format"]
+      Rails.logger.info("[FM Enforce] Injected missing block: #{block[:key]}")
+    end
+
+    workout_data["structure"]["sections"] = sections
+    workout_data
+  end
+
+  def fm_build_fallback_section(block)
+    machine = block[:machine] || "Row"
+    movement = FM_FUNCTIONAL_MOVEMENTS.sample
+
+    case block[:key]
+    when :death_race
+      { "name" => "Death Race", "category" => "main", "format" => "rounds", "rounds" => 5, "rest_secs" => 30,
+        "exercises" => [
+          { "name" => "Assault Bike", "calories" => 15, "notes" => "absolute max effort" },
+          { "name" => "Burpees", "reps" => 10, "notes" => "everything you have" }
+        ] }
+    when :twenty20
+      { "name" => "Twenty20", "category" => "main", "format" => "rounds", "rounds" => 5,
+        "exercises" => [
+          { "name" => machine, "calories" => 20, "notes" => "hard sustainable effort" },
+          { "name" => movement, "reps" => 20 }
+        ] }
+    when :switchback_ladder
+      { "name" => "The Switchback", "category" => "main", "format" => "for_time", "rounds" => 1,
+        "exercises" => [
+          { "name" => machine, "calories" => 40 }, { "name" => movement, "reps" => 10 },
+          { "name" => machine, "calories" => 30 }, { "name" => movement, "reps" => 20 },
+          { "name" => machine, "calories" => 20 }, { "name" => movement, "reps" => 30 },
+          { "name" => machine, "calories" => 10 }, { "name" => movement, "reps" => 40 }
+        ] }
+    when :continuous_circuit
+      cc = block[:cc_config] || { exercises: 3, rounds: 3, mins: 9 }
+      exercises = ([ machine ] + FM_FUNCTIONAL_MOVEMENTS.sample(cc[:exercises] - 1)).map do |name|
+        { "name" => name, "notes" => name == machine ? "steady sustainable effort" : "controlled tempo" }
+      end
+      { "name" => "The Grind Loop", "category" => "main", "format" => "emom", "emom_style" => "rotating",
+        "duration_mins" => cc[:mins], "exercises" => exercises }
+    when :cardio_intervals
+      { "name" => "Cardio Blast", "category" => "main", "format" => "rounds", "rounds" => 5, "rest_secs" => 60,
+        "exercises" => [
+          { "name" => machine, "duration_s" => 60, "notes" => "hard effort — a pace you can barely sustain" }
+        ] }
+    when :every_2_min_emom
+      moves = FM_FUNCTIONAL_MOVEMENTS.sample(3)
+      reps = [ 15, 10, 5 ]
+      { "name" => "The Clock", "category" => "main", "format" => "emom", "emom_style" => "circuit",
+        "duration_mins" => 10,
+        "exercises" => moves.each_with_index.map { |m, i| { "name" => m, "reps" => reps[i] } } }
+    when :interval_circuit
+      moves = FM_FUNCTIONAL_MOVEMENTS.sample(3)
+      { "name" => "The Grinder", "category" => "main", "format" => "rounds", "rounds" => 5,
+        "notes" => "Complete every 2 minutes",
+        "exercises" => moves.map { |m| { "name" => m, "reps" => [ 10, 15, 20 ].sample } } }
+    when :ladder_10_1
+      moves = FM_FUNCTIONAL_MOVEMENTS.sample(3)
+      { "name" => "The Descent", "category" => "main", "format" => "ladder",
+        "start" => 10, "end" => 1, "step" => 1, "rest_between_rungs" => 30,
+        "exercises" => moves.map { |m| { "name" => m } } }
+    when :bear_mountain
+      { "name" => "Bear Ascent", "category" => "main", "format" => "mountain",
+        "start" => 1, "peak" => 5, "end" => 1, "step" => 1,
+        "exercises" => [ { "name" => "Bear", "notes" => "moderate barbell — clean → press → front squat → press → back squat = 1 rep" } ] }
+    when :tabata
+      compounds = FM_COMPOUND_EXERCISES.sample(2)
+      { "name" => [ "The Burner", "Sweat & Twist", "Ignition", "Chaos Round", "Pulse Raiser" ].sample,
+        "category" => "main", "format" => "tabata", "duration_mins" => 4,
+        "exercises" => compounds.map { |c| { "name" => c, "notes" => "light — sustainable across all 8 rounds" } } }
+    end
   end
 
   # Hard rules specific to Functional Muscle sessions.
   def functional_muscle_rule
     return nil unless @activity_slug == "functional-muscle"
 
-    cc = fm_continuous_circuit_config
-
     <<~RULE.strip
       - FUNCTIONAL MUSCLE — IGNORE ALL GENERAL WORKOUT DESIGN INSTINCTS. This is a specific class format. Follow this SESSION ORDER exactly — do not rearrange it:
-
-      *** CONTINUOUS CIRCUIT DURATION FOR THIS SESSION (pre-determined — do not change): #{cc} ***
 
       WEIGHTS: Use effort-based cues so athletes self-select appropriate load. Tabata/metabolic compound exercises: "light — sustainable across all 8 rounds" (notes: "light DB" or "light KB"). Bear Mountain barbell: "moderate — you should complete all reps without form breakdown". Strength sets (5×10): "working weight — the last 2 reps of each set should feel challenging but doable". Do NOT prescribe heavy weights for tabata or metabolic blocks — cue "light" or "moderate" and let the athlete choose. If the athlete has known working weights in their Athlete Context, reference those as a starting point.
 
@@ -1386,27 +1852,9 @@ class WorkoutLLMGenerator
 
       1. WARM-UP (MANDATORY — must be the FIRST section): format: straight, duration_mins: 5. ONE exercise only — pick one at random: "Easy Row" (Rowing Machine), "Easy Ride" (Assault Bike), "Easy Ski" (Ski Erg), or "Easy Rope" (Jump Rope — singles at an easy pace) at easy pace. No mobility, no activation, no circuits. One cardio option, 5 mins. Give it a creative name.
 
-      2. METABOLIC BLOCKS (always before strength): Build the metabolic section according to the SESSION SHAPE given above — it tells you exactly how many tabatas to include. Do not add extra tabatas beyond the count specified.
+      2. METABOLIC BLOCKS (always before strength): Build EVERY SINGLE block listed in SESSION BLOCKS above, in the exact order given. SKIPPING A BLOCK IS A CRITICAL ERROR. If the directive says 4 blocks, you MUST produce 4 metabolic sections. Each block type has rules below — follow them.
 
-        TIME BUDGET — fixed sections consume half the session. You MUST stay within the metabolic budget or the session will run over. Calculate carefully:
-          Fixed sections: Warm-up 5 min + Upper Body Strength 8 min + Lower Body Strength 8 min + Abs 5 min + Cool-down 4 min = 30 min
-          Remaining for ALL metabolic blocks combined (including tabatas): #{@duration_mins - 30} min
-          Each tabata = 4 min. Add up your chosen blocks — total must not exceed #{@duration_mins - 30} min.
-
-        Block time estimates — use these to budget:
-          Tabata [H]: 6 min (4 min work + transitions)
-          Bear Mountain [I]: 10 min
-          10-1 Ladder [C]: 12 min
-          Continuous Circuit [A]: duration_mins as specified above
-          Cardio Intervals [D]: 10 min (5 rounds × 2 min)
-          Every-2-min EMOM [E]: 10 min
-          Death Race [G]: 8 min
-          Interval Circuit [B]: 10 min (5 rounds × 2 min)
-          20-20 Block [F]: 20 min — only suitable for longer sessions (75+ min)
-
-        - OTHER BLOCKS: Choose from [A]–[I] below to fill the session within the time budget. Do NOT always use the continuous circuit block — it should appear in roughly half of sessions at most.
-
-        [A] CONTINUOUS CIRCUIT — format: emom, emom_style: rotating, #{cc}. One cardio option (ski/row/bike/jump rope) + one KB or barbell movement per exercise slot + optionally one abs or bodyweight movement. NO reps, calories, distance, or duration on any exercise — each fills its full minute. Coaching notes only. Do NOT label exercises with minute numbers. For the cardio minute, add a coaching note like "steady sustainable effort" — do not prescribe calorie targets. Jump rope (singles or doubles) is a great cardio option here — vary it with machines.
+        [A] CONTINUOUS CIRCUIT — format: emom, emom_style: rotating. Use the exact duration and exercise count specified in SESSION BLOCKS above. One cardio option (ski/row/bike/jump rope) + one KB or barbell movement per exercise slot + optionally one abs or bodyweight movement. NO reps, calories, distance, or duration on any exercise — each fills its full minute. Coaching notes only. Do NOT label exercises with minute numbers. For the cardio minute, add a coaching note like "steady sustainable effort" — do not prescribe calorie targets. Jump rope (singles or doubles) is a great cardio option here — vary it with machines.
 
         [B] INTERVAL CIRCUIT — format: rounds, rounds: 5. 2–3 exercises performed every 2 minutes (add this to section notes). Include specific reps and weights. E.g. 20 KB swings + 10 slams + 5 thrusters.
 
@@ -1416,9 +1864,11 @@ class WorkoutLLMGenerator
 
         [E] EVERY-2-MIN EMOM — format: emom, emom_style: circuit, duration_mins: 10. ALWAYS exactly 3 exercises done together at the start of every 2-minute window, rest for remainder. Reps are always multiples of 5. MINIMUM 25 total reps across all 3 exercises — never use 5/5/5 or any combination that totals less than 25. Use varied rep schemes: 15/10/5 (descending), 5/10/20 (ascending), 10/10/10 (even), 10/15/5. Total work per round should take 45–60 seconds leaving 60–75 seconds rest. E.g. 5 clean and press + 10 KB swings + 15 box jumps every 2 mins. Or: 10 thrusters + 10 burpees + 20 sit-ups every 2 mins.
 
-        [F] 20-20 BLOCK — format: rounds, rounds: 10. Every 2 mins: hard cardio sprint + 20 reps of a punchy movement (KB swings, slams, jump squats). Use effort cues for the machine: "hard sustainable effort — you need to be ready for the swings". 20-minute total block. Only use for 75+ min sessions.
+        [F] TWENTY20 — format: rounds. 20 calories on a cardio machine followed by 20 reps of a functional movement, repeated. Use 5 rounds (10 min) for standard sessions or 10 rounds (20 min) for 75+ min sessions. Great pairings: Row + KB Swings, Assault Bike + Thrusters, SkiErg + Slams, Assault Bike + Wall Balls, Row + Devil Press. Use effort cues for the machine: "hard sustainable effort — you need to be ready for the swings". This is a classic conditioning protocol — use it regularly.
 
-        [G] DEATH RACE — format: rounds, rounds: 5. Bike sprint (30–45 seconds all-out) + 10 burpees. Everything you have.
+        [G] DEATH RACE — format: rounds, rounds: 5. 15 cal Assault Bike (all-out) + 10 burpees. Everything you have.
+
+        [J] SWITCHBACK LADDER — format: for_time, rounds: 1. Pair a cardio machine (calories) with a functional movement (reps). One starts high and decreases, the other starts low and increases: e.g. 40 cal Row + 10 KB Swings → 30 cal + 20 reps → 20 cal + 30 reps → 10 cal + 40 reps. Total = 100 cals + 100 reps. Scale starting point to session intensity: 50/10 (hard), 40/10 (standard), 30/10 (lighter). List each step as a separate exercise entry with its own cal/rep target. Great pairings: Row + KB Swings, Assault Bike + Thrusters, SkiErg + Wall Balls, Row + Slams. Takes ~10 min.
 
         [H] TABATA — Use 2 exercises per tabata (ABABABAB = 4 rounds each) — this is the standard format. Standard tabatas: EVERY exercise MUST be a compound (two movements fused into one flowing rep, name must contain "and", "with", "to", or "+"). Each tabata gets DIFFERENT compound pairs — never repeat the same compound in one session. For each tabata, balance PROVEN compounds from the context file with NEWLY INVENTED ones — aim for roughly one known and one new per tabata pair. Pick from proven ones like "Squat Curl and Press", "KB Swing with Side Lunge", "Wood Chop with Reverse Lunge", "Bent Over Row to Deadlift", "Clean and Pivot Press", "Hop onto Box and Side Raise", "Renegade Row Jump In and Deadlift", "Plate Halo and Twist", "Push Up to T-Rotation", etc. For invented ones, fuse any two movements from contrasting muscle groups into a single flowing rep. CARDIO MACHINE TABATA (use occasionally — at most once per session): one of the two exercises may be a cardio machine (Assault Bike, Rowing Machine, or Ski Erg) — pair it with a compound movement. Do NOT set reps or calories on the machine exercise — it's a 20s burst, the interval is the constraint. Single compound movements alone (burpees, KB swings, mountain climbers without a second movement) are never acceptable.
 
@@ -1444,7 +1894,7 @@ class WorkoutLLMGenerator
 
       GOAL ACCURACY (CRITICAL): The goal/description must ONLY reference formats and blocks that ACTUALLY APPEAR in the workout sections. If the session does not contain a mountain, do not mention "mountain". If it has no ladder, do not mention "ladder". If it has no circuit, do not mention "circuit". The goal describes what IS in the workout, not what could have been.
 
-      MINIMUM METABOLIC CONTENT: Follow the SESSION SHAPE directive above exactly — it defines exactly which blocks to include. For standard (non-themed) sessions, always include at least one structural block (continuous circuit, ladder, bear mountain, cardio intervals, death race, every-2-min EMOM, or 20-20) alongside any tabatas. A session with only tabatas and strength is too light unless the SESSION SHAPE explicitly specifies an all-tabata theme.
+      *** FINAL CHECK: Count your metabolic sections. They MUST match the SESSION BLOCKS list exactly — same count, same types, same order. If the list says 4 blocks, you need 4 metabolic sections. Missing blocks = failed workout. ***
     RULE
   end
 
