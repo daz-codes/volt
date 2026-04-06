@@ -99,7 +99,7 @@ module Workout::Exportable
       footer_y = CANVAS_HEIGHT - 80
       commands.push("-fill", BORDER_GRAY, "-draw", "rectangle 56,#{footer_y - 20} #{CANVAS_WIDTH - 56},#{footer_y - 19}")
       commands.push("-fill", MID_GRAY, "-pointsize", "24",
-                    "-gravity", "NorthEast", "-annotate", "+56+#{footer_y + 14}", safe("made by VOLT \u00B7 energise your workout"))
+                    "-gravity", "NorthEast", "-annotate", "+56+#{footer_y + 14}", safe("energise your workout"))
 
       commands.push(tempfile.path)
 

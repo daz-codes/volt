@@ -318,7 +318,7 @@ class WorkoutsController < ApplicationController
     else
       activity = Activity.find_by(name: "Volt Octathlon")
       workout = Current.user.workouts.create!(
-        name: "The Full Volt Octathlon", activity: activity, duration_mins: 35,
+        name: "Volt Octathlon", activity: activity, duration_mins: 35,
         status: "active", structure: structure, original_structure: structure
       )
     end
