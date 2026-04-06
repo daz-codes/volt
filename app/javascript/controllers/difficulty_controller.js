@@ -1,12 +1,8 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["dot", "downBtn", "upBtn", "hiddenField"]
+  static targets = ["dot", "downBtn", "upBtn"]
   static values = { level: Number, workoutId: Number }
-
-  connect() {
-    this.updateUI()
-  }
 
   levelValueChanged() {
     this.updateUI()
