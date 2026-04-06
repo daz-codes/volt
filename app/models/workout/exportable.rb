@@ -145,13 +145,15 @@ module Workout::Exportable
         end
         metric = parts.join(" \u00B7 ")
 
-        if is_ladder
+        line = if is_ladder
           ex_name
         elsif metric.present?
           "#{metric} #{ex_name}"
         else
           ex_name
         end
+        line += " \u00B7 #{ex["notes"]}" if ex["notes"].present?
+        line
       end
 
       { label: label, description: description, exercises: exercises }
@@ -198,7 +200,7 @@ module Workout::Exportable
     when "matrix"
       [ "Matrix", "Build up, strip back" ]
     else
-      [ nil, nil ]
+      [ section["name"], nil ]
     end
   end
 
