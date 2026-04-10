@@ -49,7 +49,7 @@
     <% end %>
   </div>
 
-  <% is_ladder = %w[ladder mountain].include?(section["format"].to_s) %>
+  <% is_ladder = %w[ladder mountain switchback].include?(section["format"].to_s) %>
   <% has_metric = !is_ladder && (exercise["distance_m"] || exercise["duration_s"] || exercise["weight_kg"] ||
                   (!is_tabata && (exercise["calories"] || exercise["reps"]))) %>
   <% if has_metric || (!is_ladder && exercise["notes"].present?) %>

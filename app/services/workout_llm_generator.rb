@@ -429,7 +429,7 @@ class WorkoutLLMGenerator
                 properties: {
                   name:               { type: "string" },
                   category:           { type: "string", enum: %w[warm_up main finisher cool_down], description: "Section purpose: warm_up for warm-up/activation/mobility, main for primary working blocks, finisher for short burners at the end (tabata, hundred), cool_down for stretching/recovery/decompression" },
-                  format:             { type: "string", enum: %w[straight amrap rounds emom tabata for_time ladder mountain matrix hundred], description: "straight=sets with rest, rounds=multiple rounds of the same set, amrap=as many rounds as possible in a time cap, emom=every minute on the minute, tabata=20s work/10s rest×8, for_time=complete prescribed reps/distance as fast as possible (record finishing time), ladder/mountain=reps/distance change each round, matrix=progressive exercise combination (add then remove exercises each round: A → A+B → A+B+C → B+C → C), hundred=100 reps of a single exercise for time (The Centurion)" },
+                  format:             { type: "string", enum: %w[straight amrap rounds emom tabata for_time ladder mountain matrix hundred switchback], description: "straight=sets with rest, rounds=multiple rounds of the same set, amrap=as many rounds as possible in a time cap, emom=every minute on the minute, tabata=20s work/10s rest×8, for_time=complete prescribed reps/distance as fast as possible (record finishing time), ladder/mountain=reps/distance change each round, matrix=progressive exercise combination (add then remove exercises each round: A → A+B → A+B+C → B+C → C), hundred=100 reps of a single exercise for time (The Centurion), switchback=Up & Down Ladder pairing cardio (calories) with a functional movement (reps) where the cardio counts down and the functional counts up — exactly 2 exercises, set start/end/step fields on the section" },
                   duration_mins:      { type: "integer" },
                   rounds:             { type: "integer" },
                   rest_secs:          { type: "integer", description: "Rest in seconds after each round. Must be 30, 45, or 60 only." },
@@ -1058,10 +1058,10 @@ class WorkoutLLMGenerator
         * straight — fixed sets with rest. Use for simple warm-ups or isolated single exercises.
         * matrix — progressive exercise combinations. List 3–5 exercises in order. The section builds up then strips back: for 3 exercises: A, A+B, A+B+C, B+C, C. For 4: A, A+B, A+B+C, A+B+C+D, B+C+D, C+D, D. For 5: A, A+B, A+B+C, A+B+C+D, A+B+C+D+E, B+C+D+E, C+D+E, D+E, E. IMPORTANT: all exercises must use the same metric — either all reps (same count each) or all duration_s (same seconds each). Prefer duration_s: 30 for each exercise most of the time — this is the most common Metafit style. Set rest_secs for the rest between each combination (typically 30–60s).
       - PROGRAMMING PROTOCOLS — use these regularly for variety. They produce exciting, well-structured sessions that athletes love:
-        * SWITCHBACK LADDER: Pair a cardio machine with a functional movement. One starts high and decreases while the other starts low and increases — they "switch" across 4 rounds, so the athlete gets 100 reps/cals of each. E.g. "Row 40 cal → 10 Slams → Row 30 cal → 20 Slams → Row 20 cal → 30 Slams → Row 10 cal → 40 Slams". Great pairings: Row + KB Swings, Assault Bike + Thrusters, SkiErg + Wall Balls, Row + Slams, Assault Bike + Devil Press. Scale the starting point: 50/10, 40/10, or 30/10 depending on athlete level and session intensity. Represent as for_time with rounds: 1 — list each step as a separate exercise entry with its own target (this is the ONE case where repeating an exercise name is allowed, because each entry has a different rep/cal target). Name exercises distinctly: e.g. "Row", "Slams", "Row", "Slams" with calories/reps set differently on each.
+        * UP & DOWN LADDER (switchback): Pair a cardio machine with a functional weighted movement — exactly 2 exercises, cardio FIRST and functional SECOND. The cardio counts DOWN in calories (40→30→20→10) while the functional counts UP in reps (10→20→30→40) — they "switch" so the athlete gets 100 cal + 100 reps. Use format: switchback with start: 40, end: 10, step: 10. Do NOT list each step as a separate exercise, and do NOT set calories/reps on the individual exercises — the start/end/step fields on the section carry the ladder values. Great pairings: Row + KB Swings, Assault Bike + Thrusters, SkiErg + Wall Balls, Row + Slams, Assault Bike + Devil Press. Scale the starting point: 50/10 (hard), 40/10 (standard), 30/10 (lighter). Section name should be "Up & Down Ladder" or a creative variation.
         * DESCENDING CLUSTER: 3 compound exercises performed at decreasing rep counts across rounds — e.g. 20 reps of each, then 10 reps of each, then 5 reps of each. Each cluster should take about 2 minutes. Use ladder format: start: 20, end: 5, step: 5 (gives 20→15→10→5, four rungs of all 3 exercises). Great for: thrusters + box jumps + burpees, KB swings + push-ups + air squats, wall balls + slams + devil press. Pair well with an EMOM time structure (every 2 mins) by using rest_between_rungs: 30–60 to fill the window.
       - EXERCISE VARIETY ACROSS THE SESSION: never use the same base movement in more than one section. If Back Squat appears in one section, do NOT use Back Squat (or Paused Back Squat, or any squat variation on a barbell) in another section — pick a different compound like Front Squat, Deadlift, or Overhead Press instead. The whole session should expose the athlete to as many different movement patterns as possible.
-      - NEVER repeat the same exercise as multiple entries in the exercises array — UNLESS you are building a Switchback Ladder (see protocols above), where each entry has a different rep/cal target. Outside of switchback ladders, this is always a mistake. Do NOT list "Bench Press (Set 1)", "Bench Press (Set 2)" etc. — use rounds on the section instead.
+      - NEVER repeat the same exercise as multiple entries in the exercises array — this is always a mistake. Do NOT list "Bench Press (Set 1)", "Bench Press (Set 2)" etc. — use rounds on the section instead.
       - SINGLE-EXERCISE SECTIONS are valid and often better than circuits, especially for strength and power work. A section with just one exercise is perfectly correct: e.g. '5 × 5 Deadlift (heavy)', 'EMOM 10: 8 Thrusters', '4 × 8 Romanian Deadlift'. Do not feel obligated to bundle every movement into a multi-exercise circuit. HOWEVER: a single-exercise section MUST always use multiple sets (rounds: 3 minimum) or a timed modality (emom/for_time). BANNED: a section with 1 exercise and rounds ≤ 2 (or no rounds). This is always wrong. Every section must represent real training volume, not a single isolated set. ALSO BANNED: AMRAP with fewer than 3 exercises — an AMRAP needs variety to cycle through.
       - NEVER describe the real programming in the notes instead of the structure. If you want 5 × 60m sprints, set rounds: 5 and distance_m: 60 — do NOT set rounds: 1 with "5 × 60m sprints" in the notes. The notes field is ONLY for form cues and intensity guidance (e.g. "explosive hip drive", "keep chest tall", "slow controlled tempo", "moderate weight"). BANNED from notes: number of sets or rounds (use rounds field), rep counts (use reps field), distances (use distance_m field), calorie targets (use calories field), weight amounts (use weight_kg field), descending/ascending patterns (use ladder/mountain format), any description of what the athlete should do structurally. The structure fields must always reflect the actual work — notes just tell the athlete HOW to do it, not WHAT to do.
       - NEVER list the same exercise more than once in a section's exercises array. If you need the same movement repeated (e.g. 5 × 25m Freestyle), use rounds: 5 with a single exercise entry — not 5 separate entries. Duplicate entries are always wrong.
@@ -1459,7 +1459,7 @@ class WorkoutLLMGenerator
       when :bear_mountain
         "Bear Mountain — mountain 1-2-3-4-5-4-3-2-1 Bears (clean→press→front squat→press→back squat), 10 min"
       when :switchback_ladder
-        "Switchback Ladder — for_time, #{block[:machine]} cals + functional movement reps, 40/10→30/20→20/30→10/40, 10 min"
+        "Up & Down Ladder — format: switchback, start: 40, end: 10, step: 10. Exactly 2 exercises: #{block[:machine]} (cardio, first) paired with a functional movement (second). The cardio counts down (40→30→20→10 cal) while the functional counts up (10→20→30→40 reps). 10 min"
       end
       "#{i + 1}. #{desc}"
     end
@@ -1493,7 +1493,7 @@ class WorkoutLLMGenerator
     "hundred"        => "The Hundred — 100 reps of one exercise for time",
     "matrix"         => "Matrix — build up then strip back, 3-5 exercises with same metric",
     "twenty20"       => "Twenty20 — 20 cal cardio machine + 20 reps functional movement × 5 rounds (format: rounds)",
-    "switchback"     => "Switchback Ladder — cardio cals + functional reps trading places: 40/10→30/20→20/30→10/40 (format: for_time, rounds: 1)",
+    "switchback"     => "Up & Down Ladder — cardio (calories) paired with functional movement (reps), ladder values trade places: 40/10→30/20→20/30→10/40 (format: switchback, start: 40, end: 10, step: 10, exactly 2 exercises — cardio first, functional second)",
     "death_race"     => "Death Race — 15 cal Assault Bike + 10 burpees × 5 rounds (format: rounds)",
   }.freeze
 
@@ -1628,8 +1628,6 @@ class WorkoutLLMGenerator
       section["emom_style"] == "rotating" ? "emom_rotating" : "emom_circuit"
     elsif fmt == "rounds" && section["exercises"]&.any? { |e| e["calories"] && e["calories"] == 20 } && section["rounds"] == 5
       "twenty20" # Heuristic: 5 rounds with 20-cal exercise is likely a twenty20
-    elsif fmt == "for_time" && section["rounds"] == 1 && (section["exercises"]&.size || 0) >= 6
-      "switchback" # Heuristic: for_time with 1 round and 6+ exercises is likely switchback
     else
       fmt
     end
@@ -1638,7 +1636,6 @@ class WorkoutLLMGenerator
   def normalize_format(fmt)
     case fmt
     when "twenty20", "death_race" then "rounds"
-    when "switchback" then "for_time"
     when "emom_rotating", "emom_circuit" then fmt # Keep split
     else fmt
     end
@@ -1656,12 +1653,11 @@ class WorkoutLLMGenerator
           { "name" => movement, "reps" => 20 }
         ] }
     when "switchback"
-      { "name" => "The Switchback", "category" => "main", "format" => "for_time", "rounds" => 1,
+      { "name" => "Up & Down Ladder", "category" => "main", "format" => "switchback",
+        "start" => 40, "end" => 10, "step" => 10,
         "exercises" => [
-          { "name" => machine, "calories" => 40 }, { "name" => movement, "reps" => 10 },
-          { "name" => machine, "calories" => 30 }, { "name" => movement, "reps" => 20 },
-          { "name" => machine, "calories" => 20 }, { "name" => movement, "reps" => 30 },
-          { "name" => machine, "calories" => 10 }, { "name" => movement, "reps" => 40 }
+          { "name" => machine },
+          { "name" => movement }
         ] }
     when "death_race"
       { "name" => "Death Race", "category" => "main", "format" => "rounds", "rounds" => 5, "rest_secs" => 30,
@@ -1723,7 +1719,7 @@ class WorkoutLLMGenerator
     tabata: "tabata", bear_mountain: "mountain", ladder_10_1: "ladder",
     continuous_circuit: "emom", cardio_intervals: "rounds", every_2_min_emom: "emom",
     twenty20: "rounds", death_race: "rounds", interval_circuit: "rounds",
-    switchback_ladder: "for_time"
+    switchback_ladder: "switchback"
   }.freeze
 
   # Exercise pools for building missing blocks in Ruby.
@@ -1790,12 +1786,11 @@ class WorkoutLLMGenerator
           { "name" => movement, "reps" => 20 }
         ] }
     when :switchback_ladder
-      { "name" => "The Switchback", "category" => "main", "format" => "for_time", "rounds" => 1,
+      { "name" => "Up & Down Ladder", "category" => "main", "format" => "switchback",
+        "start" => 40, "end" => 10, "step" => 10,
         "exercises" => [
-          { "name" => machine, "calories" => 40 }, { "name" => movement, "reps" => 10 },
-          { "name" => machine, "calories" => 30 }, { "name" => movement, "reps" => 20 },
-          { "name" => machine, "calories" => 20 }, { "name" => movement, "reps" => 30 },
-          { "name" => machine, "calories" => 10 }, { "name" => movement, "reps" => 40 }
+          { "name" => machine },
+          { "name" => movement }
         ] }
     when :continuous_circuit
       cc = block[:cc_config] || { exercises: 3, rounds: 3, mins: 9 }
@@ -1868,7 +1863,7 @@ class WorkoutLLMGenerator
 
         [G] DEATH RACE — format: rounds, rounds: 5. 15 cal Assault Bike (all-out) + 10 burpees. Everything you have.
 
-        [J] SWITCHBACK LADDER — format: for_time, rounds: 1. Pair a cardio machine (calories) with a functional movement (reps). One starts high and decreases, the other starts low and increases: e.g. 40 cal Row + 10 KB Swings → 30 cal + 20 reps → 20 cal + 30 reps → 10 cal + 40 reps. Total = 100 cals + 100 reps. Scale starting point to session intensity: 50/10 (hard), 40/10 (standard), 30/10 (lighter). List each step as a separate exercise entry with its own cal/rep target. Great pairings: Row + KB Swings, Assault Bike + Thrusters, SkiErg + Wall Balls, Row + Slams. Takes ~10 min.
+        [J] UP & DOWN LADDER — format: switchback, start: 40, end: 10, step: 10. Pair a cardio machine with a functional movement — exactly 2 exercises, cardio FIRST and functional SECOND. The cardio counts DOWN in calories (40→30→20→10) while the functional counts UP in reps (10→20→30→40). Total = 100 cal + 100 reps. Do NOT list each step as a separate exercise entry — the start/end/step fields on the section define the whole ladder. Do NOT set calories on the cardio exercise or reps on the functional exercise — the ladder fields carry those values. Scale starting point to session intensity: 50/10 (hard), 40/10 (standard), 30/10 (lighter). Great pairings: Row + KB Swings, Assault Bike + Thrusters, SkiErg + Wall Balls, Row + Slams. Takes ~10 min. Section name should be "Up & Down Ladder" or a creative variation.
 
         [H] TABATA — Use 2 exercises per tabata (ABABABAB = 4 rounds each) — this is the standard format. Standard tabatas: EVERY exercise MUST be a compound (two movements fused into one flowing rep, name must contain "and", "with", "to", or "+"). Each tabata gets DIFFERENT compound pairs — never repeat the same compound in one session. For each tabata, balance PROVEN compounds from the context file with NEWLY INVENTED ones — aim for roughly one known and one new per tabata pair. Pick from proven ones like "Squat Curl and Press", "KB Swing with Side Lunge", "Wood Chop with Reverse Lunge", "Bent Over Row to Deadlift", "Clean and Pivot Press", "Hop onto Box and Side Raise", "Renegade Row Jump In and Deadlift", "Plate Halo and Twist", "Push Up to T-Rotation", etc. For invented ones, fuse any two movements from contrasting muscle groups into a single flowing rep. CARDIO MACHINE TABATA (use occasionally — at most once per session): one of the two exercises may be a cardio machine (Assault Bike, Rowing Machine, or Ski Erg) — pair it with a compound movement. Do NOT set reps or calories on the machine exercise — it's a 20s burst, the interval is the constraint. Single compound movements alone (burpees, KB swings, mountain climbers without a second movement) are never acceptable.
 

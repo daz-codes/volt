@@ -7,7 +7,7 @@ module Workout::Scalable
   }.freeze
 
   # Formats that should never be deterministically scaled
-  UNSCALED_FORMATS = %w[tabata hundred matrix].freeze
+  UNSCALED_FORMATS = %w[tabata hundred matrix switchback].freeze
 
   # Section categories that should never be scaled
   UNSCALED_CATEGORIES = %w[warm_up cool_down].freeze

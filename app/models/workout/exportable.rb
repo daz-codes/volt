@@ -121,7 +121,7 @@ module Workout::Exportable
 
     main.map do |section|
       fmt = section["format"].to_s
-      is_ladder = %w[ladder mountain].include?(fmt)
+      is_ladder = %w[ladder mountain switchback].include?(fmt)
       ex_count = Array(section["exercises"]).size
 
       label, description = format_label_and_description(section, fmt, ex_count)
@@ -143,15 +143,13 @@ module Workout::Exportable
         end
         metric = parts.join(" \u00B7 ")
 
-        line = if is_ladder
+        if is_ladder
           ex_name
         elsif metric.present?
           "#{metric} #{ex_name}"
         else
           ex_name
         end
-        line += " \u00B7 #{ex["notes"]}" if ex["notes"].present?
-        line
       end
 
       { label: label, description: description, exercises: exercises }
@@ -193,6 +191,9 @@ module Workout::Exportable
     when "mountain"
       seq = mountain_sequence(section["start"], section["peak"], section["end"], section["step"])
       [ "Mountain", "#{seq} reps of each exercise" ]
+    when "switchback"
+      down_seq, up_seq = switchback_sequences(section["start"], section["end"], section["step"])
+      [ "Up & Down Ladder", "#{down_seq} cal \u00B7 #{up_seq} reps" ]
     when "hundred"
       [ "100 Reps", "For time" ]
     when "matrix"
@@ -213,6 +214,15 @@ module Workout::Exportable
     up = sv.step(pk, st.abs).to_a
     down = (pk - st.abs).step(ev, -st.abs).to_a
     (up + down).join("\u2013")
+  end
+
+  def switchback_sequences(start_val, end_val, step)
+    sv = start_val.to_i.nonzero? || 40
+    ev = end_val.to_i.nonzero?   || 10
+    st = step.to_i.nonzero?      || 10
+    down = sv.step(ev, -st.abs).to_a
+    up   = down.reverse
+    [ down.join("\u00B7"), up.join("\u00B7") ]
   end
 
   def resolve_font

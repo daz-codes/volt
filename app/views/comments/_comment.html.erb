@@ -10,7 +10,7 @@
     <%# Edit mode %>
     <% if comment.user == Current.user %>
       <div class="hidden mt-1" data-inline-edit-target="form">
-        <%= form_with url: workout_log_comment_path(comment.workout_log, comment), method: :patch do |f| %>
+        <%= form_with model: comment, url: workout_log_comment_path(comment.workout_log, comment), method: :patch do |f| %>
           <%= f.text_area :body, value: comment.body, rows: 2,
               class: "w-full bg-zinc-700 border border-zinc-600 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-lime-400 resize-none",
               data: { inline_edit_target: "input", action: "keydown->inline-edit#keydown" } %>

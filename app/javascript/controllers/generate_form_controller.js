@@ -53,6 +53,7 @@ export default class extends Controller {
       return
     }
 
+    document.getElementById("scan-loading-overlay")?.classList.remove("hidden")
     event.target.closest("form").requestSubmit()
   }
 }

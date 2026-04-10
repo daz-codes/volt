@@ -111,7 +111,7 @@ module Scannable
       categories = sections.map { |s| s["category"].to_s.downcase }
 
       unless categories.any? { |c| c == "warm_up" }
-        warmup = %w[Easy Row Easy Ride Easy Ski Easy Rope].sample
+        warmup = [ "Easy Row", "Easy Ride", "Easy Ski", "Easy Rope" ].sample
         sections.unshift({
           "name" => "Warm-Up",
           "category" => "warm_up",

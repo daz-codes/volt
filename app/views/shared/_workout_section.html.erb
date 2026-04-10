@@ -22,6 +22,8 @@
 
 <%# Build sequence string for ladder/mountain sections %>
 <% ladder_seq_str = nil
+   switchback_down_str = nil
+   switchback_up_str = nil
    if %w[ladder mountain].include?(sec_format)
      step = [section["step"].to_f, 1.0].max
      varies_lbl = { "reps" => "reps", "calories" => "cal", "kg" => "kg", "distance_m" => "m" }.fetch(section["varies"].to_s, section["varies"].to_s)
@@ -42,6 +44,15 @@
      vals = vals.map { |v| v == v.to_i ? v.to_i : v }
      seq = vals.size <= 10 ? vals.join(" · ") : "#{vals.first(3).join(" · ")} · … · #{vals.last}"
      ladder_seq_str = "#{seq} #{varies_lbl}".strip
+   elsif sec_format == "switchback"
+     sb_start = section["start"].to_i.nonzero? || 40
+     sb_end   = section["end"].to_i.nonzero?   || 10
+     sb_step  = section["step"].to_i.nonzero?  || 10
+     down_vals = []
+     v = sb_start; while v >= sb_end; down_vals << v; v -= sb_step; end
+     up_vals = down_vals.reverse
+     switchback_down_str = down_vals.join(" · ")
+     switchback_up_str   = up_vals.join(" · ")
    end %>
 
 <%# fmt_label = bold green modality name, fmt_detail = gray italic description, fmt_interval = bold green suffix (tabata only) %>
@@ -90,6 +101,9 @@
      parts = [ ladder_seq_str ]
      parts << "#{section["rest_between_rungs"]}s rest between rungs" if section["rest_between_rungs"].to_i > 0
      [sec_format.capitalize, parts.compact.join(" · ").presence]
+   when "switchback"
+     detail = "#{switchback_down_str} cal · #{switchback_up_str} reps"
+     ["Up & Down Ladder", detail]
    when "matrix"
      rest = section["rest_secs"].to_i > 0 ? "#{section["rest_secs"]}s rest between rounds" : nil
      ["Matrix", rest]
