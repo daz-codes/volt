@@ -17,16 +17,19 @@ module Workout::Exportable
 
     begin
       font_bold = resolve_font
-      y = 60
 
+      # Pre-calculate required canvas height so nothing gets cut off.
+      canvas_height = estimate_canvas_height(sections)
+
+      y = 60
       commands = []
 
       # Canvas
-      commands.push("-size", "#{CANVAS_WIDTH}x#{CANVAS_HEIGHT}", "xc:#{BG_COLOR}")
+      commands.push("-size", "#{CANVAS_WIDTH}x#{canvas_height}", "xc:#{BG_COLOR}")
 
       # Radial gradient overlay (lime tint, 4% opacity at top-left)
       commands.push(
-        "(", "-size", "#{CANVAS_WIDTH}x#{CANVAS_HEIGHT}",
+        "(", "-size", "#{CANVAS_WIDTH}x#{canvas_height}",
         "radial-gradient:rgba(163,230,53,0.04)-transparent",
         "-gravity", "NorthWest",
         "-geometry", "+0+0",
@@ -67,8 +70,6 @@ module Workout::Exportable
 
       # Sections
       sections.each do |section|
-        break if y > CANVAS_HEIGHT - 120
-
         if section[:label].present?
           commands.push("-fill", LIME, "-pointsize", "50",
                         "-annotate", "+56+#{y}", safe(section[:label].upcase))
@@ -82,7 +83,6 @@ module Workout::Exportable
         end
 
         section[:exercises].each do |line|
-          break if y > CANVAS_HEIGHT - 120
           commands.push("-fill", LIGHT_GRAY, "-pointsize", "36")
 
           wrapped = word_wrap(line.upcase, 36, CANVAS_WIDTH - 112)
@@ -96,7 +96,7 @@ module Workout::Exportable
       end
 
       # Footer
-      footer_y = CANVAS_HEIGHT - 80
+      footer_y = canvas_height - 80
       commands.push("-fill", BORDER_GRAY, "-draw", "rectangle 56,#{footer_y - 20} #{CANVAS_WIDTH - 56},#{footer_y - 19}")
       commands.push("-fill", MID_GRAY, "-pointsize", "24",
                     "-gravity", "NorthEast", "-annotate", "+56+#{footer_y + 14}", safe("energise your workout"))
@@ -157,6 +157,35 @@ module Workout::Exportable
   end
 
   private
+
+  # Dry-run Y calculation to determine the canvas height needed to fit all
+  # content. Returns at least CANVAS_HEIGHT so short workouts still look good.
+  def estimate_canvas_height(sections)
+    y = 60 # top padding
+    y += 52 # header row (activity + duration)
+
+    # Workout name
+    name_lines = word_wrap(name.upcase, workout_name_pointsize, CANVAS_WIDTH - 112)
+    y += name_lines.size * (workout_name_pointsize * 1.05).to_i
+    y += 16 # gap after name
+    y += 28 # divider + gap
+
+    sections.each do |section|
+      y += 58 if section[:label].present?
+      y += 36 if section[:description].present?
+
+      section[:exercises].each do |line|
+        wrapped = word_wrap(line.upcase, 36, CANVAS_WIDTH - 112)
+        y += wrapped.size * 44
+      end
+
+      y += 18 # gap between sections
+    end
+
+    y += 100 # footer space
+
+    [ y, CANVAS_HEIGHT ].max
+  end
 
   def format_label_and_description(section, fmt, ex_count)
     rounds = section["rounds"]
