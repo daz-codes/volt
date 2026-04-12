@@ -1551,6 +1551,7 @@ class WorkoutLLMGenerator
     "twenty20"       => "Twenty20 — 20 cal cardio machine + 20 reps functional movement × 5 rounds (format: rounds)",
     "switchback"     => "Up & Down Ladder — cardio (calories) paired with functional movement (reps), ladder values trade places: 40/10→30/20→20/30→10/40 (format: switchback, start: 40, end: 10, step: 10, exactly 2 exercises — cardio first, functional second)",
     "death_race"     => "Death Race — 15 cal Assault Bike + 10 burpees × 5 rounds (format: rounds)",
+    "cardio_intervals" => "Cardio Intervals — ONE exercise on a single cardio machine (treadmill, assault bike, rower, or ski erg), pick ONE protocol: (a) 400m repeats × 5-10 with 90s rest (format: rounds, rounds: 5-10, rest_secs: 90, 1 exercise with distance_m: 400), (b) 15s hard / 15s easy × 10-20 rounds (format: rounds, rounds: 10-20, NO rest_secs, 1 exercise with duration_s: 15, notes: '15s hard / 15s easy — recovery is built into the set'), (c) 30s hard / 30s easy × 5-10 rounds (format: rounds, rounds: 5-10, NO rest_secs, 1 exercise with duration_s: 30, notes: '30s hard / 30s easy — recovery is built into the set'), (d) 4min high effort / 3min rest × 2-4 rounds (format: rounds, rounds: 2-4, rest_secs: 180, 1 exercise with duration_s: 240, notes: 'high effort'). IMPORTANT: protocols (b) and (c) must have exactly 1 exercise and NO rest_secs — the easy portion IS the recovery. Do NOT split into separate hard/easy exercises. Builds anaerobic capacity and VO2 max.",
   }.freeze
 
   FINISHER_FORMATS = %w[tabata hundred for_time switchback death_race].freeze
@@ -1591,7 +1592,7 @@ class WorkoutLLMGenerator
     has_rounds  = (affinity[:primary] + affinity[:secondary]).include?("rounds")
     has_for_time = (affinity[:primary] + affinity[:secondary]).include?("for_time")
     if has_rounds
-      pool.push("twenty20", "death_race")
+      pool.push("twenty20", "death_race", "cardio_intervals")
     end
     if has_for_time
       pool.push("switchback")
@@ -1614,7 +1615,7 @@ class WorkoutLLMGenerator
     # Assign cardio machines for protocols that need them
     machines = FM_CARDIO_MACHINES.shuffle
     machine_for = ->(fmt) {
-      fmt.in?(%w[twenty20 switchback emom_rotating]) ? (machines.shift || FM_CARDIO_MACHINES.sample) : nil
+      fmt.in?(%w[twenty20 switchback emom_rotating cardio_intervals]) ? (machines.shift || FM_CARDIO_MACHINES.sample) : nil
     }
 
     # Build directive
@@ -1691,7 +1692,7 @@ class WorkoutLLMGenerator
 
   def normalize_format(fmt)
     case fmt
-    when "twenty20", "death_race" then "rounds"
+    when "twenty20", "death_race", "cardio_intervals" then "rounds"
     when "emom_rotating", "emom_circuit" then fmt # Keep split
     else fmt
     end
@@ -1721,6 +1722,19 @@ class WorkoutLLMGenerator
           { "name" => "Assault Bike", "calories" => 15, "notes" => "absolute max effort" },
           { "name" => "Burpees", "reps" => 10, "notes" => "everything you have" }
         ] }
+    when "cardio_intervals"
+      interval_machine = %w[Row Assault\ Bike SkiErg Treadmill].sample
+      protocols = [
+        { rounds: 8,  rest: 90,  ex: { "name" => interval_machine, "distance_m" => 400, "notes" => "fast repeats — consistent pace each round" } },
+        { rounds: 16, rest: nil, ex: { "name" => interval_machine, "duration_s" => 15, "notes" => "15s hard / 15s easy" } },
+        { rounds: 8,  rest: nil, ex: { "name" => interval_machine, "duration_s" => 30, "notes" => "30s hard / 30s easy" } },
+        { rounds: 3,  rest: 180, ex: { "name" => interval_machine, "duration_s" => 240, "notes" => "high effort — hold your pace" } }
+      ]
+      p = protocols.sample
+      sec = { "name" => "Engine Builder", "category" => "main", "format" => "rounds", "rounds" => p[:rounds],
+              "exercises" => [ p[:ex] ] }
+      sec["rest_secs"] = p[:rest] if p[:rest]
+      sec
     when "emom_rotating"
       exercises = ([ machine ] + FM_FUNCTIONAL_MOVEMENTS.sample(2)).map do |name|
         { "name" => name, "notes" => name == machine ? "steady sustainable effort" : "controlled tempo" }

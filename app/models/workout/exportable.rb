@@ -73,10 +73,16 @@ module Workout::Exportable
         if section[:label].present?
           commands.push("-fill", LIME, "-pointsize", "50",
                         "-annotate", "+56+#{y}", safe(section[:label].upcase))
-          y += 58
-        end
 
-        if section[:description].present?
+          if section[:description].present?
+            # Place description on same line, after the label
+            label_width = (section[:label].length * 50 * 0.65).to_i + 24
+            commands.push("-fill", DIM_GRAY, "-pointsize", "28",
+                          "-annotate", "+#{56 + label_width}+#{y + 18}", safe(section[:description]))
+          end
+
+          y += 58
+        elsif section[:description].present?
           commands.push("-fill", DIM_GRAY, "-pointsize", "28",
                         "-annotate", "+56+#{y}", safe(section[:description]))
           y += 36
@@ -98,8 +104,8 @@ module Workout::Exportable
       # Footer
       footer_y = canvas_height - 80
       commands.push("-fill", BORDER_GRAY, "-draw", "rectangle 56,#{footer_y - 20} #{CANVAS_WIDTH - 56},#{footer_y - 19}")
-      commands.push("-fill", MID_GRAY, "-pointsize", "24",
-                    "-gravity", "NorthEast", "-annotate", "+56+#{footer_y + 14}", safe("energise your workout"))
+      commands.push("-pointsize", "24", "-gravity", "NorthEast")
+      commands.push("-fill", MID_GRAY, "-annotate", "+56+#{footer_y + 10}", safe("Made with VOLT \u00B7 energise your workout"))
 
       commands.push(tempfile.path)
 
@@ -126,29 +132,33 @@ module Workout::Exportable
 
       label, description = format_label_and_description(section, fmt, ex_count)
 
-      exercises = Array(section["exercises"]).map do |ex|
-        ex_name = ex["name"].to_s.gsub(/\s*\([\d.]+kg.*?\)\s*/, "").strip
-        parts = []
+      exercises = if fmt == "switchback"
+        switchback_exercise_lines(section)
+      else
+        Array(section["exercises"]).map do |ex|
+          ex_name = ex["name"].to_s.gsub(/\s*\([\d.]+kg.*?\)\s*/, "").strip
+          parts = []
 
-        if ex["reps"]
-          unit = ex_name.match?(/carry|sled|prowler|drag|shuttle|farmer/i) ? "m" : ""
-          parts << "#{ex["reps"]}#{unit}"
-        end
-        parts << "#{ex["distance_m"]}m" if ex["distance_m"]
-        parts << "#{ex["calories"]} cal" if ex["calories"]
-        if ex["duration_s"]
-          dm = ex["duration_s"] / 60
-          dr = ex["duration_s"] % 60
-          parts << (dm > 0 ? "#{dm}min#{dr > 0 ? " #{dr}s" : ""}" : "#{ex["duration_s"]}s")
-        end
-        metric = parts.join(" \u00B7 ")
+          if ex["reps"]
+            unit = ex_name.match?(/carry|sled|prowler|drag|shuttle|farmer/i) ? "m" : ""
+            parts << "#{ex["reps"]}#{unit}"
+          end
+          parts << "#{ex["distance_m"]}m" if ex["distance_m"]
+          parts << "#{ex["calories"]} cal" if ex["calories"]
+          if ex["duration_s"]
+            dm = ex["duration_s"] / 60
+            dr = ex["duration_s"] % 60
+            parts << (dm > 0 ? "#{dm}min#{dr > 0 ? " #{dr}s" : ""}" : "#{ex["duration_s"]}s")
+          end
+          metric = parts.join(" \u00B7 ")
 
-        if is_ladder
-          ex_name
-        elsif metric.present?
-          "#{metric} #{ex_name}"
-        else
-          ex_name
+          if is_ladder
+            ex_name
+          elsif metric.present?
+            "#{metric} #{ex_name}"
+          else
+            ex_name
+          end
         end
       end
 
@@ -171,8 +181,21 @@ module Workout::Exportable
     y += 28 # divider + gap
 
     sections.each do |section|
-      y += 58 if section[:label].present?
-      y += 36 if section[:description].present?
+      if section[:label].present?
+        if section[:description].present?
+          label_w = (section[:label].length * 50 * 0.65).to_i + 24
+          desc_w = section[:description].length * 28 * 0.55
+          if 56 + label_w + desc_w < CANVAS_WIDTH - 56
+            y += 58
+          else
+            y += 58 + 36
+          end
+        else
+          y += 58
+        end
+      elsif section[:description].present?
+        y += 36
+      end
 
       section[:exercises].each do |line|
         wrapped = word_wrap(line.upcase, 36, CANVAS_WIDTH - 112)
@@ -200,8 +223,8 @@ module Workout::Exportable
       rotating = style == "rotating" || (style.blank? && ex_count > 1)
       if rotating
         cycles = dur && ex_count > 0 ? dur / ex_count : nil
-        desc = cycles && cycles > 1 ? "1 min of each exercise \u00B7 #{cycles} times through" : "1 min of each exercise"
-        [ "Continuous Circuit", desc ]
+        desc = cycles && cycles > 1 ? "#{dur}min \u00B7 #{cycles} rounds" : "#{dur}min"
+        [ "Circuit", desc ]
       elsif ex_count >= 3 && dur
         e2m_rounds = dur / 2
         desc = e2m_rounds > 1 ? "All #{ex_count} exercises every 2 min \u00B7 #{e2m_rounds} rounds" : nil
@@ -225,8 +248,7 @@ module Workout::Exportable
       seq = mountain_sequence(section["start"], section["peak"], section["end"], section["step"])
       [ "Mountain", "#{seq} reps of each exercise" ]
     when "switchback"
-      down_seq, up_seq = switchback_sequences(section["start"], section["end"], section["step"])
-      [ "Up & Down Ladder", "#{down_seq} cal \u00B7 #{up_seq} reps" ]
+      [ "Up & Down Ladder", "alternate each exercise" ]
     when "hundred"
       [ "100 Reps", "For time" ]
     when "matrix"
@@ -247,6 +269,19 @@ module Workout::Exportable
     up = sv.step(pk, st.abs).to_a
     down = (pk - st.abs).step(ev, -st.abs).to_a
     (up + down).join("\u2013")
+  end
+
+  def switchback_exercise_lines(section)
+    exs = Array(section["exercises"])
+    return exs.map { |e| e["name"].to_s } if exs.size != 2
+
+    down, up = switchback_sequences(section["start"], section["end"], section["step"])
+    first_name = exs[0]["name"].to_s.gsub(/\s*\([\d.]+kg.*?\)\s*/, "").strip
+    second_name = exs[1]["name"].to_s.gsub(/\s*\([\d.]+kg.*?\)\s*/, "").strip
+    [
+      "#{first_name} #{down.gsub("\u00B7", ", ")} calories",
+      "#{second_name} #{up.gsub("\u00B7", ", ")} reps"
+    ]
   end
 
   def switchback_sequences(start_val, end_val, step)

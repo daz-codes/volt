@@ -75,6 +75,7 @@ class WorkoutValidator
     fix_redundant_section_notes(sections)
     fix_rotating_emom_reps(sections)
     fix_emom_notes(sections)
+    fix_cardio_interval_split(sections)
     dedup_warmup_sections(sections)
     dedup_cooldown_sections(sections)
     check_cooldown(sections)
@@ -82,7 +83,7 @@ class WorkoutValidator
     fix_warmup_format(sections)
     fix_amrap_minimum_exercises(sections)
     dedup_identical_sections(sections)
-    cap_main_section_count(sections)
+    cap_main_section_count(sections) unless @main_tag_slug == "functional-muscle"
 
     if @main_tag_slug == "functional-muscle"
       fix_fm_remove_activation(sections)
@@ -97,6 +98,8 @@ class WorkoutValidator
       fix_fm_ensure_abs(sections)
       fix_fm_section_order(sections)
     end
+
+    fix_goal_durations(sections)
 
     @data
   end
@@ -830,6 +833,41 @@ class WorkoutValidator
     end
   end
 
+  # Cardio intervals: if the LLM split a hard/easy protocol into two exercises
+  # on the same machine (e.g. "Ski Erg Sprint" + "Ski Erg Recovery"), merge them
+  # back into one exercise and remove rest_secs.
+  CARDIO_MACHINE_PATTERN = /\b(row|assault.?bike|ski.?erg|treadmill|bike)\b/i.freeze
+
+  def fix_cardio_interval_split(sections)
+    sections.each do |section|
+      next unless section["format"] == "rounds"
+      exercises = Array(section["exercises"])
+      next unless exercises.size == 2
+
+      # Both exercises must be on the same cardio machine
+      names = exercises.map { |e| e["name"].to_s }
+      machines = names.map { |n| n.match(CARDIO_MACHINE_PATTERN)&.to_s&.downcase }
+      next unless machines[0].present? && machines[0] == machines[1]
+
+      # One should be hard/sprint, one should be easy/recovery
+      notes = exercises.map { |e| (e["notes"].to_s + " " + e["name"].to_s).downcase }
+      hard_idx = notes.index { |n| n.match?(/hard|sprint|max|effort|explosive/) }
+      easy_idx = notes.index { |n| n.match?(/easy|recovery|rest|light|slow/) }
+      next unless hard_idx && easy_idx && hard_idx != easy_idx
+
+      hard = exercises[hard_idx]
+      dur = hard["duration_s"].to_i
+      next if dur.zero?
+
+      # Merge: keep the hard exercise, update notes, drop rest_secs
+      hard["notes"] = "#{dur}s hard / #{exercises[easy_idx]["duration_s"] || dur}s easy"
+      hard["name"] = hard["name"].sub(/\s*(sprint|hard|effort|max)/i, "").strip
+      section["exercises"] = [hard]
+      section.delete("rest_secs")
+      @fixes << "Cardio intervals '#{section["name"]}': merged split hard/easy into single exercise"
+    end
+  end
+
   # FM circuit EMOMs (every-2-min style): reps must be multiples of 5, minimum 5 per
   # exercise, and at least 25 total across all exercises. If total < 25, scale up
   # proportionally (preserving ratios) until the minimum is met.
@@ -1018,6 +1056,7 @@ class WorkoutValidator
     if upper_pick
       new_sections << {
         "name"      => "Upper Body Strength",
+        "category"  => "main",
         "format"    => "rounds",
         "rounds"    => 5,
         "rest_secs" => 60,
@@ -1027,6 +1066,7 @@ class WorkoutValidator
     if lower_pick
       new_sections << {
         "name"      => "Lower Body Strength",
+        "category"  => "main",
         "format"    => "rounds",
         "rounds"    => 5,
         "rest_secs" => 60,
@@ -1053,6 +1093,7 @@ class WorkoutValidator
     exercises = FM_ABS_FALLBACK_POOL.sample
     abs_section = {
       "name"      => "Abs Finisher",
+      "category"  => "finisher",
       "format"    => "straight",
       "exercises" => exercises
     }
@@ -1063,15 +1104,15 @@ class WorkoutValidator
   end
 
   # FM: enforce the metabolic time budget.
-  # Fixed sections (warm-up 5 + upper strength 8 + lower strength 8 + abs 5 + cool-down 4) = 30 min.
-  # Remaining budget = duration_mins - 30. If metabolic blocks exceed this, remove from the end.
+  # Fixed sections (warm-up 5 + upper strength 6 + lower strength 6 + abs 5 + cool-down 4) = 26 min.
+  # Remaining budget = duration_mins - 26. If metabolic blocks exceed this, remove from the end.
   FM_BLOCK_MINUTES = {
     "tabata"   => 6,
     "mountain" => 10,
     "ladder"   => 12,
     "hundred"  => 5
   }.freeze
-  FM_FIXED_MINS = 30
+  FM_FIXED_MINS = 26
 
   def fix_fm_trim_metabolic_blocks(sections)
     budget = (@duration_mins || 60) - FM_FIXED_MINS
@@ -1231,6 +1272,32 @@ class WorkoutValidator
       sections.delete(s)
       @fixes << "Removed excess section '#{s["name"]}' to fit #{@duration_mins}-min duration"
     end
+  end
+
+  # Sync duration mentions in the goal field with actual section durations.
+  # The LLM writes the goal before the validator fixes sections, so durations
+  # like "10-minute circuit" can be stale after an EMOM snap (10 → 12).
+  def fix_goal_durations(sections)
+    goal = @data.dig("structure", "goal")
+    return unless goal.is_a?(String)
+
+    # Collect actual durations from all timed sections
+    actual_durations = sections.filter_map { |s| s["duration_mins"].to_i if s["duration_mins"].to_i > 0 }
+    return if actual_durations.empty?
+
+    # Replace any N-minute / N-min mention that doesn't match an actual section
+    goal.gsub!(/\b(\d+)[- ](?:minute|min)\b/) do |match|
+      mentioned = $1.to_i
+      if actual_durations.include?(mentioned)
+        match # already correct
+      else
+        # Find the closest actual duration
+        closest = actual_durations.min_by { |d| (d - mentioned).abs }
+        (mentioned - closest).abs <= 5 ? match.sub($1, closest.to_s) : match
+      end
+    end
+
+    @data["structure"]["goal"] = goal
   end
 
   # Trust the LLM to always include a cool-down as the last section (the prompt
