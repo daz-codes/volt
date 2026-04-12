@@ -2,6 +2,39 @@ class User < ApplicationRecord
   FREE_GENERATION_LIMIT = 5
   BETA_GENERATION_LIMIT = 25
 
+  # Equipment the user has access to. Used to filter workout generation so the
+  # LLM doesn't suggest exercises they can't perform. Stored as an array of
+  # slugs in the `equipment` JSON column.
+  #
+  # Semantics:
+  #   nil / []                        → no constraint (treat as "has everything")
+  #   array containing all slugs      → no constraint (same as above)
+  #   partial array                   → constraint — only suggest these items
+  EQUIPMENT_OPTIONS = {
+    "barbell"          => "Barbell",
+    "dumbbells"        => "Dumbbells",
+    "kettlebells"      => "Kettlebells",
+    "pull_up_bar"      => "Pull-up Bar",
+    "wall_ball"        => "Wall Ball",
+    "sled"             => "Sled",
+    "resistance_bands" => "Resistance Bands",
+    "jump_rope"        => "Jump Rope",
+    "rowing_machine"   => "Rowing Machine",
+    "assault_bike"     => "Assault Bike",
+    "ski_erg"          => "Ski Erg",
+    "treadmill"        => "Treadmill"
+  }.freeze
+
+  EQUIPMENT_SLUGS = EQUIPMENT_OPTIONS.keys.freeze
+
+  # Returns the user's equipment list with defaults applied — blank means
+  # "has everything", so return all slugs. Used by the profile edit form and
+  # the generate session form to pre-check boxes.
+  def equipment_with_defaults
+    list = Array(equipment).compact_blank
+    list.empty? ? EQUIPMENT_SLUGS : list
+  end
+
   include User::Billing
   include User::GenerationQuota
   include User::FollowGraph

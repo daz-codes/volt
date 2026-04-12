@@ -81,6 +81,8 @@ class WorkoutValidator
 
     fix_warmup_format(sections)
     fix_amrap_minimum_exercises(sections)
+    dedup_identical_sections(sections)
+    cap_main_section_count(sections)
 
     if @main_tag_slug == "functional-muscle"
       fix_fm_remove_activation(sections)
@@ -1175,6 +1177,59 @@ class WorkoutValidator
     trailing_cooldowns[0..-2].each do |dupe|
       sections.delete(dupe)
       @fixes << "Removed duplicate cool-down section '#{dupe["name"]}'"
+    end
+  end
+
+  # Remove main/finisher sections that are structurally identical (same name,
+  # format, and exercises). The LLM occasionally duplicates a section verbatim.
+  def dedup_identical_sections(sections)
+    main_finisher = sections.select { |s| %w[main finisher].include?(s["category"]) }
+    seen = {}
+    main_finisher.each do |s|
+      key = [ s["name"].to_s.downcase.strip, s["format"],
+              Array(s["exercises"]).map { |e| e["name"].to_s.downcase.strip } ].to_s
+      if seen[key]
+        sections.delete(s)
+        @fixes << "Removed duplicate section '#{s["name"]}'"
+      else
+        seen[key] = true
+      end
+    end
+  end
+
+  # If the LLM generates too many main sections for the duration, trim from the
+  # end so the workout fits. Uses per-format time estimates rather than a flat
+  # average, because tabatas (4 min) are much shorter than AMRAPs/rounds (~8-10 min).
+  SECTION_TIME_ESTIMATE = {
+    "tabata" => 4, "hundred" => 5, "matrix" => 6,
+    "ladder" => 6, "mountain" => 6, "switchback" => 8
+  }.freeze
+  DEFAULT_SECTION_TIME = 8
+
+  def cap_main_section_count(sections)
+    main_sections = sections.select { |s| %w[main finisher].include?(s["category"]) }
+    return if main_sections.size <= 2
+
+    overhead = 10 # warm-up + cool-down
+    budget   = @duration_mins - overhead
+    running  = 0
+    cutoff   = nil
+
+    main_sections.each_with_index do |s, i|
+      est = s["duration_mins"].to_i > 0 ? s["duration_mins"].to_i :
+            SECTION_TIME_ESTIMATE[s["format"]] || DEFAULT_SECTION_TIME
+      running += est
+      if running > budget && i >= 2 # keep at least 2 main sections
+        cutoff = i
+        break
+      end
+    end
+
+    return unless cutoff
+
+    main_sections[cutoff..].each do |s|
+      sections.delete(s)
+      @fixes << "Removed excess section '#{s["name"]}' to fit #{@duration_mins}-min duration"
     end
   end
 

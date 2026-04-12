@@ -1,13 +1,6 @@
 class ProfilesController < ApplicationController
   before_action :require_authentication
 
-  EQUIPMENT_OPTIONS = %w[
-    ski_erg rowing_machine assault_bike bike_erg treadmill
-    pull_up_bar barbell dumbbells kettlebells
-    sled sandbag atlas_stones resistance_bands
-    swimming_pool open_water
-  ].freeze
-
   def show
     @user = Current.user
     @workout_count = @user.workout_logs.count
@@ -27,7 +20,9 @@ class ProfilesController < ApplicationController
   def update
     @user = Current.user
     @user.assign_attributes(profile_params)
-    @user.equipment = Array(params[:user][:equipment]).reject(&:blank?)
+    @user.equipment = Array(params.dig(:user, :equipment))
+                        .compact_blank
+                        .intersection(User::EQUIPMENT_SLUGS)
 
     if @user.save
       redirect_to profile_path, notice: "Profile updated."
@@ -41,6 +36,6 @@ class ProfilesController < ApplicationController
   def profile_params
     params.expect(user: [ :username, :display_name, :avatar,
       :age, :height_cm, :weight_kg, :gender,
-      :pool_length, :speed_unit ])
+      :pool_length, :speed_unit, :injury_notes ])
   end
 end

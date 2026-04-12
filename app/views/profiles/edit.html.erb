@@ -107,6 +107,35 @@
           </div>
         </div>
 
+        <div>
+          <%= f.label :injury_notes, "Injuries / Limitations", class: "block text-sm font-semibold text-gray-300 uppercase tracking-wide mb-2" %>
+          <%= f.text_area :injury_notes, placeholder: "e.g. torn left ACL, shoulder impingement, bad lower back…",
+              rows: 2,
+              class: "w-full bg-zinc-800 border border-zinc-600 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-lime-400 transition-colors resize-none" %>
+          <p class="text-gray-600 text-xs mt-1.5">Workouts will automatically avoid exercises that aggravate these.</p>
+        </div>
+
+      </div>
+    </div>
+
+    <%# ── Equipment ── %>
+    <div class="mb-10">
+      <h2 class="text-xs font-black uppercase tracking-widest text-gray-500 mb-4">Equipment</h2>
+      <p class="text-gray-500 text-xs mb-4 leading-relaxed">Tick what you have access to. Generated workouts will only use equipment you've selected — bodyweight exercises are always allowed.</p>
+
+      <%# Hidden sentinel ensures an empty submission still sends `equipment[]` %>
+      <%= hidden_field_tag "user[equipment][]", "" %>
+
+      <% current_equipment = @user.equipment_with_defaults %>
+      <div class="flex flex-wrap gap-x-4 gap-y-1.5">
+        <% User::EQUIPMENT_OPTIONS.each do |slug, label| %>
+          <label class="inline-flex items-center gap-1.5 cursor-pointer">
+            <%= check_box_tag "user[equipment][]", slug, current_equipment.include?(slug),
+                id: "user_equipment_#{slug}",
+                class: "w-3.5 h-3.5 rounded border-zinc-500 bg-zinc-800 text-lime-400 focus:ring-lime-400 focus:ring-offset-0 accent-lime-400" %>
+            <span class="text-sm text-gray-300"><%= label %></span>
+          </label>
+        <% end %>
       </div>
     </div>
 

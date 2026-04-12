@@ -470,7 +470,7 @@ class WorkoutLLMGenerator
     new(user: user, activity: activity, group_tag_name: group_tag_name, duration_mins: duration_mins, source_workout: source_workout, session_notes: session_notes).call
   end
 
-  def initialize(user:, duration_mins:, activity: nil, group_tag_name: nil, source_workout: nil, session_notes: nil, **_legacy)
+  def initialize(user:, duration_mins:, activity: nil, group_tag_name: nil, source_workout: nil, session_notes: nil, equipment: nil, injury_notes: nil, **_legacy)
     @user           = user
     @activity       = activity.presence
     raw_slug        = @activity&.parameterize
@@ -479,6 +479,13 @@ class WorkoutLLMGenerator
     @duration_mins  = duration_mins.to_i
     @source_workout = source_workout
     @session_notes  = session_notes.presence
+    # Equipment explicitly passed in (generate form) overrides profile default.
+    # Falls back to the user's saved profile equipment. nil/empty means "no constraint".
+    raw_equipment   = equipment.nil? ? Array(@user&.equipment) : Array(equipment)
+    @equipment      = raw_equipment.compact_blank & User::EQUIPMENT_SLUGS
+    # Injury notes from the generate form override the profile value. Falls back
+    # to the user's saved profile injury_notes when not explicitly provided.
+    @injury_notes   = injury_notes.nil? ? @user&.injury_notes.to_s.strip.presence : injury_notes.presence
     @fm_selected_blocks = nil  # Set by fm_select_metabolic_blocks for post-gen compliance
   end
 
@@ -1121,10 +1128,53 @@ class WorkoutLLMGenerator
     "- Athlete pace limits (HARD LIMITS — do not prescribe any time faster than these):\n#{lines.map { |l| "    * #{l}" }.join("\n")}"
   end
 
-  # Returns a bullet-point rule for explicit exclusions (e.g. "no-run" minor tag).
-  # Builds a hard equipment constraint from session notes mentioning specific equipment.
-  # Parses what the athlete HAS, then explicitly bans everything else.
+  # Maps profile equipment slugs to a phrase used in prompts and the set of
+  # generic gym items they imply are "available" (beyond bodyweight).
+  PROFILE_EQUIPMENT_LABEL = {
+    "barbell"          => "barbell",
+    "dumbbells"        => "dumbbells",
+    "kettlebells"      => "kettlebells",
+    "pull_up_bar"      => "pull-up bar",
+    "wall_ball"        => "wall ball / medicine ball",
+    "sled"             => "sled",
+    "resistance_bands" => "resistance bands",
+    "jump_rope"        => "jump rope",
+    "rowing_machine"   => "rowing machine",
+    "assault_bike"     => "assault bike",
+    "ski_erg"          => "SkiErg",
+    "treadmill"        => "treadmill"
+  }.freeze
+
+  # Builds the hard equipment constraint from the structured profile list.
+  # Called when @equipment is a proper subset of EQUIPMENT_SLUGS.
+  def build_profile_equipment_rule
+    available = @equipment.map { |slug| PROFILE_EQUIPMENT_LABEL[slug] }.compact
+    banned    = (User::EQUIPMENT_SLUGS - @equipment).map { |slug| PROFILE_EQUIPMENT_LABEL[slug] }.compact
+
+    available_str = available.any? ? available.sort.join(", ") : "bodyweight only"
+    banned_str    = banned.join(", ")
+
+    <<~RULE.strip
+      - *** EQUIPMENT CONSTRAINT (HARD LIMIT from athlete profile) ***:
+        AVAILABLE: #{available_str} + bodyweight exercises (always allowed).
+        BANNED (athlete does NOT have these): #{banned_str}.
+        Every exercise must be doable with ONLY the available equipment or bodyweight. No exceptions.
+        Bodyweight exercises (push-ups, pull-ups if pull-up bar available, lunges, planks, burpees, etc.) are always fine as accessories — but unless the session is specifically bodyweight-focused, prioritise the listed equipment for main working sets.
+        Maximise variety with what IS available — e.g. with a barbell: deadlifts, front squats, overhead press, bent-over rows, cleans, Romanian deadlifts, hip thrusts, floor press, Pendlay rows — not just back squats repeated.
+        If a banned item would normally be a staple (e.g. rowing machine for cardio), substitute with available cardio or bodyweight conditioning (burpees, mountain climbers, jump rope if available, shuttle runs).
+    RULE
+  end
+
+  # Returns a bullet-point rule describing what equipment the athlete has
+  # access to. Preference order:
+  #   1. Explicit @equipment list (from profile/generate form) — structured, reliable
+  #   2. Session notes parsing — fallback for free-text mentions
+  # Returns nil when the athlete has everything (or no constraint signal at all).
   def build_equipment_rule
+    if @equipment.present? && (User::EQUIPMENT_SLUGS - @equipment).any?
+      return build_profile_equipment_rule
+    end
+
     return nil unless @session_notes.present?
 
     notes_lower = @session_notes.downcase
@@ -1182,8 +1232,14 @@ class WorkoutLLMGenerator
   end
 
   # Returns true when session notes mention specific equipment or a limited setting
-  # (home gym, hotel, etc.) — used to filter warm-up options that reference machines.
+  # (home gym, hotel, etc.) OR when the athlete's profile equipment list excludes
+  # cardio machines — used to filter warm-up options that reference machines.
   def equipment_limited?
+    if @equipment.present? && (User::EQUIPMENT_SLUGS - @equipment).any?
+      cardio_machines = %w[rowing_machine ski_erg assault_bike treadmill]
+      return true if (cardio_machines - @equipment).any?
+    end
+
     return false unless @session_notes.present?
     notes_lower = @session_notes.downcase
     notes_lower.include?("home gym") || notes_lower.include?("garage") ||
@@ -2137,6 +2193,14 @@ class WorkoutLLMGenerator
 
     speed_unit = @user.speed_unit.presence || "kmh"
     sections << "Speed unit preference: #{speed_unit == "mph" ? "mph" : "km/h"} — use this unit for ALL treadmill speeds and running paces."
+
+    if @injury_notes.present?
+      sections << <<~INJURY.strip
+        *** INJURY / LIMITATION (HARD LIMIT) ***:
+        The athlete reports: "#{@injury_notes}"
+        You MUST avoid any exercise that would aggravate this. Substitute with safe alternatives that work the same muscle group or energy system without loading the affected area. If in doubt, leave it out.
+      INJURY
+    end
 
     return nil if sections.empty?
 

@@ -159,6 +159,16 @@
     </div>
   <% end %>
 
+  <%# Injuries %>
+  <% if @user.injury_notes.present? %>
+    <div class="mb-8">
+      <h2 class="text-xs font-black uppercase tracking-widest text-gray-500 mb-4">Injuries / Limitations</h2>
+      <div class="bg-zinc-800 border border-zinc-700 rounded-2xl px-5 py-4">
+        <p class="text-gray-300 text-sm leading-relaxed"><%= @user.injury_notes %></p>
+      </div>
+    </div>
+  <% end %>
+
   <%# Training Environment %>
   <% if @user.pool_length.present? || @user.equipment.any? %>
     <div class="mb-8">
@@ -175,7 +185,7 @@
             <p class="text-gray-400 text-sm mb-2">Equipment</p>
             <div class="flex flex-wrap gap-1.5">
               <% @user.equipment.each do |item| %>
-                <span class="bg-zinc-700 text-gray-300 text-xs px-2.5 py-1 rounded-lg"><%= item.humanize %></span>
+                <span class="bg-zinc-700 text-gray-300 text-xs px-2.5 py-1 rounded-lg"><%= User::EQUIPMENT_OPTIONS[item] || item.humanize %></span>
               <% end %>
             </div>
           </div>
