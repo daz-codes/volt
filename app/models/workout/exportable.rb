@@ -73,16 +73,10 @@ module Workout::Exportable
         if section[:label].present?
           commands.push("-fill", LIME, "-pointsize", "50",
                         "-annotate", "+56+#{y}", safe(section[:label].upcase))
-
-          if section[:description].present?
-            # Place description on same line, after the label
-            label_width = (section[:label].length * 50 * 0.65).to_i + 24
-            commands.push("-fill", DIM_GRAY, "-pointsize", "28",
-                          "-annotate", "+#{56 + label_width}+#{y + 18}", safe(section[:description]))
-          end
-
           y += 58
-        elsif section[:description].present?
+        end
+
+        if section[:description].present?
           commands.push("-fill", DIM_GRAY, "-pointsize", "28",
                         "-annotate", "+56+#{y}", safe(section[:description]))
           y += 36
@@ -181,21 +175,8 @@ module Workout::Exportable
     y += 28 # divider + gap
 
     sections.each do |section|
-      if section[:label].present?
-        if section[:description].present?
-          label_w = (section[:label].length * 50 * 0.65).to_i + 24
-          desc_w = section[:description].length * 28 * 0.55
-          if 56 + label_w + desc_w < CANVAS_WIDTH - 56
-            y += 58
-          else
-            y += 58 + 36
-          end
-        else
-          y += 58
-        end
-      elsif section[:description].present?
-        y += 36
-      end
+      y += 58 if section[:label].present?
+      y += 36 if section[:description].present?
 
       section[:exercises].each do |line|
         wrapped = word_wrap(line.upcase, 36, CANVAS_WIDTH - 112)
