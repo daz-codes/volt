@@ -59,6 +59,8 @@ class WorkoutValidator
     end
 
     fix_notes_as_programming(sections)
+    fix_bear_complex_notes(sections)
+    fix_strength_weight_cues(sections)
     fix_jump_rope_calories(sections)
     fix_for_time_rounds(sections)
     fix_alternating_reps(sections)
@@ -433,6 +435,45 @@ class WorkoutValidator
   REPEAT_PATTERN        = /repeat\s*[×x]\s*(\d+)|[×x]\s*(\d+)\s*(?:rounds?|times?)?/i.freeze
 
   # Jump rope cannot track calories — convert to reps
+  # Bear Complex: ensure a description is present — many athletes won't know the movement
+  # Strength exercises in rounds format with moderate reps should have weight guidance
+  STRENGTH_WEIGHT_CUE = "Working weight \u2014 last 2 reps should feel challenging but doable".freeze
+  BODYWEIGHT_PATTERN = /push.?up|pull.?up|burpee|sit.?up|plank|crunch|lunge|squat(?!.*bar)|pike|dip|mountain.?climb/i.freeze
+
+  def fix_strength_weight_cues(sections)
+    sections.each do |section|
+      next unless section["format"] == "rounds"
+      next unless section["rounds"].to_i >= 3
+      next if %w[warm_up cool_down].include?(section["category"])
+
+      Array(section["exercises"]).each do |ex|
+        next if ex["notes"].present? && ex["notes"].length > 10
+        next if ex["reps"].to_i.zero? || ex["reps"].to_i > 15
+        next if ex["name"].to_s.match?(BODYWEIGHT_PATTERN)
+        next if ex["calories"] || ex["distance_m"] || ex["duration_s"]
+
+        ex["notes"] = STRENGTH_WEIGHT_CUE
+      end
+    end
+  end
+
+  BEAR_PATTERN = /\bbears?\b/i.freeze
+  BEAR_NOTES = "Power Clean \u2192 Front Squat \u2192 Push Press \u2192 Back Squat \u2192 Behind-the-neck Push Press. Heavy barbell \u2014 each rep should feel challenging by the peak.".freeze
+
+  def fix_bear_complex_notes(sections)
+    sections.each do |section|
+      Array(section["exercises"]).each do |ex|
+        name = ex["name"].to_s
+        # Match "Bear" or "Bears" but not "Bear Crawl"
+        next unless name.match?(BEAR_PATTERN) && !name.match?(/crawl/i)
+        next if ex["notes"].present? && ex["notes"].length > 20
+
+        ex["notes"] = BEAR_NOTES
+        @fixes << "'#{name}' in '#{section["name"]}': added Bear Complex description"
+      end
+    end
+  end
+
   JUMP_ROPE_PATTERN = /jump\s*rope|skipping\s*rope|skip\s*rope/i.freeze
 
   def fix_jump_rope_calories(sections)
@@ -1085,8 +1126,11 @@ class WorkoutValidator
                  lower_exercises.first ||
                  { "name" => %w[Leg\ Press Leg\ Extension Leg\ Curl Squats Lunges].sample, "reps" => 10 }
 
-    # Ensure reps: 10
-    [ upper_pick, lower_pick ].compact.each { |ex| ex["reps"] = 10 }
+    # Ensure reps: 10 and add weight guidance
+    [ upper_pick, lower_pick ].compact.each do |ex|
+      ex["reps"] = 10
+      ex["notes"] = "Working weight \u2014 last 2 reps should feel challenging but doable"
+    end
 
     # Remove all existing strength sections
     strength_sections.each { |s| sections.delete(s) }
