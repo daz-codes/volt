@@ -232,6 +232,11 @@ class WorkoutLLMGenerator
     # Functional Muscle aliases
     "sunday-workout"     => "functional-muscle",
     "maximum-voltage"    => "functional-muscle",
+    # Turbine (pure cardio)
+    "cardio"             => "turbine",
+    "pure-cardio"        => "turbine",
+    "cardio-session"     => "turbine",
+    "cardio-only"        => "turbine",
     # General
     "full-body-training" => "general-fitness"
   }.freeze
@@ -375,6 +380,37 @@ class WorkoutLLMGenerator
       primary: %w[for_time rounds emom amrap],
       secondary: %w[tabata ladder hundred mountain],
       guidance: "Volt Octathlon sessions should blend race-specific station work with conditioning variety. The race is 8 stations back-to-back with no rest — train the ability to work under accumulated fatigue. Pair machine work (row, ski, bike) with strength movements (thrusters, swings, slams, devil press). For_time and rounds simulate race pacing. EMOMs build station endurance. Switchback ladders (e.g. Row cals + KB Swings, Assault Bike cals + Slams) are perfect for octathlon training. Mix in AMRAPs, tabatas, ladders, and hundreds for training variety. ENGINE BUILDING: Occasionally include a dedicated cardio interval block (single machine) to build the engine — e.g. rower 400m repeats, assault bike 30s hard/30s easy, or ski erg 4min hard efforts."
+    },
+    # ── Pure cardio ──
+
+    "turbine" => {
+      primary: %w[rounds straight],
+      secondary: %w[],
+      guidance: <<~TURBINE.strip
+        Turbine sessions are PURE CARDIO — no weights, no functional exercises, no bodyweight movements. The ONLY equipment allowed is the 4 cardio machines: treadmill, assault bike, rowing machine, and ski erg. Nothing else.
+
+        BANNED: dumbbells, kettlebells, barbells, medicine balls, sleds, battle ropes, boxes, rings, pull-up bars, benches, jump rope. BANNED exercises: burpees, squats, lunges, push-ups, sit-ups, carries, thrusters, swings, cleans, snatches, box jumps, wall balls, slams — anything that isn't on one of the 4 machines.
+
+        STRUCTURE: Warm-up (5 min easy on any machine) → 3-4 main cardio blocks → Cool-down (5 min easy on any machine). Each main block is a standalone effort on ONE machine. Use a DIFFERENT machine for each block — the session should rotate through all 4 machines (treadmill, assault bike, rower, ski erg).
+
+        ENERGY SYSTEM MIX — every Turbine session must target at least 2 of these 4 energy systems across its blocks:
+        - SPRINT (anaerobic power): 10-20s all-out efforts with 40-60s full rest between. 6-10 rounds. Great on assault bike or ski erg. Use format: rounds with rest_secs.
+        - THRESHOLD (anaerobic capacity): 30-60s hard efforts with equal easy recovery ON THE SAME MACHINE. 8-15 rounds. Use format: rounds, NO rest_secs — the easy portion IS the recovery. Describe in exercise notes: "30s hard / 30s easy" or "15s hard / 15s easy".
+        - VO2 MAX: 2-4 min hard sustained efforts with 2-3 min rest. 3-5 rounds. Use format: rounds with rest_secs. Great for rowing 500m repeats, treadmill 400-800m repeats, or ski erg efforts.
+        - ZONE 2 (aerobic base): 8-15 min steady moderate effort, conversational pace. Use format: straight with one exercise and duration_s. A longer block — the athlete settles in and holds a sustainable pace.
+
+        FORMAT RULES:
+        - Intervals: use format: rounds. Set rounds on the section. One exercise per section with duration_s or distance_m.
+        - Threshold intervals (30/30, 15/15): NO rest_secs — recovery is built in. Describe in notes.
+        - Sprint intervals: use rest_secs for full recovery between max efforts.
+        - VO2 max efforts: use rest_secs for recovery between hard bouts.
+        - Steady state: use format: straight with duration_s on the exercise.
+        - Treadmill: use distance_m for repeats (e.g. 400m, 800m) or duration_s for time-based efforts. Use relative effort cues for pace ("hard effort", "sprint", "easy jog") — never absolute speeds.
+
+        MACHINE VARIETY: Use all 4 machines across the session. Never use the same machine twice. Good session example: Rower steady state → Assault Bike sprints → Ski Erg threshold intervals → Treadmill VO2 max repeats.
+
+        SESSION FEEL: This is a serious cardio training session — not just "go on a machine." Each block has a clear purpose and intensity target. The athlete should finish knowing they've trained multiple energy systems hard.
+      TURBINE
     },
     # ── General / fallback ──
 
@@ -724,7 +760,7 @@ class WorkoutLLMGenerator
         #{sport_rule}
         #{pace_limits}
         #{equipment_rule}
-        - Give it a punchy, memorable name — something a gym community would actually call it. Be creative and unpredictable: draw from feelings, imagery, places, days, animals, weather, mythology, slang — anything vivid. NEVER use the session type name as the workout name — "#{main_name}" is the TYPE of session, not the name. The name must be original and creative. BANNED WORDS in workout names: Voltage, Maximum, Transformer, Dynamo, Alternator, Circuit Breaker, Tread & Shred, Iron Engine, Ohm — these are session type brands, not workout names. #{recent_names.any? ? "The user's recent workout names are: #{recent_names.map { |n| "\"#{n}\"" }.join(", ")}. Do NOT reuse any word or theme from these." : ""}
+        - Give it a punchy, memorable name — something a gym community would actually call it. Be creative and unpredictable: draw from feelings, imagery, places, days, animals, weather, mythology, slang — anything vivid. NEVER use the session type name as the workout name — "#{main_name}" is the TYPE of session, not the name. The name must be original and creative. BANNED WORDS in workout names: Voltage, Maximum, Transformer, Dynamo, Alternator, Circuit Breaker, Tread & Shred, Iron Engine, Ohm, Turbine — these are session type brands, not workout names. #{recent_names.any? ? "The user's recent workout names are: #{recent_names.map { |n| "\"#{n}\"" }.join(", ")}. Do NOT reuse any word or theme from these." : ""}
         - Be specific with reps and distances. For WEIGHTS and SPEEDS, use relative effort cues instead of absolute numbers (e.g. "light — sustainable across all reps", "heavy — last 2 reps should be a struggle", "start at your fastest sustainable pace"). Only use specific weights if the athlete has known working weights in their Athlete Context
         - Rep counts should be clean numbers (even or multiples of 5)
         - NEVER use numbered block prefixes like "Block 1:", "Block 2:" in section names — use creative, descriptive names instead
@@ -754,7 +790,7 @@ class WorkoutLLMGenerator
         #{pace_limits}
         #{equipment_rule}
         #{format_directive}
-        - Give it a punchy, memorable name — something a gym community would actually call it. Be creative and unpredictable: draw from feelings, imagery, places, days, animals, weather, mythology, slang — anything vivid. NEVER use the session type name as the workout name — "#{main_name}" is the TYPE of session, not the name. The name must be original and creative. BANNED WORDS in workout names: Voltage, Maximum, Transformer, Dynamo, Alternator, Circuit Breaker, Tread & Shred, Iron Engine, Ohm — these are session type brands, not workout names. #{recent_names.any? ? "The user's recent workout names are: #{recent_names.map { |n| "\"#{n}\"" }.join(", ")}. Do NOT reuse any word or theme from these." : ""}
+        - Give it a punchy, memorable name — something a gym community would actually call it. Be creative and unpredictable: draw from feelings, imagery, places, days, animals, weather, mythology, slang — anything vivid. NEVER use the session type name as the workout name — "#{main_name}" is the TYPE of session, not the name. The name must be original and creative. BANNED WORDS in workout names: Voltage, Maximum, Transformer, Dynamo, Alternator, Circuit Breaker, Tread & Shred, Iron Engine, Ohm, Turbine — these are session type brands, not workout names. #{recent_names.any? ? "The user's recent workout names are: #{recent_names.map { |n| "\"#{n}\"" }.join(", ")}. Do NOT reuse any word or theme from these." : ""}
         - Be specific with reps and distances. For WEIGHTS and SPEEDS, use relative effort cues instead of absolute numbers (e.g. "light — sustainable across all reps", "heavy — last 2 reps should be a struggle", "start at your fastest sustainable pace"). Only use specific weights if the athlete has known working weights in their Athlete Context
         - Rep counts should be clean numbers (even or multiples of 5)
         - NEVER use numbered block prefixes like "Block 1:", "Block 2:" in section names — use creative, descriptive names instead
@@ -1037,7 +1073,7 @@ class WorkoutLLMGenerator
       - Be specific with reps and distances. For WEIGHTS and SPEEDS, use relative effort cues instead of absolute numbers (e.g. "light — sustainable across all reps", "heavy — last 2 reps should be a struggle", "start at your fastest sustainable pace"). Only use specific weights if the athlete has known working weights in their Athlete Context
       - SECTION NAMES MUST BE ACCURATE: never mention an exercise or activity in a section name unless it actually appears in that section's exercises. "Run + Station" must contain running. "Sled Circuit" must contain sled work. If unsure, use a generic evocative name instead.
       - NEVER use numbered block prefixes like "Block 1:", "Block 2:", "Block 3:" or "Part 1:", "Part 2:" in section names. Use creative, descriptive names instead.
-      - Give it a punchy, memorable name — something a gym community would actually call it. Be creative and unpredictable: draw from feelings, imagery, places, days, animals, weather, mythology, slang — anything vivid. Actively vary the style each time (e.g. a cheeky two-worder one time, a dramatic three-worder the next, a dry/ironic name after that). NEVER use the session type name as the workout name — "#{main_name}" is the TYPE of session, not the name. The name must be original and creative. BANNED WORDS in workout names: Voltage, Maximum, Transformer, Dynamo, Alternator, Circuit Breaker, Tread & Shred, Iron Engine, Ohm — these are session type brands, not workout names. #{recent_names.any? ? "The user's recent workout names are: #{recent_names.map { |n| "\"#{n}\"" }.join(", ")}. Do NOT reuse any word or theme from these." : ""}
+      - Give it a punchy, memorable name — something a gym community would actually call it. Be creative and unpredictable: draw from feelings, imagery, places, days, animals, weather, mythology, slang — anything vivid. Actively vary the style each time (e.g. a cheeky two-worder one time, a dramatic three-worder the next, a dry/ironic name after that). NEVER use the session type name as the workout name — "#{main_name}" is the TYPE of session, not the name. The name must be original and creative. BANNED WORDS in workout names: Voltage, Maximum, Transformer, Dynamo, Alternator, Circuit Breaker, Tread & Shred, Iron Engine, Ohm, Turbine — these are session type brands, not workout names. #{recent_names.any? ? "The user's recent workout names are: #{recent_names.map { |n| "\"#{n}\"" }.join(", ")}. Do NOT reuse any word or theme from these." : ""}
       #{recent_fm_formats.present? ? "- RECENT SESSIONS — the user's recent Functional Muscle sessions were:\n#{recent_fm_formats.lines.map { |l| "        #{l}" }.join}\n      Use this to avoid repetition: pick different strength machines from the ones listed, pick a different Pilates 100 exercise, and vary the tabata compounds. Block types (12-min, ladder etc) can repeat if they fit — but machines and finisher should rotate." : ""}
       #{sport_rule}
       #{pace_limits}
@@ -1577,7 +1613,7 @@ class WorkoutLLMGenerator
   # the same 2-3 formats every time.
 
   # Activities where Ruby should NOT pick formats (they have rigid structures).
-  SKIP_FORMAT_SELECTION_SLUGS = %w[functional-muscle tread-shred alternator ohm].freeze
+  SKIP_FORMAT_SELECTION_SLUGS = %w[functional-muscle tread-shred alternator ohm turbine].freeze
 
   # Format descriptions injected into the directive.
   SECTION_FORMAT_DESC = {
