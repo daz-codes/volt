@@ -36,7 +36,7 @@
          v = sv; while v >= ev - 0.001; vals << v; v -= step; end
        end
      else
-       sv = section["start"].to_f; pk = section["peak"].to_f; ev = section["end"].to_f
+       sv = section["start"].to_f; pk = section["peak"].to_f; ev = section["end"].to_f.nonzero? || sv
        up = []; v = sv; while v <= pk + 0.001; up << v; v += step; end
        dn = []; v = pk - step; while v >= ev - 0.001; dn << v; v -= step; end
        vals = up + dn
@@ -79,9 +79,10 @@
          rounds = dur > 0 ? dur / 2 : nil
          detail_parts << "all #{n} exercises every 2 minutes"
          detail_parts << "#{rounds} rounds" if rounds && rounds > 1
-         ["EMO2M", detail_parts.join(" · ").presence]
+         ["E2MOM", detail_parts.join(" · ").presence]
        else
-         detail_parts << "all #{n} exercises each minute" if n > 1
+         detail_parts << "both exercises each minute" if n == 2
+         detail_parts << "all #{n} exercises each minute" if n > 2
          ["EMOM", detail_parts.join(" · ").presence]
        end
      end
@@ -110,8 +111,7 @@
      parts << "#{section["rest_between_rungs"]}s rest between rungs" if section["rest_between_rungs"].to_i > 0
      [sec_format.capitalize, parts.compact.join(" · ").presence]
    when "switchback"
-     detail = "#{switchback_down_str} cal · #{switchback_up_str} reps"
-     ["Up & Down Ladder", detail]
+     ["Up & Down Ladder", "Alternate between each exercise"]
    when "matrix"
      rest = section["rest_secs"].to_i > 0 ? "#{section["rest_secs"]}s rest between rounds" : nil
      ["Matrix", rest]

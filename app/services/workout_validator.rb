@@ -52,12 +52,14 @@ class WorkoutValidator
         fix_tabata_exercise_count(section, idx)
       when "ladder", "mountain"
         fix_ladder_step(section, idx)
+        fix_mountain_end(section) if section["format"] == "mountain"
       when "hundred"
         fix_hundred(section, idx)
       end
     end
 
     fix_notes_as_programming(sections)
+    fix_jump_rope_calories(sections)
     fix_for_time_rounds(sections)
     fix_alternating_reps(sections)
     fix_clean_rep_counts(sections)
@@ -217,6 +219,7 @@ class WorkoutValidator
       max_exercises = is_fm ? 3 : 2
       if exercises.size > max_exercises
         section["exercises"] = exercises.first(max_exercises)
+        section.delete("notes") # LLM notes reference the old exercise count
         @fixes << "EMOM circuit '#{section["name"]}': trimmed to #{max_exercises} exercises (was #{exercises.size})"
         exercises = section["exercises"]
       end
@@ -260,6 +263,16 @@ class WorkoutValidator
 
   # Ladder/mountain: step size must be within the valid range for the varying metric.
   # Snaps up to the minimum if too small, down to the maximum if too large.
+  # Mountain sections need an end value — default to start if missing
+  def fix_mountain_end(section)
+    sv = section["start"].to_i
+    ev = section["end"].to_i
+    return if ev > 0
+
+    section["end"] = sv
+    @fixes << "Mountain '#{section["name"]}': end value missing — set to #{sv} (mirrors start)"
+  end
+
   def fix_ladder_step(section, idx)
     varies = section["varies"]
     step   = section["step"].to_f
@@ -418,6 +431,23 @@ class WorkoutValidator
   HIDDEN_REST_PATTERN   = /(\d+)\s*(?:s|sec|seconds?)\s*(?:rest|recovery|easy|glid)/i.freeze
   # Catches "Repeat × 5", "repeat x 5", "× 5 rounds" etc buried in notes
   REPEAT_PATTERN        = /repeat\s*[×x]\s*(\d+)|[×x]\s*(\d+)\s*(?:rounds?|times?)?/i.freeze
+
+  # Jump rope cannot track calories — convert to reps
+  JUMP_ROPE_PATTERN = /jump\s*rope|skipping\s*rope|skip\s*rope/i.freeze
+
+  def fix_jump_rope_calories(sections)
+    sections.each do |section|
+      Array(section["exercises"]).each do |ex|
+        next unless ex["name"].to_s.match?(JUMP_ROPE_PATTERN)
+        next unless ex["calories"].to_i > 0
+
+        cals = ex["calories"]
+        ex["reps"] = cals
+        ex.delete("calories")
+        @fixes << "'#{ex["name"]}' in '#{section["name"]}': converted #{cals} cal → #{cals} reps (jump rope has no calorie counter)"
+      end
+    end
+  end
 
   def fix_notes_as_programming(sections)
     sections.each do |section|
@@ -842,29 +872,41 @@ class WorkoutValidator
     sections.each do |section|
       next unless section["format"] == "rounds"
       exercises = Array(section["exercises"])
-      next unless exercises.size == 2
 
-      # Both exercises must be on the same cardio machine
-      names = exercises.map { |e| e["name"].to_s }
-      machines = names.map { |n| n.match(CARDIO_MACHINE_PATTERN)&.to_s&.downcase }
-      next unless machines[0].present? && machines[0] == machines[1]
+      # Case 1: LLM split hard/easy into two exercises on the same machine — merge
+      if exercises.size == 2
+        names = exercises.map { |e| e["name"].to_s }
+        machines = names.map { |n| n.match(CARDIO_MACHINE_PATTERN)&.to_s&.downcase }
+        if machines[0].present? && machines[0] == machines[1]
+          notes = exercises.map { |e| (e["notes"].to_s + " " + e["name"].to_s).downcase }
+          hard_idx = notes.index { |n| n.match?(/hard|sprint|max|effort|explosive/) }
+          easy_idx = notes.index { |n| n.match?(/easy|recovery|rest|light|slow/) }
+          if hard_idx && easy_idx && hard_idx != easy_idx
+            hard = exercises[hard_idx]
+            dur = hard["duration_s"].to_i
+            if dur > 0
+              hard["notes"] = "#{dur}s hard / #{exercises[easy_idx]["duration_s"] || dur}s easy"
+              hard["name"] = hard["name"].sub(/\s*(sprint|hard|effort|max)/i, "").strip
+              section["exercises"] = [hard]
+              section.delete("rest_secs")
+              @fixes << "Cardio intervals '#{section["name"]}': merged split hard/easy into single exercise"
+              next
+            end
+          end
+        end
+      end
 
-      # One should be hard/sprint, one should be easy/recovery
-      notes = exercises.map { |e| (e["notes"].to_s + " " + e["name"].to_s).downcase }
-      hard_idx = notes.index { |n| n.match?(/hard|sprint|max|effort|explosive/) }
-      easy_idx = notes.index { |n| n.match?(/easy|recovery|rest|light|slow/) }
-      next unless hard_idx && easy_idx && hard_idx != easy_idx
-
-      hard = exercises[hard_idx]
-      dur = hard["duration_s"].to_i
-      next if dur.zero?
-
-      # Merge: keep the hard exercise, update notes, drop rest_secs
-      hard["notes"] = "#{dur}s hard / #{exercises[easy_idx]["duration_s"] || dur}s easy"
-      hard["name"] = hard["name"].sub(/\s*(sprint|hard|effort|max)/i, "").strip
-      section["exercises"] = [hard]
-      section.delete("rest_secs")
-      @fixes << "Cardio intervals '#{section["name"]}': merged split hard/easy into single exercise"
+      # Case 2: Single-exercise cardio interval with built-in recovery — strip rest_secs
+      if exercises.size == 1
+        ex = exercises.first
+        notes = ex["notes"].to_s
+        if ex["name"].to_s.match?(CARDIO_MACHINE_PATTERN) &&
+           notes.match?(/hard.*easy|recovery.*built/i) &&
+           section["rest_secs"].to_i > 0
+          section.delete("rest_secs")
+          @fixes << "Cardio intervals '#{section["name"]}': removed rest_secs (recovery is built into the set)"
+        end
+      end
     end
   end
 

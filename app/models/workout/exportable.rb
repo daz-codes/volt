@@ -98,8 +98,10 @@ module Workout::Exportable
       # Footer
       footer_y = canvas_height - 80
       commands.push("-fill", BORDER_GRAY, "-draw", "rectangle 56,#{footer_y - 20} #{CANVAS_WIDTH - 56},#{footer_y - 19}")
-      commands.push("-pointsize", "24", "-gravity", "NorthEast")
-      commands.push("-fill", MID_GRAY, "-annotate", "+56+#{footer_y + 10}", safe("Made with VOLT \u00B7 energise your workout"))
+      commands.push("-pointsize", "24", "-gravity", "NorthWest")
+      commands.push("-fill", MID_GRAY, "-annotate", "+56+#{footer_y + 10}", safe("Made with"))
+      commands.push("-fill", LIME, "-annotate", "+170+#{footer_y + 10}", safe("VOLT"))
+      commands.push("-fill", MID_GRAY, "-annotate", "+232+#{footer_y + 10}", safe("energise your workout"))
 
       commands.push(tempfile.path)
 
@@ -209,7 +211,7 @@ module Workout::Exportable
       elsif ex_count >= 3 && dur
         e2m_rounds = dur / 2
         desc = e2m_rounds > 1 ? "All #{ex_count} exercises every 2 min \u00B7 #{e2m_rounds} rounds" : nil
-        [ "EMO2M #{dur}min", desc ]
+        [ "E2MOM #{dur}min", desc ]
       else
         [ "EMOM #{dur}min", rest ? "#{rest}s rest each minute" : nil ]
       end
@@ -229,7 +231,7 @@ module Workout::Exportable
       seq = mountain_sequence(section["start"], section["peak"], section["end"], section["step"])
       [ "Mountain", "#{seq} reps of each exercise" ]
     when "switchback"
-      [ "Up & Down Ladder", "alternate each exercise" ]
+      [ "Up & Down Ladder", "Alternate between each exercise" ]
     when "hundred"
       [ "100 Reps", "For time" ]
     when "matrix"
@@ -246,11 +248,13 @@ module Workout::Exportable
   end
 
   def mountain_sequence(start_val, peak_val, end_val, step)
-    sv = start_val.to_i; pk = peak_val.to_i; ev = end_val.to_i; st = step.to_i.nonzero? || 1
+    sv = start_val.to_i; pk = peak_val.to_i; ev = end_val.to_i.nonzero? || sv; st = step.to_i.nonzero? || 1
     up = sv.step(pk, st.abs).to_a
     down = (pk - st.abs).step(ev, -st.abs).to_a
     (up + down).join("\u2013")
   end
+
+  CALORIE_MACHINES = /\b(row|assault.?bike|ski.?erg|bike)\b/i.freeze
 
   def switchback_exercise_lines(section)
     exs = Array(section["exercises"])
@@ -259,9 +263,11 @@ module Workout::Exportable
     down, up = switchback_sequences(section["start"], section["end"], section["step"])
     first_name = exs[0]["name"].to_s.gsub(/\s*\([\d.]+kg.*?\)\s*/, "").strip
     second_name = exs[1]["name"].to_s.gsub(/\s*\([\d.]+kg.*?\)\s*/, "").strip
+    first_unit = first_name.match?(CALORIE_MACHINES) ? "calories" : "reps"
+    second_unit = second_name.match?(CALORIE_MACHINES) ? "calories" : "reps"
     [
-      "#{first_name} #{down.gsub("\u00B7", ", ")} calories",
-      "#{second_name} #{up.gsub("\u00B7", ", ")} reps"
+      "#{first_name} #{down.gsub("\u00B7", ", ")} #{first_unit}",
+      "#{second_name} #{up.gsub("\u00B7", ", ")} #{second_unit}"
     ]
   end
 

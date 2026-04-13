@@ -50,9 +50,25 @@
   </div>
 
   <% is_ladder = %w[ladder mountain switchback].include?(section["format"].to_s) %>
+  <% is_switchback = section["format"].to_s == "switchback" %>
   <% has_metric = !is_ladder && (exercise["distance_m"] || exercise["duration_s"] || exercise["weight_kg"] ||
                   (!is_tabata && (exercise["calories"] || exercise["reps"]))) %>
-  <% if has_metric || (!is_ladder && exercise["notes"].present?) %>
+  <% if is_switchback && Array(section["exercises"]).size == 2 %>
+    <% sb_start = section["start"].to_i.nonzero? || 40
+       sb_end   = section["end"].to_i.nonzero?   || 10
+       sb_step  = section["step"].to_i.nonzero?   || 10
+       down_vals = []; v = sb_start; while v >= sb_end; down_vals << v; v -= sb_step; end
+       up_vals = down_vals.reverse
+       is_cal_machine = exercise["name"].to_s.match?(/\b(row|assault.?bike|ski.?erg|bike)\b/i)
+       seq = exercise_index == 0 ? down_vals : up_vals
+       unit = is_cal_machine ? "cal" : "reps" %>
+    <div class="flex items-center gap-1.5 mt-1 flex-wrap">
+      <span class="text-xs font-bold text-sky-200"><%= seq.join(", ") %> <%= unit %></span>
+      <% if exercise["notes"].present? %>
+        <span class="text-gray-400 text-xs italic"><%= exercise["notes"] %></span>
+      <% end %>
+    </div>
+  <% elsif has_metric || (!is_ladder && exercise["notes"].present?) %>
     <div class="flex items-center gap-1.5 mt-1 flex-wrap" <% if swap_can_show %>data-swap-exercise-target="details"<% end %>>
       <% if exercise["distance_m"] %>
         <span class="text-xs font-bold text-sky-200"><%= exercise["distance_m"] %>m</span>
