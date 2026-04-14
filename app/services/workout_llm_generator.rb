@@ -1074,7 +1074,8 @@ class WorkoutLLMGenerator
       - Main sets: do NOT set duration_mins on main sets — let the reps, rounds, and format define the work. Only amrap and emom sections need a duration_mins (their time cap). A short punchy finisher (e.g. Tabata, The Hundred/Centurion, for_time sprint) is a welcome extra at the end of the main work — but ONLY if the time budget allows it.
       #{core_rule}
       #{training_rule}
-      - Rep counts and calorie targets must be "clean" numbers — even numbers (2, 4, 6, 8, 10, 12, 16, 20…) or multiples of 5 (5, 10, 15, 20, 25…). Never use odd, awkward counts like 13, 7, 11, 17, or 19. When scaling from competition volumes, round to the nearest clean number.
+      - Rep counts and calorie targets must be "clean" numbers. PREFERRED: 5, 8, 10, 12, 15, 20, 25, 30, 40, 50. ACCEPTABLE: other even numbers (6, 14, 16, 18) or multiples of 5. BANNED: 7, 9, 11, 13, 17, 19 — never use these. Default to 10 reps when unsure. When scaling from competition volumes, round to the nearest preferred number.
+      - AMRAP durations must be round numbers: 8, 10, 12, 15, or 20 minutes. Never use odd durations like 7, 9, 11, 13, or 17 minutes. Same for EMOM durations — use clean numbers.
       - Be specific with reps and distances. For WEIGHTS and SPEEDS, use relative effort cues instead of absolute numbers (e.g. "light — sustainable across all reps", "heavy — last 2 reps should be a struggle", "start at your fastest sustainable pace"). Only use specific weights if the athlete has known working weights in their Athlete Context
       - SECTION NAMES MUST BE ACCURATE: never mention an exercise or activity in a section name unless it actually appears in that section's exercises. "Run + Station" must contain running. "Sled Circuit" must contain sled work. If unsure, use a generic evocative name instead.
       - NEVER use numbered block prefixes like "Block 1:", "Block 2:", "Block 3:" or "Part 1:", "Part 2:" in section names. Use creative, descriptive names instead.
@@ -1379,13 +1380,16 @@ class WorkoutLLMGenerator
     working_mins = @duration_mins - warmup_mins - cooldown_mins
     main_sections = (working_mins / 15.0).floor
     main_sections = [ main_sections, 1 ].max
-    leftover = working_mins - (main_sections * 15)
+    changeover_mins = main_sections > 1 ? (main_sections - 1) * 3 : 0
+    effective_working = working_mins - changeover_mins
+    leftover = effective_working - (main_sections * 12)
     finisher = leftover >= 4 ? "Yes — a quick finisher (Tabata = 4 min, The Hundred ≈ 5 min, or a short abs set ≈ 3 min) fits in the remaining #{leftover} min." : "No finisher — there is not enough spare time."
 
     <<~BUDGET
       - *** TIME BUDGET (CRITICAL — sessions MUST fit within #{@duration_mins} minutes) ***
         Warm-up: #{warmup_mins} min | Cool-down: #{cooldown_mins} min | Working time: #{working_mins} min.
-        At ~15 min per main section, you have room for EXACTLY #{main_sections} main section#{"s" if main_sections > 1}.
+        Allow ~3 min changeover/rest between sections (#{changeover_mins} min for #{main_sections} sections). Effective working time: #{effective_working} min.
+        At ~12 min per main section, you have room for #{main_sections} main section#{"s" if main_sections > 1}.
         Finisher: #{finisher}
         TIMING GUIDE per format (use these to stay on budget):
         - AMRAP / EMOM: duration_mins IS the time — set it to fit the budget exactly.

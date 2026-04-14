@@ -118,17 +118,23 @@
                     <input name="sections[<%= si %>][exercises][<%= ex_id %>][notes]" type="text"
                       value="<%= exercise["notes"] %>" placeholder="Description or cue (optional)"
                       class="w-full bg-zinc-800 border border-zinc-600 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-lime-400 transition-colors">
-                    <% metric = exercise["reps"] ? "reps" : exercise["distance_m"] ? "distance" : exercise["duration_s"] ? "duration" : "reps" %>
+                    <% metric = exercise["calories"] ? "calories" : exercise["reps"] ? "reps" : exercise["distance_m"] ? "distance" : exercise["duration_s"] ? "duration" : "reps" %>
                     <div class="flex items-center gap-2 flex-wrap">
                       <select data-action="change->builder#toggleMetric"
                         class="bg-zinc-800 border border-zinc-600 rounded-lg px-2 py-1.5 text-xs text-gray-300 focus:outline-none focus:border-lime-400 transition-colors">
                         <option value="reps"     <%= "selected" if metric == "reps" %>>Reps</option>
+                        <option value="calories" <%= "selected" if metric == "calories" %>>Calories</option>
                         <option value="distance" <%= "selected" if metric == "distance" %>>Distance</option>
                         <option value="duration" <%= "selected" if metric == "duration" %>>Time</option>
                       </select>
                       <div data-metric="reps" <%= "style=display:none" if metric != "reps" %>>
                         <input name="sections[<%= si %>][exercises][<%= ex_id %>][reps]" type="number" min="1"
                           value="<%= exercise["reps"] %>" placeholder="Reps"
+                          class="w-20 bg-zinc-800 border border-zinc-600 rounded-lg px-2 py-1.5 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-lime-400 transition-colors">
+                      </div>
+                      <div data-metric="calories" <%= "style=display:none" if metric != "calories" %>>
+                        <input name="sections[<%= si %>][exercises][<%= ex_id %>][calories]" type="number" min="1"
+                          value="<%= exercise["calories"] %>" placeholder="Calories"
                           class="w-20 bg-zinc-800 border border-zinc-600 rounded-lg px-2 py-1.5 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-lime-400 transition-colors">
                       </div>
                       <div data-metric="distance" <%= "style=display:none" if metric != "distance" %>>

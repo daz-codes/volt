@@ -84,6 +84,7 @@ class WorkoutValidator
     fix_emom_notes(sections)
     fix_cardio_interval_split(sections)
     fix_threshold_interval_duration(sections)
+    fix_cardio_missing_metric(sections)
     if @main_tag_slug == "turbine"
       fix_turbine_formats(sections)
       fix_turbine_block_durations(sections)
@@ -95,6 +96,7 @@ class WorkoutValidator
 
     fix_warmup_format(sections)
     fix_amrap_minimum_exercises(sections)
+    fix_timed_section_durations(sections)
     dedup_identical_sections(sections)
     dedup_structurally_identical_sections(sections)
     cap_main_section_count(sections) unless @main_tag_slug == "functional-muscle"
@@ -390,12 +392,22 @@ class WorkoutValidator
     end
   end
 
+  # Preferred rep counts: these are the numbers athletes actually use.
+  # We snap to the nearest preferred number first; fall back to any even/mult-of-5.
+  PREFERRED_REPS = [ 5, 6, 8, 10, 12, 15, 16, 18, 20, 25, 30, 40, 50 ].freeze
+  BANNED_REPS    = [ 7, 9, 11, 13, 17, 19 ].freeze
+
   def nearest_clean_rep(n)
-    return n if n % 2 == 0 || n % 5 == 0
-    # Find nearest value that is even or a multiple of 5
-    down = (n - 1).downto(1).find { |v| v % 2 == 0 || v % 5 == 0 }
-    up   = (n + 1).upto(n + 5).find { |v| v % 2 == 0 || v % 5 == 0 }
-    [ down, up ].compact.min_by { |v| (v - n).abs }
+    return n if !BANNED_REPS.include?(n) && (n % 2 == 0 || n % 5 == 0)
+    # Find nearest preferred number
+    best = PREFERRED_REPS.min_by { |v| (v - n).abs }
+    # If preferred is too far (>5 away), fall back to nearest even/mult-of-5
+    if (best - n).abs > 5
+      down = (n - 1).downto([n - 5, 1].max).find { |v| v % 2 == 0 || v % 5 == 0 }
+      up   = (n + 1).upto(n + 5).find { |v| v % 2 == 0 || v % 5 == 0 }
+      best = [ down, up ].compact.min_by { |v| (v - n).abs }
+    end
+    best
   end
 
   # Snap distance_m to clean round numbers.
@@ -431,9 +443,10 @@ class WorkoutValidator
   end
 
   # Treadmills don't have calorie counters in the way bikes/rowers do.
-  # Convert calories to distance (rough ~80m per cal at sprint pace).
+  # Convert calories to distance (~20m per cal — a rough treadmill estimate).
+  # 15 cal ≈ 300m, 25 cal ≈ 500m. Snapped to nearest 100m.
   TREADMILL_PATTERN_STRICT = /\btreadmill\b/i.freeze
-  TREADMILL_CAL_TO_DISTANCE_M = 80
+  TREADMILL_CAL_TO_DISTANCE_M = 20
 
   def fix_treadmill_calories(sections)
     sections.each do |section|
@@ -504,6 +517,21 @@ class WorkoutValidator
       section["rounds"] = 3
       section.delete("duration_mins")
       @fixes << "'#{section["name"]}': AMRAP with #{exercises.size} exercise(s) → converted to 3 rounds for_time"
+    end
+  end
+
+  # AMRAP and EMOM durations should be clean round numbers.
+  CLEAN_TIMED_DURATIONS = [ 4, 6, 8, 10, 12, 15, 16, 18, 20, 24, 30 ].freeze
+
+  def fix_timed_section_durations(sections)
+    sections.each do |section|
+      next unless section["format"].in?(%w[amrap emom])
+      dur = section["duration_mins"].to_i
+      next if dur <= 0 || CLEAN_TIMED_DURATIONS.include?(dur)
+
+      clean = CLEAN_TIMED_DURATIONS.min_by { |v| (v - dur).abs }
+      section["duration_mins"] = clean
+      @fixes << "'#{section["name"]}': #{section["format"].upcase} duration #{dur} min → #{clean} min (snapped to clean number)"
     end
   end
 
@@ -1089,6 +1117,31 @@ class WorkoutValidator
     end
   end
 
+  # Cardio machines (bike, rower, ski erg) must have a metric — calories, distance,
+  # or duration. If none is set, default to calories based on the section context.
+  DEFAULT_CARDIO_CALS = { 1 => 25, 2 => 20, 3 => 15 }.freeze # by round count bucket
+
+  def fix_cardio_missing_metric(sections)
+    sections.each do |section|
+      next if section["format"] == "emom" # EMOMs have their own rules
+      rounds = section["rounds"].to_i.clamp(1, 99)
+
+      Array(section["exercises"]).each do |ex|
+        next unless ex["name"].to_s.match?(CARDIO_MACHINE_PATTERN)
+        next if ex["name"].to_s.match?(/\btreadmill\b/i) # treadmill handled separately
+        has_metric = ex["reps"].to_i > 0 || ex["calories"].to_i > 0 ||
+                     ex["distance_m"].to_i > 0 || ex["duration_s"].to_i > 0
+        next if has_metric
+
+        # Pick a sensible calorie default based on round count
+        bucket = rounds <= 3 ? 1 : rounds <= 6 ? 2 : 3
+        cals = DEFAULT_CARDIO_CALS[bucket]
+        ex["calories"] = cals
+        @fixes << "'#{section["name"]}': #{ex["name"]} had no metric — set #{cals} cal"
+      end
+    end
+  end
+
   # Turbine sessions: fix formats and ensure sensible round counts.
   # - Convert for_time to rounds (Turbine blocks are always interval or steady-state)
   # - Ensure distance repeats have at least 4 rounds
@@ -1601,10 +1654,12 @@ class WorkoutValidator
     budget   = @duration_mins - overhead
     running  = 0
     cutoff   = nil
+    changeover = 3 # ~3 min changeover between sections
 
     main_sections.each_with_index do |s, i|
       est = s["duration_mins"].to_i > 0 ? s["duration_mins"].to_i :
             SECTION_TIME_ESTIMATE[s["format"]] || DEFAULT_SECTION_TIME
+      est += changeover if i > 0 # changeover time before each section after the first
       running += est
       if running > budget && i >= 2 # keep at least 2 main sections
         cutoff = i

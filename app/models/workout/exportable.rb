@@ -99,9 +99,7 @@ module Workout::Exportable
       footer_y = canvas_height - 80
       commands.push("-fill", BORDER_GRAY, "-draw", "rectangle 56,#{footer_y - 20} #{CANVAS_WIDTH - 56},#{footer_y - 19}")
       commands.push("-pointsize", "24", "-gravity", "NorthWest")
-      commands.push("-fill", MID_GRAY, "-annotate", "+56+#{footer_y + 10}", safe("Made with"))
-      commands.push("-fill", LIME, "-annotate", "+170+#{footer_y + 10}", safe("VOLT"))
-      commands.push("-fill", MID_GRAY, "-annotate", "+232+#{footer_y + 10}", safe("energise your workout"))
+      commands.push("-fill", MID_GRAY, "-annotate", "+56+#{footer_y + 10}", safe("Made with VOLT \u00B7 energise your workout"))
 
       commands.push(tempfile.path)
 
@@ -218,9 +216,26 @@ module Workout::Exportable
     when "amrap"
       [ "AMRAP #{dur}min", "As many rounds as possible" ]
     when "rounds"
-      label = rounds && rounds > 1 ? "#{rounds} Rounds" : nil
-      desc = rest && rest > 0 && rounds && rounds > 1 ? "#{rest}s rest after each round" : nil
-      [ label, desc ]
+      if rounds && rounds > 1
+        label = "#{rounds} Rounds"
+        desc_parts = []
+        desc_parts << "#{rest}s rest after each round" if rest && rest > 0
+
+        # Pull hard/easy interval description from single-exercise notes
+        exercises = Array(section["exercises"])
+        if exercises.size == 1
+          notes = exercises.first["notes"].to_s
+          interval = notes[/\d+s\s*hard\s*\/\s*\d+s\s*easy/i] ||
+                     notes[/\d+s\s*hard\s+effort\s*\/\s*\d+s\s*easy\s*recovery/i]
+          desc_parts << interval if interval
+        end
+
+        [ label, desc_parts.compact.join(" \u00B7 ").presence ]
+      else
+        # Single-round or no-round sections: use section name as label so
+        # they're visually separated from the previous section.
+        [ section["name"], nil ]
+      end
     when "for_time"
       desc = rounds && rounds > 1 ? "#{rounds} rounds \u00B7 race the clock" : "Race the clock"
       [ "For Time", desc ]
