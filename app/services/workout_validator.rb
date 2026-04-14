@@ -1081,7 +1081,7 @@ class WorkoutValidator
   # splits that add to a round minute. Snap duration_s to the hard portion and
   # rewrite notes to match. Also fix duration_s set to the total (hard+easy)
   # instead of just the hard portion.
-  CLEAN_THRESHOLD_SPLITS = [ [30, 30], [40, 20], [45, 15], [20, 10] ].freeze
+  CLEAN_THRESHOLD_SPLITS = [ [15, 15], [20, 10], [30, 30], [40, 20], [45, 15] ].freeze
 
   def fix_threshold_interval_duration(sections)
     sections.each do |section|
@@ -1093,8 +1093,8 @@ class WorkoutValidator
       next unless ex["name"].to_s.match?(CARDIO_MACHINE_PATTERN)
       notes = ex["notes"].to_s
 
-      # Match "Xs hard / Ys easy" pattern
-      m = notes.match(/(\d+)s\s*hard\s*\/\s*(\d+)s\s*easy/i)
+      # Match "Xs hard / Ys easy" pattern (with optional words like "effort", "recovery" in between)
+      m = notes.match(/(\d+)s\s*hard[\w\s]*\/\s*(\d+)s\s*easy/i)
       next unless m
 
       hard = m[1].to_i
@@ -1111,7 +1111,7 @@ class WorkoutValidator
       unless CLEAN_THRESHOLD_SPLITS.include?([hard, easy])
         best = CLEAN_THRESHOLD_SPLITS.min_by { |h, e| (h - hard).abs + (e - easy).abs }
         ex["duration_s"] = best[0]
-        ex["notes"] = notes.sub(/\d+s\s*hard\s*\/\s*\d+s\s*easy/i, "#{best[0]}s hard / #{best[1]}s easy")
+        ex["notes"] = notes.sub(/\d+s\s*hard[\w\s]*\/\s*\d+s\s*easy[\w\s]*/i, "#{best[0]}s hard / #{best[1]}s easy")
         @fixes << "'#{section["name"]}': snapped interval to #{best[0]}s hard / #{best[1]}s easy (was #{hard}s/#{easy}s)"
       end
     end

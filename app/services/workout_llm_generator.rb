@@ -397,7 +397,7 @@ class WorkoutLLMGenerator
 
         ENERGY SYSTEM MIX — every Turbine session must target at least 2 of these 4 energy systems across its blocks:
         - SPRINT (anaerobic power): 10-20s all-out efforts with 40-60s full rest between. 6-10 rounds. Great on assault bike or ski erg. Use format: rounds with rest_secs. Total block ~8-10 min.
-        - THRESHOLD (anaerobic capacity): Hard/easy intervals ON THE SAME MACHINE that add to a round minute. 8-12 rounds. Use format: rounds, NO rest_secs — the easy portion IS the recovery. Set duration_s to the HARD portion only. Describe the full interval in exercise notes. Allowed splits: "30s hard / 30s easy" (duration_s: 30), "40s hard / 20s easy" (duration_s: 40), "45s hard / 15s easy" (duration_s: 45), "20s hard / 10s easy" (duration_s: 20). ALWAYS pick one of these — do NOT invent odd splits like 35s/25s. Total block ~8-12 min.
+        - THRESHOLD (anaerobic capacity): Hard/easy intervals ON THE SAME MACHINE that add to a round minute. 8-12 rounds. Use format: rounds, NO rest_secs — the easy portion IS the recovery. Set duration_s to the HARD portion only. Describe the full interval in exercise notes. Allowed splits: "15s hard / 15s easy" (duration_s: 15), "20s hard / 10s easy" (duration_s: 20), "30s hard / 30s easy" (duration_s: 30), "40s hard / 20s easy" (duration_s: 40), "45s hard / 15s easy" (duration_s: 45). ALWAYS pick one of these — do NOT invent odd splits like 35s/25s. Total block ~8-12 min.
         - VO2 MAX: 2-4 min hard sustained efforts with 2-3 min rest. 4-6 rounds. Use format: rounds with rest_secs. Set distance_m PER REP (e.g. distance_m: 400 with rounds: 5 — NOT distance_m: 2000 with rounds: 1). Great for rowing 500m repeats, treadmill 400m repeats, or ski erg efforts. Total block ~10-12 min.
         - ZONE 2 (aerobic base): 8-12 min single sustained effort at conversational pace. Use format: rounds with rounds: 1 and duration_s on the exercise. NEVER more than 1 round — this is one continuous effort, not repeated sets.
 
@@ -1820,8 +1820,8 @@ class WorkoutLLMGenerator
       interval_machine = %w[Row Assault\ Bike SkiErg Treadmill].sample
       protocols = [
         { rounds: 8,  rest: 90,  ex: { "name" => interval_machine, "distance_m" => 400, "notes" => "fast repeats — consistent pace each round" } },
-        { rounds: 16, rest: nil, ex: { "name" => interval_machine, "duration_s" => 15, "notes" => "15s hard / 15s easy" } },
-        { rounds: 8,  rest: nil, ex: { "name" => interval_machine, "duration_s" => 30, "notes" => "30s hard / 30s easy" } },
+        { rounds: 10, rest: nil, ex: { "name" => interval_machine, "duration_s" => 30, "notes" => "30s hard / 30s easy" } },
+        { rounds: 8,  rest: nil, ex: { "name" => interval_machine, "duration_s" => 40, "notes" => "40s hard / 20s easy" } },
         { rounds: 3,  rest: 180, ex: { "name" => interval_machine, "duration_s" => 240, "notes" => "high effort — hold your pace" } }
       ]
       p = protocols.sample
