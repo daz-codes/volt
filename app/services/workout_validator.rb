@@ -59,6 +59,7 @@ class WorkoutValidator
     end
 
     fix_mountain_rep_sequence(sections)
+    fix_exercise_name_programming(sections)
     fix_notes_as_programming(sections)
     fix_bear_complex_notes(sections)
     fix_strength_weight_cues(sections)
@@ -598,6 +599,29 @@ class WorkoutValidator
     end
   end
 
+  # Strip distances, durations, and programming descriptors from exercise names.
+  # The LLM sometimes generates names like "Rower 1000m Single", "SkiErg 30s Sprint",
+  # "Assault Bike 15 cal Blast". The name should just be the equipment/movement.
+  EXERCISE_NAME_JUNK = /\s+\d+\s*(?:m|km|s|sec|min|cal|calories|reps?)\b.*$/i.freeze
+  EXERCISE_NAME_DESCRIPTOR = /\s+(?:single|couplet|triplet|ladder|pyramid|interval|sprint|repeat|blast|piece|set)\s*$/i.freeze
+  EXERCISE_NAME_HARD_EASY = /\s+(?:hard|easy|recovery|threshold|steady|all.out)[\s\/]*(?:easy|recovery|interval|effort)?.*$/i.freeze
+
+  def fix_exercise_name_programming(sections)
+    sections.each do |section|
+      Array(section["exercises"]).each do |ex|
+        original = ex["name"].to_s
+        cleaned = original
+          .sub(EXERCISE_NAME_JUNK, "")
+          .sub(EXERCISE_NAME_DESCRIPTOR, "")
+          .sub(EXERCISE_NAME_HARD_EASY, "")
+          .strip
+        next if cleaned == original || cleaned.empty?
+        ex["name"] = cleaned
+        @fixes << "'#{section["name"]}': exercise name '#{original}' → '#{cleaned}' (stripped embedded programming)"
+      end
+    end
+  end
+
   def fix_notes_as_programming(sections)
     sections.each do |section|
       next if %w[warm_up cool_down].include?(section["category"])
@@ -1082,6 +1106,9 @@ class WorkoutValidator
   # rewrite notes to match. Also fix duration_s set to the total (hard+easy)
   # instead of just the hard portion.
   CLEAN_THRESHOLD_SPLITS = [ [15, 15], [20, 10], [30, 30], [40, 20], [45, 15] ].freeze
+  INTERVAL_HARD_WORDS = /(?:hard|sprint|all.out|max|effort|explosive|power)/i.freeze
+  INTERVAL_EASY_WORDS = /(?:easy|rest|recovery|active|slow|light)/i.freeze
+  INTERVAL_NOTES_PATTERN = /(\d+)\s*(?:s|sec(?:ond)?s?)\s*#{INTERVAL_HARD_WORDS}[^\/;,]*[\/;,]\s*(\d+)\s*(?:s|sec(?:ond)?s?)\s*#{INTERVAL_EASY_WORDS}/i.freeze
 
   def fix_threshold_interval_duration(sections)
     sections.each do |section|
@@ -1093,8 +1120,10 @@ class WorkoutValidator
       next unless ex["name"].to_s.match?(CARDIO_MACHINE_PATTERN)
       notes = ex["notes"].to_s
 
-      # Match "Xs hard / Ys easy" pattern (with optional words like "effort", "recovery" in between)
-      m = notes.match(/(\d+)s\s*hard[\w\s]*\/\s*(\d+)s\s*easy/i)
+      # Match hard/easy interval patterns in notes. The LLM writes these many ways:
+      #   "30s hard / 30s easy", "45 seconds all-out; 20 seconds easy recovery",
+      #   "40s hard effort / 20s easy", "20s max / 10s rest"
+      m = notes.match(INTERVAL_NOTES_PATTERN)
       next unless m
 
       hard = m[1].to_i
@@ -1111,7 +1140,7 @@ class WorkoutValidator
       unless CLEAN_THRESHOLD_SPLITS.include?([hard, easy])
         best = CLEAN_THRESHOLD_SPLITS.min_by { |h, e| (h - hard).abs + (e - easy).abs }
         ex["duration_s"] = best[0]
-        ex["notes"] = notes.sub(/\d+s\s*hard[\w\s]*\/\s*\d+s\s*easy[\w\s]*/i, "#{best[0]}s hard / #{best[1]}s easy")
+        ex["notes"] = "#{best[0]}s hard / #{best[1]}s easy"
         @fixes << "'#{section["name"]}': snapped interval to #{best[0]}s hard / #{best[1]}s easy (was #{hard}s/#{easy}s)"
       end
     end
@@ -1223,6 +1252,7 @@ class WorkoutValidator
       end
     end
   end
+
 
   # Hyrox does NOT use Assault Bike / Air Bike. The only cardio machines are
   # SkiErg, Rowing Machine, and Treadmill. Replace any bike references.

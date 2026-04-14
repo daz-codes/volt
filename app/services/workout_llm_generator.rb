@@ -391,12 +391,12 @@ class WorkoutLLMGenerator
 
         BANNED: dumbbells, kettlebells, barbells, medicine balls, sleds, battle ropes, boxes, rings, pull-up bars, benches, jump rope. BANNED exercises: burpees, squats, lunges, push-ups, sit-ups, carries, thrusters, swings, cleans, snatches, box jumps, wall balls, slams — anything that isn't on one of the 4 machines.
 
-        STRUCTURE: Warm-up (5 min easy on any machine) → 3-4 main cardio blocks → Cool-down (5 min easy on any machine). Each main block is a standalone effort on ONE machine. Use a DIFFERENT machine for each block — the session should rotate through all 4 machines (treadmill, assault bike, rower, ski erg).
+        STRUCTURE: Warm-up (5 min easy on any machine) → 3-4 main cardio blocks → Cool-down (5 min easy on any machine). Each main block is a standalone effort on ONE machine. Use a DIFFERENT machine for each block — the session should rotate through all 4 machines (treadmill, assault bike, rower, ski erg). A tabata CAN appear occasionally as one of the main blocks (on any machine, not just treadmill), but most sessions should NOT have one — distance repeats, threshold intervals, and steady state are the bread and butter. Do NOT default to ending every session with a treadmill tabata.
 
         BLOCK DURATION: Each main block must be 8-12 minutes of working time (including rest). This is CRITICAL — a 45-min session has ~35 min of working time across 3-4 blocks. Do NOT create blocks longer than 12 minutes. Do NOT set rounds on steady-state efforts — zone 2 is always rounds: 1.
 
         ENERGY SYSTEM MIX — every Turbine session must target at least 2 of these 4 energy systems across its blocks:
-        - SPRINT (anaerobic power): 10-20s all-out efforts with 40-60s full rest between. 6-10 rounds. Great on assault bike or ski erg. Use format: rounds with rest_secs. Total block ~8-10 min.
+        - SPRINT (anaerobic power): 10-20s all-out efforts with full rest between. 6-10 rounds. Great on assault bike or ski erg. Use format: rounds with rest_secs. Allowed sprint combos: 10s work / 50s rest, 15s work / 45s rest, 20s work / 40s rest (work + rest = 60s always). Total block ~8-10 min.
         - THRESHOLD (anaerobic capacity): Hard/easy intervals ON THE SAME MACHINE that add to a round minute. 8-12 rounds. Use format: rounds, NO rest_secs — the easy portion IS the recovery. Set duration_s to the HARD portion only. Describe the full interval in exercise notes. Allowed splits: "15s hard / 15s easy" (duration_s: 15), "20s hard / 10s easy" (duration_s: 20), "30s hard / 30s easy" (duration_s: 30), "40s hard / 20s easy" (duration_s: 40), "45s hard / 15s easy" (duration_s: 45). ALWAYS pick one of these — do NOT invent odd splits like 35s/25s. Total block ~8-12 min.
         - VO2 MAX: 2-4 min hard sustained efforts with 2-3 min rest. 4-6 rounds. Use format: rounds with rest_secs. Set distance_m PER REP (e.g. distance_m: 400 with rounds: 5 — NOT distance_m: 2000 with rounds: 1). Great for rowing 500m repeats, treadmill 400m repeats, or ski erg efforts. Total block ~10-12 min.
         - ZONE 2 (aerobic base): 8-12 min single sustained effort at conversational pace. Use format: rounds with rounds: 1 and duration_s on the exercise. NEVER more than 1 round — this is one continuous effort, not repeated sets.
@@ -408,11 +408,20 @@ class WorkoutLLMGenerator
         - Sprint intervals: use rest_secs for full recovery between max efforts.
         - VO2 max efforts: use rest_secs for recovery between hard bouts.
         - Steady state / zone 2: use format: rounds with rounds: 1 and duration_s on the exercise. NEVER set rounds > 1 on steady-state blocks.
-        - Treadmill: use distance_m for repeats (e.g. 400m) or duration_s for time-based efforts. Use relative effort cues for pace ("hard effort", "sprint", "easy jog") — never absolute speeds.
+        - Treadmill: use distance_m for repeats (e.g. 400m) or duration_s for time-based efforts. Use relative effort cues for pace ("hard effort", "sprint", "easy jog") — never absolute speeds. TREADMILL IS NOT JUST FOR TABATAS — use it for ANY energy system:
+          * VO2 max: 5 × 400m with 90s rest, 4 × 800m with 2min rest
+          * Threshold: 30s hard / 30s easy × 10 rounds, 40s hard / 20s easy × 8 rounds
+          * Sprint: 200m all-out × 6 with 60s rest
+          * Zone 2: 10min steady run at conversational pace
+          The treadmill should appear as a MAIN block doing real running work, not just as a tabata at the end.
 
         DISTANCE PYRAMID: An optional block type — descending distance sets on one machine. Structure as 3 consecutive sections on the SAME machine with decreasing distance and increasing reps: e.g. 1×800m → 2×400m → 4×200m (or doubled: 1×1600m → 2×800m → 4×400m). Each tier is its own section with format: rounds. This is an exception to the machine variety rule — pyramid tiers share a machine. Great on treadmill or rower.
 
-        MACHINE VARIETY: Use all 4 machines across the session. Never use the same machine for two separate blocks — EXCEPT for distance pyramid tiers, which intentionally use the same machine across their 3 tiers. Good session example: Rower steady state → Assault Bike sprints → Ski Erg threshold intervals → Treadmill VO2 max repeats. Or: Treadmill distance pyramid (800/400/200) → Rower steady state → Assault Bike sprints → Ski Erg threshold intervals.
+        MACHINE VARIETY: Use all 4 machines across the session. Never use the same machine for two separate blocks — EXCEPT for distance pyramid tiers, which intentionally use the same machine across their 3 tiers. VARY THE ORDER every session — do not always put treadmill last. Example sessions (vary these):
+          1. Treadmill 5×400m (VO2 max) → Assault Bike 30s/30s (threshold) → Rower steady state (zone 2) → SkiErg 10s sprints (sprint)
+          2. Rower 500m repeats (VO2 max) → SkiErg 40s/20s (threshold) → Treadmill 10min steady (zone 2) → Assault Bike sprints (sprint)
+          3. SkiErg 45s/15s (threshold) → Treadmill 4×800m (VO2 max) → Assault Bike 15s sprints (sprint) → Rower steady state (zone 2)
+          4. Assault Bike 30s/30s (threshold) → Rower 4×500m (VO2 max) → SkiErg steady state (zone 2) → Treadmill 6×200m sprints (sprint)
 
         SESSION FEEL: This is a serious cardio training session — not just "go on a machine." Each block has a clear purpose and intensity target. The athlete should finish knowing they've trained multiple energy systems hard.
       TURBINE
@@ -1078,6 +1087,7 @@ class WorkoutLLMGenerator
       - AMRAP durations must be round numbers: 8, 10, 12, 15, or 20 minutes. Never use odd durations like 7, 9, 11, 13, or 17 minutes. Same for EMOM durations — use clean numbers.
       - Be specific with reps and distances. For WEIGHTS and SPEEDS, use relative effort cues instead of absolute numbers (e.g. "light — sustainable across all reps", "heavy — last 2 reps should be a struggle", "start at your fastest sustainable pace"). Only use specific weights if the athlete has known working weights in their Athlete Context
       - SECTION NAMES MUST BE ACCURATE: never mention an exercise or activity in a section name unless it actually appears in that section's exercises. "Run + Station" must contain running. "Sled Circuit" must contain sled work. If unsure, use a generic evocative name instead.
+      - EXERCISE NAMES ARE JUST THE MOVEMENT OR MACHINE — never embed distances, durations, reps, or programming descriptors in exercise names. WRONG: "Rower 1000m Single", "SkiErg 30s Sprint", "Assault Bike 15 cal Blast". RIGHT: "Rowing Machine", "SkiErg", "Assault Bike". Put distances in distance_m, durations in duration_s, and descriptors in notes.
       - NEVER use numbered block prefixes like "Block 1:", "Block 2:", "Block 3:" or "Part 1:", "Part 2:" in section names. Use creative, descriptive names instead.
       - Give it a punchy, memorable name — something a gym community would actually call it. Be creative and unpredictable: draw from feelings, imagery, places, days, animals, weather, mythology, slang — anything vivid. Actively vary the style each time (e.g. a cheeky two-worder one time, a dramatic three-worder the next, a dry/ironic name after that). NEVER use the session type name as the workout name — "#{main_name}" is the TYPE of session, not the name. The name must be original and creative. BANNED WORDS in workout names: Voltage, Maximum, Transformer, Dynamo, Alternator, Circuit Breaker, Tread & Shred, Iron Engine, Ohm, Turbine — these are session type brands, not workout names. #{recent_names.any? ? "The user's recent workout names are: #{recent_names.map { |n| "\"#{n}\"" }.join(", ")}. Do NOT reuse any word or theme from these." : ""}
       #{recent_fm_formats.present? ? "- RECENT SESSIONS — the user's recent Functional Muscle sessions were:\n#{recent_fm_formats.lines.map { |l| "        #{l}" }.join}\n      Use this to avoid repetition: pick different strength machines from the ones listed, pick a different Pilates 100 exercise, and vary the tabata compounds. Block types (12-min, ladder etc) can repeat if they fit — but machines and finisher should rotate." : ""}
@@ -1383,7 +1393,13 @@ class WorkoutLLMGenerator
     changeover_mins = main_sections > 1 ? (main_sections - 1) * 3 : 0
     effective_working = working_mins - changeover_mins
     leftover = effective_working - (main_sections * 12)
-    finisher = leftover >= 4 ? "Yes — a quick finisher (Tabata = 4 min, The Hundred ≈ 5 min, or a short abs set ≈ 3 min) fits in the remaining #{leftover} min." : "No finisher — there is not enough spare time."
+    finisher = if @activity_slug == "turbine"
+      "No dedicated finisher — spread all working time across the main cardio blocks. A tabata can occasionally BE one of the main blocks, but don't default to it."
+    elsif leftover >= 4
+      "Yes — a quick finisher (Tabata = 4 min, The Hundred ≈ 5 min, or a short abs set ≈ 3 min) fits in the remaining #{leftover} min."
+    else
+      "No finisher — there is not enough spare time."
+    end
 
     <<~BUDGET
       - *** TIME BUDGET (CRITICAL — sessions MUST fit within #{@duration_mins} minutes) ***
