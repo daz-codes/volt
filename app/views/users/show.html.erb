@@ -1,5 +1,6 @@
 <% content_for :title, @profile_user.display %>
 <% content_for :full_bleed, true %>
+<% content_for :head do %><meta name="turbo-cache-control" content="no-cache"><% end %>
 
 <% if @page == 1 %>
   <div class="max-w-2xl mx-auto">

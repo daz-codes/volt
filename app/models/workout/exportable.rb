@@ -219,7 +219,7 @@ module Workout::Exportable
       [ "AMRAP #{dur}min", "As many rounds as possible" ]
     when "rounds"
       label = rounds && rounds > 1 ? "#{rounds} Rounds" : nil
-      desc = rest && rest > 0 ? "#{rest}s rest after each round" : nil
+      desc = rest && rest > 0 && rounds && rounds > 1 ? "#{rest}s rest after each round" : nil
       [ label, desc ]
     when "for_time"
       desc = rounds && rounds > 1 ? "#{rounds} rounds \u00B7 race the clock" : "Race the clock"

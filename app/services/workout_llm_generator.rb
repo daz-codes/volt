@@ -374,7 +374,7 @@ class WorkoutLLMGenerator
     "hyrox" => {
       primary: %w[for_time rounds emom],
       secondary: %w[amrap tabata ladder hundred mountain],
-      guidance: "Hyrox sessions must include treadmill running — it's the backbone of the race (8 × 1km). For_time and rounds simulate race pacing. EMOMs build station endurance. Mix in AMRAPs, tabatas, ladders, and hundreds for training variety. MANDATORY: Every Hyrox session MUST include at least 2 treadmill running intervals (500m–1km each) placed between station blocks. Use treadmill, not outdoor running. ENGINE BUILDING: Occasionally include a dedicated running interval block (pure treadmill, not mixed with functional exercises) to build VO2 max — e.g. 400m repeats with 90s rest, 30s hard/30s easy, or 4min hard efforts. Not every session, but mix them in regularly to improve 1km split times."
+      guidance: "Hyrox sessions must include treadmill running — it's the backbone of the race (8 × 1km). For_time and rounds simulate race pacing. EMOMs build station endurance. Mix in AMRAPs, tabatas, ladders, and hundreds for training variety. MANDATORY: Every Hyrox session MUST include at least 2 treadmill running intervals (500m–1km each) placed between station blocks. Use treadmill, not outdoor running. ENGINE BUILDING: Occasionally include a dedicated cardio interval block (SkiErg, Rowing, or Treadmill — NOT Assault Bike) to build the engine — e.g. rower 500m repeats, SkiErg 30s hard/30s easy, or treadmill 400m repeats. BANNED EQUIPMENT: Assault Bike is NOT a Hyrox machine. The only cardio machines in Hyrox are SkiErg, Rowing Machine, and Treadmill. Never use Assault Bike, Air Bike, or any stationary bike in Hyrox sessions. UNIQUE SECTIONS: Every section must be meaningfully different — do not create two sections with the same exercises and structure but different names."
     },
     "volt-octathlon" => {
       primary: %w[for_time rounds emom amrap],
@@ -385,7 +385,7 @@ class WorkoutLLMGenerator
 
     "turbine" => {
       primary: %w[rounds straight],
-      secondary: %w[],
+      secondary: %w[distance_pyramid],
       guidance: <<~TURBINE.strip
         Turbine sessions are PURE CARDIO — no weights, no functional exercises, no bodyweight movements. The ONLY equipment allowed is the 4 cardio machines: treadmill, assault bike, rowing machine, and ski erg. Nothing else.
 
@@ -393,21 +393,26 @@ class WorkoutLLMGenerator
 
         STRUCTURE: Warm-up (5 min easy on any machine) → 3-4 main cardio blocks → Cool-down (5 min easy on any machine). Each main block is a standalone effort on ONE machine. Use a DIFFERENT machine for each block — the session should rotate through all 4 machines (treadmill, assault bike, rower, ski erg).
 
+        BLOCK DURATION: Each main block must be 8-12 minutes of working time (including rest). This is CRITICAL — a 45-min session has ~35 min of working time across 3-4 blocks. Do NOT create blocks longer than 12 minutes. Do NOT set rounds on steady-state efforts — zone 2 is always rounds: 1.
+
         ENERGY SYSTEM MIX — every Turbine session must target at least 2 of these 4 energy systems across its blocks:
-        - SPRINT (anaerobic power): 10-20s all-out efforts with 40-60s full rest between. 6-10 rounds. Great on assault bike or ski erg. Use format: rounds with rest_secs.
-        - THRESHOLD (anaerobic capacity): 30-60s hard efforts with equal easy recovery ON THE SAME MACHINE. 8-15 rounds. Use format: rounds, NO rest_secs — the easy portion IS the recovery. Describe in exercise notes: "30s hard / 30s easy" or "15s hard / 15s easy".
-        - VO2 MAX: 2-4 min hard sustained efforts with 2-3 min rest. 3-5 rounds. Use format: rounds with rest_secs. Great for rowing 500m repeats, treadmill 400-800m repeats, or ski erg efforts.
-        - ZONE 2 (aerobic base): 8-15 min steady moderate effort, conversational pace. Use format: straight with one exercise and duration_s. A longer block — the athlete settles in and holds a sustainable pace.
+        - SPRINT (anaerobic power): 10-20s all-out efforts with 40-60s full rest between. 6-10 rounds. Great on assault bike or ski erg. Use format: rounds with rest_secs. Total block ~8-10 min.
+        - THRESHOLD (anaerobic capacity): Hard/easy intervals ON THE SAME MACHINE that add to a round minute. 8-12 rounds. Use format: rounds, NO rest_secs — the easy portion IS the recovery. Set duration_s to the HARD portion only. Describe the full interval in exercise notes. Allowed splits: "30s hard / 30s easy" (duration_s: 30), "40s hard / 20s easy" (duration_s: 40), "45s hard / 15s easy" (duration_s: 45), "20s hard / 10s easy" (duration_s: 20). ALWAYS pick one of these — do NOT invent odd splits like 35s/25s. Total block ~8-12 min.
+        - VO2 MAX: 2-4 min hard sustained efforts with 2-3 min rest. 4-6 rounds. Use format: rounds with rest_secs. Set distance_m PER REP (e.g. distance_m: 400 with rounds: 5 — NOT distance_m: 2000 with rounds: 1). Great for rowing 500m repeats, treadmill 400m repeats, or ski erg efforts. Total block ~10-12 min.
+        - ZONE 2 (aerobic base): 8-12 min single sustained effort at conversational pace. Use format: rounds with rounds: 1 and duration_s on the exercise. NEVER more than 1 round — this is one continuous effort, not repeated sets.
 
         FORMAT RULES:
-        - Intervals: use format: rounds. Set rounds on the section. One exercise per section with duration_s or distance_m.
+        - ALL interval blocks must use format: rounds (NOT for_time, NOT amrap). Set rounds on the section. One exercise per section with duration_s or distance_m.
+        - DISTANCE REPEATS: set distance_m to the SINGLE REP distance and use rounds for the number of reps. E.g. 5 × 400m = distance_m: 400, rounds: 5. NEVER multiply out the total distance (NOT distance_m: 2000 with rounds: 1).
         - Threshold intervals (30/30, 15/15): NO rest_secs — recovery is built in. Describe in notes.
         - Sprint intervals: use rest_secs for full recovery between max efforts.
         - VO2 max efforts: use rest_secs for recovery between hard bouts.
-        - Steady state: use format: straight with duration_s on the exercise.
-        - Treadmill: use distance_m for repeats (e.g. 400m, 800m) or duration_s for time-based efforts. Use relative effort cues for pace ("hard effort", "sprint", "easy jog") — never absolute speeds.
+        - Steady state / zone 2: use format: rounds with rounds: 1 and duration_s on the exercise. NEVER set rounds > 1 on steady-state blocks.
+        - Treadmill: use distance_m for repeats (e.g. 400m) or duration_s for time-based efforts. Use relative effort cues for pace ("hard effort", "sprint", "easy jog") — never absolute speeds.
 
-        MACHINE VARIETY: Use all 4 machines across the session. Never use the same machine twice. Good session example: Rower steady state → Assault Bike sprints → Ski Erg threshold intervals → Treadmill VO2 max repeats.
+        DISTANCE PYRAMID: An optional block type — descending distance sets on one machine. Structure as 3 consecutive sections on the SAME machine with decreasing distance and increasing reps: e.g. 1×800m → 2×400m → 4×200m (or doubled: 1×1600m → 2×800m → 4×400m). Each tier is its own section with format: rounds. This is an exception to the machine variety rule — pyramid tiers share a machine. Great on treadmill or rower.
+
+        MACHINE VARIETY: Use all 4 machines across the session. Never use the same machine for two separate blocks — EXCEPT for distance pyramid tiers, which intentionally use the same machine across their 3 tiers. Good session example: Rower steady state → Assault Bike sprints → Ski Erg threshold intervals → Treadmill VO2 max repeats. Or: Treadmill distance pyramid (800/400/200) → Rower steady state → Assault Bike sprints → Ski Erg threshold intervals.
 
         SESSION FEEL: This is a serious cardio training session — not just "go on a machine." Each block has a clear purpose and intensity target. The athlete should finish knowing they've trained multiple energy systems hard.
       TURBINE
@@ -1093,10 +1098,11 @@ class WorkoutLLMGenerator
         * hundred — "The Centurion": exactly 100 reps of a single exercise, done for time. Set reps: 100 on the one exercise. A genuinely brutal and satisfying finisher for ANY session type — not just Functional Muscle. Works for: KB swings, wall balls, box jumps, push-ups, burpees, thrusters, air squats, sit-ups, rowing calories, ski calories. Use it as a punchy end to a main set when you want one last gut-check. Not just a gimmick — it's a legitimate conditioning tool.
         * rounds — structured circuit with planned rest between rounds. The athlete works, rests a set time, then goes again — pacing is controlled, not a race. Good for strength work and conditioning where recovery matters. ALWAYS set rounds explicitly (e.g. rounds: 5 for 5×5 strength, rounds: 3 for a conditioning circuit) and set rest_secs (30–90s) for recovery between rounds.
         * ladder / mountain — rep or distance progression each rung. Highly effective and underused — use it regularly, not just occasionally. ONLY when all exercises share the same metric AND the step size is realistic:
-          - reps: step 1–5. E.g. start:10 end:1 step:1 = 10,9,8...1 reps.
-          - calories: step 5–10. E.g. start:20 end:5 step:5 = 20,15,10,5 cal.
-          - distance_m: step 10–20. E.g. start:40 end:20 step:10 = 40m,30m,20m.
-          - mountain: ascend then descend. E.g. start:5 peak:15 end:5 step:5 = 5,10,15,10,5 reps. Great for barbell strength work (Bears, cleans, deadlifts).
+          - LADDER reps: step 1–5. E.g. start:10 end:1 step:1 = 10,9,8...1 reps.
+          - LADDER calories: step 5–10. E.g. start:20 end:5 step:5 = 20,15,10,5 cal.
+          - LADDER distance_m: step 10–20. E.g. start:40 end:20 step:10 = 40m,30m,20m.
+          - MOUNTAIN reps: use step 3 or 5 for larger mountains to get clean progressions — step 5 → 5,10,15,20,15,10,5 or step 3 → 9,12,15,18,21,18,15,12,9. CrossFit-style multiples of 3 (9,15,21,15,9) are excellent. Step 1 or 2 is fine ONLY for small ranges (peak ≤ 5), e.g. 1,2,3,4,5,4,3,2,1. NEVER use step 1 with a peak above 5 — it creates too many rungs with ugly numbers. Great for barbell strength work (Bears, cleans, deadlifts).
+          - MOUNTAIN calories/distance: same step rules as ladders (calories: 5–10, distance_m: 10–20).
           IMPORTANT: Always set rest_between_rungs (30–60s) on ladder/mountain sections — athletes need recovery between rungs.
           - INVALID: mixing reps, distance, and calorie exercises in the same ladder.
           - INVALID: using ladder format for treadmill speed/pace changes — speeds are not reps or distances. For treadmill pace work (speed ladders, fartlek, pace builds), use format: straight with a single exercise. Protocol: describe the pattern using RELATIVE effort cues, not absolute speeds. E.g. "Start at your fastest sustainable pace, drop 0.5 km/h each minute with 1 min easy jog between" or "Build from easy jog to sprint over 5 rounds, adding 0.5 km/h each round". Set duration_s for the total time. NEVER prescribe absolute treadmill speeds — athletes vary hugely. Use cues like "easy jog", "moderate pace", "hard effort", "sprint", "fastest sustainable pace". ONE exercise only — do not add a separate recovery jog exercise.
@@ -1631,6 +1637,7 @@ class WorkoutLLMGenerator
     "switchback"     => "Up & Down Ladder — cardio (calories) paired with functional movement (reps), ladder values trade places: 40/10→30/20→20/30→10/40 (format: switchback, start: 40, end: 10, step: 10, exactly 2 exercises — cardio first, functional second)",
     "death_race"     => "Death Race — 15 cal Assault Bike + 10 burpees × 5 rounds (format: rounds)",
     "cardio_intervals" => "Cardio Intervals — ONE exercise on a single cardio machine (treadmill, assault bike, rower, or ski erg), pick ONE protocol: (a) 400m repeats × 5-10 with 90s rest (format: rounds, rounds: 5-10, rest_secs: 90, 1 exercise with distance_m: 400), (b) 15s hard / 15s easy × 10-20 rounds (format: rounds, rounds: 10-20, NO rest_secs, 1 exercise with duration_s: 15, notes: '15s hard / 15s easy — recovery is built into the set'), (c) 30s hard / 30s easy × 5-10 rounds (format: rounds, rounds: 5-10, NO rest_secs, 1 exercise with duration_s: 30, notes: '30s hard / 30s easy — recovery is built into the set'), (d) 4min high effort / 3min rest × 2-4 rounds (format: rounds, rounds: 2-4, rest_secs: 180, 1 exercise with duration_s: 240, notes: 'high effort'). IMPORTANT: protocols (b) and (c) must have exactly 1 exercise and NO rest_secs — the easy portion IS the recovery. Do NOT split into separate hard/easy exercises. Builds anaerobic capacity and VO2 max.",
+    "distance_pyramid" => "Distance Pyramid — descending distance sets on a single cardio machine, getting shorter and faster. Create 3 SEPARATE sections on the same machine, each with format: rounds. Standard pyramid: 1×800m (rest 2min) → 2×400m (rest 90s) → 4×200m (rest 60s). Long pyramid: 1×1600m (rest 3min) → 2×800m (rest 2min) → 4×400m (rest 90s). Each tier is its own section — set distance_m to the PER-REP distance and rounds for the number of reps. Name the sections creatively (e.g. 'The Long Haul', 'Building Speed', 'Sprint Finish'). Great for treadmill, rower, and ski erg. Rest gets shorter as distances get shorter — you should be running/rowing faster on the shorter distances.",
   }.freeze
 
   FINISHER_FORMATS = %w[tabata hundred for_time switchback death_race].freeze
@@ -1671,10 +1678,10 @@ class WorkoutLLMGenerator
     has_rounds  = (affinity[:primary] + affinity[:secondary]).include?("rounds")
     has_for_time = (affinity[:primary] + affinity[:secondary]).include?("for_time")
     if has_rounds
-      pool.push("twenty20", "death_race", "cardio_intervals")
+      pool.push("twenty20", "death_race", "cardio_intervals", "distance_pyramid")
       # Race/event types get extra cardio interval weight — engine building matters
       if @activity_slug.in?(%w[hyrox deka deka-fit deka-mile volt-octathlon])
-        pool.push("cardio_intervals", "cardio_intervals")
+        pool.push("cardio_intervals", "cardio_intervals", "distance_pyramid")
       end
     end
     if has_for_time
@@ -1698,7 +1705,7 @@ class WorkoutLLMGenerator
     # Assign cardio machines for protocols that need them
     machines = FM_CARDIO_MACHINES.shuffle
     machine_for = ->(fmt) {
-      fmt.in?(%w[twenty20 switchback emom_rotating cardio_intervals]) ? (machines.shift || FM_CARDIO_MACHINES.sample) : nil
+      fmt.in?(%w[twenty20 switchback emom_rotating cardio_intervals distance_pyramid]) ? (machines.shift || FM_CARDIO_MACHINES.sample) : nil
     }
 
     # Build directive
@@ -1775,7 +1782,7 @@ class WorkoutLLMGenerator
 
   def normalize_format(fmt)
     case fmt
-    when "twenty20", "death_race", "cardio_intervals" then "rounds"
+    when "twenty20", "death_race", "cardio_intervals", "distance_pyramid" then "rounds"
     when "emom_rotating", "emom_circuit" then fmt # Keep split
     else fmt
     end
@@ -1818,6 +1825,27 @@ class WorkoutLLMGenerator
               "exercises" => [ p[:ex] ] }
       sec["rest_secs"] = p[:rest] if p[:rest]
       sec
+    when "distance_pyramid"
+      pyramid_machine = %w[Row Assault\ Bike SkiErg Treadmill].sample
+      pyramids = [
+        # Standard: 800, 2×400, 4×200
+        [
+          { name: "The Long Haul", rounds: 1, rest: 120, dist: 800, notes: "hard sustained effort" },
+          { name: "Building Speed", rounds: 2, rest: 90, dist: 400, notes: "faster than the 800" },
+          { name: "Sprint Finish", rounds: 4, rest: 60, dist: 200, notes: "near max effort" }
+        ],
+        # Long: 1600, 2×800, 4×400
+        [
+          { name: "The Long Road", rounds: 1, rest: 180, dist: 1600, notes: "strong but sustainable" },
+          { name: "Half Splits", rounds: 2, rest: 120, dist: 800, notes: "faster than the 1600" },
+          { name: "Quarter Sprints", rounds: 4, rest: 90, dist: 400, notes: "fast and aggressive" }
+        ]
+      ]
+      # Return just the first tier as the fallback section; LLM should generate all 3
+      tier = pyramids.sample.first
+      { "name" => tier[:name], "category" => "main", "format" => "rounds",
+        "rounds" => tier[:rounds], "rest_secs" => tier[:rest],
+        "exercises" => [{ "name" => pyramid_machine, "distance_m" => tier[:dist], "notes" => tier[:notes] }] }
     when "emom_rotating"
       exercises = ([ machine ] + FM_FUNCTIONAL_MOVEMENTS.sample(2)).map do |name|
         { "name" => name, "notes" => name == machine ? "steady sustainable effort" : "controlled tempo" }
@@ -2073,6 +2101,8 @@ class WorkoutLLMGenerator
     when "hyrox"
       <<~RULE.strip
         - MANDATORY RUNNING (Hyrox): Every Hyrox session MUST include running intervals. The race is 8×1km runs — running is the backbone. Include 1km repeats, 800m intervals, or run-to-station transitions. Running must appear in the main set, not just the warm-up.
+        - TREADMILL METRICS: Treadmill NEVER uses calories. Always use distance_m (e.g. 200m, 400m) or duration_s for treadmill exercises. This applies to all workout types.
+        - ROTATING EMOM / CONTINUOUS CIRCUIT: Do NOT set distance_m, reps, or calories on exercises — the athlete just fills each minute. Only set notes describing effort (e.g. "race pace", "steady effort"). The timer is the only metric.
         - TRAINING REP COUNTS (Hyrox): When using Hyrox stations in multi-round sets (rounds ≥ 2), use reduced training volumes — NOT full race amounts. Examples:
             * Wall Balls: race 100 reps → training 40–65/round
             * Sandbag Lunges: race 100m → training 40–65m/round
@@ -2261,7 +2291,8 @@ class WorkoutLLMGenerator
       - Do not include a workout_type field
       - The name MUST be completely original — do NOT reuse or rephrase "#{@source_workout.name}"
       - You may use ladder or mountain sections for variety, but ONLY when all exercises share the same metric AND the step size is realistic:
-        * reps: step 1–5. E.g. start:10 end:1 step:1 = 10,9,8...1 reps.
+        * LADDER reps: step 1–5. E.g. start:10 end:1 step:1 = 10,9,8...1 reps.
+        * MOUNTAIN reps: use step 3 or 5 for larger mountains. Step 1-2 only for small ranges (peak ≤ 5). E.g. step 5 → 5,10,15,20,15,10,5. CrossFit-style multiples of 3 (9,15,21,15,9) are excellent.
         * calories: step 5–10. E.g. start:20 end:5 step:5 = 20,15,10,5 cal.
         * distance_m: step 10–20. E.g. start:40 end:20 step:10 = 40m,30m,20m.
         * kg: step 5–10. E.g. start:60 end:40 step:10 = 60,50,40 kg.

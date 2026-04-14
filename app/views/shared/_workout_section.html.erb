@@ -58,8 +58,9 @@
 <%# fmt_label = bold green modality name, fmt_detail = gray italic description, fmt_interval = bold green suffix (tabata only) %>
 <% fmt_label, fmt_detail, fmt_interval = case sec_format
    when "rounds"
-     label  = section["rounds"].to_i > 0 ? "#{section["rounds"]} rounds" : nil
-     detail = section["rest_secs"].to_i > 0 ? "#{section["rest_secs"]}s rest after each round" : nil
+     r = section["rounds"].to_i
+     label  = r > 1 ? "#{r} rounds" : nil
+     detail = section["rest_secs"].to_i > 0 && r > 1 ? "#{section["rest_secs"]}s rest after each round" : nil
      [label, detail]
    when "amrap"
      ["AMRAP", section["duration_mins"] ? "#{section["duration_mins"]} min" : nil]

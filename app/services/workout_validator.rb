@@ -18,7 +18,7 @@ class WorkoutValidator
   # On a SkiErg, Air Bike, or Rowing Machine you can't hit more than ~10 cal/min
   # while sharing that minute with other exercises.
   EMOM_CARDIO_CAL_CAP = 10
-  CARDIO_MACHINE_PATTERN = /ski|erg|row|bike|assault|air.?bike|concept/i.freeze
+  CARDIO_MACHINE_PATTERN = /ski|erg|row|bike|assault|air.?bike|concept|treadmill/i.freeze
 
   # Valid step-size range per ladder/mountain metric.
   # distance_m has no upper bound — just a minimum of 10.
@@ -58,6 +58,7 @@ class WorkoutValidator
       end
     end
 
+    fix_mountain_rep_sequence(sections)
     fix_notes_as_programming(sections)
     fix_bear_complex_notes(sections)
     fix_strength_weight_cues(sections)
@@ -66,6 +67,7 @@ class WorkoutValidator
     fix_alternating_reps(sections)
     fix_clean_rep_counts(sections)
     fix_clean_distances(sections)
+    fix_treadmill_calories(sections)
     fix_rest_secs(sections)
     fix_single_set_sections(sections)
     fix_tabata_exercise_metrics(sections)
@@ -77,9 +79,16 @@ class WorkoutValidator
     fix_atlas_barbell_press(sections)
     fix_overhead_weight_cap(sections)
     fix_redundant_section_notes(sections)
+    fix_duplicate_section_exercise_notes(sections)
     fix_rotating_emom_reps(sections)
     fix_emom_notes(sections)
     fix_cardio_interval_split(sections)
+    fix_threshold_interval_duration(sections)
+    if @main_tag_slug == "turbine"
+      fix_turbine_formats(sections)
+      fix_turbine_block_durations(sections)
+    end
+    fix_hyrox_banned_machines(sections) if @main_tag_slug == "hyrox"
     dedup_warmup_sections(sections)
     dedup_cooldown_sections(sections)
     check_cooldown(sections)
@@ -87,6 +96,7 @@ class WorkoutValidator
     fix_warmup_format(sections)
     fix_amrap_minimum_exercises(sections)
     dedup_identical_sections(sections)
+    dedup_structurally_identical_sections(sections)
     cap_main_section_count(sections) unless @main_tag_slug == "functional-muscle"
 
     if @main_tag_slug == "functional-muscle"
@@ -297,6 +307,56 @@ class WorkoutValidator
               "step #{step} invalid for #{varies} — corrected to #{corrected}"
   end
 
+  # Clean mountain presets — curated sequences that look and feel right.
+  # The validator snaps ugly step-1 mountains (peak > 5) to the nearest preset.
+  MOUNTAIN_PRESETS = [
+    { total: 16,  start: 1, peak: 4,  step: 1 },  # 1,2,3,4,3,2,1
+    { total: 25,  start: 1, peak: 5,  step: 1 },  # 1,2,3,4,5,4,3,2,1
+    { total: 45,  start: 5, peak: 15, step: 5 },  # 5,10,15,10,5
+    { total: 50,  start: 2, peak: 10, step: 2 },  # 2,4,6,8,10,8,6,4,2
+    { total: 75,  start: 3, peak: 15, step: 3 },  # 3,6,9,12,15,12,9,6,3
+    { total: 80,  start: 5, peak: 20, step: 5 },  # 5,10,15,20,15,10,5
+    { total: 90,  start: 9, peak: 18, step: 3 },  # 9,12,15,18,15,12,9
+    { total: 125, start: 5, peak: 25, step: 5 },  # 5,10,15,20,25,20,15,10,5
+  ].freeze
+
+  # Mountain rep sequences with step 1 and a peak above 5 produce ugly, drawn-out
+  # sequences (8,9,10,11,12,11,10,9,8). Snap to the nearest clean preset.
+  # Step 1 with peak ≤ 5 is fine (Bear Complex: 1,2,3,4,5,4,3,2,1).
+  # Step 2+ is always fine.
+  def fix_mountain_rep_sequence(sections)
+    sections.each do |section|
+      next unless section["format"] == "mountain"
+      next unless section["varies"].to_s == "reps"
+      next unless section["step"].to_i == 1
+
+      sv = section["start"].to_i
+      pk = section["peak"].to_i
+      ev = section["end"].to_i.nonzero? || sv
+      next if pk <= 5  # small mountains with step 1 are fine
+
+      # Calculate current total reps per exercise
+      up = sv.step(pk, 1).to_a
+      dn = (pk - 1).step(ev, -1).to_a
+      current_total = (up + dn).sum
+
+      # Find nearest preset
+      preset = MOUNTAIN_PRESETS.min_by { |p| (p[:total] - current_total).abs }
+      next unless preset
+
+      old_seq = "#{sv}→#{pk}→#{ev} step 1"
+      section["start"] = preset[:start]
+      section["peak"]  = preset[:peak]
+      section["end"]   = preset[:start]
+      section["step"]  = preset[:step]
+
+      new_up = preset[:start].step(preset[:peak], preset[:step]).to_a
+      new_dn = (preset[:peak] - preset[:step]).step(preset[:start], -preset[:step]).to_a
+      new_seq = (new_up + new_dn).join(",")
+      @fixes << "Mountain '#{section["name"]}': ugly sequence (#{old_seq} = #{current_total} reps) → #{new_seq} (#{preset[:total]} reps)"
+    end
+  end
+
   # For-time sections with multiple exercises and fewer than 3 rounds are not a
   # meaningful conditioning block — bump to 3 rounds. Single-exercise for_time
   # (e.g. 100 cal row for time) is fine with 1 round.
@@ -368,6 +428,26 @@ class WorkoutValidator
     up   = down + step
     # Prefer the closer one; tie goes up
     (n - down) <= (up - n) ? down : up
+  end
+
+  # Treadmills don't have calorie counters in the way bikes/rowers do.
+  # Convert calories to distance (rough ~80m per cal at sprint pace).
+  TREADMILL_PATTERN_STRICT = /\btreadmill\b/i.freeze
+  TREADMILL_CAL_TO_DISTANCE_M = 80
+
+  def fix_treadmill_calories(sections)
+    sections.each do |section|
+      Array(section["exercises"]).each do |ex|
+        next unless ex["name"].to_s.match?(TREADMILL_PATTERN_STRICT)
+        next unless ex["calories"].to_i > 0
+
+        cals = ex["calories"].to_i
+        distance = nearest_clean_distance(cals * TREADMILL_CAL_TO_DISTANCE_M, 100)
+        ex["distance_m"] = distance
+        ex.delete("calories")
+        @fixes << "'#{section["name"]}': treadmill #{cals} cal → #{distance}m (treadmills use distance, not calories)"
+      end
+    end
   end
 
   # Any non-exempt section with rounds missing/zero is almost certainly a mistake.
@@ -775,6 +855,26 @@ class WorkoutValidator
     end
   end
 
+  # When section notes and an exercise's notes say the same thing, remove the
+  # duplicate from whichever is less specific. For single-exercise sections,
+  # keep the exercise notes (shown inline) and clear the section notes.
+  def fix_duplicate_section_exercise_notes(sections)
+    sections.each do |section|
+      next unless section["notes"].present?
+      exercises = Array(section["exercises"])
+      exercises.each do |ex|
+        next unless ex["notes"].present?
+        sec_note = section["notes"].to_s.strip.downcase
+        ex_note  = ex["notes"].to_s.strip.downcase
+        if sec_note == ex_note || sec_note.include?(ex_note) || ex_note.include?(sec_note)
+          section.delete("notes")
+          @fixes << "'#{section["name"]}': removed duplicate section notes (already on exercise)"
+          break
+        end
+      end
+    end
+  end
+
   # Strip leading "N sets of N reps at Xkg" sentences from section notes — that
   # information is already shown structurally in the section header and exercise rows.
   REDUNDANT_NOTE_PATTERN = /\A\d+\s+sets?\s+of\s+\d+[^.]*\.\s*/i
@@ -907,8 +1007,6 @@ class WorkoutValidator
   # Cardio intervals: if the LLM split a hard/easy protocol into two exercises
   # on the same machine (e.g. "Ski Erg Sprint" + "Ski Erg Recovery"), merge them
   # back into one exercise and remove rest_secs.
-  CARDIO_MACHINE_PATTERN = /\b(row|assault.?bike|ski.?erg|treadmill|bike)\b/i.freeze
-
   def fix_cardio_interval_split(sections)
     sections.each do |section|
       next unless section["format"] == "rounds"
@@ -942,11 +1040,173 @@ class WorkoutValidator
         ex = exercises.first
         notes = ex["notes"].to_s
         if ex["name"].to_s.match?(CARDIO_MACHINE_PATTERN) &&
-           notes.match?(/hard.*easy|recovery.*built/i) &&
+           notes.match?(/hard.*easy|all.out.*easy|effort.*easy|recovery.*built|easy.*recovery.*built/i) &&
            section["rest_secs"].to_i > 0
           section.delete("rest_secs")
           @fixes << "Cardio intervals '#{section["name"]}': removed rest_secs (recovery is built into the set)"
         end
+      end
+    end
+  end
+
+  # Threshold cardio intervals (e.g. "35s hard / 25s easy") should use clean
+  # splits that add to a round minute. Snap duration_s to the hard portion and
+  # rewrite notes to match. Also fix duration_s set to the total (hard+easy)
+  # instead of just the hard portion.
+  CLEAN_THRESHOLD_SPLITS = [ [30, 30], [40, 20], [45, 15], [20, 10] ].freeze
+
+  def fix_threshold_interval_duration(sections)
+    sections.each do |section|
+      next unless section["format"] == "rounds"
+      exercises = Array(section["exercises"])
+      next unless exercises.size == 1
+
+      ex = exercises.first
+      next unless ex["name"].to_s.match?(CARDIO_MACHINE_PATTERN)
+      notes = ex["notes"].to_s
+
+      # Match "Xs hard / Ys easy" pattern
+      m = notes.match(/(\d+)s\s*hard\s*\/\s*(\d+)s\s*easy/i)
+      next unless m
+
+      hard = m[1].to_i
+      easy = m[2].to_i
+      total = hard + easy
+
+      # Fix 1: duration_s set to total (hard+easy) instead of just hard
+      if ex["duration_s"].to_i == total && hard != total
+        ex["duration_s"] = hard
+        @fixes << "'#{section["name"]}': duration_s #{total}s → #{hard}s (hard portion only, easy is recovery)"
+      end
+
+      # Fix 2: odd split — snap to nearest clean preset
+      unless CLEAN_THRESHOLD_SPLITS.include?([hard, easy])
+        best = CLEAN_THRESHOLD_SPLITS.min_by { |h, e| (h - hard).abs + (e - easy).abs }
+        ex["duration_s"] = best[0]
+        ex["notes"] = notes.sub(/\d+s\s*hard\s*\/\s*\d+s\s*easy/i, "#{best[0]}s hard / #{best[1]}s easy")
+        @fixes << "'#{section["name"]}': snapped interval to #{best[0]}s hard / #{best[1]}s easy (was #{hard}s/#{easy}s)"
+      end
+    end
+  end
+
+  # Turbine sessions: fix formats and ensure sensible round counts.
+  # - Convert for_time to rounds (Turbine blocks are always interval or steady-state)
+  # - Ensure distance repeats have at least 4 rounds
+  MIN_TURBINE_DISTANCE_ROUNDS = 4
+
+  def fix_turbine_formats(sections)
+    sections.each do |section|
+      next unless section["category"] == "main"
+
+      # Convert for_time to rounds — Turbine is always intervals or steady-state
+      if section["format"] == "for_time"
+        section["format"] = "rounds"
+        section["rounds"] = [section["rounds"].to_i, 4].max
+        @fixes << "Turbine '#{section["name"]}': converted for_time to rounds"
+      end
+
+      # Ensure distance repeats have enough rounds
+      exercises = Array(section["exercises"])
+      if section["format"] == "rounds" && exercises.size == 1 && exercises.first["distance_m"].to_i > 0
+        if section["rounds"].to_i < MIN_TURBINE_DISTANCE_ROUNDS
+          old_rounds = section["rounds"].to_i
+          section["rounds"] = MIN_TURBINE_DISTANCE_ROUNDS
+          @fixes << "Turbine '#{section["name"]}': increased rounds from #{old_rounds} to #{MIN_TURBINE_DISTANCE_ROUNDS} for distance repeats"
+        end
+      end
+    end
+  end
+
+  # Turbine sessions: cap each main block to ~12 min of working time.
+  # Zone 2 / steady-state blocks must be rounds: 1 (one continuous effort).
+  # Any block with rounds × duration exceeding 12 min gets trimmed.
+  MAX_TURBINE_BLOCK_SECS = 12 * 60
+
+  def fix_turbine_block_durations(sections)
+    sections.each do |section|
+      next unless section["category"] == "main"
+      exercises = Array(section["exercises"])
+      next if exercises.empty?
+
+      rounds = section["rounds"].to_i
+      rounds = 1 if rounds < 1
+
+      # Steady-state detection: single exercise with long duration and no hard/easy notes
+      if exercises.size == 1
+        ex = exercises.first
+        dur = ex["duration_s"].to_i
+        notes = ex["notes"].to_s
+
+        # Zone 2 / steady state — force rounds: 1
+        if dur >= 300 && !notes.match?(/hard.*easy|sprint|max effort/i)
+          if rounds > 1
+            section["rounds"] = 1
+            @fixes << "Turbine '#{section["name"]}': capped steady-state to 1 round (was #{rounds})"
+            rounds = 1
+          end
+          # Cap duration to 12 min
+          if dur > MAX_TURBINE_BLOCK_SECS
+            ex["duration_s"] = MAX_TURBINE_BLOCK_SECS
+            @fixes << "Turbine '#{section["name"]}': capped duration to 12 min (was #{dur / 60} min)"
+          end
+        end
+      end
+
+      # General check: total working time across rounds
+      total_work = exercises.sum { |e| e["duration_s"].to_i } * rounds
+      rest_total = section["rest_secs"].to_i * [rounds - 1, 0].max
+      total_secs = total_work + rest_total
+
+      if total_secs > MAX_TURBINE_BLOCK_SECS && rounds > 1
+        # Reduce rounds to fit
+        new_rounds = rounds
+        while new_rounds > 1
+          new_rounds -= 1
+          t = exercises.sum { |e| e["duration_s"].to_i } * new_rounds + section["rest_secs"].to_i * [new_rounds - 1, 0].max
+          break if t <= MAX_TURBINE_BLOCK_SECS
+        end
+        section["rounds"] = new_rounds
+        @fixes << "Turbine '#{section["name"]}': reduced rounds from #{rounds} to #{new_rounds} to fit 12-min block cap"
+      end
+    end
+  end
+
+  # Hyrox does NOT use Assault Bike / Air Bike. The only cardio machines are
+  # SkiErg, Rowing Machine, and Treadmill. Replace any bike references.
+  HYROX_BIKE_PATTERN = /assault\s*bike|air\s*bike/i.freeze
+  HYROX_CARDIO_REPLACEMENTS = [ "SkiErg", "Rowing Machine", "Treadmill" ].freeze
+
+  def fix_hyrox_banned_machines(sections)
+    used_machines = sections.flat_map { |s| Array(s["exercises"]).map { |e| e["name"].to_s } }
+    sections.each do |section|
+      Array(section["exercises"]).each do |ex|
+        next unless ex["name"].to_s.match?(HYROX_BIKE_PATTERN)
+
+        # Pick a replacement that isn't already heavily used in this workout
+        replacement = (HYROX_CARDIO_REPLACEMENTS - used_machines).first || HYROX_CARDIO_REPLACEMENTS.sample
+        old_name = ex["name"]
+        ex["name"] = replacement
+        used_machines << replacement
+        @fixes << "'#{section["name"]}': replaced #{old_name} with #{replacement} (not a Hyrox machine)"
+      end
+    end
+  end
+
+  # Catches sections with different names but identical structure (same format,
+  # rounds, and exercises). The LLM sometimes generates "FINAL PUSH" and
+  # "DEATH RACE" with the exact same content.
+  def dedup_structurally_identical_sections(sections)
+    main_finisher = sections.select { |s| %w[main finisher].include?(s["category"]) }
+    seen = {}
+    main_finisher.each do |s|
+      key = [ s["format"],
+              s["rounds"].to_i,
+              Array(s["exercises"]).map { |e| [ e["name"].to_s.downcase.strip, e["reps"].to_i, e["duration_s"].to_i, e["distance_m"].to_i, e["calories"].to_i ] } ].to_s
+      if seen[key]
+        sections.delete(s)
+        @fixes << "Removed structurally duplicate section '#{s["name"]}' (same as '#{seen[key]}')"
+      else
+        seen[key] = s["name"]
       end
     end
   end
