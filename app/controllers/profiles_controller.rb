@@ -36,6 +36,6 @@ class ProfilesController < ApplicationController
   def profile_params
     params.expect(user: [ :username, :display_name, :avatar,
       :age, :height_cm, :weight_kg, :gender,
-      :pool_length, :speed_unit, :injury_notes ])
+      :pool_length, :speed_unit, :unit_system, :injury_notes ])
   end
 end
