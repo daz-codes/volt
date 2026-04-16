@@ -53,7 +53,7 @@ The Stimulus controller duplicates these constants client-side for the on-submit
 The Physical stats section uses the view helper to display height and weight in the user's preferred unit system:
 
 - **Metric:** `180cm` / `80kg` (current behaviour, no space before unit)
-- **Imperial:** `5'11"` / `176lbs` (no space before unit, always show both feet and inches including `6'0"`)
+- **Imperial:** `5'11"` / `176.5lbs` (no space before unit, always show both feet and inches including `6'0"`; whole-number pounds drop the decimal, e.g. `180lbs`)
 
 ### Profiles Controller
 
