@@ -145,13 +145,23 @@
         <% end %>
         <% if @user.height_cm.present? %>
           <div class="bg-zinc-800 rounded-xl p-4 text-center">
-            <p class="text-2xl font-bold text-white"><%= @user.height_cm %><span class="text-sm text-gray-500 font-normal">cm</span></p>
+            <% if @user.unit_system == "imperial" %>
+              <% ft, inches = cm_to_ft_in(@user.height_cm) %>
+              <p class="text-2xl font-bold text-white"><%= ft %><span class="text-sm text-gray-500 font-normal">'</span><%= inches %><span class="text-sm text-gray-500 font-normal">"</span></p>
+            <% else %>
+              <p class="text-2xl font-bold text-white"><%= @user.height_cm %><span class="text-sm text-gray-500 font-normal">cm</span></p>
+            <% end %>
             <p class="text-gray-500 text-xs mt-1 uppercase tracking-wide">Height</p>
           </div>
         <% end %>
         <% if @user.weight_kg.present? %>
           <div class="bg-zinc-800 rounded-xl p-4 text-center">
-            <p class="text-2xl font-bold text-white"><%= @user.weight_kg.to_f.round(1) %><span class="text-sm text-gray-500 font-normal">kg</span></p>
+            <% if @user.unit_system == "imperial" %>
+              <% lbs = kg_to_lbs(@user.weight_kg) %>
+              <p class="text-2xl font-bold text-white"><%= lbs == lbs.to_i ? lbs.to_i : lbs %><span class="text-sm text-gray-500 font-normal">lbs</span></p>
+            <% else %>
+              <p class="text-2xl font-bold text-white"><%= @user.weight_kg.to_f.round(1) %><span class="text-sm text-gray-500 font-normal">kg</span></p>
+            <% end %>
             <p class="text-gray-500 text-xs mt-1 uppercase tracking-wide">Weight</p>
           </div>
         <% end %>
