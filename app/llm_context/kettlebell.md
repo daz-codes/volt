@@ -8,6 +8,7 @@ Kettlebell-only sessions that build explosive power, grip endurance, and full-bo
 - No dumbbells, no barbells, no cable machines, no cardio machines (no rower, no bike, no ski erg)
 - Bodyweight is allowed ONLY for: warm-up activation, active recovery between KB sets, cool-down stretching
 - If the athlete has multiple KB weights available, vary load across sections (heavier for grinds, lighter for ballistics)
+- **Double KB priority**: when the athlete's equipment indicates multiple kettlebells, include at least one section using double-KB variations (double clean, double front squat, double press, double swing, double rack carry) — these are the purest Iron Engine work and should appear regularly, not just occasionally
 
 ## Movement Vocabulary
 
@@ -26,10 +27,25 @@ KB Farmer's Carry, KB Rack Carry (single or double), KB Overhead Carry, KB Waite
 **Core / Stability**
 KB Windmill, KB Turkish Get-Up, KB Around the World, KB Figure 8, KB Russian Twist, KB Sit-Up (weighted), KB Plank Pull-Through, KB Dead Bug (hold overhead)
 
+## Session Balance
+
+**Movement pattern coverage** — every session MUST include at least one exercise from each of these patterns. Check your selection against this list before finalising:
+- **Squat pattern** — goblet squat, front squat (single or double), thruster
+- **Hinge pattern** — swing, deadlift, Romanian deadlift, sumo deadlift high pull
+- **Push pattern** — overhead press, push press, floor press, thruster
+- **Pull pattern** — row, high pull, gorilla row, clean (pull component)
+- **Ballistic / explosive** — swing, snatch, clean, long cycle, sumo deadlift high pull
+
+One exercise can satisfy multiple patterns (a thruster covers squat + push; a clean covers pull + ballistic). Use that to your advantage — but verify all five patterns are represented across the working sections.
+
+**Alternate ballistic and grind blocks** — don't stack two power sections or two strength sections back-to-back. A swing/snatch/clean-focused section should be followed by a press/squat/row section, not another ballistic. The ideal session flows: ballistic → grind → ballistic → grind (or the reverse). This manages fatigue profiles so the athlete can sustain intensity across the whole session.
+
 ## Session Formats
 
 **KB Complex**
 A complex is a sequence of movements performed without putting the kettlebell down. Each movement flows into the next. One full sequence = 1 rep of the complex. Example: Clean → Press → Front Squat → Row → Swing = 1 rep. Typically 3-5 rounds of 5-8 reps with 60-90s rest between rounds.
+
+**Complex ordering — rack-flow rule**: chain movements so the bell never needs to be set down and each movement's end position is the next movement's start position. Clean → Front Squat → Press → Row → Swing cycles through rack and hinge positions naturally. Avoid orderings that force awkward transitions (e.g. Snatch → Goblet Squat requires re-gripping the bell; Press → Swing drops the bell from overhead to a hinge with no bridge). When in doubt, start from the clean (floor to rack), stay in the rack or overhead for the middle work, and finish with a ballistic (swing or snatch) that returns the bell to the start for the next rep.
 
 **KB Flow**
 Similar to a complex but movements blend more fluidly — less "rep each movement" and more continuous movement. Example: Swing → Clean → Snatch → Windmill → Reverse Lunge, flowing for time. 3-5 minute flows with 60-90s rest.
@@ -87,9 +103,7 @@ These show the rhythm and feel of a proper Iron Engine session — use as struct
 
 ## Key Patterns
 - EVERY working exercise uses a kettlebell — no exceptions
-- Mix ballistic (power) and grind (strength) work in the same session
-- Complexes and flows are signature Iron Engine formats — use them often
-- Carries should appear regularly — they build the grip and core that make everything else better
+- **Complexes, flows, and carries are Iron Engine's signature formats** — most sessions should include at least one. If a session has no complex, no flow, and no carry, something is missing. These are what make it Iron Engine instead of just "kettlebell conditioning"
 - Single-arm work builds balance — alternate sides or dedicate rounds to each arm
 - TGUs and Windmills are skill work — programme them with lower volume and focus on quality
 - Swings are the foundation — most sessions should include them somewhere
