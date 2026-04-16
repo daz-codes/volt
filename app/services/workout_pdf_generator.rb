@@ -124,7 +124,9 @@ class WorkoutPdfGenerator
         parts << "#{rest}s rest" if rest > 0
       end
     when "tabata"
-      parts << "Tabata · 20s work / 10s rest · 8 rounds (4 min)"
+      tabata_rounds = rounds > 0 ? rounds : 8
+      total_mins = ((20 + 10) * tabata_rounds / 60.0).ceil
+      parts << "Tabata · 20s work / 10s rest · #{tabata_rounds} rounds (#{total_mins} min)"
     when "ladder"
       varies = section["varies"].presence || "reps"
       parts << "Ladder · #{section["start"]} down to #{section["end"]} #{varies}"

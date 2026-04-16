@@ -6,7 +6,12 @@
    section_index = local_assigns.fetch(:section_index, nil)
    preview_token = local_assigns.fetch(:preview_token, nil) %>
 <% sec_format = section["format"].to_s %>
-<% sec_mins = sec_format == "tabata" ? 4 : (section["duration_mins"].to_i > 0 ? section["duration_mins"].to_i : nil) %>
+<% sec_mins = if sec_format == "tabata"
+     r = section["rounds"].to_i > 0 ? section["rounds"].to_i : 8
+     ((20 + 10) * r / 60.0).ceil
+   elsif section["duration_mins"].to_i > 0
+     section["duration_mins"].to_i
+   end %>
 
 <%# Section distance (for distance-based sports) %>
 <% if local_assigns[:distance_sport]
@@ -89,12 +94,19 @@
      end
    when "tabata"
      n = Array(section["exercises"]).size
-     rotation = case n
-       when 2 then "alternating · 4 rounds each"
-       when 4 then "rotating · 2 rounds each"
-       when 8 then "1 round each"
-       else "8 rounds"
+     r = section["rounds"].to_i > 0 ? section["rounds"].to_i : 8
+     rotation = if n > 1 && (r % n).zero?
+       per = r / n
+       if per == 1
+         "1 round each"
+       elsif n == 2
+         "alternating · #{per} rounds each"
+       else
+         "rotating · #{per} rounds each"
        end
+     else
+       "#{r} rounds"
+     end
      ["Tabata", rotation]
    when "for_time"
      ft_rounds = section["rounds"].to_i

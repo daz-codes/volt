@@ -199,7 +199,8 @@ module Workout::Exportable
 
     case fmt
     when "tabata"
-      [ "Tabata", "8 rounds \u00B7 20s hard / 10s rest" ]
+      tabata_rounds = rounds.to_i > 0 ? rounds.to_i : 8
+      [ "Tabata", "#{tabata_rounds} rounds \u00B7 20s hard / 10s rest" ]
     when "emom"
       rotating = style == "rotating" || (style.blank? && ex_count > 1)
       if rotating

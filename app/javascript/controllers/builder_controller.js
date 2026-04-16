@@ -106,8 +106,10 @@ export default class extends Controller {
           </div>
         </div>
         <div data-format-field="tabata" style="display:none" class="mb-3">
-          <div class="flex items-center gap-2">
-            <span class="text-xs font-bold text-purple-400 bg-purple-500/10 border border-purple-500/25 px-3 py-1.5 rounded-full">8 rounds · 20s on · 30s rest</span>
+          <div class="flex items-center gap-2 flex-wrap">
+            <input name="sections[${id}][rounds]" type="number" min="1" placeholder="Rounds" value="8" disabled
+              class="w-24 bg-zinc-800 border border-zinc-600 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-lime-400 transition-colors">
+            <span class="text-xs font-bold text-purple-400 bg-purple-500/10 border border-purple-500/25 px-3 py-1.5 rounded-full">20s work · 10s rest</span>
             <p class="text-xs text-gray-500">Add the exercises performed during each work interval.</p>
           </div>
         </div>
