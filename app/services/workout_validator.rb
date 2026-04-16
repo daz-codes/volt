@@ -91,6 +91,7 @@ class WorkoutValidator
       fix_turbine_block_durations(sections)
     end
     fix_hyrox_banned_machines(sections) if @main_tag_slug == "hyrox"
+    fix_kettlebell_non_kb_exercises(sections) if @main_tag_slug == "kettlebell"
     dedup_warmup_sections(sections)
     dedup_cooldown_sections(sections)
     check_cooldown(sections)
@@ -1271,6 +1272,40 @@ class WorkoutValidator
         ex["name"] = replacement
         used_machines << replacement
         @fixes << "'#{section["name"]}': replaced #{old_name} with #{replacement} (not a Hyrox machine)"
+      end
+    end
+  end
+
+  # Iron Engine (kettlebell) is kettlebell-only. Strip any exercise from main/
+  # finisher sections whose name doesn't indicate a kettlebell movement (either
+  # starts with "KB " or contains "kettlebell"). If a section ends up empty,
+  # remove it. Warm-ups and cool-downs are exempt — bodyweight activation and
+  # stretching are allowed there.
+  KB_EXERCISE_PATTERN = /\A\s*(kb\b|kettlebell\b|double\s+kb\b|gorilla\s+row)/i
+
+  def fix_kettlebell_non_kb_exercises(sections)
+    sections.each do |section|
+      next unless %w[main finisher].include?(section["category"])
+      original = Array(section["exercises"])
+      kept = original.reject do |ex|
+        name = ex["name"].to_s
+        if name.match?(KB_EXERCISE_PATTERN)
+          false
+        else
+          @fixes << "'#{section["name"]}': removed '#{name}' (Iron Engine is kettlebell-only)"
+          true
+        end
+      end
+      section["exercises"] = kept
+    end
+
+    sections.reject! do |section|
+      next false unless %w[main finisher].include?(section["category"])
+      if Array(section["exercises"]).empty?
+        @fixes << "Removed section '#{section["name"]}' (no kettlebell exercises remained)"
+        true
+      else
+        false
       end
     end
   end

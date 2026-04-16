@@ -104,6 +104,64 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
     assert_nil section["notes"], "Section notes with fractional rounds should be stripped after duration snap"
   end
 
+  # -- Iron Engine (kettlebell) KB-only enforcement --
+
+  test "fix_kettlebell_non_kb_exercises strips non-KB exercises from main sections" do
+    data = build_workout_with_sections([
+      { "name" => "Warm-Up", "category" => "warm_up", "format" => "straight",
+        "exercises" => [ { "name" => "Arm Circles" }, { "name" => "Bodyweight Squat" } ] },
+      { "name" => "Main Block", "category" => "main", "format" => "rounds", "rounds" => 3,
+        "exercises" => [
+          { "name" => "KB Swing", "reps" => 20 },
+          { "name" => "Assault Bike", "calories" => 12 },
+          { "name" => "KB Row", "reps" => 10 }
+        ] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 60, main_tag_slug: "kettlebell").validate_and_fix
+    main = result.dig("structure", "sections").find { |s| s["category"] == "main" }
+    names = main["exercises"].map { |e| e["name"] }
+    assert_equal [ "KB Swing", "KB Row" ], names
+  end
+
+  test "fix_kettlebell_non_kb_exercises removes sections left empty" do
+    data = build_workout_with_sections([
+      { "name" => "Main Block", "category" => "main", "format" => "rounds", "rounds" => 3,
+        "exercises" => [ { "name" => "KB Swing", "reps" => 20 } ] },
+      { "name" => "Rope Work", "category" => "main", "format" => "rounds", "rounds" => 3,
+        "exercises" => [ { "name" => "Jump Rope", "distance_m" => 800 } ] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 60, main_tag_slug: "kettlebell").validate_and_fix
+    section_names = result.dig("structure", "sections").map { |s| s["name"] }
+    assert_includes section_names, "Main Block"
+    assert_not_includes section_names, "Rope Work"
+  end
+
+  test "fix_kettlebell_non_kb_exercises leaves warm-ups and cool-downs alone" do
+    data = build_workout_with_sections([
+      { "name" => "Warm-Up", "category" => "warm_up", "format" => "straight",
+        "exercises" => [ { "name" => "Jumping Jacks" }, { "name" => "Bodyweight Squat" } ] },
+      { "name" => "Main Block", "category" => "main", "format" => "rounds", "rounds" => 3,
+        "exercises" => [ { "name" => "KB Swing", "reps" => 20 } ] },
+      { "name" => "Cool-Down", "category" => "cool_down", "format" => "straight",
+        "exercises" => [ { "name" => "Hamstring Stretch" } ] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 60, main_tag_slug: "kettlebell").validate_and_fix
+    warm_up  = result.dig("structure", "sections").find { |s| s["category"] == "warm_up" }
+    cooldown = result.dig("structure", "sections").find { |s| s["category"] == "cool_down" }
+    assert_equal 2, warm_up["exercises"].size
+    assert_equal 1, cooldown["exercises"].size
+  end
+
+  test "fix_kettlebell_non_kb_exercises is a no-op for non-kettlebell activities" do
+    data = build_workout_with_sections([
+      { "name" => "Main Block", "category" => "main", "format" => "rounds", "rounds" => 3,
+        "exercises" => [ { "name" => "Assault Bike", "calories" => 12 } ] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 60, main_tag_slug: "crossfit").validate_and_fix
+    main = result.dig("structure", "sections").find { |s| s["category"] == "main" }
+    assert main["exercises"].any? { |e| e["name"].match?(/bike/i) }, "non-kettlebell activities should keep bike work"
+  end
+
   private
 
   def build_workout_with_sections(sections)

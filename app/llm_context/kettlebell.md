@@ -4,11 +4,25 @@
 Kettlebell-only sessions that build explosive power, grip endurance, and full-body conditioning. Every exercise in the main set MUST use a kettlebell — no dumbbells, no barbells, no machines. Bodyweight movements are permitted only in warm-ups, cool-downs, and brief active recovery between KB efforts. The kettlebell is the only tool — embrace its versatility.
 
 ## Equipment Rules
-- **KETTLEBELL ONLY** — every working exercise must involve a kettlebell
-- No dumbbells, no barbells, no cable machines, no cardio machines (no rower, no bike, no ski erg)
-- Bodyweight is allowed ONLY for: warm-up activation, active recovery between KB sets, cool-down stretching
+
+**KETTLEBELL ONLY — this is absolute. Iron Engine is a kettlebell-only programme. There are no exceptions for conditioning, no exceptions for "variety", no exceptions for cardio blocks.**
+
+- Every exercise name in `main` and `finisher` sections MUST begin with **"KB "** (e.g. "KB Swing", "KB Goblet Squat", "KB Clean and Press"). If you cannot phrase an exercise as a KB movement, DO NOT include it — pick a different KB movement instead.
+- **FORBIDDEN in main/finisher sections** — including any of these is a workout-breaking error:
+  - Cardio machines: Assault Bike, Rowing Machine, SkiErg, Treadmill, Air Bike, Stationary Bike, Elliptical, Stair Master
+  - Unloaded cardio: Jump Rope, Skipping, Running, Jogging, Sprints, Cycling, Rowing (machine-free)
+  - Other loads: Barbell, Dumbbell, Wall Ball, Medicine Ball, Sandbag, Resistance Band, Cable, TRX, Pull-up Bar, Plyo Box
+  - Bodyweight conditioning: Burpees, Box Jumps, Jumping Jacks, Mountain Climbers (these belong only in warm-ups, not main work)
+- Need conditioning? Use KB Swings, KB Snatches, KB Cleans, KB Long Cycle, KB Thrusters, KB Man Makers, Double KB Swings, KB Sumo Deadlift High Pulls, or a KB Farmer's / Rack / Overhead Carry. The kettlebell IS the conditioning tool.
+- Bodyweight is allowed ONLY in: warm-up activation (e.g. squats, lunges, arm circles), brief active recovery between KB sets within a section, and cool-down stretching. Never as a main-section exercise and never as a stand-alone section.
 - If the athlete has multiple KB weights available, vary load across sections (heavier for grinds, lighter for ballistics)
 - **Double KB priority**: when the athlete's equipment indicates multiple kettlebells, include at least one section using double-KB variations (double clean, double front squat, double press, double swing, double rack carry) — these are the purest Iron Engine work and should appear regularly, not just occasionally
+
+## Section Variety Rules
+
+- **No repeated primary exercise across sections.** If one section is built around KB Swings, no other section may feature KB Swings as its primary exercise — pick a different KB movement (snatch, clean, long cycle, thruster, goblet squat, etc.). The session should expose the athlete to as many different KB patterns as possible.
+- **No near-duplicate sections.** Two sections with the same exercise at different distances/reps/rounds is ALWAYS wrong (e.g. "Jump Rope 1600m" and "Jump Rope 800m" in the same session — don't do this, even once). Each section should have a distinct character: different exercises, different format, different energy.
+- **No format repetition back-to-back.** If one section is a Continuous Circuit EMOM, the next must be something else (complex, flow, ladder, for_time, rounds, tabata, etc.).
 
 ## Movement Vocabulary
 
