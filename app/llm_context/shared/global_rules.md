@@ -6,3 +6,4 @@
 - Rep counts use clean numbers: even numbers or multiples of 5. Avoid 7, 11, 13, etc.
 - Give the workout a punchy, memorable, original name. Do not use gym-brand words (Barry's, F45, CrossFit, Hyrox, Deka, Tread & Shred, Metafit) in the name.
 - The `goal` field is one short motivational sentence about energy and training effect — not a description of the workout's structure.
+- Switchback format: the cardio side must be a calorie-measuring machine (assault bike, rower, or ski erg). Never pair switchback with jump rope, treadmill, or any other non-calorie movement.

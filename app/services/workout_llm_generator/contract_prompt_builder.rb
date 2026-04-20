@@ -23,6 +23,7 @@ class WorkoutLLMGenerator
       - Rep counts are clean numbers (even or multiples of 5).
       - Workout name: punchy, memorable, original. Banned words: Barry's, F45, CrossFit, Hyrox, Deka, Tread & Shred, Metafit.
       - `goal` is one motivational sentence about energy and training effect.
+      - Switchback format: cardio side must be a calorie-measuring machine (assault bike, rower, ski erg). Never pair switchback with jump rope, treadmill, or any other non-calorie movement.
     RULES
 
     def initialize(activity:, duration_mins:, athlete_block:, session_notes: nil, banned_equipment_override: [], contract_override: nil)
