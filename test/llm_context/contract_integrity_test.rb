@@ -76,4 +76,8 @@ class LLMContext::ContractIntegrityTest < ActiveSupport::TestCase
   test "Ohm contract is valid" do
     assert_activity_valid(LLMContext::Activities::Ohm)
   end
+
+  test "Dynamo contract is valid" do
+    assert_activity_valid(LLMContext::Activities::Dynamo)
+  end
 end
