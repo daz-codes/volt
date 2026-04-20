@@ -396,7 +396,7 @@ class WorkoutLLMGenerator
         BLOCK DURATION: Each main block must be 8-12 minutes of working time (including rest). This is CRITICAL — a 45-min session has ~35 min of working time across 3-4 blocks. Do NOT create blocks longer than 12 minutes. Do NOT set rounds on steady-state efforts — zone 2 is always rounds: 1.
 
         ENERGY SYSTEM MIX — every Turbine session must target at least 2 of these 4 energy systems across its blocks:
-        - SPRINT (anaerobic power): 10-20s all-out efforts with full rest between. 6-10 rounds. Great on assault bike or ski erg. Use format: rounds with rest_secs. Allowed sprint combos: 10s work / 50s rest, 15s work / 45s rest, 20s work / 40s rest (work + rest = 60s always). Total block ~8-10 min.
+        - SPRINT (anaerobic power): 20-30s hard efforts with equal-or-shorter rest. 10-20 rounds. Great on assault bike or ski erg. Use format: rounds with rest_secs. Allowed sprint combos: 20s work / 10s rest, 20s work / 20s rest, 30s work / 15s rest, 30s work / 30s rest. RULE: rest_secs must NEVER exceed the working duration — rest is always equal to or shorter than work. Total block ~8-10 min.
         - THRESHOLD (anaerobic capacity): Hard/easy intervals ON THE SAME MACHINE that add to a round minute. 8-12 rounds. Use format: rounds, NO rest_secs — the easy portion IS the recovery. Set duration_s to the HARD portion only. Describe the full interval in exercise notes. Allowed splits: "15s hard / 15s easy" (duration_s: 15), "20s hard / 10s easy" (duration_s: 20), "30s hard / 30s easy" (duration_s: 30), "40s hard / 20s easy" (duration_s: 40), "45s hard / 15s easy" (duration_s: 45). ALWAYS pick one of these — do NOT invent odd splits like 35s/25s. Total block ~8-12 min.
         - VO2 MAX: 2-4 min hard sustained efforts with 2-3 min rest. 4-6 rounds. Use format: rounds with rest_secs. Set distance_m PER REP (e.g. distance_m: 400 with rounds: 5 — NOT distance_m: 2000 with rounds: 1). Great for rowing 500m repeats, treadmill 400m repeats, or ski erg efforts. Total block ~10-12 min.
         - ZONE 2 (aerobic base): 8-12 min single sustained effort at conversational pace. Use format: rounds with rounds: 1 and duration_s on the exercise. NEVER more than 1 round — this is one continuous effort, not repeated sets.
@@ -418,9 +418,9 @@ class WorkoutLLMGenerator
         DISTANCE PYRAMID: An optional block type — descending distance sets on one machine. Structure as 3 consecutive sections on the SAME machine with decreasing distance and increasing reps: e.g. 1×800m → 2×400m → 4×200m (or doubled: 1×1600m → 2×800m → 4×400m). Each tier is its own section with format: rounds. This is an exception to the machine variety rule — pyramid tiers share a machine. Great on treadmill or rower.
 
         MACHINE VARIETY: Use all 4 machines across the session. Never use the same machine for two separate blocks — EXCEPT for distance pyramid tiers, which intentionally use the same machine across their 3 tiers. VARY THE ORDER every session — do not always put treadmill last. Example sessions (vary these):
-          1. Treadmill 5×400m (VO2 max) → Assault Bike 30s/30s (threshold) → Rower steady state (zone 2) → SkiErg 10s sprints (sprint)
-          2. Rower 500m repeats (VO2 max) → SkiErg 40s/20s (threshold) → Treadmill 10min steady (zone 2) → Assault Bike sprints (sprint)
-          3. SkiErg 45s/15s (threshold) → Treadmill 4×800m (VO2 max) → Assault Bike 15s sprints (sprint) → Rower steady state (zone 2)
+          1. Treadmill 5×400m (VO2 max) → Assault Bike 30s/30s (threshold) → Rower steady state (zone 2) → SkiErg 20s on / 10s off sprints (sprint)
+          2. Rower 500m repeats (VO2 max) → SkiErg 40s/20s (threshold) → Treadmill 10min steady (zone 2) → Assault Bike 30s on / 30s off sprints (sprint)
+          3. SkiErg 45s/15s (threshold) → Treadmill 4×800m (VO2 max) → Assault Bike 20s on / 20s off sprints (sprint) → Rower steady state (zone 2)
           4. Assault Bike 30s/30s (threshold) → Rower 4×500m (VO2 max) → SkiErg steady state (zone 2) → Treadmill 6×200m sprints (sprint)
 
         SESSION FEEL: This is a serious cardio training session — not just "go on a machine." Each block has a clear purpose and intensity target. The athlete should finish knowing they've trained multiple energy systems hard.
@@ -939,9 +939,15 @@ class WorkoutLLMGenerator
   def build_warmup_cooldown
     breaths = @duration_mins <= 30 ? 5 : 10
     bodyweight_only = @activity_slug.in?(BODYWEIGHT_ONLY_SLUGS)
+    kettlebell_only = @activity_slug == "kettlebell"
 
     if @duration_mins <= 30
-      if bodyweight_only
+      if kettlebell_only
+        warmup_section = <<~W
+          ## Warm-Up Approach: KB Activation (3 min)
+          3–4 kettlebell and bodyweight activation exercises, 30–45 seconds each (duration_s: 30 or 45). NO cardio machines — Iron Engine is KB-only, warm-up included. Choose from: KB halos (light), KB goblet squats (light), arm circles, leg swings, hip circles, air squats, single-arm KB deadlifts (light). format: straight, duration_mins: 3.
+        W
+      elsif bodyweight_only
         warmup_section = <<~W
           ## Warm-Up Approach: Bodyweight Activation (3 min)
           3–4 bodyweight activation exercises, 30–45 seconds each (duration_s: 30 or 45). No equipment, no cardio machines. Choose movements that prime the whole body: e.g. jumping jacks, inchworms, leg swings, arm circles, air squats. format: straight, duration_mins: 3.
@@ -952,6 +958,11 @@ class WorkoutLLMGenerator
           Use a single exercise: 3 minutes of easy cardio (e.g. light jog, easy row, easy bike). format: straight, duration_mins: 3, one exercise with duration_s: 180.
         W
       end
+    elsif kettlebell_only
+      warmup_section = <<~W
+        ## Warm-Up Approach: KB Activation (5 min)
+        5 KB and bodyweight activation exercises, 45–60 seconds each (duration_s: 45 or 60), flowing one into the next with no rest. NO cardio machines — Iron Engine is KB-only, warm-up included. Pick from: KB halos (light), KB goblet squats (light), KB deadlifts (light), light KB swings, arm circles, leg swings, hip circles, world's greatest stretch, inchworms, air squats. Keep intensity very low — this is preparation, not training.
+      W
     else
       # Filter warm-ups for bodyweight-only or equipment-limited sessions
       warmup_pool = if bodyweight_only || equipment_limited?
@@ -1639,7 +1650,7 @@ class WorkoutLLMGenerator
   # the same 2-3 formats every time.
 
   # Activities where Ruby should NOT pick formats (they have rigid structures).
-  SKIP_FORMAT_SELECTION_SLUGS = %w[functional-muscle tread-shred alternator ohm turbine].freeze
+  SKIP_FORMAT_SELECTION_SLUGS = %w[functional-muscle tread-shred alternator ohm turbine kettlebell].freeze
 
   # Format descriptions injected into the directive.
   SECTION_FORMAT_DESC = {
@@ -2268,10 +2279,18 @@ class WorkoutLLMGenerator
     cooldown_mins = 5
     working_mins = @duration_mins - warmup_mins - cooldown_mins
 
-    # 1 main set per 15 min of working time
-    # e.g. 45 min → 35 working → 2 main sets, 60 min → 50 working → 3, 75 min → 65 working → 4
-    main_sets = [ (working_mins / 15.0).floor, 1 ].max
-    finisher_fits = (working_mins - (main_sets * 15)) >= 4
+    # Turbine blocks are 8–12 min each (per its own guidance), not 15. Fit more blocks
+    # and never force a tabata finisher — Turbine's guidance explicitly warns against
+    # defaulting to an end-of-session tabata.
+    if @activity_slug == "turbine"
+      main_sets = [ (working_mins / 10.0).round, 2 ].max
+      finisher_fits = false
+    else
+      # 1 main set per 15 min of working time
+      # e.g. 45 min → 35 working → 2 main sets, 60 min → 50 working → 3, 75 min → 65 working → 4
+      main_sets = [ (working_mins / 15.0).floor, 1 ].max
+      finisher_fits = (working_mins - (main_sets * 15)) >= 4
+    end
 
     set_word = main_sets == 1 ? "1 main section" : "#{main_sets} main sections"
     finisher_text = finisher_fits ? " → Finisher (Tabata 4 min or short for_time sprint)" : ""
