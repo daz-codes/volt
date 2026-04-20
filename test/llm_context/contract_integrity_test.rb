@@ -80,4 +80,8 @@ class LLMContext::ContractIntegrityTest < ActiveSupport::TestCase
   test "Dynamo contract is valid" do
     assert_activity_valid(LLMContext::Activities::Dynamo)
   end
+
+  test "Hyrox contract is valid" do
+    assert_activity_valid(LLMContext::Activities::Hyrox)
+  end
 end
