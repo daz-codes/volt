@@ -68,4 +68,8 @@ class LLMContext::ContractIntegrityTest < ActiveSupport::TestCase
   test "Iron Engine contract is valid" do
     assert_activity_valid(LLMContext::Activities::IronEngine)
   end
+
+  test "Turbine contract is valid" do
+    assert_activity_valid(LLMContext::Activities::Turbine)
+  end
 end
