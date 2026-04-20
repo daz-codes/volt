@@ -566,13 +566,20 @@ class WorkoutLLMGenerator
       workout_data = collapse_duplicate_exercises(workout_data)
       collapse_set_notation(workout_data)
     else
-      example_workouts = fetch_top_liked_examples
-      prompt           = build_example_prompt(example_workouts)
-      workout_data     = call_llm(prompt)
-      workout_data     = validate_and_fix(workout_data)
-      workout_data     = collapse_duplicate_exercises(workout_data)
-      workout_data     = fm_enforce_blocks(workout_data)
-      workout_data     = general_enforce_formats(workout_data)
+      if contract_path?
+        prompt           = build_contract_prompt
+        log_prompt_path(:contract, prompt)
+        workout_data     = call_llm(prompt)
+      else
+        example_workouts = fetch_top_liked_examples
+        prompt           = build_example_prompt(example_workouts)
+        log_prompt_path(:example, prompt)
+        workout_data     = call_llm(prompt)
+      end
+      workout_data = validate_and_fix(workout_data)
+      workout_data = collapse_duplicate_exercises(workout_data)
+      workout_data = fm_enforce_blocks(workout_data)
+      workout_data = general_enforce_formats(workout_data)
       collapse_set_notation(workout_data)
     end
   end
@@ -2789,6 +2796,65 @@ class WorkoutLLMGenerator
     lines << "\nThe session MUST feel authentically like #{@activity}. Follow the structure and use the exercises above — someone who has attended a real class should recognise it immediately."
 
     lines.join("\n")
+  end
+
+  def contract_path?
+    enabled = ENV["WORKOUT_PROMPT_CONTRACT_ACTIVITIES"].to_s.split(",").map(&:strip)
+    return false if enabled.empty?
+    # Accept either direction — user may set the env var to the display slug they
+    # know ("iron-engine") or the canonical slug stored on the record ("kettlebell").
+    canonical = LLMContext::Activities.canonical_slug(@activity_slug)
+    enabled_canonicals = enabled.map { |s| LLMContext::Activities.canonical_slug(s) }
+    enabled_canonicals.include?(canonical)
+  end
+
+  def build_contract_prompt
+    activity = LLMContext::Activities.for!(@activity_slug)
+    contract = activity::CONTRACT.dup
+    contract[:core]     = :never    if no_core?
+    contract[:finisher] = :required if race_simulation?
+    ContractPromptBuilder.new(
+      activity:                  activity,
+      duration_mins:             @duration_mins,
+      athlete_block:             build_athlete_block_for_contract,
+      session_notes:             sanitized_session_notes,
+      banned_equipment_override: profile_banned_equipment + session_note_banned_equipment,
+      contract_override:         contract
+    ).build
+  end
+
+  def log_prompt_path(path, prompt)
+    Rails.logger.info(
+      "[workout_llm_generator] activity=#{@activity_slug} " \
+      "path=#{path} " \
+      "prompt_chars=#{prompt.length} " \
+      "prompt_tokens_est=#{(prompt.length / 4.0).round}"
+    )
+  end
+
+  # Reuses build_user_context (around line 2343) which already produces the athlete
+  # section used inside build_example_prompt. No new logic — just a clear entry point.
+  def build_athlete_block_for_contract
+    build_user_context.to_s.strip
+  end
+
+  # Mirrors build_profile_equipment_rule (around line 1216) but returns canonical
+  # slugs, not prose. Only limits when the user profile is a genuine constraint.
+  def profile_banned_equipment
+    return [] unless @equipment.present? && (User::EQUIPMENT_SLUGS - @equipment).any?
+    User::EQUIPMENT_SLUGS - @equipment
+  end
+
+  # Session-note behaviour flags that translate into equipment bans.
+  # no_run? already exists (around lines 1362–1372).
+  def session_note_banned_equipment
+    banned = []
+    banned << "treadmill" if no_run?
+    banned
+  end
+
+  def sanitized_session_notes
+    @session_notes.to_s.gsub(/<[^>]+>/, "").strip.presence
   end
 
   def call_llm(prompt, tools: [ TOOL_DEFINITION ], tool_choice: { type: "any" }, max_tokens: 4096)
