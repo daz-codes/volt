@@ -108,4 +108,28 @@ class LLMContext::ContractIntegrityTest < ActiveSupport::TestCase
   test "Volt Octathlon contract is valid" do
     assert_activity_valid(LLMContext::Activities::VoltOctathlon)
   end
+
+  test "Alternator contract is valid" do
+    assert_activity_valid(LLMContext::Activities::Alternator)
+  end
+
+  test "Transformer contract is valid" do
+    assert_activity_valid(LLMContext::Activities::Transformer)
+  end
+
+  test "Circuit Breaker contract is valid" do
+    assert_activity_valid(LLMContext::Activities::CircuitBreaker)
+  end
+
+  test "CrossFit contract is valid" do
+    assert_activity_valid(LLMContext::Activities::CrossFit)
+  end
+
+  test "Functional Muscle contract is valid" do
+    assert_activity_valid(LLMContext::Activities::FunctionalMuscle)
+  end
+
+  test "General Fitness contract is valid" do
+    assert_activity_valid(LLMContext::Activities::GeneralFitness)
+  end
 end
