@@ -15,7 +15,7 @@
 These were verified against the live codebase before writing — confirm they still hold before Task 0.
 
 1. **Canonical activity slug for Iron Engine is `"kettlebell"`, not `"iron-engine"`.** `WorkoutLLMGenerator#initialize` line 527 normalises through `ACTIVITY_ALIASES`: `"iron-engine" => "kettlebell"` (line 231). So at runtime `@activity_slug == "kettlebell"`. Every registry key in this plan uses the *canonical DB slug*, and the module's `SLUG` constant matches it (`SLUG = "kettlebell"` for `IronEngine`, `SLUG = "tread-shred"` for whatever T&S routes to, etc.).
-2. **Autoload:** Rails 8 autoloads direct subdirectories of `app/` as root paths. `app/lib/` is NOT a root path (only top-level `lib/` is, via `config.autoload_lib` — confirmed in `config/application.rb:17`). The registry therefore lives at `app/llm_context/activities.rb`, which Zeitwerk resolves as `LLMContext::Activities`, sibling to the `app/llm_context/activities/` directory that provides its children.
+2. **Autoload:** Rails 8 treats each direct subdirectory of `app/` as its own autoload root. Dropping a file at `app/llm_context/activities.rb` would therefore resolve as the top-level constant `Activities`, not `LLMContext::Activities`. `app/llm_context/` is also already occupied: it holds the legacy markdown prompt files the new system replaces. The registry and modules therefore live under `lib/llm_context/`. `lib/` is an autoload root via `config.autoload_lib` (`config/application.rb:17`), so `lib/llm_context/activities.rb` resolves as `LLMContext::Activities`, and `lib/llm_context/activities/iron_engine.rb` as `LLMContext::Activities::IronEngine`. Shared `.md` snippets still live in `app/llm_context/shared/` — they are read with `File.read`, not autoloaded, so their location is independent of Zeitwerk.
 3. **Equipment vocabulary** comes from `User::EQUIPMENT_SLUGS` (`app/models/user.rb:28`): `%w[barbell dumbbells kettlebells pull_up_bar wall_ball sled resistance_bands jump_rope rowing_machine assault_bike ski_erg treadmill]`. Every `allowed_equipment` / `banned_equipment` value used in activity contracts MUST come from this list (or `"bodyweight"`, which is implicit). Do not invent new slugs like `"rower"` or `"cardio_machines"`.
 4. **Slug-direction rule.** `ACTIVITY_ALIASES` in the generator maps *display* slugs to *canonical* slugs. `LLMContext::Activities::ALIASES` in the new registry mirrors that direction (display → canonical). The registry's `MODULES` hash is keyed on canonical slugs only.
 
@@ -27,24 +27,24 @@ These were verified against the live codebase before writing — confirm they st
 
 | Path | Responsibility |
 |---|---|
-| `app/llm_context/activities.rb` | Registry: canonical-slug → activity module. Owns `ALIASES` (display-slug → canonical) and `MODULES` (canonical → module constant). |
-| `app/llm_context/activities/iron_engine.rb` | Iron Engine contract + vocab + 3 examples. `SLUG = "kettlebell"`. |
-| `app/llm_context/activities/turbine.rb` | Turbine contract + vocab + 3 examples. |
-| `app/llm_context/activities/alternator.rb` | Alternator contract + examples. Includes T&S treadmill-focus note. |
-| `app/llm_context/activities/circuit_breaker.rb` | Circuit Breaker (F45). |
-| `app/llm_context/activities/dynamo.rb` | Dynamo (HIIT bodyweight). |
-| `app/llm_context/activities/transformer.rb` | Transformer (strength). |
-| `app/llm_context/activities/ohm.rb` | Ohm (yoga/mobility). |
-| `app/llm_context/activities/hyrox.rb` | Hyrox. |
-| `app/llm_context/activities/deka.rb` | Deka parent. |
-| `app/llm_context/activities/deka_fit.rb` | Deka Fit. |
-| `app/llm_context/activities/deka_strong.rb` | Deka Strong. |
-| `app/llm_context/activities/deka_mile.rb` | Deka Mile. |
-| `app/llm_context/activities/deka_atlas.rb` | Deka Atlas. |
-| `app/llm_context/activities/volt_octathlon.rb` | Volt Octathlon. |
-| `app/llm_context/activities/functional_muscle.rb` | Functional Muscle. |
-| `app/llm_context/activities/crossfit.rb` | CrossFit. |
-| `app/llm_context/activities/general_fitness.rb` | General Fitness default. |
+| `lib/llm_context/activities.rb` | Registry: canonical-slug → activity module. Owns `ALIASES` (display-slug → canonical) and `MODULES` (canonical → module constant). |
+| `lib/llm_context/activities/iron_engine.rb` | Iron Engine contract + vocab + 3 examples. `SLUG = "kettlebell"`. |
+| `lib/llm_context/activities/turbine.rb` | Turbine contract + vocab + 3 examples. |
+| `lib/llm_context/activities/alternator.rb` | Alternator contract + examples. Includes T&S treadmill-focus note. |
+| `lib/llm_context/activities/circuit_breaker.rb` | Circuit Breaker (F45). |
+| `lib/llm_context/activities/dynamo.rb` | Dynamo (HIIT bodyweight). |
+| `lib/llm_context/activities/transformer.rb` | Transformer (strength). |
+| `lib/llm_context/activities/ohm.rb` | Ohm (yoga/mobility). |
+| `lib/llm_context/activities/hyrox.rb` | Hyrox. |
+| `lib/llm_context/activities/deka.rb` | Deka parent. |
+| `lib/llm_context/activities/deka_fit.rb` | Deka Fit. |
+| `lib/llm_context/activities/deka_strong.rb` | Deka Strong. |
+| `lib/llm_context/activities/deka_mile.rb` | Deka Mile. |
+| `lib/llm_context/activities/deka_atlas.rb` | Deka Atlas. |
+| `lib/llm_context/activities/volt_octathlon.rb` | Volt Octathlon. |
+| `lib/llm_context/activities/functional_muscle.rb` | Functional Muscle. |
+| `lib/llm_context/activities/crossfit.rb` | CrossFit. |
+| `lib/llm_context/activities/general_fitness.rb` | General Fitness default. |
 | `app/llm_context/shared/global_rules.md` | Global JSON/naming/rest≤work/variety rules. |
 | `app/llm_context/shared/warm_up_cool_down.md` | Warm-up and cool-down style vocabulary. |
 | `app/services/workout_llm_generator/contract_prompt_builder.rb` | Small PORO: takes activity module + request context, returns the XML-tagged prompt string. Keeps `WorkoutLLMGenerator` thin for the new path without doing a full service split. |
@@ -58,7 +58,7 @@ These were verified against the live codebase before writing — confirm they st
 |---|---|
 | `app/services/workout_llm_generator.rb` | Add `build_contract_prompt` dispatch (Phase 2). Delete old methods/constants (Phase 4). |
 
-No changes needed in `config/application.rb` — `app/llm_context/` is already autoloaded because it is a direct subdirectory of `app/`.
+No changes needed in `config/application.rb` — `lib/` is already autoloaded via `config.autoload_lib(ignore: %w[assets tasks])`, so `lib/llm_context/**/*.rb` is picked up automatically.
 
 **Deleted files (Phase 4):** every `app/llm_context/*.md` except `shared/*.md`.
 
@@ -101,7 +101,7 @@ Zero impact on running code. Adds the registry, one activity module, the shared 
 ### Task 1.1: Create the activities registry
 
 **Files:**
-- Create: `app/llm_context/activities.rb`
+- Create: `lib/llm_context/activities.rb`
 - Create: `test/llm_context/activities_test.rb`
 
 - [ ] **Step 1: Write the failing test**
@@ -161,7 +161,7 @@ Expected: FAIL — uninitialized constant `LLMContext::Activities`.
 `ALIASES` must mirror the direction of the generator's existing `ACTIVITY_ALIASES` (lines 207–242): display-slug → canonical-slug. In Phase 4 we delete `ACTIVITY_ALIASES` from the generator and this becomes the single source of truth, so port every entry — do not skip any.
 
 ```ruby
-# app/llm_context/activities.rb
+# lib/llm_context/activities.rb
 module LLMContext
   module Activities
     class UnknownActivity < StandardError; end
@@ -252,14 +252,14 @@ Expected: unknown-slug + `canonical_slug` + cycle-safety tests pass; the two Iro
 - [ ] **Step 5: Commit**
 
 ```bash
-git add app/llm_context/activities.rb test/llm_context/activities_test.rb
+git add lib/llm_context/activities.rb test/llm_context/activities_test.rb
 git commit -m "feat(llm_context): add Activities registry with slug/alias resolution"
 ```
 
 ### Task 1.2: Create Iron Engine activity module
 
 **Files:**
-- Create: `app/llm_context/activities/iron_engine.rb`
+- Create: `lib/llm_context/activities/iron_engine.rb`
 
 - [ ] **Step 1: Write the failing contract integrity test file**
 
@@ -356,7 +356,7 @@ Expected: FAIL — uninitialized constant `LLMContext::Activities::IronEngine`.
 
 All equipment slugs below come from `User::EQUIPMENT_SLUGS` (`app/models/user.rb:28`): `barbell`, `dumbbells`, `kettlebells`, `pull_up_bar`, `wall_ball`, `sled`, `resistance_bands`, `jump_rope`, `rowing_machine`, `assault_bike`, `ski_erg`, `treadmill`. The canonical DB slug for Iron Engine is `"kettlebell"` (not `"iron-engine"`).
 
-Create `app/llm_context/activities/iron_engine.rb`:
+Create `lib/llm_context/activities/iron_engine.rb`:
 
 ```ruby
 module LLMContext
@@ -466,8 +466,8 @@ Expected: all pass.
 - [ ] **Step 5: Commit**
 
 ```bash
-git add app/llm_context/activities.rb \
-        app/llm_context/activities/iron_engine.rb \
+git add lib/llm_context/activities.rb \
+        lib/llm_context/activities/iron_engine.rb \
         test/llm_context/activities_test.rb \
         test/llm_context/contract_integrity_test.rb
 git commit -m "feat(llm_context): scaffold Iron Engine contract + vocabulary + 3 examples"
@@ -1008,7 +1008,7 @@ Order matters. Purity-sensitive activities go first because bleed is most visibl
 ### Task 3.1: Author Turbine
 
 **Files:**
-- Create: `app/llm_context/activities/turbine.rb`
+- Create: `lib/llm_context/activities/turbine.rb`
 - Modify: `test/llm_context/contract_integrity_test.rb` (add `test "Turbine contract is valid"`)
 
 - [ ] **Step 1: Add the contract-integrity test for Turbine**
@@ -1025,7 +1025,7 @@ end
 bin/rails test test/llm_context/contract_integrity_test.rb -n /Turbine/
 ```
 
-- [ ] **Step 3: Write `app/llm_context/activities/turbine.rb`**
+- [ ] **Step 3: Write `lib/llm_context/activities/turbine.rb`**
 
 Use `User::EQUIPMENT_SLUGS` vocabulary. Source material: the existing Turbine block in `FORMAT_AFFINITY["turbine"]` (line 388+ of the generator) and any Turbine-specific guidance in `WorkoutLLMGenerator` around lines 1407 and 2285.
 
@@ -1139,7 +1139,7 @@ export WORKOUT_PROMPT_CONTRACT_ACTIVITIES=kettlebell,turbine
 - [ ] **Step 6: Commit**
 
 ```bash
-git add app/llm_context/activities/turbine.rb test/llm_context/contract_integrity_test.rb
+git add lib/llm_context/activities/turbine.rb test/llm_context/contract_integrity_test.rb
 git commit -m "feat(llm_context): add Turbine contract + vocabulary + 3 examples"
 ```
 
