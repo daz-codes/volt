@@ -31,17 +31,23 @@ class WorkoutLLMGenerator::ContractPromptBuilderTest < ActiveSupport::TestCase
     assert_includes build, "KETTLEBELL ONLY"
   end
 
-  test "iron-engine prompt never contains assault bike or treadmill strings" do
+  test "iron-engine prompt does not mention cardio machines as allowed or in examples" do
     prompt = build
-    refute_match(/assault bike/i, prompt)
-    refute_match(/treadmill/i,    prompt)
+    allowed_line = prompt[/ALLOWED EQUIPMENT:([^\n]+)/, 1]
+    refute_nil allowed_line
+    refute_match(/treadmill|assault.?bike|rower|ski.?erg/i, allowed_line)
+
+    examples_block = prompt[/<examples>(.*?)<\/examples>/m, 1]
+    refute_nil examples_block
+    refute_match(/"equipment"\s*:\s*"(treadmill|assault_bike|rowing_machine|ski_erg)"/, examples_block)
+    refute_match(/"name"\s*:\s*"[^"]*(treadmill|assault bike|rower|ski erg)/i, examples_block)
   end
 
   test "examples tag contains three serialised workouts" do
     prompt = build
     examples_block = prompt[/\<examples\>(.*?)\<\/examples\>/m, 1]
     refute_nil examples_block
-    assert_equal 3, examples_block.scan(/"name"\s*:/).length
+    assert_equal 3, examples_block.scan(/"goal"\s*:/).length
   end
 
   test "global_rules block contains the rest-work rule" do

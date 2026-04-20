@@ -54,7 +54,7 @@ class WorkoutLLMGenerator
     end
 
     def banned_equipment
-      @banned_override.uniq
+      (Array(contract[:banned_equipment]) + @banned_override).uniq
     end
 
     def contract_block
@@ -97,23 +97,7 @@ class WorkoutLLMGenerator
     end
 
     def examples_block
-      serialised = @activity::EXAMPLES.map do |ex|
-        {
-          "name"         => ex[:name],
-          "goal"         => ex[:goal],
-          "duration_mins" => ex[:duration_mins],
-          "sections"     => Array(ex[:sections]).map do |sec|
-            sec.deep_stringify_keys
-               .transform_keys { |k| k == "name" ? "section" : k }
-               .tap do |s|
-                 s["exercises"] = Array(s["exercises"]).map do |e|
-                   e.transform_keys { |k| k == "name" ? "exercise" : k }
-                 end
-               end
-          end
-        }
-      end
-      json = JSON.pretty_generate(serialised)
+      json = JSON.pretty_generate(@activity::EXAMPLES.map { |ex| ex.deep_stringify_keys })
       <<~EX.strip
         Three #{@activity::NAME} workouts that show the quality bar and style. Study structure,
         exercise selection, format variety, and naming. Create something fresh in the same
