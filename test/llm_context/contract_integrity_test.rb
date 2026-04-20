@@ -88,4 +88,24 @@ class LLMContext::ContractIntegrityTest < ActiveSupport::TestCase
   test "Deka Fit contract is valid" do
     assert_activity_valid(LLMContext::Activities::DekaFit)
   end
+
+  test "Deka contract is valid" do
+    assert_activity_valid(LLMContext::Activities::Deka)
+  end
+
+  test "Deka Strong contract is valid" do
+    assert_activity_valid(LLMContext::Activities::DekaStrong)
+  end
+
+  test "Deka Mile contract is valid" do
+    assert_activity_valid(LLMContext::Activities::DekaMile)
+  end
+
+  test "Deka Atlas contract is valid" do
+    assert_activity_valid(LLMContext::Activities::DekaAtlas)
+  end
+
+  test "Volt Octathlon contract is valid" do
+    assert_activity_valid(LLMContext::Activities::VoltOctathlon)
+  end
 end
