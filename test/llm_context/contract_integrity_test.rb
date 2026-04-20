@@ -72,4 +72,8 @@ class LLMContext::ContractIntegrityTest < ActiveSupport::TestCase
   test "Turbine contract is valid" do
     assert_activity_valid(LLMContext::Activities::Turbine)
   end
+
+  test "Ohm contract is valid" do
+    assert_activity_valid(LLMContext::Activities::Ohm)
+  end
 end
