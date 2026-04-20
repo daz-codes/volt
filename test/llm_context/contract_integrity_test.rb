@@ -84,4 +84,8 @@ class LLMContext::ContractIntegrityTest < ActiveSupport::TestCase
   test "Hyrox contract is valid" do
     assert_activity_valid(LLMContext::Activities::Hyrox)
   end
+
+  test "Deka Fit contract is valid" do
+    assert_activity_valid(LLMContext::Activities::DekaFit)
+  end
 end
