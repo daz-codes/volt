@@ -1,4 +1,12 @@
 module ApplicationHelper
+  # LLM outputs sometimes HTML-entity-encode the strings they return
+  # ("Run &amp; Ski"). Unescape once before ERB's auto-escaper runs so the
+  # final HTML is "Run &amp; Ski" rendering as "Run & Ski".
+  def clean_llm_text(str)
+    return str if str.blank?
+    CGI.unescapeHTML(str.to_s)
+  end
+
   # Returns the matching benchmark test definition if the exercise name matches
   # one of the curated benchmarks, otherwise nil.
   def benchmark_for_exercise(name)

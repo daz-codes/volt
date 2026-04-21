@@ -20,9 +20,9 @@
       <% video_url = ExerciseVideo.url_for(exercise["name"]) %>
       <p class="text-white font-semibold text-sm" <% if swap_can_show %>data-swap-exercise-target="name"<% end %>>
         <% if video_url %>
-          <%= link_to exercise["name"], video_url, target: "_blank", rel: "noopener", class: "underline decoration-dotted underline-offset-2 hover:text-lime-400 transition-colors", onclick: "event.stopPropagation()" %>
+          <%= link_to clean_llm_text(exercise["name"]), video_url, target: "_blank", rel: "noopener", class: "underline decoration-dotted underline-offset-2 hover:text-lime-400 transition-colors", onclick: "event.stopPropagation()" %>
         <% else %>
-          <%= exercise["name"] %>
+          <%= clean_llm_text(exercise["name"]) %>
         <% end %>
       </p>
       <% if is_tabata %>
