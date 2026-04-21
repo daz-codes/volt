@@ -57,13 +57,16 @@
     <% sb_start = section["start"].to_i.nonzero? || 40
        sb_end   = section["end"].to_i.nonzero?   || 10
        sb_step  = section["step"].to_i.nonzero?   || 10
+       sb_start, sb_end = sb_end, sb_start if sb_start < sb_end
        down_vals = []; v = sb_start; while v >= sb_end; down_vals << v; v -= sb_step; end
        up_vals = down_vals.reverse
        is_cal_machine = exercise["name"].to_s.match?(/\b(row|assault.?bike|ski.?erg|bike)\b/i)
        seq = exercise_index == 0 ? down_vals : up_vals
        unit = is_cal_machine ? "cal" : "reps" %>
     <div class="flex items-center gap-1.5 mt-1 flex-wrap">
-      <span class="text-xs font-bold text-sky-200"><%= seq.join(", ") %> <%= unit %></span>
+      <% if seq.any? %>
+        <span class="text-xs font-bold text-sky-200"><%= seq.join(", ") %> <%= unit %></span>
+      <% end %>
       <% if exercise["notes"].present? %>
         <span class="text-gray-400 text-xs italic"><%= exercise["notes"] %></span>
       <% end %>
@@ -72,10 +75,10 @@
     <div class="flex items-center gap-1.5 mt-1 flex-wrap" <% if swap_can_show %>data-swap-exercise-target="details"<% end %>>
       <% if exercise["distance_m"] %>
         <span class="text-xs font-bold text-sky-200"><%= exercise["distance_m"] %>m</span>
-      <% elsif !is_tabata && exercise["calories"] %>
+      <% elsif !is_tabata && exercise["calories"].to_i > 0 %>
         <span class="text-xs font-bold text-sky-200"><%= exercise["calories"] %> cal</span>
-      <% elsif !is_tabata && exercise["reps"] %>
-        <% reps_value = exercise["reps"].to_s
+      <% elsif !is_tabata && exercise["reps"].present? && exercise["reps"].to_s.strip != "0" %>
+        <% reps_value = exercise["reps"].to_s.strip
            reps_display = if reps_value.match?(/[a-zA-Z]/)
                             reps_value
                           elsif exercise["name"].to_s.match?(/carry|sled|prowler|drag|shuttle|farmer/i)
