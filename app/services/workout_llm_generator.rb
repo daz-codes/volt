@@ -566,16 +566,9 @@ class WorkoutLLMGenerator
       workout_data = collapse_duplicate_exercises(workout_data)
       collapse_set_notation(workout_data)
     else
-      if contract_path?
-        prompt           = build_contract_prompt
-        log_prompt_path(:contract, prompt)
-        workout_data     = call_llm(prompt)
-      else
-        example_workouts = fetch_top_liked_examples
-        prompt           = build_example_prompt(example_workouts)
-        log_prompt_path(:example, prompt)
-        workout_data     = call_llm(prompt)
-      end
+      prompt       = build_contract_prompt
+      log_prompt_path(:contract, prompt)
+      workout_data = call_llm(prompt)
       workout_data = validate_and_fix(workout_data)
       workout_data = collapse_duplicate_exercises(workout_data)
       workout_data = fm_enforce_blocks(workout_data)
@@ -2796,14 +2789,6 @@ class WorkoutLLMGenerator
     lines << "\nThe session MUST feel authentically like #{@activity}. Follow the structure and use the exercises above — someone who has attended a real class should recognise it immediately."
 
     lines.join("\n")
-  end
-
-  def contract_path?
-    legacy = ENV["WORKOUT_PROMPT_LEGACY_ACTIVITIES"].to_s.split(",").map { |s|
-      LLMContext::Activities.canonical_slug(s.strip)
-    }
-    return false if legacy.include?(LLMContext::Activities.canonical_slug(@activity_slug))
-    LLMContext::Activities.for(@activity_slug).present?
   end
 
   def build_contract_prompt
