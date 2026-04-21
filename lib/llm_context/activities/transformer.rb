@@ -65,9 +65,10 @@ module LLMContext
             { name: "DB Bench Press", format: "rounds", rounds: 4, rest_secs: 90,
               exercises: [ { name: "DB Bench Press", reps: 10, equipment: "dumbbells" } ] },
             { name: "Accessory Ladder", format: "ladder",
+              varies: "reps", start: 10, end: 2, step: 2, rest_between_rungs: 30,
               exercises: [
-                { name: "Push-ups", reps: "10-8-6-4-2", equipment: "bodyweight" },
-                { name: "Lateral Raise", reps: "10-8-6-4-2", equipment: "dumbbells" }
+                { name: "Push-ups", equipment: "bodyweight" },
+                { name: "Lateral Raise", equipment: "dumbbells" }
               ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }

@@ -82,10 +82,11 @@ module LLMContext
                 { name: "KB Clean and Press", duration_s: 20, equipment: "kettlebells" }
               ] },
             { name: "Ten-to-One Ladder", format: "ladder",
+              varies: "reps", start: 10, end: 1, step: 1, rest_between_rungs: 30,
               exercises: [
-                { name: "KB Swings", reps: "10-1", equipment: "kettlebells" },
-                { name: "Wall Balls", reps: "10-1", equipment: "wall_ball" },
-                { name: "Burpees", reps: "10-1", equipment: "bodyweight" }
+                { name: "KB Swings", equipment: "kettlebells" },
+                { name: "Wall Balls", equipment: "wall_ball" },
+                { name: "Burpees", equipment: "bodyweight" }
               ] },
             { name: "Upper Body Strength", format: "rounds", rounds: 5, rest_secs: 60,
               exercises: [ { name: "Shoulder Press", reps: 10, notes: "working weight", equipment: "dumbbells" } ] },
@@ -115,7 +116,8 @@ module LLMContext
                 { name: "KB Swings", reps: 20, equipment: "kettlebells" }
               ] },
             { name: "Bear Mountain", format: "mountain",
-              exercises: [ { name: "Bear", reps: "1-2-3-4-5-4-3-2-1", notes: "moderate barbell", equipment: "barbell" } ] },
+              varies: "reps", start: 1, peak: 5, end: 1, step: 1, rest_between_rungs: 30,
+              exercises: [ { name: "Bear", notes: "moderate barbell — clean → press → front squat → press → back squat = 1 rep", equipment: "barbell" } ] },
             { name: "Upper Body Strength", format: "rounds", rounds: 5, rest_secs: 60,
               exercises: [ { name: "Low Row", reps: 10, notes: "working weight", equipment: "dumbbells" } ] },
             { name: "Lower Body Strength", format: "rounds", rounds: 5, rest_secs: 60,
