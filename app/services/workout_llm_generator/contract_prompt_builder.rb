@@ -87,9 +87,21 @@ class WorkoutLLMGenerator
       warm_up_min = @duration_mins <= 30 ? 3 : 5
       cool_down_min = @duration_mins <= 30 ? 2 : 5
       working = @duration_mins - warm_up_min - cool_down_min
+      target_mains = case @duration_mins
+                     when 0..30 then "1-2"
+                     when 31..45 then "2"
+                     when 46..60 then "3"
+                     else "3-4"
+                     end
       <<~SHAPE.strip
-        Warm-up (#{warm_up_min} min) → main sections → Cool-down (#{cool_down_min} min).
-        Working time: #{working} min. Do NOT set duration_mins on main sets.
+        Shape: Warm-up (#{warm_up_min} min) → main sections → Cool-down (#{cool_down_min} min).
+        Total duration: #{@duration_mins} min. Working budget is roughly #{working} min MINUS
+        ~3-5 min per transition between adjacent sections for equipment changes and rest.
+        Do NOT emit transitions as their own sections or mention them in the output — just
+        leave room in the timing budget when sizing the work.
+        Target #{target_mains} main section(s). Err on the side of fewer, tighter sections —
+        workouts consistently run long, so cut a section if in doubt.
+        Do NOT set duration_mins on main sets.
       SHAPE
     end
 
