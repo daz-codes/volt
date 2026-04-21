@@ -55,7 +55,7 @@ module LLMContext
             { name: "Strength", format: "rounds", rounds: 5, rest_secs: 90,
               exercises: [
                 { name: "DB Thrusters", reps: 10, equipment: "dumbbells" },
-                { name: "Pull-ups", reps: 6, equipment: "pull_up_bar" }
+                { name: "Pull-ups", reps: 5, equipment: "pull_up_bar" }
               ] },
             { name: "Conditioning EMOM", format: "emom", duration_mins: 12, rest_secs: 0,
               exercises: [
@@ -77,7 +77,7 @@ module LLMContext
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
             { name: "Strength Block", format: "rounds", rounds: 5, rest_secs: 90,
               exercises: [
-                { name: "Back Squat", reps: 8, equipment: "barbell" },
+                { name: "Back Squat", reps: 5, equipment: "barbell" },
                 { name: "DB Bench Press", reps: 10, equipment: "dumbbells" }
               ] },
             { name: "Conditioning For Time", format: "for_time",

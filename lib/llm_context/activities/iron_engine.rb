@@ -24,10 +24,10 @@ module LLMContext
         notes: "Complexes, flows, and carries are Iron Engine's signature formats — " \
                "at least one should appear in most sessions. " \
                "REP COUNTS: kettlebells are heavy, so keep reps low. Grinds " \
-               "(press, squat, row, deadlift) sit at 6-10 reps per set. " \
-               "Ballistics (swings, snatches, cleans) sit at 10-15 reps per set; " \
-               "20 is an absolute ceiling, only for light swings as a short burst, " \
-               "never for grinds. Do NOT prescribe 20+ reps on any grind. " \
+               "(press, squat, row, deadlift) use 5 reps (heavy) or 10 reps (moderate). " \
+               "Ballistics (swings, snatches, cleans) use 10 (standard) or 15 (lighter conditioning). " \
+               "20 is the ceiling, only for light swings as a short burst — never for grinds. " \
+               "Follow the global rule: same rep count across all exercises in a round. " \
                "NO CONTINUOUS CIRCUITS: do not structure main sections as back-to-back " \
                "KB stations with no rest between exercises, and do not use 1-minute " \
                "EMOM slots that chain heavy KB grinds with no break. Include 15-45s " \
@@ -58,7 +58,7 @@ module LLMContext
             { name: "Ballistic Finisher", format: "emom", duration_mins: 10, rest_secs: 0,
               exercises: [
                 { name: "KB Swing",  reps: 15, equipment: "kettlebells" },
-                { name: "KB Snatch", reps: "5/side", equipment: "kettlebells" }
+                { name: "KB Snatch", reps: "5 each side", equipment: "kettlebells" }
               ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
@@ -88,8 +88,8 @@ module LLMContext
               exercises: [ { name: "KB activation", duration_s: 180, equipment: "kettlebells" } ] },
             { name: "Ballistic AMRAP", format: "amrap", duration_mins: 10, rest_secs: 15,
               exercises: [
-                { name: "KB Swing",    reps: 15, equipment: "kettlebells" },
-                { name: "Goblet Squat", reps: 8, equipment: "kettlebells" }
+                { name: "KB Swing",    reps: 10, equipment: "kettlebells" },
+                { name: "Goblet Squat", reps: 10, equipment: "kettlebells" }
               ] },
             { name: "Carry Finisher", format: "for_time", rest_secs: 0,
               exercises: [ { name: "KB Rack Carry", reps: "3 x 30m", equipment: "kettlebells" } ] },

@@ -48,15 +48,15 @@ module LLMContext
               exercises: [ { name: "Row", reps: "250m", equipment: "rowing_machine" } ] },
             { name: "Upper Body Floor", format: "rounds", rounds: 3, rest_secs: 45,
               exercises: [
-                { name: "DB Bench Press", reps: 12, equipment: "dumbbells" },
-                { name: "DB Row each side", reps: 12, equipment: "dumbbells" }
+                { name: "DB Bench Press", reps: 10, equipment: "dumbbells" },
+                { name: "DB Row each side", reps: 10, equipment: "dumbbells" }
               ] },
             { name: "Assault Bike Sprints", format: "emom", duration_mins: 8, rest_secs: 0,
               exercises: [ { name: "Assault Bike", reps: "10 cal", equipment: "assault_bike" } ] },
             { name: "Core Floor", format: "rounds", rounds: 3, rest_secs: 30,
               exercises: [
                 { name: "Plank", duration_s: 45, equipment: "bodyweight" },
-                { name: "V-ups", reps: 15, equipment: "bodyweight" }
+                { name: "V-ups", reps: 20, equipment: "bodyweight" }
               ] },
             { name: "Cool-Down", format: "straight", duration_mins: 2,
               exercises: [ { name: "Dynamic stretches", notes: "5 deep breaths" } ] }
@@ -80,8 +80,8 @@ module LLMContext
               exercises: [ { name: "Row", reps: "250m", equipment: "rowing_machine" } ] },
             { name: "Lower Floor", format: "rounds", rounds: 3, rest_secs: 45,
               exercises: [
-                { name: "Goblet Squat", reps: 12, equipment: "kettlebells" },
-                { name: "DB RDL", reps: 12, equipment: "dumbbells" }
+                { name: "Goblet Squat", reps: 10, equipment: "kettlebells" },
+                { name: "DB RDL", reps: 10, equipment: "dumbbells" }
               ] },
             { name: "Assault Bike Sprints", format: "emom", duration_mins: 8, rest_secs: 0,
               exercises: [ { name: "Assault Bike", reps: "10 cal", equipment: "assault_bike" } ] },
@@ -100,8 +100,8 @@ module LLMContext
               exercises: [ { name: "Run", reps: "400m", notes: "hard pace", equipment: "treadmill" } ] },
             { name: "Upper Body Floor", format: "rounds", rounds: 3, rest_secs: 45,
               exercises: [
-                { name: "DB Bench Press", reps: 12, equipment: "dumbbells" },
-                { name: "DB Row each side", reps: 12, equipment: "dumbbells" }
+                { name: "DB Bench Press", reps: 10, equipment: "dumbbells" },
+                { name: "DB Row each side", reps: 10, equipment: "dumbbells" }
               ] },
             { name: "Treadmill Finisher", format: "for_time",
               exercises: [ { name: "Run", reps: "1km", equipment: "treadmill" } ] },

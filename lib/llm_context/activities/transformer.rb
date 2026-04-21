@@ -83,7 +83,7 @@ module LLMContext
             { name: "Deadlift", format: "straight", rest_secs: 120,
               exercises: [ { name: "Deadlift", reps: "5 × 3", equipment: "barbell" } ] },
             { name: "Pull-up Block", format: "rounds", rounds: 5, rest_secs: 90,
-              exercises: [ { name: "Pull-ups", reps: 6, equipment: "pull_up_bar" } ] },
+              exercises: [ { name: "Pull-ups", reps: 5, equipment: "pull_up_bar" } ] },
             { name: "Ski Erg Finisher", format: "rounds", rounds: 5, rest_secs: 45,
               exercises: [ { name: "SkiErg", reps: "250m", equipment: "ski_erg" } ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,

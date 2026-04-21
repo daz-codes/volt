@@ -3,7 +3,22 @@
 - `rest_secs` must never exceed the working duration of any set. Rest ≤ work, always. (Tabata rest is the fixed 10s work / 20s rest pattern — it does not count against this rule.)
 - At least three different section formats across the session. No two adjacent sections share a format.
 - Exercise `name` fields contain the movement only — no embedded reps, durations, loads, or descriptors. Reps and durations go in their own fields.
-- Rep counts use clean numbers: even numbers or multiples of 5. Avoid 7, 11, 13, etc.
+- Rep counts use clean numbers: even numbers or multiples of 5. **Never 7, 11, 13, 17, 19** — not as reps, not as ladder rungs, not as mountain steps. 6, 8, 9, 12, 14, 16, 18 are all allowed when they fit — 9 in particular is common in CrossFit ladders (21-15-9). Defaults to reach for: 5 (heavy), 10 (standard), 15 or 20 (conditioning), 20 or 25 (core).
+- **Within a single round, every exercise uses the same rep count.** If the block is `rounds`, `amrap`, `for_time`, `matrix`, or a core/abs circuit, all rep-based exercises in it share one number. Pick the number that fits the load and intent, then apply it across the board.
+    - BAD (three numbers in one round): `Bench Press 10 / Shoulder Press 8 / Push-ups 12`
+    - BAD (two numbers in one round): `Front Squat 8 / Romanian Deadlift 10`
+    - BAD (heavy KB grind with mixed reps): `KB Clean & Press 6 / KB Deadlift 8 / KB Row 6` — pick one number (5 or 10) and use it for all three.
+    - GOOD (one number across the round): `Bench Press 10 / Shoulder Press 10 / Push-ups 10`
+    - GOOD (heavy block): `Front Squat 5 / Romanian Deadlift 5` or `Deadlift 5 / Pull-ups 5`
+    - GOOD (heavy KB grind): `KB Clean & Press 5 / KB Deadlift 5 / KB Row 5`
+    - GOOD (conditioning): `KB Swings 20 / Wall Balls 20 / Burpees 20`
+    - GOOD (strength round with duration cardio finisher): `Front Squat 10 / RDL 10 / Jump Rope 45s` — rep-based exercises share one number; duration-based exercises are independent.
+  
+  Duration holds (Plank, Hollow Hold) and ladder/mountain formats (reps vary by design) are the only exceptions; EMOM is also exempt because each slot is its own work window.
+- Ladder/mountain rep sequences must use clean numbers throughout and start from a natural anchor — usually 1 (ascending) or a round peak like 10/20/25 (descending). Canonical patterns: `10-1` (ten rungs counting down), `5-4-3-2-1`, `1-2-3-4-5`, `1-2-3-4-5-6`, `2-4-6-8-10`, `20-16-12-8-4`, `21-15-9`, `10-8-6-4-2`, or pyramids like `1-2-3-4-5-4-3-2-1`. Never `15-13-11-9-7-5`, `3-4-5-6-7-8-9-10`, or any sequence containing 7/11/13/17/19. Do not start a ladder mid-count with no anchor (starting at 3 instead of 1 is weird — start at 1 and shorten the ladder if needed).
+- Cardio machine interval blocks (row/ski/bike/run repeats) use `format: "rounds"`. Set `rounds` to the number of intervals and put the per-interval distance or duration on the exercise (`reps: "250m"` or `duration_s: 30`). Never use `for_time` for interval blocks — `for_time` is for one continuous chipper effort.
+- Timed cardio-machine intervals **must set `rest_secs`** and land on a **clean minute**: `duration_s + rest_secs = 60`. Use 30s work / 30s rest, 40s work / 20s rest, 45s work / 15s rest, 20s work / 40s rest, or 15s work / 45s rest. Never 30s work / 20s rest (50s per round — athletes lose the clock). Never omit rest on a timed interval block — 12 rounds of 30s ski erg with no rest is not intervals, it's 6 minutes of continuous work and should be `format: "straight"` with `duration_s: 360` instead.
 - Give the workout a punchy, memorable, original name. Do not use gym-brand words (Barry's, F45, CrossFit, Hyrox, Deka, Tread & Shred, Metafit) in the name.
 - The `goal` field is one short motivational sentence about energy and training effect — not a description of the workout's structure.
 - Switchback format: the cardio side must be a calorie-measuring machine (assault bike, rower, or ski erg). Never pair switchback with jump rope, treadmill, or any other non-calorie movement.
+- Tabata format: either **one** exercise (single-movement tabata — 8 rounds of 20s work / 10s rest on the same movement) or **two genuinely different** exercises alternating. Never list the same movement twice with a cosmetic rename (`Assault Bike` + `Assault Bike Active` is the same machine — pick one movement and use a single exercise, or pair with a real second movement). The two exercises in an alternating tabata should work different patterns or equipment, not fatigue the same muscle group back-to-back.

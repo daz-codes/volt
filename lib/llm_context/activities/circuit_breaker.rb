@@ -60,8 +60,8 @@ module LLMContext
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
             { name: "Strength Rounds", format: "rounds", rounds: 4, rest_secs: 60,
               exercises: [
-                { name: "Deadlift", reps: 8, equipment: "barbell" },
-                { name: "Pull-ups", reps: 6, equipment: "pull_up_bar" }
+                { name: "Deadlift", reps: 5, equipment: "barbell" },
+                { name: "Pull-ups", reps: 5, equipment: "pull_up_bar" }
               ] },
             { name: "Switchback Ladder", format: "rounds", rounds: 4, rest_secs: 0,
               exercises: [
@@ -82,20 +82,20 @@ module LLMContext
             { name: "Strength EMOM", format: "emom", duration_mins: 15, rest_secs: 0,
               exercises: [
                 { name: "DB Push Press", reps: 10, equipment: "dumbbells" },
-                { name: "Goblet Squat", reps: 12, equipment: "kettlebells" },
+                { name: "Goblet Squat", reps: 10, equipment: "kettlebells" },
                 { name: "Row", reps: "15 cal", equipment: "rowing_machine" }
               ] },
             { name: "Conditioning AMRAP", format: "amrap", duration_mins: 12, rest_secs: 15,
               exercises: [
                 { name: "Wall Balls", reps: 15, equipment: "wall_ball" },
                 { name: "Burpees", reps: 10, equipment: "bodyweight" },
-                { name: "Box Jumps", reps: 12, equipment: "bodyweight" }
+                { name: "Box Jumps", reps: 10, equipment: "bodyweight" }
               ] },
             { name: "Matrix Finisher", format: "matrix",
               exercises: [
-                { name: "Jumping Lunges", reps: 20, equipment: "bodyweight" },
+                { name: "Jumping Lunges", reps: 10, equipment: "bodyweight" },
                 { name: "Push-ups", reps: 10, equipment: "bodyweight" },
-                { name: "Sit-ups", reps: 15, equipment: "bodyweight" }
+                { name: "Sit-ups", reps: 10, equipment: "bodyweight" }
               ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }

@@ -16,15 +16,7 @@ class WorkoutLLMGenerator
       savasana:          "Longer holds, quiet."
     }.freeze
 
-    GLOBAL_RULES = <<~RULES.strip.freeze
-      - rest_secs must never exceed the working duration of any set (tabata's 10s/20s pattern is the only exception).
-      - At least 3 different section formats across the session. No two adjacent sections share a format.
-      - Exercise `name` fields contain the movement only — no reps, durations, loads, or descriptors.
-      - Rep counts are clean numbers (even or multiples of 5).
-      - Workout name: punchy, memorable, original. Banned words: Barry's, F45, CrossFit, Hyrox, Deka, Tread & Shred, Metafit.
-      - `goal` is one motivational sentence about energy and training effect.
-      - Switchback format: cardio side must be a calorie-measuring machine (assault bike, rower, ski erg). Never pair switchback with jump rope, treadmill, or any other non-calorie movement.
-    RULES
+    GLOBAL_RULES_PATH = Rails.root.join("app/llm_context/shared/global_rules.md").freeze
 
     def initialize(activity:, duration_mins:, athlete_block:, session_notes: nil, banned_equipment_override: [], contract_override: nil)
       @activity = activity
@@ -41,7 +33,7 @@ class WorkoutLLMGenerator
       tags << xml(:athlete, @athlete_block)
       tags << xml(:task, "Generate a #{@duration_mins}-minute #{@activity::NAME} session.")
       tags << xml(:contract, contract_block)
-      tags << xml(:global_rules, GLOBAL_RULES)
+      tags << xml(:global_rules, global_rules)
       tags << xml(:session_shape, session_shape_block)
       tags << xml(:examples, examples_block)
       tags << xml(:session_notes, @session_notes) if @session_notes.present?
@@ -49,6 +41,10 @@ class WorkoutLLMGenerator
     end
 
     private
+
+    def global_rules
+      @global_rules ||= File.read(GLOBAL_RULES_PATH).sub(/\A# .*\n+/, "").strip
+    end
 
     def contract
       @contract_override || @activity::CONTRACT

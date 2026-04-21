@@ -63,12 +63,12 @@ module LLMContext
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
             { name: "Barbell EMOM", format: "emom", duration_mins: 15, rest_secs: 0,
               exercises: [
-                { name: "Barbell Thrusters", reps: 8, equipment: "barbell" },
-                { name: "Bar-Facing Burpees Over Bar", reps: 8, equipment: "barbell" }
+                { name: "Barbell Thrusters", reps: 5, equipment: "barbell" },
+                { name: "Bar-Facing Burpees Over Bar", reps: 10, equipment: "barbell" }
               ] },
             { name: "DB Circuit", format: "rounds", rounds: 4, rest_secs: 45,
               exercises: [
-                { name: "DB Shoulder to Overhead Press", reps: 12, equipment: "dumbbells" },
+                { name: "DB Shoulder to Overhead Press", reps: 10, equipment: "dumbbells" },
                 { name: "Dumbbell Bear Crawl", reps: "20m", equipment: "dumbbells" }
               ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
