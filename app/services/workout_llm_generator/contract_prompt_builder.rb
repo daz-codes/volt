@@ -10,10 +10,10 @@ class WorkoutLLMGenerator
     }.freeze
 
     COOL_DOWN_VOCAB = {
-      full_body_stretch: "Dynamic stretches covering hips, hamstrings, chest, shoulders, spine.",
-      lower_focus:       "Hip flexors, pigeon, quads, hamstrings, spinal twist.",
-      upper_focus:       "Chest opener, cross-body shoulder, thread the needle, lat stretch.",
-      savasana:          "Longer holds, quiet."
+      full_body_stretch: "Name 4-6 specific stretches in the notes — e.g. pigeon, forward fold, cobra, spinal twist, chest opener, thread the needle. Do NOT write generic phrases like \"cover hips, hamstrings, chest, shoulders, spine\" — list actual stretch names.",
+      lower_focus:       "Name 4-6 specific lower-body stretches — e.g. pigeon, couch stretch, hamstring stretch, quad pull, spinal twist, figure-four.",
+      upper_focus:       "Name 4-6 specific upper-body stretches — e.g. chest opener, cross-body shoulder, thread the needle, lat stretch, child's pose, wrist roll.",
+      savasana:          "Longer holds, quiet. Name the final poses — e.g. supta baddha konasana, legs-up-the-wall, savasana."
     }.freeze
 
     GLOBAL_RULES_PATH = Rails.root.join("app/llm_context/shared/global_rules.md").freeze
