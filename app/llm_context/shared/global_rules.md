@@ -23,6 +23,12 @@
     - **Rower / ski erg**: metres, calories, or time — all three are fine.
     - **Treadmill**: metres (distance repeats like 200m/400m) or time. Never calories.
 - Timed cardio-machine intervals **must set `rest_secs`** and land on a **clean minute**: `duration_s + rest_secs = 60`. Use 30s work / 30s rest, 40s work / 20s rest, 45s work / 15s rest, 20s work / 40s rest, or 15s work / 45s rest. Never 30s work / 20s rest (50s per round — athletes lose the clock). Never omit rest on a timed interval block — 12 rounds of 30s ski erg with no rest is not intervals, it's 6 minutes of continuous work and should be `format: "straight"` with `duration_s: 360` instead.
+- **Cardio-machine circuits** (two or more machines paired inside one round): use `format: "rounds"` with each machine as its own exercise. Every machine named in the section title must appear as an exercise. Each machine uses its natural unit (per the unit-pairing rule above) — do not force a shared unit across different machines. Do not use `format: "ladder"` for a machine circuit unless you have a real multi-rung rep sequence. Canonical patterns:
+    - `Run + Ski Erg — 3 rounds, 60s rest: Run 400m / Ski Erg 10 cal`
+    - `Triple machine — 5 rounds, 45s rest: Ski Erg 10 cal / Air Bike 10 cal / Row 10 cal`
+    - `Run + Row + Bike — 4 rounds, 60s rest: Run 200m / Row 250m / Air Bike 15 cal`
+    - `Ski + Bike couplet — 6 rounds, 30s rest: Ski Erg 15 cal / Air Bike 15 cal`
+  BAD: section titled `Run + Ski Erg Ladder` with only a treadmill entry. BAD: forcing every machine in a circuit to use metres (bikes can't). BAD: wrapping a single-machine interval block in a machine-circuit title.
 - Give the workout a punchy, memorable, original name. Do not use gym-brand words (Barry's, F45, CrossFit, Hyrox, Deka, Tread & Shred, Metafit) in the name.
 - Section names must describe what's actually in the section. If the section name references a machine or movement (`Row Intervals`, `KB Complex`, `Run + Ski Erg Ladder`), every machine/movement named must appear in the exercise list. BAD: section named `Run + Ski Erg Ladder` containing only `Treadmill` (no ski erg). Either add the ski erg or rename the section.
 - The `goal` field is one short motivational sentence about energy and training effect — not a description of the workout's structure.
