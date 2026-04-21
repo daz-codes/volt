@@ -2799,13 +2799,11 @@ class WorkoutLLMGenerator
   end
 
   def contract_path?
-    enabled = ENV["WORKOUT_PROMPT_CONTRACT_ACTIVITIES"].to_s.split(",").map(&:strip)
-    return false if enabled.empty?
-    # Accept either direction — user may set the env var to the display slug they
-    # know ("iron-engine") or the canonical slug stored on the record ("kettlebell").
-    canonical = LLMContext::Activities.canonical_slug(@activity_slug)
-    enabled_canonicals = enabled.map { |s| LLMContext::Activities.canonical_slug(s) }
-    enabled_canonicals.include?(canonical)
+    legacy = ENV["WORKOUT_PROMPT_LEGACY_ACTIVITIES"].to_s.split(",").map { |s|
+      LLMContext::Activities.canonical_slug(s.strip)
+    }
+    return false if legacy.include?(LLMContext::Activities.canonical_slug(@activity_slug))
+    LLMContext::Activities.for(@activity_slug).present?
   end
 
   def build_contract_prompt

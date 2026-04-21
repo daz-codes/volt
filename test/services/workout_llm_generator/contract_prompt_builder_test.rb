@@ -75,42 +75,41 @@ end
 
 class WorkoutLLMGenerator::RoutingTest < ActiveSupport::TestCase
   setup do
-    @original = ENV["WORKOUT_PROMPT_CONTRACT_ACTIVITIES"]
+    @original = ENV["WORKOUT_PROMPT_LEGACY_ACTIVITIES"]
+    ENV.delete("WORKOUT_PROMPT_LEGACY_ACTIVITIES")
   end
 
   teardown do
-    ENV["WORKOUT_PROMPT_CONTRACT_ACTIVITIES"] = @original
+    ENV["WORKOUT_PROMPT_LEGACY_ACTIVITIES"] = @original
   end
 
   # @activity_slug at runtime is the canonical slug ("kettlebell" for Iron Engine),
   # because WorkoutLLMGenerator#initialize normalises display slugs through
   # ACTIVITY_ALIASES before storing. Set it to "kettlebell" in these tests.
 
-  test "contract_path? returns true when canonical slug is enabled directly" do
-    ENV["WORKOUT_PROMPT_CONTRACT_ACTIVITIES"] = "kettlebell,turbine"
+  test "contract_path? returns true by default for a registered activity" do
     gen = WorkoutLLMGenerator.allocate
     gen.instance_variable_set(:@activity_slug, "kettlebell")
     assert gen.send(:contract_path?)
   end
 
-  test "contract_path? returns true when the flag uses a display slug that aliases to the canonical" do
-    ENV["WORKOUT_PROMPT_CONTRACT_ACTIVITIES"] = "iron-engine"
-    gen = WorkoutLLMGenerator.allocate
-    gen.instance_variable_set(:@activity_slug, "kettlebell")
-    assert gen.send(:contract_path?)
-  end
-
-  test "contract_path? returns false when slug missing from flag" do
-    ENV["WORKOUT_PROMPT_CONTRACT_ACTIVITIES"] = "turbine"
+  test "contract_path? returns false when canonical slug is in legacy flag" do
+    ENV["WORKOUT_PROMPT_LEGACY_ACTIVITIES"] = "kettlebell,turbine"
     gen = WorkoutLLMGenerator.allocate
     gen.instance_variable_set(:@activity_slug, "kettlebell")
     refute gen.send(:contract_path?)
   end
 
-  test "contract_path? returns false when env flag unset" do
-    ENV.delete("WORKOUT_PROMPT_CONTRACT_ACTIVITIES")
+  test "contract_path? returns false when legacy flag uses a display slug that aliases to the canonical" do
+    ENV["WORKOUT_PROMPT_LEGACY_ACTIVITIES"] = "iron-engine"
     gen = WorkoutLLMGenerator.allocate
     gen.instance_variable_set(:@activity_slug, "kettlebell")
+    refute gen.send(:contract_path?)
+  end
+
+  test "contract_path? returns false when slug is not in the activity registry" do
+    gen = WorkoutLLMGenerator.allocate
+    gen.instance_variable_set(:@activity_slug, "nonexistent-activity")
     refute gen.send(:contract_path?)
   end
 end
