@@ -71,5 +71,32 @@ class WorkoutLLMGenerator::ContractPromptBuilderTest < ActiveSupport::TestCase
     assert_match(/FINISHER: required/, prompt)
     assert_match(/CORE SECTION: never/, prompt)
   end
+
+  test "banned_exercise_patterns appear in the contract block as readable terms" do
+    contract_block = build[/\<contract\>(.*?)\<\/contract\>/m, 1]
+    refute_nil contract_block
+    assert_match(/BANNED EXERCISE NAMES/, contract_block)
+    assert_match(/assault bike/i, contract_block)
+  end
+
+  test "omits ALLOWED EQUIPMENT line when activity allows none (e.g. ohm)" do
+    contract_block = build(activity_slug: "ohm")[/\<contract\>(.*?)\<\/contract\>/m, 1]
+    refute_nil contract_block
+    refute_match(/ALLOWED EQUIPMENT:/, contract_block)
+  end
+
+  test "omits BANNED EQUIPMENT line when activity bans none (e.g. alternator)" do
+    contract_block = build(activity_slug: "alternator")[/\<contract\>(.*?)\<\/contract\>/m, 1]
+    refute_nil contract_block
+    refute_match(/BANNED EQUIPMENT:/, contract_block)
+  end
+
+  test "flow activities (ohm) emit a continuous-sequence shape without bookends" do
+    shape = build(activity_slug: "ohm")[/\<session_shape\>(.*?)\<\/session_shape\>/m, 1]
+    refute_nil shape
+    refute_match(/Warm-up \(\d+ min\)/, shape)
+    refute_match(/Cool-down \(\d+ min\)/, shape)
+    assert_match(/continuous flowing sequence/i, shape)
+  end
 end
 

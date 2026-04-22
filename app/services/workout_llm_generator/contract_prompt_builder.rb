@@ -33,18 +33,18 @@ class WorkoutLLMGenerator
       tags << xml(:athlete, @athlete_block)
       tags << xml(:task, "Generate a #{@duration_mins}-minute #{@activity::NAME} session.")
       tags << xml(:contract, contract_block)
-      tags << xml(:global_rules, global_rules)
+      tags << xml(:global_rules, self.class.global_rules)
       tags << xml(:session_shape, session_shape_block)
       tags << xml(:examples, examples_block)
       tags << xml(:session_notes, @session_notes) if @session_notes.present?
       tags.join("\n\n")
     end
 
-    private
-
-    def global_rules
+    def self.global_rules
       @global_rules ||= File.read(GLOBAL_RULES_PATH).sub(/\A# .*\n+/, "").strip
     end
+
+    private
 
     def contract
       @contract_override || @activity::CONTRACT
@@ -56,12 +56,17 @@ class WorkoutLLMGenerator
 
     def contract_block
       vocab = defined?(@activity::MOVEMENT_VOCABULARY) ? @activity::MOVEMENT_VOCABULARY : nil
+      allowed = Array(contract[:allowed_equipment])
+      banned  = banned_equipment
       lines = []
       lines << "Activity: #{@activity::NAME} (#{@activity::SLUG})"
       lines << ""
       lines << "PURITY: #{contract[:purity]}"
-      lines << "ALLOWED EQUIPMENT: #{Array(contract[:allowed_equipment]).join(', ')}"
-      lines << "BANNED EQUIPMENT: #{banned_equipment.join(', ')}"
+      lines << "ALLOWED EQUIPMENT: #{allowed.join(', ')}" if allowed.any?
+      lines << "BANNED EQUIPMENT: #{banned.join(', ')}" if banned.any?
+      if banned_exercise_terms.any?
+        lines << "BANNED EXERCISE NAMES (do not use in any section): #{banned_exercise_terms.join(', ')}"
+      end
       lines << "ALLOWED FORMATS: #{Array(contract[:allowed_formats]).join(', ')}"
       lines << "PRIMARY FORMATS: #{Array(contract[:primary_formats]).join(', ')}"
       if contract[:signature_formats].present?
@@ -83,7 +88,17 @@ class WorkoutLLMGenerator
       lines.join("\n")
     end
 
+    # Extracts readable terms from the contract's banned_exercise_patterns regexes
+    # (e.g. /\bassault bike\b/i → "assault bike") so the LLM sees them in the prompt.
+    def banned_exercise_terms
+      Array(contract[:banned_exercise_patterns]).map do |pattern|
+        pattern.source.gsub(/\\b/, "").gsub(/\s+/, " ").strip
+      end.reject(&:empty?)
+    end
+
     def session_shape_block
+      return flow_session_shape if contract[:warm_up] == :flow
+
       warm_up_min = @duration_mins <= 30 ? 3 : 5
       cool_down_min = @duration_mins <= 30 ? 2 : 5
       working = @duration_mins - warm_up_min - cool_down_min
@@ -103,6 +118,18 @@ class WorkoutLLMGenerator
         workouts consistently run long, so cut a section if in doubt.
         Do NOT set duration_mins on main sets.
       SHAPE
+    end
+
+    # Flow sessions (yoga/pilates/mobility) run as one continuous sequence.
+    # The session IS the warm-up and cool-down — no separate bookend blocks.
+    def flow_session_shape
+      <<~FLOW.strip
+        Shape: One continuous flowing sequence across the full #{@duration_mins} minutes —
+        no separate warm-up or cool-down sections. Open with a gentle activation flow,
+        build through the main sequence, and close with longer held poses / savasana.
+        Pacing is slow and breath-led throughout. Do NOT emit transitions as their own
+        sections. Do NOT set duration_mins on main sets.
+      FLOW
     end
 
     def examples_block

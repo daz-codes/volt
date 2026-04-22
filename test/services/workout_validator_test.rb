@@ -201,14 +201,17 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
   end
 
   test "fix_rest_ratio leaves tabata alone" do
+    # 45s rest > 20s work on either exercise — fix_rest_ratio would cap a non-tabata
+    # section to 20s (single-exercise) or 40s (summed). Tabata must be exempt.
     data = build_workout_with_sections([
       { "name" => "Tabata Finisher", "category" => "finisher", "format" => "tabata",
-        "duration_mins" => 4,
-        "exercises" => [ { "name" => "KB Swing" }, { "name" => "Goblet Squat" } ] }
+        "duration_mins" => 4, "rest_secs" => 45,
+        "exercises" => [ { "name" => "KB Swing", "duration_s" => 20 }, { "name" => "Goblet Squat", "duration_s" => 20 } ] }
     ])
     result = WorkoutValidator.new(data, duration_mins: 45, main_tag_slug: "").validate_and_fix
     section = result.dig("structure", "sections").first
     assert_equal "tabata", section["format"], "tabata format preserved"
+    assert_equal 45, section["rest_secs"], "tabata rest_secs must not be capped by fix_rest_ratio"
   end
 
   test "fix_rest_ratio leaves sections where rest already <= work" do

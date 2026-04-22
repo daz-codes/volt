@@ -1,7 +1,6 @@
 module ApplicationHelper
-  # LLM outputs sometimes HTML-entity-encode the strings they return
-  # ("Run &amp; Ski"). Unescape once before ERB's auto-escaper runs so the
-  # final HTML is "Run &amp; Ski" rendering as "Run & Ski".
+  # The LLM occasionally HTML-entity-encodes strings ("Run &amp; Ski"). Unescape
+  # once so ERB's auto-escaper produces the correct rendering.
   def clean_llm_text(str)
     return str if str.blank?
     CGI.unescapeHTML(str.to_s)

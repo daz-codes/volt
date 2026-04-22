@@ -2,12 +2,10 @@ require "test_helper"
 
 class LLMContext::ActivitiesTest < ActiveSupport::TestCase
   test "resolves a display slug through to the module via aliases" do
-    skip "Iron Engine module not yet defined" unless defined?(LLMContext::Activities::IronEngine)
     assert_equal LLMContext::Activities::IronEngine, LLMContext::Activities.for("iron-engine")
   end
 
   test "resolves the canonical slug directly" do
-    skip "Iron Engine module not yet defined" unless defined?(LLMContext::Activities::IronEngine)
     assert_equal LLMContext::Activities::IronEngine, LLMContext::Activities.for("kettlebell")
   end
 

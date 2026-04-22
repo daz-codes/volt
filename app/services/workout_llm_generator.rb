@@ -115,20 +115,18 @@ class WorkoutLLMGenerator
   private
 
   def generate_data
-    if @source_workout
-      prompt       = build_remix_prompt
-      workout_data = call_llm(prompt)
-      workout_data = validate_and_fix(workout_data)
-      workout_data = collapse_duplicate_exercises(workout_data)
-      collapse_set_notation(workout_data)
-    else
-      prompt       = build_contract_prompt
-      log_prompt_path(:contract, prompt)
-      workout_data = call_llm(prompt)
-      workout_data = validate_and_fix(workout_data)
-      workout_data = collapse_duplicate_exercises(workout_data)
-      collapse_set_notation(workout_data)
-    end
+    prompt =
+      if @source_workout
+        build_remix_prompt
+      else
+        build_contract_prompt.tap { |p| log_prompt_path(:contract, p) }
+      end
+    workout_data = call_llm(prompt)
+    workout_data = validate_and_fix(workout_data)
+    workout_data = collapse_duplicate_exercises(workout_data)
+    collapse_set_notation(workout_data)
+  rescue LLMContext::Activities::UnknownActivity
+    raise WorkoutGenerationError, "Unknown activity: #{@activity.inspect}"
   end
 
   # E.g. 5 × { name: "Freestyle", distance_m: 25 } → rounds: 5, exercises: [{ name: "Freestyle", distance_m: 25 }]
