@@ -31,4 +31,13 @@ class LLMContext::ActivitiesTest < ActiveSupport::TestCase
       LLMContext::Activities.for!("does-not-exist")
     end
   end
+
+  test "tread-shred slug routes to Alternator" do
+    assert_equal "alternator", LLMContext::Activities.canonical_slug("tread-shred")
+    assert_equal LLMContext::Activities::Alternator, LLMContext::Activities.for("tread-shred")
+  end
+
+  test "barry-s slug routes to Alternator" do
+    assert_equal LLMContext::Activities::Alternator, LLMContext::Activities.for("barry-s")
+  end
 end

@@ -22,7 +22,7 @@ TAG_TO_ACTIVITY = {
   "functional-fitness" => "Functional Fitness", "functional-muscle" => "Functional Muscle",
   "hiit" => "HIIT", "bodyweight" => "Bodyweight", "kettlebell" => "Kettlebell",
   "metafit" => "Metafit", "f45" => "F45", "strength" => "Strength",
-  "dirty-dozen" => "Dirty Dozen", "barry-s-bootcamp" => "Barry's Bootcamp"
+  "dirty-dozen" => "Dirty Dozen", "barry-s-bootcamp" => "Alternator"
 }.freeze
 
 def activity_from_tag_names(tag_names)
@@ -450,10 +450,10 @@ else
       "goal" => "Move fast but keep form. This one sneaks up on you — the push-ups after jump squats will humble you."
     }
   },
-  # ── Barry's ──────────────────────────────────────────────────────────
+  # ── Alternator (treadmill-forward hybrid) ───────────────────────────
   {
     name:          "Double Red",
-    activity:      "Tread & Shred",
+    activity:      "Alternator",
     duration_mins: 50,
     structure: {
       "sections" => [
@@ -498,7 +498,7 @@ else
   },
   {
     name:          "Lights Out",
-    activity:      "Tread & Shred",
+    activity:      "Alternator",
     duration_mins: 60,
     structure: {
       "sections" => [
