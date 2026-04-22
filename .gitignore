@@ -36,6 +36,9 @@
 # Ignore key files for decrypting credentials and more.
 /config/*.key
 
+# Claude Code per-user local overrides (permission allowlists etc.)
+/.claude/settings.local.json
+
 
 /app/assets/builds/*
 !/app/assets/builds/.keep
