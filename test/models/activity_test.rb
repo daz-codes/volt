@@ -31,7 +31,8 @@ class ActivityTest < ActiveSupport::TestCase
     assert_includes Activity::DEFAULT_NAMES, "Iron Engine"
     assert_includes Activity::DEFAULT_NAMES, "Sunday Workout"
     assert_includes Activity::DEFAULT_NAMES, "Volt Octathlon"
-    assert_equal 17, Activity::DEFAULT_NAMES.size
+    assert_includes Activity::DEFAULT_NAMES, "Turbine"
+    assert_equal 18, Activity::DEFAULT_NAMES.size
   end
 
   test "defaults scope returns only default activities" do
