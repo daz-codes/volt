@@ -70,6 +70,7 @@ class WorkoutValidator
     fix_clean_distances(sections)
     fix_treadmill_calories(sections)
     fix_rest_secs(sections)
+    fix_rest_ratio(sections)
     fix_single_set_sections(sections)
     fix_tabata_exercise_metrics(sections)
     fix_tabata_exercise_names(sections)
@@ -698,6 +699,28 @@ class WorkoutValidator
       next if snapped == rest
       @fixes << "'#{section["name"]}': rest_secs #{rest}s → #{snapped}s"
       section["rest_secs"] = snapped
+    end
+  end
+
+  # Caps rest_secs so it never exceeds the working duration of a single round.
+  # Only applies to sections whose work is clearly timed (every exercise has a duration_s).
+  # Rep-based and calorie-based work is left alone — their work duration isn't measurable here.
+  # Tabata's 20s/10s is defined by the format, not rest_secs — skip it.
+  def fix_rest_ratio(sections)
+    sections.each do |section|
+      next if section["format"] == "tabata"
+      rest = section["rest_secs"].to_i
+      next if rest.zero?
+
+      exercises = Array(section["exercises"])
+      next if exercises.empty?
+      next unless exercises.all? { |ex| ex["duration_s"].to_i > 0 }
+
+      work_secs = exercises.sum { |ex| ex["duration_s"].to_i }
+      next if rest <= work_secs
+
+      @fixes << "'#{section["name"]}': rest_secs #{rest}s → #{work_secs}s (rest cannot exceed #{work_secs}s work)"
+      section["rest_secs"] = work_secs
     end
   end
 

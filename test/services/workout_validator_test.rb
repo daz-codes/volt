@@ -162,6 +162,69 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
     assert main["exercises"].any? { |e| e["name"].match?(/bike/i) }, "non-kettlebell activities should keep bike work"
   end
 
+  # -- Rest ≤ work ratio enforcement --
+
+  test "fix_rest_ratio caps rest_secs at working duration for single-exercise timed rounds" do
+    data = build_workout_with_sections([
+      { "name" => "Sprint Block", "category" => "main", "format" => "rounds", "rounds" => 6,
+        "rest_secs" => 45,
+        "exercises" => [ { "name" => "Assault Bike", "duration_s" => 10 } ] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 45, main_tag_slug: "turbine").validate_and_fix
+    section = result.dig("structure", "sections").first
+    assert_operator section["rest_secs"], :<=, 10, "rest_secs must not exceed 10s work"
+  end
+
+  test "fix_rest_ratio caps rest_secs at summed duration for multi-exercise rounds" do
+    data = build_workout_with_sections([
+      { "name" => "Circuit", "category" => "main", "format" => "rounds", "rounds" => 4,
+        "rest_secs" => 60,
+        "exercises" => [
+          { "name" => "Thruster Hold", "duration_s" => 30 },
+          { "name" => "Row Hold", "duration_s" => 15 }
+        ] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 45, main_tag_slug: "").validate_and_fix
+    section = result.dig("structure", "sections").first
+    assert_operator section["rest_secs"], :<=, 45, "rest_secs must not exceed total work (30+15)"
+  end
+
+  test "fix_rest_ratio leaves rep-based rounds alone" do
+    data = build_workout_with_sections([
+      { "name" => "Strength", "category" => "main", "format" => "rounds", "rounds" => 4,
+        "rest_secs" => 60,
+        "exercises" => [ { "name" => "Back Squat", "reps" => 5 } ] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 45, main_tag_slug: "").validate_and_fix
+    section = result.dig("structure", "sections").first
+    assert_equal 60, section["rest_secs"], "no timed work — leave rest alone"
+  end
+
+  test "fix_rest_ratio leaves tabata alone" do
+    # 45s rest > 20s work on either exercise — fix_rest_ratio would cap a non-tabata
+    # section to 20s (single-exercise) or 40s (summed). Tabata must be exempt.
+    data = build_workout_with_sections([
+      { "name" => "Tabata Finisher", "category" => "finisher", "format" => "tabata",
+        "duration_mins" => 4, "rest_secs" => 45,
+        "exercises" => [ { "name" => "KB Swing", "duration_s" => 20 }, { "name" => "Goblet Squat", "duration_s" => 20 } ] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 45, main_tag_slug: "").validate_and_fix
+    section = result.dig("structure", "sections").first
+    assert_equal "tabata", section["format"], "tabata format preserved"
+    assert_equal 45, section["rest_secs"], "tabata rest_secs must not be capped by fix_rest_ratio"
+  end
+
+  test "fix_rest_ratio leaves sections where rest already <= work" do
+    data = build_workout_with_sections([
+      { "name" => "Hard Bike", "category" => "main", "format" => "rounds", "rounds" => 8,
+        "rest_secs" => 30,
+        "exercises" => [ { "name" => "Assault Bike", "duration_s" => 45 } ] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 45, main_tag_slug: "turbine").validate_and_fix
+    section = result.dig("structure", "sections").first
+    assert_equal 30, section["rest_secs"], "valid rest ratio should be preserved"
+  end
+
   private
 
   def build_workout_with_sections(sections)
