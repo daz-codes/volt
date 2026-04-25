@@ -337,6 +337,80 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
     assert_nil ex["notes"]
   end
 
+  test "validators together strip 'Speed Ladder' from exercise names" do
+    # fix_exercise_name_programming strips trailing 'Ladder'; fix_speed_language
+    # cleans up any remaining "Speed Ladder" pattern. End state: no Speed Ladder.
+    data = build_workout_with_sections([
+      { "name" => "Run Block", "category" => "main", "format" => "straight", "duration_mins" => 8,
+        "exercises" => [ { "name" => "Treadmill Speed Ladder", "duration_s" => 480 } ] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 30, main_tag_slug: "").validate_and_fix
+    ex = result.dig("structure", "sections").first["exercises"].first
+    refute_match(/Speed Ladder/i, ex["name"])
+  end
+
+  # -- Treadmill speed-ladder → distance-ladder rescue --
+
+  test "fix_treadmill_ladder converts speed-shaped ladder to distance ladder" do
+    data = build_workout_with_sections([
+      { "name" => "Run Cardio Ladder", "category" => "main", "format" => "ladder",
+        "varies" => "reps", "start" => 800, "end" => 400, "step" => 100,
+        "exercises" => [ { "name" => "Treadmill" } ] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 30, main_tag_slug: "hyrox").validate_and_fix
+    section = result.dig("structure", "sections").first
+    assert_equal "ladder", section["format"]
+    assert_equal "distance_m", section["varies"]
+    assert_equal 800, section["start"]
+    assert_equal 400, section["end"]
+    assert_equal 100, section["step"]
+    ex = section["exercises"].first
+    assert_equal "Run", ex["name"]
+    refute_match(/Speed Ladder/i, ex["name"])
+    assert_nil ex["notes"]
+  end
+
+  test "fix_treadmill_ladder defaults to 400→100m when range too small" do
+    data = build_workout_with_sections([
+      { "name" => "Run Block", "category" => "main", "format" => "ladder",
+        "varies" => "reps", "start" => 50, "end" => 50, "step" => 1,
+        "exercises" => [ { "name" => "Treadmill" } ] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 30, main_tag_slug: "hyrox").validate_and_fix
+    section = result.dig("structure", "sections").first
+    assert_equal 400, section["start"]
+    assert_equal 100, section["end"]
+  end
+
+  test "fix_treadmill_ladder leaves a proper distance ladder alone" do
+    data = build_workout_with_sections([
+      { "name" => "Distance Ladder", "category" => "main", "format" => "ladder",
+        "varies" => "distance_m", "start" => 400, "end" => 100, "step" => 100,
+        "rest_between_rungs" => 60,
+        "exercises" => [ { "name" => "Run", "equipment" => "treadmill" } ] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 30, main_tag_slug: "hyrox").validate_and_fix
+    section = result.dig("structure", "sections").first
+    assert_equal "ladder", section["format"]
+    assert_equal "distance_m", section["varies"]
+    assert_equal 400, section["start"]
+    assert_equal 100, section["end"]
+  end
+
+  test "fix_treadmill_ladder still converts incline ladders to straight" do
+    data = build_workout_with_sections([
+      { "name" => "Treadmill Incline Ladder", "category" => "main", "format" => "ladder",
+        "varies" => "reps", "start" => 1, "end" => 10, "step" => 1,
+        "exercises" => [ { "name" => "Treadmill" } ] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 30, main_tag_slug: "").validate_and_fix
+    section = result.dig("structure", "sections").first
+    assert_equal "straight", section["format"]
+    ex = section["exercises"].first
+    assert_match(/Incline/i, ex["name"])
+    refute_match(/km\/h/i, ex["notes"].to_s)
+  end
+
   test "fix_speed_language leaves clean notes alone" do
     data = build_workout_with_sections([
       { "name" => "Run Block", "category" => "main", "format" => "rounds", "rounds" => 3,

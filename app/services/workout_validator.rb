@@ -824,22 +824,25 @@ class WorkoutValidator
     end
   end
 
-  # Treadmill exercises in ladder format are always wrong — speeds/inclines aren't reps.
-  # Convert to straight format: one exercise, total duration, protocol in notes.
-  # Detects incline vs speed based on section name and ladder values.
+  # Treadmill exercises in ladder format are wrong if `varies` is anything but
+  # `distance_m`. The LLM often emits speed-ladder shapes (start/end values that
+  # look like km/h) — we rescue those by reshaping into a proper distance ladder.
+  # Incline ladders (small values + incline language) are converted to a straight
+  # block with athlete-relative effort cues.
   TREADMILL_PATTERN = /treadmill|pace.?build|fartlek|speed.?ladder|climb|jog|run|incline/i.freeze
   INCLINE_PATTERN   = /incline|climb|hill|gradient/i.freeze
 
   def fix_treadmill_ladder(sections)
     sections.each do |section|
       next unless %w[ladder mountain].include?(section["format"])
+      # If the ladder is already a clean distance ladder, leave it alone.
+      next if section["varies"].to_s == "distance_m"
+
       exercises = Array(section["exercises"])
-      # Match on section name OR exercise names
       is_treadmill = section["name"].to_s.match?(TREADMILL_PATTERN) ||
                      exercises.any? { |ex| ex["name"].to_s.match?(TREADMILL_PATTERN) }
       next unless is_treadmill
 
-      # Build progression from ladder values
       sv = section["start"].to_f; ev = section["end"].to_f
       step = [ section["step"].to_f, 1.0 ].max
 
@@ -853,46 +856,61 @@ class WorkoutValidator
       end
       vals = vals.map { |v| v == v.to_i ? v.to_i : v }
 
-      # Detect incline vs speed from section/exercise names and values
       is_incline = section["name"].to_s.match?(INCLINE_PATTERN) ||
                    exercises.any? { |ex| ex["name"].to_s.match?(INCLINE_PATTERN) } ||
-                   vals.max <= 15 # speeds below 15 km/h with a start of 1-3 are almost certainly inclines
-
-      # Sanity check: if "speed" values start below 5, they're probably incline %
-      is_incline = true if vals.first <= 3
+                   (vals.max <= 15 && vals.first <= 5)
 
       if is_incline
-        # Incline ladder: 1 min at each incline %, 1 min flat between
-        # Cap incline at sensible max (15%) and ensure values make sense as %
         vals = vals.map { |v| [ v, 15 ].min }
         total_mins = vals.size * 2
         total_secs = total_mins * 60
-        pace_note = "#{vals.first}%→#{vals.last}% incline, 1 min at each grade (keep pace at 10–12 km/h) with 1 min flat (0%) between"
-        ex_name = "Treadmill Incline Ladder"
+        pace_note = "#{vals.first}%→#{vals.last}% incline · 1 min at each grade with 1 min flat (0%) between · steady hard effort throughout"
+        ex_name = "Treadmill Incline Intervals"
+
+        section["format"] = "straight"
+        section["duration_mins"] = total_mins
+        section.delete("rounds")
+        %w[start end step peak varies rest_between_rungs rest_secs].each { |k| section.delete(k) }
+
+        first_ex = exercises.first
+        first_ex["name"] = ex_name
+        first_ex["duration_s"] = total_secs
+        %w[reps calories distance_m weight_kg].each { |k| first_ex.delete(k) }
+        first_ex["notes"] = pace_note
+        section["exercises"] = [ first_ex ]
+
+        @fixes << "'#{section["name"]}': treadmill incline ladder → straight (#{vals.join(" → ")}%, #{total_mins} min)"
       else
-        # Speed ladder: 1 min at each speed + 1 min easy jog between
-        total_mins = vals.size * 2
-        total_secs = total_mins * 60
-        pace_note = "#{vals.first}→#{vals.last} km/h, 1 min at each speed with 1 min easy jog (10 km/h) between"
-        ex_name = "Treadmill Speed Ladder"
+        # Speed-ladder shape — reshape as a DISTANCE ladder so it renders properly
+        # and the prompt-level absolute-speed ban isn't violated.
+        clamped_start = (vals.first.to_i / 100.0).round * 100
+        clamped_end   = (vals.last.to_i  / 100.0).round * 100
+        clamped_start = clamped_start.clamp(100, 800)
+        clamped_end   = clamped_end.clamp(100, 800)
+        # Need at least 3 rungs (100m apart). If not, default to 400→100m.
+        if (clamped_start - clamped_end).abs < 200 || clamped_start == clamped_end
+          clamped_start = 400
+          clamped_end   = 100
+        end
+
+        section["format"] = "ladder"
+        section["varies"] = "distance_m"
+        section["start"]  = clamped_start
+        section["end"]    = clamped_end
+        section["step"]   = 100
+        section["rest_between_rungs"] = section["rest_between_rungs"].to_i.nonzero? || 60
+        section.delete("rounds")
+        section.delete("peak")
+        section.delete("rest_secs")
+
+        first_ex = exercises.first
+        first_ex["name"] = "Run"
+        first_ex["equipment"] = "treadmill"
+        %w[reps calories distance_m weight_kg duration_s notes].each { |k| first_ex.delete(k) }
+        section["exercises"] = [ first_ex ]
+
+        @fixes << "'#{section["name"]}': treadmill speed ladder → distance ladder (#{clamped_start}→#{clamped_end}m, step 100)"
       end
-
-      # Convert to straight format with a single exercise
-      section["format"] = "straight"
-      section["duration_mins"] = total_mins
-      section.delete("rounds")
-      %w[start end step peak varies rest_between_rungs rest_secs].each { |k| section.delete(k) }
-
-      # Collapse to one exercise — drop recovery jog entries
-      first_ex = exercises.first
-      first_ex["name"] = ex_name
-      first_ex["duration_s"] = total_secs
-      %w[reps calories distance_m weight_kg].each { |k| first_ex.delete(k) }
-      first_ex["notes"] = pace_note
-      section["exercises"] = [ first_ex ]
-
-      label = is_incline ? "incline" : "speed"
-      @fixes << "'#{section["name"]}': treadmill #{label} ladder → straight (#{vals.join(" → ")}#{is_incline ? "%" : " km/h"}, #{total_mins} min)"
     end
   end
 
@@ -1242,6 +1260,13 @@ class WorkoutValidator
       end
 
       Array(section["exercises"]).each do |ex|
+        ex_name = ex["name"].to_s
+        if ex_name.match?(SPEED_LADDER_NAME)
+          original = ex_name.dup
+          ex["name"] = ex_name.gsub(SPEED_LADDER_NAME) { "Distance #{$1.capitalize}" }
+          @fixes << "'#{section["name"]}' / '#{original}' renamed to '#{ex["name"]}' (speed ladder banned)"
+        end
+
         if ex["notes"].to_s.match?(ABSOLUTE_SPEED_PATTERN)
           @fixes << "'#{section["name"]}' / '#{ex["name"]}' notes stripped (contained absolute speed/pace/power)"
           ex.delete("notes")
