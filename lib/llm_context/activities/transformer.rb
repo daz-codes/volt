@@ -2,7 +2,7 @@ module LLMContext
   module Activities
     module Transformer
       SLUG = "transformer"
-      NAME = "Transformer"
+      NAME = "Volt Strong"
 
       CONTRACT = {
         purity: "Strength-leaning functional training — heavy compound lifts built around " \

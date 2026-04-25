@@ -2,7 +2,7 @@ module LLMContext
   module Activities
     module Ohm
       SLUG = "ohm"
-      NAME = "Ohm"
+      NAME = "Volt Flow"
 
       CONTRACT = {
         purity: "Yoga / pilates / mobility. No machines, no weights, no conditioning. " \

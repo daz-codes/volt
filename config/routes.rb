@@ -48,7 +48,6 @@ Rails.application.routes.draw do
       post :retry_slot
     end
   end
-  get "octathlon", to: "workouts#octathlon", as: :octathlon
   get "library", to: "workouts#index", as: :library
   get "workout_log", to: "workout_logs#index", as: :workout_log_index
   get "calendar",     to: "workout_logs#calendar",     as: :calendar

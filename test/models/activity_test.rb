@@ -20,21 +20,18 @@ class ActivityTest < ActiveSupport::TestCase
   end
 
   test "DEFAULT_NAMES contains expected activities" do
-    assert_includes Activity::DEFAULT_NAMES, "Hyrox"
-    assert_includes Activity::DEFAULT_NAMES, "Alternator"
-    assert_includes Activity::DEFAULT_NAMES, "Tread & Shred"
-    assert_includes Activity::DEFAULT_NAMES, "Circuit Breaker"
-    assert_includes Activity::DEFAULT_NAMES, "Dynamo"
-    assert_includes Activity::DEFAULT_NAMES, "Transformer"
-    assert_includes Activity::DEFAULT_NAMES, "Ohm"
-    assert_includes Activity::DEFAULT_NAMES, "Maximum Voltage"
-    assert_includes Activity::DEFAULT_NAMES, "Iron Engine"
-    assert_includes Activity::DEFAULT_NAMES, "Sunday Workout"
-    assert_includes Activity::DEFAULT_NAMES, "Volt Octathlon"
-    assert_includes Activity::DEFAULT_NAMES, "Turbine"
+    assert_includes Activity::DEFAULT_NAMES, "Functional Muscle"
+    assert_includes Activity::DEFAULT_NAMES, "Volt Strong"
+    assert_includes Activity::DEFAULT_NAMES, "Pump & Grind"
+    assert_includes Activity::DEFAULT_NAMES, "Mega Fit"
+    assert_includes Activity::DEFAULT_NAMES, "Kettlebell Hell"
+    assert_includes Activity::DEFAULT_NAMES, "Volt Flow"
+    assert_includes Activity::DEFAULT_NAMES, "Engine Room"
     assert_includes Activity::DEFAULT_NAMES, "Hybrid Race"
     assert_includes Activity::DEFAULT_NAMES, "Strong Stations"
-    assert_equal 20, Activity::DEFAULT_NAMES.size
+    assert_includes Activity::DEFAULT_NAMES, "Hyrox"
+    assert_includes Activity::DEFAULT_NAMES, "Sunday Workout"
+    assert_equal 16, Activity::DEFAULT_NAMES.size
   end
 
   test "defaults scope returns only default activities" do

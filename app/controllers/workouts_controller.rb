@@ -308,24 +308,6 @@ class WorkoutsController < ApplicationController
     @debug_info = Rails.cache.read("workout_llm_debug_#{@workout.id}")
   end
 
-  # GET /octathlon
-  def octathlon
-    workout = Current.user.workouts.find_by(name: "Volt Octathlon")
-    structure = octathlon_structure
-
-    if workout
-      workout.update!(structure: structure, original_structure: structure)
-    else
-      activity = Activity.find_by(name: "Volt Octathlon")
-      workout = Current.user.workouts.create!(
-        name: "Volt Octathlon", activity: activity, duration_mins: 35,
-        status: "active", structure: structure, original_structure: structure
-      )
-    end
-
-    redirect_to workout_path(workout)
-  end
-
   # POST /workouts/:id/scale
   def scale
     @workout = Workout.find(params[:id])
@@ -517,39 +499,4 @@ class WorkoutsController < ApplicationController
     workout.tag_ids = tag_ids
   end
 
-  def octathlon_structure
-    {
-      "goal" => "Race simulation — go hard, record your time. This is the benchmark.",
-      "sections" => [
-        { "name" => "Warm-Up", "category" => "warm_up", "format" => "straight", "duration_mins" => 5,
-          "exercises" => [
-            { "name" => "Easy Row", "duration_s" => 120, "notes" => "Easy pace" },
-            { "name" => "Light Thrusters", "reps" => 10, "notes" => "Empty hands or very light" },
-            { "name" => "KB Swings", "reps" => 10, "notes" => "Light — loosen the hips" }
-          ] },
-        { "name" => "Initi8", "category" => "main", "format" => "straight",
-          "exercises" => [ { "name" => "Thrusters", "reps" => 50, "notes" => "2 x 10kg DB" } ] },
-        { "name" => "Elev8", "category" => "main", "format" => "straight",
-          "exercises" => [ { "name" => "Row", "distance_m" => 1000 } ] },
-        { "name" => "Stimul8", "category" => "main", "format" => "straight",
-          "exercises" => [ { "name" => "Slams", "reps" => 50, "notes" => "10kg" } ] },
-        { "name" => "Acceler8", "category" => "main", "format" => "straight",
-          "exercises" => [ { "name" => "Ski", "distance_m" => 1000 } ] },
-        { "name" => "Gravit8", "category" => "main", "format" => "straight",
-          "exercises" => [ { "name" => "KB Swing", "reps" => 50, "notes" => "20kg" } ] },
-        { "name" => "Domin8", "category" => "main", "format" => "straight",
-          "exercises" => [ { "name" => "Assault Bike", "calories" => 50 } ] },
-        { "name" => "Anihil8", "category" => "main", "format" => "straight",
-          "exercises" => [ { "name" => "Devil Press", "reps" => 50, "notes" => "2 x 10kg DB" } ] },
-        { "name" => "Termin8", "category" => "main", "format" => "straight",
-          "exercises" => [ { "name" => "Run", "distance_m" => 1000 } ] },
-        { "name" => "Cool-Down", "category" => "cool_down", "format" => "straight", "duration_mins" => 5,
-          "exercises" => [
-            { "name" => "Walk", "duration_s" => 120, "notes" => "Slow walk, bring heart rate down" },
-            { "name" => "Hamstring Stretch", "duration_s" => 30, "notes" => "Each side" },
-            { "name" => "Shoulder Stretch", "duration_s" => 30, "notes" => "Each side" }
-          ] }
-      ]
-    }
-  end
 end

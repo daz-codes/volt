@@ -2,7 +2,7 @@ module LLMContext
   module Activities
     module Alternator
       SLUG = "alternator"
-      NAME = "Alternator"
+      NAME = "Pump & Grind"
 
       CONTRACT = {
         purity: "Alternator sessions alternate DIFFERENT cardio machines with floor " \

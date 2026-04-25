@@ -47,4 +47,19 @@ class LLMContext::ActivitiesTest < ActiveSupport::TestCase
     assert_equal "deka-atlas", LLMContext::Activities.canonical_slug("strong-stations")
     assert_equal LLMContext::Activities::DekaAtlas, LLMContext::Activities.for("strong-stations")
   end
+
+  test "renamed display slugs route to existing modules" do
+    assert_equal LLMContext::Activities::IronEngine,   LLMContext::Activities.for("kettlebell-hell")
+    assert_equal LLMContext::Activities::Transformer,  LLMContext::Activities.for("volt-strong")
+    assert_equal LLMContext::Activities::Dynamo,       LLMContext::Activities.for("mega-fit")
+    assert_equal LLMContext::Activities::Alternator,   LLMContext::Activities.for("pump-grind")
+    assert_equal LLMContext::Activities::Ohm,          LLMContext::Activities.for("volt-flow")
+    assert_equal LLMContext::Activities::Turbine,      LLMContext::Activities.for("engine-room")
+  end
+
+  test "circuit-breaker slug now routes to FunctionalMuscle (absorbed)" do
+    assert_equal "functional-muscle", LLMContext::Activities.canonical_slug("circuit-breaker")
+    assert_equal LLMContext::Activities::FunctionalMuscle, LLMContext::Activities.for("circuit-breaker")
+    assert_equal LLMContext::Activities::FunctionalMuscle, LLMContext::Activities.for("f45")
+  end
 end

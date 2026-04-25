@@ -2,7 +2,7 @@ module LLMContext
   module Activities
     module IronEngine
       SLUG = "kettlebell"
-      NAME = "Iron Engine"
+      NAME = "Kettlebell Hell"
 
       CONTRACT = {
         purity: "KETTLEBELL ONLY. Every main and finisher exercise must use a kettlebell. " \

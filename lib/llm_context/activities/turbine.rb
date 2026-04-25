@@ -2,7 +2,7 @@ module LLMContext
   module Activities
     module Turbine
       SLUG = "turbine"
-      NAME = "Turbine"
+      NAME = "Engine Room"
 
       CONTRACT = {
         purity: "PURE CARDIO. The only equipment allowed in main sections is the four " \

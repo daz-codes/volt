@@ -2,7 +2,7 @@ module LLMContext
   module Activities
     module Dynamo
       SLUG = "dynamo"
-      NAME = "Dynamo"
+      NAME = "Mega Fit"
 
       CONTRACT = {
         purity: "BODYWEIGHT ONLY. Dynamo sessions are pure bodyweight HIIT — the intensity " \

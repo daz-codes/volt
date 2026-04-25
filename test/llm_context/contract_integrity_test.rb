@@ -105,10 +105,6 @@ class LLMContext::ContractIntegrityTest < ActiveSupport::TestCase
     assert_activity_valid(LLMContext::Activities::DekaAtlas)
   end
 
-  test "Volt Octathlon contract is valid" do
-    assert_activity_valid(LLMContext::Activities::VoltOctathlon)
-  end
-
   test "Alternator contract is valid" do
     assert_activity_valid(LLMContext::Activities::Alternator)
   end
