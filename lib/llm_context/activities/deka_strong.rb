@@ -5,8 +5,9 @@ module LLMContext
       NAME = "Deka Strong"
 
       CONTRACT = {
-        purity: "Deka Strong race training — no running. Ten weighted functional zones " \
-                "back-to-back, with emphasis on strength-endurance and station capacity.",
+        purity: "Deka Strong training — no running. Strength-endurance and station capacity " \
+                "via the 10 weighted functional zones, but most sessions use 4-6 stations " \
+                "with supplementary movement work, NOT a full 10-zone simulation.",
         allowed_equipment: %w[rowing_machine ski_erg assault_bike wall_ball sled kettlebells],
         banned_equipment:  %w[treadmill barbell dumbbells pull_up_bar resistance_bands jump_rope],
         banned_exercise_patterns: [
@@ -21,18 +22,20 @@ module LLMContext
         notes: "No running. Build anaerobic capacity on ski erg, assault bike, or rower " \
                "instead — 30s hard/30s easy or 400m repeats. Stations: RAM Reverse Lunges, " \
                "Row, Box Jump, Med Ball Sit-up Throw, SkiErg, Farmer's Carry, Air Bike, " \
-               "Dead Ball Yoke Over, Sled Push/Pull, RAM Weighted Burpees. The race stations " \
-               "remain the primary movements; supplementary exercises (see vocabulary) can " \
-               "appear occasionally for variety but stations should still dominate. An abs " \
-               "finisher (sit-ups, leg raises, planks, V-ups, Russian twists) is a good " \
-               "optional close-out."
+               "Dead Ball Yoke Over, Sled Push/Pull, RAM Weighted Burpees. **Most sessions " \
+               "use 4-6 stations, not all 10** — full 10-zone simulations are reserved for " \
+               "race-prep sessions only (triggered by 'race sim' in session notes). " \
+               "**Include 1-2 supplementary movements** (KB Swings, KB Thrusters, Wall Balls, " \
+               "walking lunges, burpee variations like Box Jump Burpees) in most sessions — " \
+               "they keep training varied and complement the stations. An abs finisher " \
+               "(sit-ups, leg raises, planks, V-ups, Russian twists) is a good optional close-out."
       }.freeze
 
       MOVEMENT_VOCABULARY = <<~VOCAB.freeze
         Stations:          RAM Reverse Lunges, Row 500m, Box Jump, Med Ball Sit-up Throw, SkiErg 500m,
                            Farmer's Carry, Air Bike 25 cal, Dead Ball Yoke Over, Sled Push/Pull, RAM Weighted Burpees
         Engine:            Ski Erg 500m repeats, Rower 500m repeats, Assault Bike 30s/30s
-        Supplementary:     KB Swings, KB Thrusters, KB High Pull, Wall Balls, Walking Lunges, Jump Squats, Push-ups, Med Ball Slams, KB Shoulder Press (use sparingly — stations remain primary)
+        Supplementary:     KB Swings, KB Thrusters, KB High Pull, Wall Balls, Walking Lunges, Jump Squats, Push-ups, Med Ball Slams, KB Shoulder Press (include 1-2 per session for variety)
         Burpee variations: Box Jump Burpees, Plate Burpees, Wall Ball Burpees, KB Burpees
         Abs finisher:      Sit-ups, Leg Raises, Plank, V-ups, Russian Twists, Hollow Holds
       VOCAB
@@ -82,27 +85,29 @@ module LLMContext
           ]
         },
         {
-          name: "Ten Zones, No Run",
-          goal: "Move through all ten Deka Strong zones back-to-back.",
+          name: "Long Mixed Strong",
+          goal: "Engine, station strength with supplementary work and a burpee variation, abs close — not a race simulation.",
           duration_mins: 60,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
-            { name: "Race Simulation", format: "for_time",
+            { name: "Engine Block", format: "rounds", rounds: 6, rest_secs: 60,
               exercises: [
-                { name: "RAM Reverse Lunges", reps: 30 },
                 { name: "Row", reps: "500m", equipment: "rowing_machine" },
-                { name: "Box Jump / Step Over", reps: 20, equipment: "bodyweight" },
-                { name: "Med Ball Sit-up Throw", reps: 25 },
-                { name: "SkiErg", reps: "500m", equipment: "ski_erg" },
-                { name: "Farmer's Carry", reps: "100m", equipment: "kettlebells" },
-                { name: "Air Bike", reps: "25 cal", equipment: "assault_bike" },
-                { name: "Dead Ball Yoke Over", reps: 20 },
-                { name: "Sled Push / Pull", reps: "100m", equipment: "sled" },
-                { name: "RAM Weighted Burpees", reps: 20 }
+                { name: "Air Bike", reps: "20 cal", equipment: "assault_bike" }
               ] },
-            { name: "Engine Finisher", format: "rounds", rounds: 6, rest_secs: 30,
-              exercises: [ { name: "Row", reps: "250m", equipment: "rowing_machine" } ] },
+            { name: "Strength Stations", format: "rounds", rounds: 5, rest_secs: 60,
+              exercises: [
+                { name: "RAM Reverse Lunges", reps: 12 },
+                { name: "KB Thrusters", reps: 12, equipment: "kettlebells" },
+                { name: "Box Jump Burpees", reps: 12, equipment: "bodyweight" }
+              ] },
+            { name: "Abs Finisher", format: "rounds", rounds: 3, rest_secs: 30,
+              exercises: [
+                { name: "V-ups", reps: 20, equipment: "bodyweight" },
+                { name: "Russian Twists", reps: 20, equipment: "bodyweight" },
+                { name: "Plank", duration_s: 45, equipment: "bodyweight" }
+              ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
           ]
