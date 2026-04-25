@@ -24,15 +24,19 @@ module LLMContext
                "Single Unders, Atlas Shoulder to Carry. No running. Pair heavy stations " \
                "with machine conditioning to manage fatigue. The race stations remain the " \
                "primary movements; supplementary exercises (see vocabulary) can appear " \
-               "occasionally for variety but stations should still dominate."
+               "occasionally for variety but stations should still dominate. An abs finisher " \
+               "(sit-ups, leg raises, planks, V-ups, Russian twists) is a good optional " \
+               "close-out."
       }.freeze
 
       MOVEMENT_VOCABULARY = <<~VOCAB.freeze
-        Barbell:       Thrusters, Bar-Facing Burpees Over Bar
-        Dumbbell:      Single Arm DB Ground to Overhead, DB Shoulder to Overhead Press, Bear Crawl
-        Carries:       Farmer's Carry, Atlas Shoulder to Carry
-        Bodyweight:    Surrender Lunges (weighted), Weighted Sit-ups, Jump Rope Single Unders
-        Supplementary: KB Swings, KB Thrusters, KB High Pull, DB Devil Press, Walking Lunges, Jump Squats, Push-ups, KB/DB Shoulder Press (use sparingly — race stations remain primary)
+        Barbell:           Thrusters, Bar-Facing Burpees Over Bar
+        Dumbbell:          Single Arm DB Ground to Overhead, DB Shoulder to Overhead Press, Bear Crawl
+        Carries:           Farmer's Carry, Atlas Shoulder to Carry
+        Bodyweight:        Surrender Lunges (weighted), Weighted Sit-ups, Jump Rope Single Unders
+        Supplementary:     KB Swings, KB Thrusters, KB High Pull, DB Devil Press, Walking Lunges, Jump Squats, Push-ups, KB/DB Shoulder Press (use sparingly — race stations remain primary)
+        Burpee variations: Box Jump Burpees, Plate Burpees, KB Burpees, DB Burpees
+        Abs finisher:      Sit-ups, Leg Raises, Plank, V-ups, Russian Twists, Hollow Holds
       VOCAB
 
       EXAMPLES = [

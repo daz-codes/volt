@@ -26,14 +26,18 @@ module LLMContext
                "meaningfully different — do not create two sections with the same " \
                "exercises and structure but different names. The main stations should " \
                "dominate every session; supplementary movements (see vocabulary) can " \
-               "appear occasionally for variety but should never displace the race stations."
+               "appear occasionally for variety but should never displace the race stations. " \
+               "An abs finisher (sit-ups, leg raises, planks, V-ups, Russian twists) is a " \
+               "good optional close-out before the cool-down."
       }.freeze
 
       MOVEMENT_VOCABULARY = <<~VOCAB.freeze
-        Running:       Treadmill 500m, 1km, 400m repeats
-        Stations:      SkiErg, Sled Push, Sled Pull, Rowing Machine, Farmer's Carry, Wall Ball, Sandbag Lunges
-        Bodyweight:    Burpee Broad Jumps
-        Supplementary: KB Swings, KB Thrusters, KB High Pull, Walking Lunges, Jump Squats, Push-ups, Med Ball Slams, KB Shoulder Press (use sparingly — race stations remain primary)
+        Running:           Treadmill 500m, 1km, 400m repeats
+        Stations:          SkiErg, Sled Push, Sled Pull, Rowing Machine, Farmer's Carry, Wall Ball, Sandbag Lunges
+        Bodyweight:        Burpee Broad Jumps
+        Supplementary:     KB Swings, KB Thrusters, KB High Pull, Walking Lunges, Jump Squats, Push-ups, Med Ball Slams, KB Shoulder Press (use sparingly — race stations remain primary)
+        Burpee variations: Box Jump Burpees, Wall Ball Burpees, KB Burpees (in addition to the standard Burpee Broad Jumps)
+        Abs finisher:      Sit-ups, Leg Raises, Plank, V-ups, Russian Twists, Hollow Holds
       VOCAB
 
       EXAMPLES = [

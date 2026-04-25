@@ -23,14 +23,18 @@ module LLMContext
                "are common). Engine-building blocks on treadmill should appear regularly " \
                "(400m repeats, mile repeats, 4min hard efforts). The race stations remain " \
                "the primary functional movements; supplementary exercises (see vocabulary) " \
-               "can appear occasionally for variety but stations should still dominate."
+               "can appear occasionally for variety but stations should still dominate. An " \
+               "abs finisher (sit-ups, leg raises, planks, V-ups, Russian twists) is a good " \
+               "optional close-out."
       }.freeze
 
       MOVEMENT_VOCABULARY = <<~VOCAB.freeze
-        Run blocks:    Treadmill 400m–mile repeats, 4min hard efforts, tempo runs
-        Stations:      RAM Reverse Lunges, Row, Box Jump, SkiErg, Farmer's Carry, Air Bike,
-                       Dead Ball Yoke Over, Sled Push/Pull, RAM Weighted Burpees
-        Supplementary: KB Swings, KB Thrusters, KB High Pull, Wall Balls, Walking Lunges, Jump Squats, Push-ups, Med Ball Slams, KB Shoulder Press (use sparingly — stations remain primary)
+        Run blocks:        Treadmill 400m–mile repeats, 4min hard efforts, tempo runs
+        Stations:          RAM Reverse Lunges, Row, Box Jump, SkiErg, Farmer's Carry, Air Bike,
+                           Dead Ball Yoke Over, Sled Push/Pull, RAM Weighted Burpees
+        Supplementary:     KB Swings, KB Thrusters, KB High Pull, Wall Balls, Walking Lunges, Jump Squats, Push-ups, Med Ball Slams, KB Shoulder Press (use sparingly — stations remain primary)
+        Burpee variations: Box Jump Burpees, Plate Burpees, Wall Ball Burpees, KB Burpees
+        Abs finisher:      Sit-ups, Leg Raises, Plank, V-ups, Russian Twists, Hollow Holds
       VOCAB
 
       EXAMPLES = [

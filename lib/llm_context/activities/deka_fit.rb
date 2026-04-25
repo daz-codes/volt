@@ -25,15 +25,18 @@ module LLMContext
                "Burpees. When race_simulation? is true the builder sets finisher: :required " \
                "and the session covers all ten zones. The race stations remain the primary " \
                "movements; supplementary exercises (see vocabulary) can appear occasionally " \
-               "for variety but stations should still dominate."
+               "for variety but stations should still dominate. An abs finisher (sit-ups, " \
+               "leg raises, planks, V-ups, Russian twists) is a good optional close-out."
       }.freeze
 
       MOVEMENT_VOCABULARY = <<~VOCAB.freeze
-        Run zones:     Treadmill 500m
-        Functional:    RAM Reverse Lunges, Row 500m, Box Jump / Step Over, Med Ball Sit-up Throw,
-                       SkiErg 500m, Farmer's Carry, Air Bike 25 cal, Dead Ball Yoke Over,
-                       Sled Push/Pull, RAM Weighted Burpees
-        Supplementary: KB Swings, KB Thrusters, KB High Pull, Wall Balls, Walking Lunges, Jump Squats, Push-ups, Med Ball Slams, KB Shoulder Press (use sparingly — stations remain primary)
+        Run zones:         Treadmill 500m
+        Functional:        RAM Reverse Lunges, Row 500m, Box Jump / Step Over, Med Ball Sit-up Throw,
+                           SkiErg 500m, Farmer's Carry, Air Bike 25 cal, Dead Ball Yoke Over,
+                           Sled Push/Pull, RAM Weighted Burpees
+        Supplementary:     KB Swings, KB Thrusters, KB High Pull, Wall Balls, Walking Lunges, Jump Squats, Push-ups, Med Ball Slams, KB Shoulder Press (use sparingly — stations remain primary)
+        Burpee variations: Box Jump Burpees, Plate Burpees, Wall Ball Burpees, KB Burpees
+        Abs finisher:      Sit-ups, Leg Raises, Plank, V-ups, Russian Twists, Hollow Holds
       VOCAB
 
       EXAMPLES = [
