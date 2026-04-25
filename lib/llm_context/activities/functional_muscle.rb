@@ -46,8 +46,8 @@ module LLMContext
           goal: "The core class shape — metabolic, strength, abs, out the door.",
           duration_mins: 45,
           sections: [
-            { name: "Easy Row Warm-Up", format: "straight", duration_mins: 5,
-              exercises: [ { name: "Easy Row", duration_s: 300, notes: "easy pace", equipment: "rowing_machine" } ] },
+            { name: "Warm-Up", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "rowing_machine" } ] },
             { name: "The Grind Loop", format: "emom", duration_mins: 12, rest_secs: 0,
               exercises: [
                 { name: "Row", notes: "steady sustainable effort", equipment: "rowing_machine" },
@@ -74,8 +74,8 @@ module LLMContext
           goal: "A 10-1 ladder sits centre stage between warm-up and abs.",
           duration_mins: 45,
           sections: [
-            { name: "Easy Ride Warm-Up", format: "straight", duration_mins: 5,
-              exercises: [ { name: "Easy Ride", duration_s: 300, notes: "easy pace", equipment: "assault_bike" } ] },
+            { name: "Warm-Up", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "assault_bike" } ] },
             { name: "Pulse Raiser", format: "tabata", rounds: 8, rest_secs: 10,
               exercises: [
                 { name: "Push Up to T-Rotation", duration_s: 20, equipment: "bodyweight" },
@@ -108,8 +108,8 @@ module LLMContext
           goal: "A 60-min version — TWENTY20 plus Bear Mountain plus the standard close.",
           duration_mins: 60,
           sections: [
-            { name: "Easy Ski Warm-Up", format: "straight", duration_mins: 5,
-              exercises: [ { name: "Easy Ski", duration_s: 300, notes: "easy pace", equipment: "ski_erg" } ] },
+            { name: "Warm-Up", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
             { name: "TWENTY20", format: "rounds", rounds: 5, rest_secs: 0,
               exercises: [
                 { name: "Row", reps: "20 cal", notes: "hard sustainable effort", equipment: "rowing_machine" },

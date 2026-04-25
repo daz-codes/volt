@@ -104,17 +104,20 @@ class WorkoutLLMGenerator
       working = @duration_mins - warm_up_min - cool_down_min
       target_mains = case @duration_mins
                      when 0..30 then "1-2"
-                     when 31..45 then "2"
-                     when 46..60 then "3"
-                     else "3-4"
+                     when 31..45 then "1-2"
+                     when 46..60 then "1-3"
+                     else "1-4"
                      end
       <<~SHAPE.strip
-        Shape: Warm-up (#{warm_up_min} min) → main sections → Cool-down (#{cool_down_min} min).
+        Shape: Warm-up (#{warm_up_min} min) → main section(s) → Cool-down (#{cool_down_min} min).
         Total duration: #{@duration_mins} min. Working budget is roughly #{working} min MINUS
         ~3-5 min per transition between adjacent sections for equipment changes and rest.
         Do NOT emit transitions as their own sections or mention them in the output — just
         leave room in the timing budget when sizing the work.
-        Target #{target_mains} main section(s). Err on the side of fewer, tighter sections —
+        Target #{target_mains} main section(s). A single long main section is a valid and
+        often better shape when the workout is one unbroken effort — chippers, long AMRAPs,
+        hero WODs, race simulations, extended metcons. Pick the count the workout calls for,
+        not the upper end of the range. Err on the side of fewer, tighter sections —
         workouts consistently run long, so cut a section if in doubt.
         Do NOT set duration_mins on main sets.
       SHAPE

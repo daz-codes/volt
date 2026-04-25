@@ -225,6 +225,130 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
     assert_equal 30, section["rest_secs"], "valid rest ratio should be preserved"
   end
 
+  # -- Cardio machine reps conversion --
+
+  test "fix_cardio_machine_reps converts SkiErg reps to calories" do
+    data = build_workout_with_sections([
+      { "name" => "Station Grind", "category" => "main", "format" => "rounds", "rounds" => 3,
+        "exercises" => [ { "name" => "SkiErg", "reps" => 15 } ] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 45, main_tag_slug: "hyrox").validate_and_fix
+    ex = result.dig("structure", "sections").first["exercises"].first
+    assert_equal 15, ex["calories"]
+    assert_nil ex["reps"]
+  end
+
+  test "fix_cardio_machine_reps converts Rowing Machine reps to calories" do
+    data = build_workout_with_sections([
+      { "name" => "Engine", "category" => "main", "format" => "rounds", "rounds" => 4,
+        "exercises" => [ { "name" => "Rowing Machine", "reps" => 12 } ] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 45, main_tag_slug: "").validate_and_fix
+    ex = result.dig("structure", "sections").first["exercises"].first
+    assert_equal 12, ex["calories"]
+    assert_nil ex["reps"]
+  end
+
+  test "fix_cardio_machine_reps converts Assault Bike reps to calories" do
+    data = build_workout_with_sections([
+      { "name" => "Bike Block", "category" => "main", "format" => "rounds", "rounds" => 3,
+        "exercises" => [ { "name" => "Assault Bike", "reps" => 10 } ] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 30, main_tag_slug: "").validate_and_fix
+    ex = result.dig("structure", "sections").first["exercises"].first
+    assert_equal 10, ex["calories"]
+    assert_nil ex["reps"]
+  end
+
+  test "fix_cardio_machine_reps converts Treadmill reps to duration_s" do
+    data = build_workout_with_sections([
+      { "name" => "Run Block", "category" => "main", "format" => "rounds", "rounds" => 3,
+        "exercises" => [ { "name" => "Treadmill", "reps" => 30 } ] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 30, main_tag_slug: "").validate_and_fix
+    ex = result.dig("structure", "sections").first["exercises"].first
+    assert_equal 30, ex["duration_s"]
+    assert_nil ex["reps"]
+  end
+
+  test "fix_cardio_machine_reps leaves DB Row alone (strength row, not cardio)" do
+    data = build_workout_with_sections([
+      { "name" => "Pull Block", "category" => "main", "format" => "rounds", "rounds" => 3,
+        "exercises" => [ { "name" => "DB Row", "reps" => 10 } ] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 30, main_tag_slug: "").validate_and_fix
+    ex = result.dig("structure", "sections").first["exercises"].first
+    assert_equal 10, ex["reps"]
+    assert_nil ex["calories"]
+  end
+
+  test "fix_cardio_machine_reps no-op when calories already set" do
+    data = build_workout_with_sections([
+      { "name" => "Engine", "category" => "main", "format" => "rounds", "rounds" => 3,
+        "exercises" => [ { "name" => "SkiErg", "calories" => 12 } ] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 30, main_tag_slug: "").validate_and_fix
+    ex = result.dig("structure", "sections").first["exercises"].first
+    assert_equal 12, ex["calories"]
+    assert_nil ex["reps"]
+  end
+
+  # -- Speed-language stripping --
+
+  test "fix_speed_language renames 'Speed Ladder' section to 'Distance Ladder'" do
+    data = build_workout_with_sections([
+      { "name" => "Treadmill Speed Ladder", "category" => "main", "format" => "ladder",
+        "exercises" => [ { "name" => "Run", "distance_m" => 400 } ] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 30, main_tag_slug: "hyrox").validate_and_fix
+    section = result.dig("structure", "sections").first
+    assert_match(/Distance Ladder/i, section["name"])
+    refute_match(/Speed/i, section["name"])
+  end
+
+  test "fix_speed_language renames 'Speed Pyramid' section" do
+    data = build_workout_with_sections([
+      { "name" => "Speed Pyramid", "category" => "main", "format" => "mountain",
+        "exercises" => [ { "name" => "Run", "distance_m" => 400 } ] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 30, main_tag_slug: "").validate_and_fix
+    section = result.dig("structure", "sections").first
+    assert_match(/Distance Pyramid/i, section["name"])
+  end
+
+  test "fix_speed_language strips section notes containing km/h" do
+    data = build_workout_with_sections([
+      { "name" => "Run Block", "category" => "main", "format" => "rounds", "rounds" => 3,
+        "notes" => "400→100 km/h, 1 min at each speed",
+        "exercises" => [ { "name" => "Run", "distance_m" => 400 } ] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 30, main_tag_slug: "").validate_and_fix
+    section = result.dig("structure", "sections").first
+    assert_nil section["notes"]
+  end
+
+  test "fix_speed_language strips exercise notes containing pace" do
+    data = build_workout_with_sections([
+      { "name" => "Run Block", "category" => "main", "format" => "rounds", "rounds" => 3,
+        "exercises" => [ { "name" => "Run", "distance_m" => 400, "notes" => "hold 6:00/km pace" } ] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 30, main_tag_slug: "").validate_and_fix
+    ex = result.dig("structure", "sections").first["exercises"].first
+    assert_nil ex["notes"]
+  end
+
+  test "fix_speed_language leaves clean notes alone" do
+    data = build_workout_with_sections([
+      { "name" => "Run Block", "category" => "main", "format" => "rounds", "rounds" => 3,
+        "notes" => "hard effort, sustainable",
+        "exercises" => [ { "name" => "Run", "distance_m" => 400, "notes" => "all-out" } ] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 30, main_tag_slug: "").validate_and_fix
+    section = result.dig("structure", "sections").first
+    assert_equal "hard effort, sustainable", section["notes"]
+    assert_equal "all-out", section["exercises"].first["notes"]
+  end
+
   private
 
   def build_workout_with_sections(sections)

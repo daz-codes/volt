@@ -87,6 +87,8 @@ class WorkoutValidator
     fix_cardio_interval_split(sections)
     fix_threshold_interval_duration(sections)
     fix_cardio_missing_metric(sections)
+    fix_cardio_machine_reps(sections)
+    fix_speed_language(sections)
     if @main_tag_slug == "turbine"
       fix_turbine_formats(sections)
       fix_turbine_block_durations(sections)
@@ -110,8 +112,6 @@ class WorkoutValidator
       fix_fm_tabata_remove_non_compounds(sections)
       fix_fm_merge_strength_sections(sections)
       fix_fm_strength_sets(sections)
-      fix_fm_warmup(sections)
-      fix_fm_cooldown(sections)
       fix_fm_strip_machine_suffix(sections)
       fix_fm_trim_metabolic_blocks(sections)
       fix_fm_ensure_abs(sections)
@@ -1195,6 +1195,61 @@ class WorkoutValidator
     end
   end
 
+  # Cardio machines never take `reps` — convert to the right metric.
+  # Row/Ski/Bike → calories. Treadmill → duration_s. Bare "Row" is excluded
+  # because it's commonly a strength exercise (DB Row, Bent-Over Row, Inverted Row).
+  CARDIO_REPS_TO_CAL = /\b(rowing\s*machine|rower|ski.?erg|skierg|assault\s*bike|echo\s*bike|air\s*bike|fan\s*bike)\b/i.freeze
+  CARDIO_REPS_TO_DURATION = /\btreadmill\b/i.freeze
+
+  def fix_cardio_machine_reps(sections)
+    sections.each do |section|
+      Array(section["exercises"]).each do |ex|
+        next unless ex["reps"].to_i > 0
+        next if ex["calories"].to_i > 0 || ex["distance_m"].to_i > 0 || ex["duration_s"].to_i > 0
+
+        name = ex["name"].to_s
+        if name.match?(CARDIO_REPS_TO_CAL)
+          ex["calories"] = ex["reps"]
+          ex.delete("reps")
+          @fixes << "'#{section["name"]}' / '#{name}': converted reps→calories (cardio machines never take reps)"
+        elsif name.match?(CARDIO_REPS_TO_DURATION)
+          ex["duration_s"] = ex["reps"]
+          ex.delete("reps")
+          @fixes << "'#{section["name"]}' / '#{name}': converted reps→duration_s (treadmill never takes reps)"
+        end
+      end
+    end
+  end
+
+  # Strip absolute speed/pace/power references the LLM occasionally injects
+  # despite the prompt ban. Renames "Speed Ladder" / "Speed Pyramid" sections,
+  # and deletes section/exercise notes containing the banned patterns.
+  ABSOLUTE_SPEED_PATTERN = %r{\d+(?:\.\d+)?\s*(?:km/h|mph|w\b|spm|rpm)|\d+:\d+\s*/\s*(?:km|mile)\b}i.freeze
+  SPEED_LADDER_NAME = /\bspeed\s+(ladder|pyramid)\b/i.freeze
+
+  def fix_speed_language(sections)
+    sections.each do |section|
+      name = section["name"].to_s
+      if name.match?(SPEED_LADDER_NAME)
+        original = name.dup
+        section["name"] = name.gsub(SPEED_LADDER_NAME) { "Distance #{$1.capitalize}" }
+        @fixes << "Renamed '#{original}' → '#{section["name"]}' (speed ladders are banned — use distance/duration)"
+      end
+
+      if section["notes"].to_s.match?(ABSOLUTE_SPEED_PATTERN)
+        @fixes << "'#{section["name"]}' notes stripped (contained absolute speed/pace/power)"
+        section.delete("notes")
+      end
+
+      Array(section["exercises"]).each do |ex|
+        if ex["notes"].to_s.match?(ABSOLUTE_SPEED_PATTERN)
+          @fixes << "'#{section["name"]}' / '#{ex["name"]}' notes stripped (contained absolute speed/pace/power)"
+          ex.delete("notes")
+        end
+      end
+    end
+  end
+
   # Turbine sessions: fix formats and ensure sensible round counts.
   # - Convert for_time to rounds (Turbine blocks are always interval or steady-state)
   # - Ensure distance repeats have at least 4 rounds
@@ -1414,66 +1469,6 @@ class WorkoutValidator
         @fixes << "FM '#{ex["name"]}' in '#{section["name"]}': reps #{reps} → #{snapped} (FM only allows 5×5 or 5×10)"
       end
     end
-  end
-
-  # FM: warm-up must be a single cardio machine exercise (bike/row/ski), 5 mins, straight format.
-  # If multiple exercises are found in the warm-up, trim to the first one.
-  FM_CARDIO_MACHINES = [ "Easy Row", "Easy Ride", "Easy Ski" ].freeze
-
-  def fix_fm_warmup(sections)
-    warmup = sections.find { |s| s["category"] == "warm_up" }
-
-    # If the LLM omitted the warm-up entirely, inject one as the first section
-    unless warmup
-      machine = FM_CARDIO_MACHINES.sample
-      warmup = {
-        "name" => "Warm-Up",
-        "category" => "warm_up",
-        "format" => "straight",
-        "duration_mins" => 5,
-        "exercises" => [
-          { "name" => machine, "duration_s" => 300, "notes" => "Light pace, get the blood flowing" }
-        ]
-      }
-      sections.unshift(warmup)
-      @fixes << "FM: injected missing warm-up (#{machine}, 5 min)"
-      return
-    end
-
-    exercises = Array(warmup["exercises"])
-    if exercises.size > 1
-      warmup["exercises"] = exercises.first(1)
-      @fixes << "FM warm-up trimmed to 1 exercise (was #{exercises.size}) — FM warm-up is cardio machine only"
-    end
-
-    if warmup["duration_mins"].to_i != 5
-      old = warmup["duration_mins"]
-      warmup["duration_mins"] = 5
-      @fixes << "FM warm-up duration #{old} → 5 mins"
-    end
-  end
-
-  # FM: ensure a cool-down exists as the last section.
-  # If the LLM omitted it, inject a simple stretch.
-  def fix_fm_cooldown(sections)
-    last = sections.last
-    has_cooldown = last && last["category"] == "cool_down"
-    return if has_cooldown
-
-    breaths = 10
-    cooldown = {
-      "name" => "Cool-Down",
-      "category" => "cool_down",
-      "format" => "straight",
-      "duration_mins" => 5,
-      "exercises" => [
-        { "name" => "Pigeon Pose", "notes" => "#{breaths} deep breaths each side" },
-        { "name" => "Seated Forward Fold", "notes" => "#{breaths} deep breaths" },
-        { "name" => "Lying Spinal Twist", "notes" => "#{breaths} deep breaths each side" }
-      ]
-    }
-    sections << cooldown
-    @fixes << "FM: injected missing cool-down (5 min stretch)"
   end
 
   # FM: remove non-compound exercises from tabata sections.
