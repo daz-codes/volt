@@ -132,4 +132,8 @@ class LLMContext::ContractIntegrityTest < ActiveSupport::TestCase
   test "General Fitness contract is valid" do
     assert_activity_valid(LLMContext::Activities::GeneralFitness)
   end
+
+  test "Hybrid Race contract is valid" do
+    assert_activity_valid(LLMContext::Activities::HybridRace)
+  end
 end

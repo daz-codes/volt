@@ -31,7 +31,8 @@ module LLMContext
       "pure-cardio"         => "turbine",
       "cardio-session"      => "turbine",
       "cardio-only"         => "turbine",
-      "full-body-training"  => "general-fitness"
+      "full-body-training"  => "general-fitness",
+      "strong-stations"     => "deka-atlas"
     }.freeze
 
     # Canonical slug (as stored in the DB and seen in @activity_slug at runtime)
@@ -53,7 +54,8 @@ module LLMContext
       "volt-octathlon"    => :VoltOctathlon,
       "functional-muscle" => :FunctionalMuscle,
       "crossfit"          => :CrossFit,
-      "general-fitness"   => :GeneralFitness
+      "general-fitness"   => :GeneralFitness,
+      "hybrid-race"       => :HybridRace
     }.freeze
 
     # One-hop resolution on purpose — see the "one-hop" test for the rationale.

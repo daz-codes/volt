@@ -38,4 +38,13 @@ class LLMContext::ActivitiesTest < ActiveSupport::TestCase
   test "barry-s slug routes to Alternator" do
     assert_equal LLMContext::Activities::Alternator, LLMContext::Activities.for("barry-s")
   end
+
+  test "hybrid-race slug routes to HybridRace" do
+    assert_equal LLMContext::Activities::HybridRace, LLMContext::Activities.for("hybrid-race")
+  end
+
+  test "strong-stations slug aliases to DekaAtlas" do
+    assert_equal "deka-atlas", LLMContext::Activities.canonical_slug("strong-stations")
+    assert_equal LLMContext::Activities::DekaAtlas, LLMContext::Activities.for("strong-stations")
+  end
 end
