@@ -59,7 +59,7 @@ module LLMContext
                 { name: "Wall Balls", reps: 15, equipment: "wall_ball" }
               ] },
             { name: "Cooked", format: "for_time",
-              exercises: [ { name: "Burpee Broad Jumps", reps: 20, equipment: "bodyweight" } ] },
+              exercises: [ { name: "Burpee Broad Jumps", reps: 75, equipment: "bodyweight" } ] },
             { name: "Cool-Down", format: "straight", duration_mins: 2,
               exercises: [ { name: "Dynamic stretches", notes: "5 deep breaths" } ] }
           ]
