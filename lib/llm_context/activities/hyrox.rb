@@ -24,13 +24,16 @@ module LLMContext
                "mirror the race: SkiErg, Sled Push/Pull, Burpee Broad Jumps, Rowing, " \
                "Farmer's Carry, Sandbag Lunges, Wall Balls. Every section must be " \
                "meaningfully different — do not create two sections with the same " \
-               "exercises and structure but different names."
+               "exercises and structure but different names. The main stations should " \
+               "dominate every session; supplementary movements (see vocabulary) can " \
+               "appear occasionally for variety but should never displace the race stations."
       }.freeze
 
       MOVEMENT_VOCABULARY = <<~VOCAB.freeze
-        Running:   Treadmill 500m, 1km, 400m repeats
-        Stations:  SkiErg, Sled Push, Sled Pull, Rowing Machine, Farmer's Carry, Wall Ball, Sandbag Lunges
-        Bodyweight: Burpee Broad Jumps
+        Running:       Treadmill 500m, 1km, 400m repeats
+        Stations:      SkiErg, Sled Push, Sled Pull, Rowing Machine, Farmer's Carry, Wall Ball, Sandbag Lunges
+        Bodyweight:    Burpee Broad Jumps
+        Supplementary: KB Swings, KB Thrusters, KB High Pull, Walking Lunges, Jump Squats, Push-ups, Med Ball Slams, KB Shoulder Press (use sparingly — race stations remain primary)
       VOCAB
 
       EXAMPLES = [

@@ -21,13 +21,16 @@ module LLMContext
         notes: "No running. Build anaerobic capacity on ski erg, assault bike, or rower " \
                "instead — 30s hard/30s easy or 400m repeats. Stations: RAM Reverse Lunges, " \
                "Row, Box Jump, Med Ball Sit-up Throw, SkiErg, Farmer's Carry, Air Bike, " \
-               "Dead Ball Yoke Over, Sled Push/Pull, RAM Weighted Burpees."
+               "Dead Ball Yoke Over, Sled Push/Pull, RAM Weighted Burpees. The race stations " \
+               "remain the primary movements; supplementary exercises (see vocabulary) can " \
+               "appear occasionally for variety but stations should still dominate."
       }.freeze
 
       MOVEMENT_VOCABULARY = <<~VOCAB.freeze
-        Stations:  RAM Reverse Lunges, Row 500m, Box Jump, Med Ball Sit-up Throw, SkiErg 500m,
-                   Farmer's Carry, Air Bike 25 cal, Dead Ball Yoke Over, Sled Push/Pull, RAM Weighted Burpees
-        Engine:    Ski Erg 500m repeats, Rower 500m repeats, Assault Bike 30s/30s
+        Stations:      RAM Reverse Lunges, Row 500m, Box Jump, Med Ball Sit-up Throw, SkiErg 500m,
+                       Farmer's Carry, Air Bike 25 cal, Dead Ball Yoke Over, Sled Push/Pull, RAM Weighted Burpees
+        Engine:        Ski Erg 500m repeats, Rower 500m repeats, Assault Bike 30s/30s
+        Supplementary: KB Swings, KB Thrusters, KB High Pull, Wall Balls, Walking Lunges, Jump Squats, Push-ups, Med Ball Slams, KB Shoulder Press (use sparingly — stations remain primary)
       VOCAB
 
       EXAMPLES = [

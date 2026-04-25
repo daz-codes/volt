@@ -21,13 +21,16 @@ module LLMContext
         notes: "MANDATORY: every session includes at least 2 treadmill intervals, and " \
                "runs are usually longer than the 500m Deka Fit zone (800m–mile repeats " \
                "are common). Engine-building blocks on treadmill should appear regularly " \
-               "(400m repeats, mile repeats, 4min hard efforts)."
+               "(400m repeats, mile repeats, 4min hard efforts). The race stations remain " \
+               "the primary functional movements; supplementary exercises (see vocabulary) " \
+               "can appear occasionally for variety but stations should still dominate."
       }.freeze
 
       MOVEMENT_VOCABULARY = <<~VOCAB.freeze
-        Run blocks: Treadmill 400m–mile repeats, 4min hard efforts, tempo runs
-        Stations:   RAM Reverse Lunges, Row, Box Jump, SkiErg, Farmer's Carry, Air Bike,
-                    Dead Ball Yoke Over, Sled Push/Pull, RAM Weighted Burpees
+        Run blocks:    Treadmill 400m–mile repeats, 4min hard efforts, tempo runs
+        Stations:      RAM Reverse Lunges, Row, Box Jump, SkiErg, Farmer's Carry, Air Bike,
+                       Dead Ball Yoke Over, Sled Push/Pull, RAM Weighted Burpees
+        Supplementary: KB Swings, KB Thrusters, KB High Pull, Wall Balls, Walking Lunges, Jump Squats, Push-ups, Med Ball Slams, KB Shoulder Press (use sparingly — stations remain primary)
       VOCAB
 
       EXAMPLES = [

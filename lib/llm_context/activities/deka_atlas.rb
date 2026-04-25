@@ -22,14 +22,17 @@ module LLMContext
                "Lunges (weighted), Single Arm DB Ground to Overhead, Dumbbell Bear Crawl, " \
                "Weighted Sit-ups, Farmer's Carry, DB Shoulder to Overhead Press, Jump Rope " \
                "Single Unders, Atlas Shoulder to Carry. No running. Pair heavy stations " \
-               "with machine conditioning to manage fatigue."
+               "with machine conditioning to manage fatigue. The race stations remain the " \
+               "primary movements; supplementary exercises (see vocabulary) can appear " \
+               "occasionally for variety but stations should still dominate."
       }.freeze
 
       MOVEMENT_VOCABULARY = <<~VOCAB.freeze
-        Barbell:    Thrusters, Bar-Facing Burpees Over Bar
-        Dumbbell:   Single Arm DB Ground to Overhead, DB Shoulder to Overhead Press, Bear Crawl
-        Carries:    Farmer's Carry, Atlas Shoulder to Carry
-        Bodyweight: Surrender Lunges (weighted), Weighted Sit-ups, Jump Rope Single Unders
+        Barbell:       Thrusters, Bar-Facing Burpees Over Bar
+        Dumbbell:      Single Arm DB Ground to Overhead, DB Shoulder to Overhead Press, Bear Crawl
+        Carries:       Farmer's Carry, Atlas Shoulder to Carry
+        Bodyweight:    Surrender Lunges (weighted), Weighted Sit-ups, Jump Rope Single Unders
+        Supplementary: KB Swings, KB Thrusters, KB High Pull, DB Devil Press, Walking Lunges, Jump Squats, Push-ups, KB/DB Shoulder Press (use sparingly — race stations remain primary)
       VOCAB
 
       EXAMPLES = [

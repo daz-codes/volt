@@ -22,13 +22,16 @@ module LLMContext
                "(500m–1km each). Stations: RAM Reverse Lunges, Row, Box Jump, Med Ball " \
                "Sit-up Throw, SkiErg, Farmer's Carry, Air Bike, Dead Ball Yoke Over, " \
                "Sled Push/Pull, RAM Weighted Burpees. When race_simulation? is true the " \
-               "builder sets finisher: :required."
+               "builder sets finisher: :required. The race stations remain the primary " \
+               "movements; supplementary exercises (see vocabulary) can appear occasionally " \
+               "for variety but stations should still dominate."
       }.freeze
 
       MOVEMENT_VOCABULARY = <<~VOCAB.freeze
-        Run zones:   Treadmill 500m
-        Functional:  RAM Reverse Lunges, Row 500m, Box Jump, Med Ball Sit-up Throw, SkiErg 500m,
-                     Farmer's Carry, Air Bike 25 cal, Dead Ball Yoke Over, Sled Push/Pull, RAM Weighted Burpees
+        Run zones:     Treadmill 500m
+        Functional:    RAM Reverse Lunges, Row 500m, Box Jump, Med Ball Sit-up Throw, SkiErg 500m,
+                       Farmer's Carry, Air Bike 25 cal, Dead Ball Yoke Over, Sled Push/Pull, RAM Weighted Burpees
+        Supplementary: KB Swings, KB Thrusters, KB High Pull, Wall Balls, Walking Lunges, Jump Squats, Push-ups, Med Ball Slams, KB Shoulder Press (use sparingly — stations remain primary)
       VOCAB
 
       EXAMPLES = [
