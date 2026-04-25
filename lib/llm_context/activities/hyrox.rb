@@ -48,13 +48,13 @@ module LLMContext
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "rowing_machine" } ] },
-            { name: "Run–Station Rounds", format: "rounds", rounds: 4, rest_secs: 30,
+            { name: "Last Mile", format: "rounds", rounds: 4, rest_secs: 30,
               exercises: [
                 { name: "Run", reps: "500m", equipment: "treadmill" },
                 { name: "SkiErg", reps: "250m", equipment: "ski_erg" },
                 { name: "Wall Balls", reps: 20, equipment: "wall_ball" }
               ] },
-            { name: "Run Finisher", format: "for_time",
+            { name: "Run to Victory", format: "for_time",
               exercises: [ { name: "Run", reps: "1km", equipment: "treadmill" } ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
@@ -67,9 +67,9 @@ module LLMContext
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 3,
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 180, equipment: "ski_erg" } ] },
-            { name: "Run Repeats", format: "rounds", rest_secs: 45,
+            { name: "Lung Buster", format: "rounds", rest_secs: 45,
               exercises: [ { name: "Run", reps: "500m", equipment: "treadmill" } ] },
-            { name: "Station Circuit", format: "for_time",
+            { name: "Cooked", format: "for_time",
               exercises: [
                 { name: "Sled Push", reps: "20m", equipment: "sled" },
                 { name: "Farmer's Carry", reps: "40m", equipment: "kettlebells" },
@@ -86,15 +86,15 @@ module LLMContext
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
-            { name: "Treadmill Engine", format: "rounds", rounds: 5, rest_secs: 60,
+            { name: "Engine Builder", format: "rounds", rounds: 5, rest_secs: 60,
               exercises: [ { name: "Run", reps: "400m", notes: "hard pace", equipment: "treadmill" } ] },
-            { name: "Stations Block", format: "emom", duration_mins: 15, rest_secs: 0,
+            { name: "Heavy Hands", format: "emom", duration_mins: 15, rest_secs: 0,
               exercises: [
                 { name: "Row", reps: "15 cal", equipment: "rowing_machine" },
                 { name: "Sandbag Lunges", reps: "20m", equipment: "sled" },
                 { name: "SkiErg", reps: "15 cal", equipment: "ski_erg" }
               ] },
-            { name: "Race Simulation", format: "for_time",
+            { name: "Final Boss", format: "for_time",
               exercises: [
                 { name: "Run", reps: "1km", equipment: "treadmill" },
                 { name: "Wall Balls", reps: 50, equipment: "wall_ball" }

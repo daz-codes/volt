@@ -52,13 +52,13 @@ module LLMContext
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 3,
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 180, equipment: "rowing_machine" } ] },
-            { name: "Run-Station Rounds", format: "rounds", rounds: 4, rest_secs: 30,
+            { name: "Hammer Time", format: "rounds", rounds: 4, rest_secs: 30,
               exercises: [
                 { name: "Run", reps: "500m", equipment: "treadmill" },
                 { name: "Sled Push", reps: "15m", equipment: "sled" },
                 { name: "Wall Balls", reps: 15, equipment: "wall_ball" }
               ] },
-            { name: "Burpee Finisher", format: "for_time",
+            { name: "Cooked", format: "for_time",
               exercises: [ { name: "Burpee Broad Jumps", reps: 20, equipment: "bodyweight" } ] },
             { name: "Cool-Down", format: "straight", duration_mins: 2,
               exercises: [ { name: "Dynamic stretches", notes: "5 deep breaths" } ] }
@@ -71,9 +71,9 @@ module LLMContext
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
-            { name: "Run Repeats", format: "rounds", rounds: 4, rest_secs: 60,
+            { name: "Engine Builder", format: "rounds", rounds: 4, rest_secs: 60,
               exercises: [ { name: "Run", reps: "500m", notes: "hard pace", equipment: "treadmill" } ] },
-            { name: "Mixed Stations", format: "rounds", rounds: 4, rest_secs: 60,
+            { name: "Heavy Hands", format: "rounds", rounds: 4, rest_secs: 60,
               exercises: [
                 { name: "RAM Reverse Lunges", reps: 12 },
                 { name: "KB Thrusters", reps: 12, equipment: "kettlebells" },
@@ -90,19 +90,19 @@ module LLMContext
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "rowing_machine" } ] },
-            { name: "Run-Station Circuit", format: "rounds", rounds: 4, rest_secs: 60,
+            { name: "Tip of the Spear", format: "rounds", rounds: 4, rest_secs: 60,
               exercises: [
                 { name: "Run", reps: "500m", equipment: "treadmill" },
                 { name: "Sled Push", reps: "15m", equipment: "sled" },
                 { name: "Sandbag Lunges", reps: "20m", equipment: "sled" }
               ] },
-            { name: "Mixed Strength Stations", format: "rounds", rounds: 5, rest_secs: 60,
+            { name: "Iron Storm", format: "rounds", rounds: 5, rest_secs: 60,
               exercises: [
                 { name: "RAM Reverse Lunges", reps: 12 },
                 { name: "KB Thrusters", reps: 12, equipment: "kettlebells" },
                 { name: "Box Jump Burpees", reps: 12, equipment: "bodyweight" }
               ] },
-            { name: "Abs Finisher", format: "rounds", rounds: 3, rest_secs: 30,
+            { name: "Gut Check", format: "rounds", rounds: 3, rest_secs: 30,
               exercises: [
                 { name: "V-ups", reps: 20, equipment: "bodyweight" },
                 { name: "Russian Twists", reps: 20, equipment: "bodyweight" },
