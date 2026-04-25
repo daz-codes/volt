@@ -6,8 +6,8 @@ module LLMContext
 
       CONTRACT = {
         purity: "Deka Strong training — no running. Strength-endurance and station capacity " \
-                "via the 10 weighted functional zones, but most sessions use 4-6 stations " \
-                "with supplementary movement work, NOT a full 10-zone simulation.",
+                "via the 10 weighted functional zones. Most sessions use 4-6 stations with " \
+                "supplementary movement work; full 10-zone sessions are valid but uncommon.",
         allowed_equipment: %w[rowing_machine ski_erg assault_bike wall_ball sled kettlebells],
         banned_equipment:  %w[treadmill barbell dumbbells pull_up_bar resistance_bands jump_rope],
         banned_exercise_patterns: [
@@ -23,12 +23,12 @@ module LLMContext
                "instead — 30s hard/30s easy or 400m repeats. Stations: RAM Reverse Lunges, " \
                "Row, Box Jump, Med Ball Sit-up Throw, SkiErg, Farmer's Carry, Air Bike, " \
                "Dead Ball Yoke Over, Sled Push/Pull, RAM Weighted Burpees. **Most sessions " \
-               "use 4-6 stations, not all 10** — full 10-zone simulations are reserved for " \
-               "race-prep sessions only (triggered by 'race sim' in session notes). " \
-               "**Include 1-2 supplementary movements** (KB Swings, KB Thrusters, Wall Balls, " \
-               "walking lunges, burpee variations like Box Jump Burpees) in most sessions — " \
-               "they keep training varied and complement the stations. An abs finisher " \
-               "(sit-ups, leg raises, planks, V-ups, Russian twists) is a good optional close-out."
+               "use 4-6 stations** with supplementary movement work; full 10-zone sessions " \
+               "are valid but uncommon — roughly 1 in 5 workouts. **Include 1-2 supplementary " \
+               "movements** (KB Swings, KB Thrusters, Wall Balls, walking lunges, burpee " \
+               "variations like Box Jump Burpees) in most sessions — they keep training " \
+               "varied and complement the stations. An abs finisher (sit-ups, leg raises, " \
+               "planks, V-ups, Russian twists) is a good optional close-out."
       }.freeze
 
       MOVEMENT_VOCABULARY = <<~VOCAB.freeze
