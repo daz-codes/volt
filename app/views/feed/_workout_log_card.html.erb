@@ -152,9 +152,6 @@
     <% end %>
   </div>
 
-  <%# ── Workout summary (main + finisher sections only) + View Workout link ── %>
-  <%= render "workouts/summary", workout: workout %>
-
   <%= turbo_frame_tag dom_id(workout_log, :comments) %>
 
 </div>
