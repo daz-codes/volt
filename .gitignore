@@ -39,6 +39,9 @@
 # Claude Code per-user local overrides (permission allowlists etc.)
 /.claude/settings.local.json
 
+# ProtonDrive sync conflict files — never commit these
+**/*\#\ Edit\ conflict\ *\#*
+
 
 /app/assets/builds/*
 !/app/assets/builds/.keep
