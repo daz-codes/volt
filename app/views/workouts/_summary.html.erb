@@ -29,13 +29,5 @@
       <% end %>
     </div>
 
-    <%= link_to workout_path(workout),
-          data: { turbo_frame: "_top" },
-          class: "block bg-zinc-800 hover:bg-zinc-700/60 border border-zinc-600/60 hover:border-lime-400/60 rounded-xl px-3 py-2.5 text-center transition-colors mt-4" do %>
-      <span class="inline-flex items-center gap-1.5 text-gray-400 text-xs font-bold uppercase tracking-wide">
-        View Workout
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-      </span>
-    <% end %>
   </div>
 <% end %>
