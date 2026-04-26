@@ -1,0 +1,23 @@
+<%# Compact HTML summary for use in feed cards.
+    Renders main + finisher sections only (warm-ups and cool-downs are skipped
+    to keep the summary tight). Includes a "View Workout" link at the bottom.
+    Locals: workout %>
+<% summary_sections = (workout.structure.is_a?(Hash) ? Array(workout.structure["sections"]) : [])
+                       .reject { |s| %w[warm_up cool_down].include?(s["category"].to_s) } %>
+
+<% if summary_sections.any? %>
+  <div class="bg-zinc-900 border-t border-zinc-700/40 px-3 py-3 space-y-2">
+    <% summary_sections.each do |section| %>
+      <%= render "shared/workout_section", section: section, distance_sport: false %>
+    <% end %>
+
+    <%= link_to workout_path(workout),
+          data: { turbo_frame: "_top" },
+          class: "block bg-zinc-800 hover:bg-zinc-700/60 border border-zinc-600/60 hover:border-lime-400/60 rounded-xl px-3 py-2.5 text-center transition-colors mt-3" do %>
+      <span class="inline-flex items-center gap-1.5 text-gray-400 text-xs font-bold uppercase tracking-wide">
+        View Workout
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      </span>
+    <% end %>
+  </div>
+<% end %>

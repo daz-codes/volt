@@ -1,12 +1,8 @@
-<% structure  = workout_log.workout.structure %>
 <% workout    = workout_log.workout %>
 <% liked      = liked_workout_ids.include?(workout.id) %>
 <% like_count = workout.workout_likes.size %>
 <% is_own     = workout_log.user == Current.user %>
 <% in_library = local_assigns[:library_workout_ids] ? library_workout_ids.include?(workout.id) : is_own %>
-
-<% sections = structure.is_a?(Hash) ? Array(structure["sections"]) : [] %>
-<% goal = structure.is_a?(Hash) ? structure["goal"] : nil %>
 
 <div class="bg-zinc-800 sm:border sm:border-zinc-600/70 sm:rounded-2xl overflow-hidden shadow-sm hover:border-gray-600 hover:shadow-md transition-all duration-200">
 
@@ -151,31 +147,8 @@
     <% end %>
   </div>
 
-  <%# ── Show/Hide Workout toggle ── %>
-  <details data-controller="details-toggle">
-    <summary class="bg-zinc-900 border-t border-zinc-700/50 px-4 py-2.5 list-none cursor-pointer select-none text-center">
-      <span data-details-toggle-target="showLabel" class="inline-flex items-center gap-1.5 text-gray-500 text-xs font-bold uppercase tracking-wide hover:text-gray-300 transition-colors">
-        Show Workout
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-      </span>
-      <span data-details-toggle-target="hideLabel" style="display:none" class="items-center gap-1.5 text-gray-400 text-xs font-bold uppercase tracking-wide hover:text-gray-300 transition-colors">
-        Hide Workout
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
-      </span>
-    </summary>
-    <div class="bg-zinc-900 border-t border-zinc-700/40 px-3 py-3 space-y-2">
-      <% if goal.present? %>
-        <p class="text-gray-500 text-sm italic leading-snug mb-2"><%= goal %></p>
-      <% end %>
-      <% if sections.any? %>
-        <% sections.each do |section| %>
-          <%= render "shared/workout_section", section: section, distance_sport: false %>
-        <% end %>
-      <% else %>
-        <p class="text-gray-600 text-sm text-center py-4">No workout details added yet</p>
-      <% end %>
-    </div>
-  </details>
+  <%# ── Workout summary (main + finisher sections only) + View Workout link ── %>
+  <%= render "workouts/summary", workout: workout %>
 
   <%= turbo_frame_tag dom_id(workout_log, :comments) %>
 

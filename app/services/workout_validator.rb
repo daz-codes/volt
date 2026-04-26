@@ -90,6 +90,7 @@ class WorkoutValidator
     fix_cardio_machine_reps(sections)
     fix_speed_language(sections)
     fix_switchback_inference(sections)
+    fix_ladder_switchback_strip_metrics(sections)
     if @main_tag_slug == "turbine"
       fix_turbine_formats(sections)
       fix_turbine_block_durations(sections)
