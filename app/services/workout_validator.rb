@@ -90,6 +90,7 @@ class WorkoutValidator
     fix_cardio_machine_reps(sections)
     fix_speed_language(sections)
     fix_switchback_inference(sections)
+    fix_ladder_switchback_strip_metrics(sections)
     if @main_tag_slug == "turbine"
       fix_turbine_formats(sections)
       fix_turbine_block_durations(sections)
@@ -1283,6 +1284,28 @@ class WorkoutValidator
   # often emits format: rounds with single values, which renders as a flat couplet.
   SWITCHBACK_NAME_HINT = /\bup\s*(?:and|&|n)\s*(?:back|down)\b|\bswitch.?back\b|\bup.?down\b/i.freeze
   CAL_CARDIO_PATTERN   = /\b(rower|rowing\s*machine|ski\s*erg|skierg|assault\s*bike|echo\s*bike|air\s*bike|fan\s*bike)\b/i.freeze
+
+  # Ladder, mountain, and switchback formats derive per-rung values from the
+  # section-level `start`/`end`/`step` fields. Per-exercise `reps`/`calories`/
+  # `distance_m`/`duration_s` are ignored by the renderer but make the JSON
+  # look conflicting and confuse anyone editing the data. Strip them so the
+  # section-level values are the single source of truth.
+  def fix_ladder_switchback_strip_metrics(sections)
+    sections.each do |section|
+      next unless %w[ladder mountain switchback].include?(section["format"])
+      Array(section["exercises"]).each do |ex|
+        stripped = []
+        %w[reps calories distance_m duration_s weight_kg].each do |key|
+          next unless ex.key?(key) && ex[key]
+          stripped << "#{key}=#{ex[key]}"
+          ex.delete(key)
+        end
+        if stripped.any?
+          @fixes << "#{section["format"].capitalize} '#{section["name"]}' / '#{ex["name"]}': stripped per-exercise #{stripped.join(", ")} (derived from section start/end/step)"
+        end
+      end
+    end
+  end
 
   def fix_switchback_inference(sections)
     sections.each do |section|

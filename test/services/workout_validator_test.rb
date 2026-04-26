@@ -434,6 +434,40 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
     assert_nil floor["reps"]
   end
 
+  test "fix_ladder_switchback_strip_metrics removes per-exercise values when section is switchback" do
+    data = build_workout_with_sections([
+      { "name" => "Up and Back", "category" => "main", "format" => "switchback",
+        "varies" => "calories", "start" => 30, "end" => 10, "step" => 5, "rest_between_rungs" => 45,
+        "exercises" => [
+          { "name" => "Assault Bike", "calories" => 25, "notes" => "hard effort" },
+          { "name" => "Thrusters",    "reps" => 5,      "notes" => "moderate load" }
+        ] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 30, main_tag_slug: "").validate_and_fix
+    section = result.dig("structure", "sections").first
+    assert_equal 30, section["start"]
+    assert_equal 10, section["end"]
+    cardio = section["exercises"].find { |ex| ex["name"].match?(/bike/i) }
+    floor  = section["exercises"].find { |ex| ex["name"].match?(/thruster/i) }
+    assert_nil cardio["calories"]
+    assert_nil floor["reps"]
+    assert_equal "hard effort", cardio["notes"]
+    assert_equal "moderate load", floor["notes"]
+  end
+
+  test "fix_ladder_switchback_strip_metrics removes per-exercise values when section is a ladder" do
+    data = build_workout_with_sections([
+      { "name" => "Run Ladder", "category" => "main", "format" => "ladder",
+        "varies" => "distance_m", "start" => 400, "end" => 100, "step" => 100,
+        "exercises" => [
+          { "name" => "Run", "distance_m" => 250, "equipment" => "treadmill" }
+        ] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 30, main_tag_slug: "").validate_and_fix
+    ex = result.dig("structure", "sections").first["exercises"].first
+    assert_nil ex["distance_m"]
+  end
+
   test "fix_switchback_inference leaves non-switchback-named sections alone" do
     data = build_workout_with_sections([
       { "name" => "Cardio + Strength", "category" => "main", "format" => "rounds", "rounds" => 3,
