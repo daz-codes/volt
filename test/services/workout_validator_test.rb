@@ -411,6 +411,42 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
     refute_match(/km\/h/i, ex["notes"].to_s)
   end
 
+  # -- Switchback inference --
+
+  test "fix_switchback_inference converts 'Up and Back' rounds into switchback format" do
+    data = build_workout_with_sections([
+      { "name" => "Up and Back", "category" => "main", "format" => "rounds", "rounds" => 5,
+        "exercises" => [
+          { "name" => "Assault Bike", "calories" => 25 },
+          { "name" => "Thrusters",    "reps" => 5 }
+        ] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 30, main_tag_slug: "").validate_and_fix
+    section = result.dig("structure", "sections").first
+    assert_equal "switchback", section["format"]
+    assert_equal 25, section["start"]
+    assert_equal 5,  section["end"]
+    assert_equal 5,  section["step"]
+    # Switchback derives per-rung values from start/end/step — exercise rows should not carry them.
+    cardio = section["exercises"].find { |ex| ex["name"].match?(/bike/i) }
+    floor  = section["exercises"].find { |ex| ex["name"].match?(/thruster/i) }
+    assert_nil cardio["calories"]
+    assert_nil floor["reps"]
+  end
+
+  test "fix_switchback_inference leaves non-switchback-named sections alone" do
+    data = build_workout_with_sections([
+      { "name" => "Cardio + Strength", "category" => "main", "format" => "rounds", "rounds" => 3,
+        "exercises" => [
+          { "name" => "Assault Bike", "calories" => 15 },
+          { "name" => "Thrusters",    "reps" => 10 }
+        ] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 30, main_tag_slug: "").validate_and_fix
+    section = result.dig("structure", "sections").first
+    assert_equal "rounds", section["format"]
+  end
+
   test "fix_speed_language leaves clean notes alone" do
     data = build_workout_with_sections([
       { "name" => "Run Block", "category" => "main", "format" => "rounds", "rounds" => 3,

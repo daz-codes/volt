@@ -70,9 +70,14 @@ export default class extends Controller {
             <option value="rounds">Rounds</option>
             <option value="amrap">AMRAP</option>
             <option value="emom">EMOM</option>
+            <option value="continuous_circuit">Continuous Circuit</option>
             <option value="tabata">Tabata</option>
+            <option value="for_time">For Time</option>
             <option value="ladder">Ladder</option>
             <option value="mountain">Mountain</option>
+            <option value="matrix">Matrix</option>
+            <option value="hundred">Hundred</option>
+            <option value="switchback">Switchback</option>
           </select>
           <button type="button" data-action="builder#insertSectionAbove"
             class="text-gray-600 hover:text-lime-400 transition-colors flex-shrink-0 p-1" aria-label="Insert section above" title="Insert section above">

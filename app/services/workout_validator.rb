@@ -89,6 +89,7 @@ class WorkoutValidator
     fix_cardio_missing_metric(sections)
     fix_cardio_machine_reps(sections)
     fix_speed_language(sections)
+    fix_switchback_inference(sections)
     if @main_tag_slug == "turbine"
       fix_turbine_formats(sections)
       fix_turbine_block_durations(sections)
@@ -1272,6 +1273,63 @@ class WorkoutValidator
           ex.delete("notes")
         end
       end
+    end
+  end
+
+  # Detect 2-exercise sections that look like switchback intent (one cal-cardio
+  # paired with one rep-based floor movement, with section name suggesting up-and-
+  # down) and convert to format: switchback so the renderer shows the proper
+  # descending/ascending sequence under each exercise. Without this the LLM
+  # often emits format: rounds with single values, which renders as a flat couplet.
+  SWITCHBACK_NAME_HINT = /\bup\s*(?:and|&|n)\s*(?:back|down)\b|\bswitch.?back\b|\bup.?down\b/i.freeze
+  CAL_CARDIO_PATTERN   = /\b(rower|rowing\s*machine|ski\s*erg|skierg|assault\s*bike|echo\s*bike|air\s*bike|fan\s*bike)\b/i.freeze
+
+  def fix_switchback_inference(sections)
+    sections.each do |section|
+      next if section["format"] == "switchback"
+      next unless section["name"].to_s.match?(SWITCHBACK_NAME_HINT)
+      exercises = Array(section["exercises"])
+      next unless exercises.size == 2
+
+      cardio_idx = exercises.find_index { |ex| ex["name"].to_s.match?(CAL_CARDIO_PATTERN) && ex["calories"].to_i > 0 }
+      floor_idx  = exercises.find_index { |ex| ex["reps"].to_i > 0 }
+      next unless cardio_idx && floor_idx && cardio_idx != floor_idx
+
+      cardio = exercises[cardio_idx]
+      floor  = exercises[floor_idx]
+
+      # Switchback: cardio side counts down, floor side counts up.
+      # Use the larger of the two as the start; smaller as the end.
+      hi = [ cardio["calories"].to_i, floor["reps"].to_i ].max
+      lo = [ cardio["calories"].to_i, floor["reps"].to_i ].min
+      step = case hi - lo
+             when 0..0 then 5
+             when 1..15 then 5
+             else 5
+             end
+      # Snap to multiples of 5 and ensure ≥3 rungs.
+      hi = (hi / 5.0).round * 5
+      lo = (lo / 5.0).round * 5
+      hi = 25 if hi < 15 || hi == lo
+      lo = 5  if lo < 5  || hi == lo
+      lo = hi - (step * 4) if (hi - lo) < step * 2
+
+      # Reorder exercises so cardio is first (descending side per the schema).
+      ordered = [ cardio, floor ]
+      # Strip baked-in single values — switchback derives them from start/end/step.
+      %w[reps calories distance_m duration_s].each do |k|
+        ordered.each { |ex| ex.delete(k) }
+      end
+
+      section["format"] = "switchback"
+      section["start"]  = hi
+      section["end"]    = lo
+      section["step"]   = step
+      section["exercises"] = ordered
+      section.delete("rounds")
+      section.delete("rest_secs")
+
+      @fixes << "'#{section["name"]}': inferred switchback (#{hi}→#{lo}, step #{step}) from up-and-back pattern"
     end
   end
 
