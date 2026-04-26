@@ -56,7 +56,7 @@
 
     <%# Photo %>
     <% if @workout_log.photo.attached? %>
-      <%= image_tag @workout_log.photo, class: "w-full max-h-72 object-cover border-t border-zinc-700" %>
+      <%= image_tag @workout_log.photo, class: "w-full h-auto border-t border-zinc-700" %>
     <% end %>
 
     <%# Notes %>
