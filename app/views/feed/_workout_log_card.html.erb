@@ -48,6 +48,9 @@
     <%= image_tag workout_log.photo, class: "w-full h-auto" %>
   <% end %>
 
+  <%# ── Workout summary (main + finisher sections only) + View Workout link ── %>
+  <%= render "workouts/summary", workout: workout %>
+
   <% if workout_log.notes.present? %>
     <div class="px-4 pt-3 pb-3">
       <p class="text-gray-500 text-sm italic leading-snug"><%= workout_log.notes %></p>
@@ -146,9 +149,6 @@
       <span id="liked_by_<%= workout.id %>"></span>
     <% end %>
   </div>
-
-  <%# ── Workout summary (main + finisher sections only) + View Workout link ── %>
-  <%= render "workouts/summary", workout: workout %>
 
   <%= turbo_frame_tag dom_id(workout_log, :comments) %>
 
