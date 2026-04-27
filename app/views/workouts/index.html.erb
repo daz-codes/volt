@@ -181,9 +181,10 @@
 
           <%# Card body %>
           <div class="px-4 pt-4 pb-3">
-            <p class="text-gray-300 text-2xl leading-tight tracking-tight font-jost uppercase">
+            <%= link_to workout_path(workout),
+                  class: "block text-gray-300 text-2xl leading-tight tracking-tight font-jost uppercase hover:text-lime-400 transition-colors" do %>
               <%= workout.name.presence || "Untitled Workout" %>
-            </p>
+            <% end %>
             <div class="flex items-center justify-between gap-3 mt-2">
               <% if workout.activity.present? %>
                 <p class="text-lime-400 font-black text-xs uppercase tracking-wide leading-none"><%= workout.activity.name %></p>
