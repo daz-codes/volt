@@ -691,13 +691,18 @@ class WorkoutValidator
 
   # Snaps rest_secs to the nearest allowed value: 30, 45, or 60.
   # Any rest longer than 60s is capped at 60; anything below 30 stays as-is (short transitions are fine).
-  ALLOWED_REST = [ 30, 45, 60 ].freeze
+  ALLOWED_REST            = [ 30, 45, 60 ].freeze
+  ALLOWED_REST_MAX_EFFORT = [ 90, 120, 150, 180 ].freeze
 
   def fix_rest_secs(sections)
     sections.each do |section|
       rest = section["rest_secs"].to_i
       next if rest.zero? || rest <= 20  # no rest or very short transition — leave alone
-      snapped = ALLOWED_REST.min_by { |v| (v - rest).abs }
+
+      # Max-effort sections (heavy lifts, sprint intervals) need long rest.
+      # Snap to the wider 90/120/150/180 grid; never coerce to 60s.
+      allowed = section["intensity_style"] == "max_effort" ? ALLOWED_REST_MAX_EFFORT : ALLOWED_REST
+      snapped = allowed.min_by { |v| (v - rest).abs }
       next if snapped == rest
       @fixes << "'#{section["name"]}': rest_secs #{rest}s → #{snapped}s"
       section["rest_secs"] = snapped
@@ -711,6 +716,9 @@ class WorkoutValidator
   def fix_rest_ratio(sections)
     sections.each do |section|
       next if section["format"] == "tabata"
+      # max_effort sections deliberately have long rest (heavy lifts, sprint
+      # intervals) — rest > work is the point.
+      next if section["intensity_style"] == "max_effort"
       rest = section["rest_secs"].to_i
       next if rest.zero?
 

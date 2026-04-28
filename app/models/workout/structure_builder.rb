@@ -34,6 +34,7 @@ module Workout::StructureBuilder
         "format"   => format
       }
       section["emom_style"]    = emom_style              if format == "emom" && %w[circuit rotating].include?(emom_style)
+      section["intensity_style"] = s[:intensity_style].to_s if %w[zone_2 conditioning max_effort].include?(s[:intensity_style].to_s)
       section["rounds"]        = s[:rounds].to_i         if s[:rounds].present?
       section["duration_mins"] = s[:duration_mins].to_i  if s[:duration_mins].present?
       section["rest_secs"]     = s[:rest_secs].to_i      if s[:rest_secs].present?
