@@ -21,7 +21,7 @@ class WorkoutLLMGenerator::ContractPromptBuilderTest < ActiveSupport::TestCase
   end
 
   test "omits session_notes tag when no notes given" do
-    refute_includes build, "<session_notes>"
+    refute_includes build, "</session_notes>"
   end
 
   test "includes session_notes tag when notes given" do
@@ -29,7 +29,7 @@ class WorkoutLLMGenerator::ContractPromptBuilderTest < ActiveSupport::TestCase
   end
 
   test "omits intensity_style tag when not given" do
-    refute_includes build, "<intensity_style>"
+    refute_includes build, "</intensity_style>"
   end
 
   test "includes intensity_style tag when set" do
