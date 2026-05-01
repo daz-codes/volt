@@ -88,6 +88,29 @@
       </div>
     </div>
 
+    <%# Intensity — session-wide directive (Mixed = no-op default) %>
+    <div class="mb-6">
+      <p class="text-sm font-semibold text-gray-300 uppercase tracking-wide mb-3">Intensity</p>
+      <% intensity_options = [
+        { value: "",             label: "Mixed",        default: true  },
+        { value: "zone_2",       label: "Zone 2",       default: false },
+        { value: "conditioning", label: "Conditioning", default: false },
+        { value: "max_effort",   label: "Max Effort",   default: false }
+      ] %>
+      <div class="flex flex-wrap gap-2">
+        <% intensity_options.each do |opt| %>
+          <label class="cursor-pointer">
+            <%= radio_button_tag "intensity_style", opt[:value], opt[:default],
+                id: "intensity_#{opt[:value].presence || 'mixed'}",
+                class: "peer sr-only" %>
+            <div class="px-3 py-1.5 rounded-full border border-zinc-600 text-xs font-semibold text-gray-400 peer-checked:border-lime-400 peer-checked:bg-lime-400/10 peer-checked:text-lime-400 transition-all">
+              <%= opt[:label] %>
+            </div>
+          </label>
+        <% end %>
+      </div>
+    </div>
+
     <%# Session Notes — free text %>
     <div class="mb-6">
       <p class="text-sm font-semibold text-gray-300 uppercase tracking-wide mb-1">Training Notes</p>
