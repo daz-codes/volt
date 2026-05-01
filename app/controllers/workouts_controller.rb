@@ -442,20 +442,22 @@ class WorkoutsController < ApplicationController
       return
     end
 
-    activity       = params[:activity].presence || params[:custom_activity].presence
-    session_notes  = params[:session_notes].presence
-    group_tag_name = params[:group_code].presence
-    equipment      = Array(params[:equipment]).compact_blank.intersection(User::EQUIPMENT_SLUGS)
-    injury_notes   = params[:injury_notes].presence
+    activity        = params[:activity].presence || params[:custom_activity].presence
+    session_notes   = params[:session_notes].presence
+    group_tag_name  = params[:group_code].presence
+    equipment       = Array(params[:equipment]).compact_blank.intersection(User::EQUIPMENT_SLUGS)
+    injury_notes    = params[:injury_notes].presence
+    intensity_style = params[:intensity_style].to_s.presence_in(%w[zone_2 conditioning max_effort])
 
     generator = WorkoutLLMGenerator.new(
-      user:           Current.user,
-      activity:       activity,
-      session_notes:  session_notes,
-      group_tag_name: group_tag_name,
-      duration_mins:  params[:duration_mins],
-      equipment:      equipment,
-      injury_notes:   injury_notes,
+      user:            Current.user,
+      activity:        activity,
+      session_notes:   session_notes,
+      group_tag_name:  group_tag_name,
+      duration_mins:   params[:duration_mins],
+      equipment:       equipment,
+      injury_notes:    injury_notes,
+      intensity_style: intensity_style,
     )
     result = generator.generate
 

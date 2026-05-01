@@ -1,6 +1,27 @@
 require "test_helper"
+require "ostruct"
 
 class WorkoutsControllerTest < ActionDispatch::IntegrationTest
+  # Temporarily replaces WorkoutLLMGenerator.new with a kwarg-capturing stub.
+  # Yields the captured kwargs hash (mutated by the stub) so the test body
+  # can assert on it after the request runs.
+  def with_generator_stub
+    captured = {}
+    fake_result = { attrs: {}, debug_info: [], group_tag_name: nil }
+    fake_instance = OpenStruct.new(generate: fake_result)
+
+    WorkoutLLMGenerator.singleton_class.alias_method(:__orig_new, :new)
+    WorkoutLLMGenerator.define_singleton_method(:new) do |**kwargs|
+      captured.merge!(kwargs)
+      fake_instance
+    end
+
+    yield captured
+  ensure
+    WorkoutLLMGenerator.singleton_class.send(:alias_method, :new, :__orig_new)
+    WorkoutLLMGenerator.singleton_class.send(:remove_method, :__orig_new)
+  end
+
   setup do
     @user = users(:one)
     sign_in_as(@user)
@@ -58,6 +79,27 @@ class WorkoutsControllerTest < ActionDispatch::IntegrationTest
     standalone = workouts(:strength_session)
     assert_difference "Workout.count", -1 do
       delete workout_path(standalone)
+    end
+  end
+
+  test "create_with_llm forwards intensity_style to generator when valid" do
+    with_generator_stub do |captured|
+      post workouts_path, params: { activity: "Functional Muscle", duration_mins: 45, intensity_style: "zone_2" }
+      assert_equal "zone_2", captured[:intensity_style]
+    end
+  end
+
+  test "create_with_llm passes nil when intensity_style is blank" do
+    with_generator_stub do |captured|
+      post workouts_path, params: { activity: "Functional Muscle", duration_mins: 45, intensity_style: "" }
+      assert_nil captured[:intensity_style]
+    end
+  end
+
+  test "create_with_llm rejects unknown intensity_style values" do
+    with_generator_stub do |captured|
+      post workouts_path, params: { activity: "Functional Muscle", duration_mins: 45, intensity_style: "garbage" }
+      assert_nil captured[:intensity_style]
     end
   end
 end
