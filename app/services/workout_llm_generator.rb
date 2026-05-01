@@ -73,11 +73,11 @@ class WorkoutLLMGenerator
     }
   }.freeze
 
-  def self.call(user:, duration_mins:, activity: nil, group_tag_name: nil, source_workout: nil, session_notes: nil, **_legacy)
-    new(user: user, activity: activity, group_tag_name: group_tag_name, duration_mins: duration_mins, source_workout: source_workout, session_notes: session_notes).call
+  def self.call(user:, duration_mins:, activity: nil, group_tag_name: nil, source_workout: nil, session_notes: nil, intensity_style: nil, **_legacy)
+    new(user: user, activity: activity, group_tag_name: group_tag_name, duration_mins: duration_mins, source_workout: source_workout, session_notes: session_notes, intensity_style: intensity_style).call
   end
 
-  def initialize(user:, duration_mins:, activity: nil, group_tag_name: nil, source_workout: nil, session_notes: nil, equipment: nil, injury_notes: nil, **_legacy)
+  def initialize(user:, duration_mins:, activity: nil, group_tag_name: nil, source_workout: nil, session_notes: nil, equipment: nil, injury_notes: nil, intensity_style: nil, **_legacy)
     @user           = user
     @activity       = activity.presence
     raw_slug        = @activity&.parameterize
@@ -86,6 +86,7 @@ class WorkoutLLMGenerator
     @duration_mins  = duration_mins.to_i
     @source_workout = source_workout
     @session_notes  = sanitize_user_input(session_notes)
+    @intensity_style = intensity_style.to_s.presence_in(%w[zone_2 conditioning max_effort])
     # Equipment explicitly passed in (generate form) overrides profile default.
     # Falls back to the user's saved profile equipment. nil/empty means "no constraint".
     raw_equipment   = equipment.nil? ? Array(@user&.equipment) : Array(equipment)
@@ -584,6 +585,7 @@ class WorkoutLLMGenerator
       duration_mins:             @duration_mins,
       athlete_block:             build_athlete_block_for_contract,
       session_notes:             sanitized_session_notes,
+      intensity_style:           @intensity_style,
       banned_equipment_override: profile_banned_equipment + session_note_banned_equipment,
       contract_override:         contract
     ).build
