@@ -1,13 +1,14 @@
 require "test_helper"
 
 class WorkoutLLMGenerator::ContractPromptBuilderTest < ActiveSupport::TestCase
-  def build(activity_slug: "kettlebell", duration_mins: 45, athlete: "test athlete", session_notes: nil, banned_override: [])
+  def build(activity_slug: "kettlebell", duration_mins: 45, athlete: "test athlete", session_notes: nil, banned_override: [], intensity_style: nil)
     WorkoutLLMGenerator::ContractPromptBuilder.new(
       activity: LLMContext::Activities.for!(activity_slug),
       duration_mins: duration_mins,
       athlete_block: athlete,
       session_notes: session_notes,
-      banned_equipment_override: banned_override
+      banned_equipment_override: banned_override,
+      intensity_style: intensity_style
     ).build
   end
 
@@ -25,6 +26,23 @@ class WorkoutLLMGenerator::ContractPromptBuilderTest < ActiveSupport::TestCase
 
   test "includes session_notes tag when notes given" do
     assert_includes build(session_notes: "no running please"), "<session_notes>"
+  end
+
+  test "omits intensity_style tag when not given" do
+    refute_includes build, "<intensity_style>"
+  end
+
+  test "includes intensity_style tag when set" do
+    prompt = build(intensity_style: "zone_2")
+    assert_includes prompt, "<intensity_style>\nzone_2\n</intensity_style>"
+  end
+
+  test "intensity_style tag appears before session_notes tag" do
+    prompt = build(intensity_style: "max_effort", session_notes: "no running")
+    intensity_pos = prompt.index("<intensity_style>")
+    notes_pos = prompt.index("<session_notes>")
+    assert intensity_pos && notes_pos, "both tags must be present"
+    assert intensity_pos < notes_pos, "intensity_style must come before session_notes"
   end
 
   test "iron-engine prompt includes KETTLEBELL ONLY purity statement" do

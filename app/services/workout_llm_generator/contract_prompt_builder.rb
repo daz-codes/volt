@@ -18,13 +18,14 @@ class WorkoutLLMGenerator
 
     GLOBAL_RULES_PATH = Rails.root.join("app/llm_context/shared/global_rules.md").freeze
 
-    def initialize(activity:, duration_mins:, athlete_block:, session_notes: nil, banned_equipment_override: [], contract_override: nil)
+    def initialize(activity:, duration_mins:, athlete_block:, session_notes: nil, banned_equipment_override: [], contract_override: nil, intensity_style: nil)
       @activity = activity
       @duration_mins = duration_mins
       @athlete_block = athlete_block
       @session_notes = session_notes
       @banned_override = Array(banned_equipment_override)
       @contract_override = contract_override
+      @intensity_style = intensity_style
     end
 
     def build
@@ -36,6 +37,7 @@ class WorkoutLLMGenerator
       tags << xml(:global_rules, self.class.global_rules)
       tags << xml(:session_shape, session_shape_block)
       tags << xml(:examples, examples_block)
+      tags << xml(:intensity_style, @intensity_style) if @intensity_style.present?
       tags << xml(:session_notes, @session_notes) if @session_notes.present?
       tags.join("\n\n")
     end
