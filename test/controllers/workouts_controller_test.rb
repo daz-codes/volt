@@ -11,7 +11,7 @@ class WorkoutsControllerTest < ActionDispatch::IntegrationTest
     fake_instance = OpenStruct.new(generate: fake_result)
 
     WorkoutLLMGenerator.singleton_class.alias_method(:__orig_new, :new)
-    WorkoutLLMGenerator.define_singleton_method(:new) do |**kwargs|
+    WorkoutLLMGenerator.define_singleton_method(:new) do |*_args, **kwargs|
       captured.merge!(kwargs)
       fake_instance
     end
