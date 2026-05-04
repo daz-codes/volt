@@ -104,6 +104,21 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
     assert_nil section["notes"], "Section notes with fractional rounds should be stripped after duration snap"
   end
 
+  test "legacy emom + emom_style=rotating shape is normalized to continuous_circuit" do
+    workout_data = build_workout_with_sections([
+      { "name" => "Old Shape", "category" => "main", "format" => "emom", "emom_style" => "rotating",
+        "duration_mins" => 12,
+        "exercises" => [ { "name" => "A", "reps" => 10 }, { "name" => "B", "reps" => 10 }, { "name" => "C", "reps" => 10 } ] }
+    ])
+
+    validator = WorkoutValidator.new(workout_data, duration_mins: 60, main_tag_slug: "")
+    result = validator.validate_and_fix
+
+    section = result.dig("structure", "sections").first
+    assert_equal "continuous_circuit", section["format"]
+    assert_nil section["emom_style"]
+  end
+
   # -- Iron Engine (kettlebell) KB-only enforcement --
 
   test "fix_kettlebell_non_kb_exercises strips non-KB exercises from main sections" do
@@ -539,8 +554,7 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
 
     section = {
       "name" => "Test Circuit",
-      "format" => "emom",
-      "emom_style" => "rotating",
+      "format" => "continuous_circuit",
       "duration_mins" => duration_mins,
       "exercises" => exercise_list
     }

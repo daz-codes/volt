@@ -75,6 +75,8 @@ module Workout::Scalable
       scale_mountain_section(section, factors)
     when "emom"
       scale_emom_section(section, factors)
+    when "continuous_circuit"
+      scale_continuous_circuit_section(section, factors)
     when "amrap", "straight"
       scale_exercises(section["exercises"], factors)
     end
@@ -111,7 +113,17 @@ module Workout::Scalable
     if section["duration_mins"].to_i > 0
       section["duration_mins"] = [ section["duration_mins"].to_i + factors[:emom_mins], 4 ].max
     end
-    scale_exercises(section["exercises"], factors) unless section["emom_style"] == "rotating"
+    scale_exercises(section["exercises"], factors)
+  end
+
+  # Continuous circuits cycle one exercise per minute, so reps fill the minute and
+  # shouldn't scale. Only the total duration scales (more rounds = more total work).
+  def scale_continuous_circuit_section(section, factors)
+    return unless section["duration_mins"].to_i > 0
+    n = Array(section["exercises"]).size
+    raw = section["duration_mins"].to_i + factors[:emom_mins]
+    snapped = n > 0 ? ((raw.to_f / n).ceil * n) : raw
+    section["duration_mins"] = [ snapped, n > 0 ? n : 4 ].max
   end
 
   def scale_exercises(exercises, factors)

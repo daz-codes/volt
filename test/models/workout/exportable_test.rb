@@ -69,6 +69,51 @@ class Workout::ExportableTest < ActiveSupport::TestCase
     end
   end
 
+  test "export_sections renders 2-exercise EMOM as EMOM, not Continuous Circuit, when emom_style is blank" do
+    @workout.structure = {
+      "sections" => [
+        { "name" => "Heavy Station Block", "category" => "main", "format" => "emom", "duration_mins" => 18,
+          "exercises" => [
+            { "name" => "Reverse Lunges", "reps" => 6 },
+            { "name" => "Yoke Over",     "reps" => 5 }
+          ] }
+      ]
+    }
+
+    sections = @workout.export_sections
+    assert_equal "EMOM 18min", sections.first[:label]
+  end
+
+  test "export_sections renders 2-exercise EMOM with emom_style=circuit as EMOM" do
+    @workout.structure = {
+      "sections" => [
+        { "name" => "Couplet", "category" => "main", "format" => "emom", "emom_style" => "circuit", "duration_mins" => 10,
+          "exercises" => [
+            { "name" => "Wall Balls", "reps" => 10 },
+            { "name" => "Box Jumps",  "reps" => 8 }
+          ] }
+      ]
+    }
+
+    sections = @workout.export_sections
+    assert_equal "EMOM 10min", sections.first[:label]
+  end
+
+  test "export_sections renders continuous_circuit format as Continuous Circuit" do
+    @workout.structure = {
+      "sections" => [
+        { "name" => "Cycle", "category" => "main", "format" => "continuous_circuit", "duration_mins" => 12,
+          "exercises" => [
+            { "name" => "Burpees",    "reps" => 10 },
+            { "name" => "Wall Balls", "reps" => 12 }
+          ] }
+      ]
+    }
+
+    sections = @workout.export_sections
+    assert_equal "Continuous Circuit", sections.first[:label]
+  end
+
   test "export_sections returns nil label for single-round rounds format" do
     @workout.structure = {
       "sections" => [

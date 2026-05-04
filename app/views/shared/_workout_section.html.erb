@@ -72,26 +72,26 @@
    when "emom"
      detail_parts = []
      detail_parts << "#{section["duration_mins"]} min" if section["duration_mins"]
-     if section["emom_style"] == "rotating"
-       n = Array(section["exercises"]).size
-       dur = section["duration_mins"].to_i
-       rounds_each = n > 0 && dur > 0 && (dur % n).zero? ? dur / n : nil
-       detail_parts << (rounds_each ? "#{n} exercises · #{rounds_each} rounds each — fill each minute" : "#{n} exercises · fill each minute")
-       ["Continuous Circuit", detail_parts.join(" · ").presence]
+     n = Array(section["exercises"]).size
+     dur = section["duration_mins"].to_i
+     if n >= 3
+       rounds = dur > 0 ? dur / 2 : nil
+       detail_parts << "all #{n} exercises every 2 minutes"
+       detail_parts << "#{rounds} rounds" if rounds && rounds > 1
+       ["E2MOM", detail_parts.join(" · ").presence]
      else
-       n = Array(section["exercises"]).size
-       dur = section["duration_mins"].to_i
-       if n >= 3
-         rounds = dur > 0 ? dur / 2 : nil
-         detail_parts << "all #{n} exercises every 2 minutes"
-         detail_parts << "#{rounds} rounds" if rounds && rounds > 1
-         ["E2MOM", detail_parts.join(" · ").presence]
-       else
-         detail_parts << "both exercises each minute" if n == 2
-         detail_parts << "all #{n} exercises each minute" if n > 2
-         ["EMOM", detail_parts.join(" · ").presence]
-       end
+       detail_parts << "both exercises each minute" if n == 2
+       detail_parts << "all #{n} exercises each minute" if n > 2
+       ["EMOM", detail_parts.join(" · ").presence]
      end
+   when "continuous_circuit"
+     detail_parts = []
+     detail_parts << "#{section["duration_mins"]} min" if section["duration_mins"]
+     n = Array(section["exercises"]).size
+     dur = section["duration_mins"].to_i
+     rounds_each = n > 0 && dur > 0 && (dur % n).zero? ? dur / n : nil
+     detail_parts << (rounds_each ? "#{n} exercises · #{rounds_each} rounds each — fill each minute" : "#{n} exercises · fill each minute")
+     ["Continuous Circuit", detail_parts.join(" · ").presence]
    when "tabata"
      n = Array(section["exercises"]).size
      r = section["rounds"].to_i > 0 ? section["rounds"].to_i : 8

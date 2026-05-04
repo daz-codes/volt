@@ -14,7 +14,7 @@ class Workout < ApplicationRecord
   has_many :tags, through: :taggings
   has_many :shares, as: :shareable, dependent: :destroy
 
-  FORMATS     = %w[straight rounds amrap emom tabata for_time ladder mountain matrix hundred switchback].freeze
+  FORMATS     = %w[straight rounds amrap emom continuous_circuit tabata for_time ladder mountain matrix hundred switchback].freeze
   CATEGORIES  = %w[warm_up main finisher cool_down].freeze
 
   WARMUP_NAME_PATTERN  = /\bwarm|wake.?up|ease.?in|activation|loosen|mobilit|primer/i.freeze

@@ -195,19 +195,17 @@ module Workout::Exportable
     rounds = section["rounds"]
     rest = section["rest_secs"]
     dur = section["duration_mins"]
-    style = section["emom_style"]
 
     case fmt
     when "tabata"
       tabata_rounds = rounds.to_i > 0 ? rounds.to_i : 8
       [ "Tabata", "#{tabata_rounds} rounds \u00B7 20s hard / 10s rest" ]
+    when "continuous_circuit"
+      cycles = dur && ex_count > 0 ? dur / ex_count : nil
+      desc = cycles && cycles > 1 ? "1 min each exercise, #{cycles} rounds" : "1 min each exercise"
+      [ "Continuous Circuit", desc ]
     when "emom"
-      rotating = style == "rotating" || (style.blank? && ex_count > 1)
-      if rotating
-        cycles = dur && ex_count > 0 ? dur / ex_count : nil
-        desc = cycles && cycles > 1 ? "1 min each exercise, #{cycles} rounds" : "1 min each exercise"
-        [ "Continuous Circuit", desc ]
-      elsif ex_count >= 3 && dur
+      if ex_count >= 3 && dur
         e2m_rounds = dur / 2
         desc = e2m_rounds > 1 ? "All #{ex_count} exercises every 2 min \u00B7 #{e2m_rounds} rounds" : nil
         [ "E2MOM #{dur}min", desc ]

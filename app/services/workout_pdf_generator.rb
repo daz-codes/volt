@@ -115,14 +115,13 @@ class WorkoutPdfGenerator
       parts << "#{rest}s rest between rounds" if rest > 0
     when "emom"
       dur = section["duration_mins"].to_i
-      if section["emom_style"] == "rotating"
-        ex_count = Array(section["exercises"]).size
-        reps_each = dur / ex_count if ex_count > 0
-        parts << "EMOM · #{dur} min · #{ex_count} exercises · #{reps_each} rounds each"
-      else
-        parts << "Every 2 minutes · #{dur} min"
-        parts << "#{rest}s rest" if rest > 0
-      end
+      parts << "Every 2 minutes · #{dur} min"
+      parts << "#{rest}s rest" if rest > 0
+    when "continuous_circuit"
+      dur = section["duration_mins"].to_i
+      ex_count = Array(section["exercises"]).size
+      reps_each = dur / ex_count if ex_count > 0
+      parts << "Continuous Circuit · #{dur} min · #{ex_count} exercises · #{reps_each} rounds each"
     when "tabata"
       tabata_rounds = rounds > 0 ? rounds : 8
       total_mins = ((20 + 10) * tabata_rounds / 60.0).ceil

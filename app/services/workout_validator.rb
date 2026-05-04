@@ -40,6 +40,7 @@ class WorkoutValidator
 
   def validate_and_fix
     sections = Array(@data.dig("structure", "sections"))
+    normalize_continuous_circuit_format(sections)
     ensure_section_categories(sections)
 
     sections.each_with_index do |section, idx|
@@ -47,6 +48,8 @@ class WorkoutValidator
       when "emom"
         fix_emom_structure(section, idx)
         fix_emom_reps(section, idx)
+      when "continuous_circuit"
+        fix_continuous_circuit_structure(section, idx)
       when "tabata"
         fix_tabata_duration(section, idx)
         fix_tabata_exercise_count(section, idx)
@@ -82,7 +85,7 @@ class WorkoutValidator
     fix_overhead_weight_cap(sections)
     fix_redundant_section_notes(sections)
     fix_duplicate_section_exercise_notes(sections)
-    fix_rotating_emom_reps(sections)
+    fix_continuous_circuit_exercise_metrics(sections)
     fix_emom_notes(sections)
     fix_cardio_interval_split(sections)
     fix_threshold_interval_duration(sections)
@@ -110,7 +113,7 @@ class WorkoutValidator
 
     if @main_tag_slug == "functional-muscle"
       fix_fm_remove_activation(sections)
-      fix_fm_circuit_emom_reps(sections)
+      fix_fm_continuous_circuit_reps(sections)
       fix_fm_tabata_remove_non_compounds(sections)
       fix_fm_merge_strength_sections(sections)
       fix_fm_strength_sets(sections)
@@ -155,15 +158,22 @@ class WorkoutValidator
     end
   end
 
-  # EMOM circuit: total reps per minute must not exceed the rep cap.
-  # Rotating EMOMs don't have a per-minute rep cap (each exercise fills its own minute).
-  # Also enforces a per-exercise calorie cap for cardio machines (max 10 cal).
-  def fix_emom_reps(section, idx)
-    return if section["emom_style"] == "rotating"
-    # FM every-2-min EMOMs (exactly 3 exercises) have their own higher total
-    # enforced by fix_fm_circuit_emom_reps — skip the standard 10-cap here.
-    return if @main_tag_slug == "functional-muscle" && Array(section["exercises"]).size == 3
+  # Defensive: if the LLM emits `format: emom + emom_style: rotating` (the legacy
+  # encoding), normalize it to the first-class `format: continuous_circuit` so
+  # downstream rules don't have to know about both shapes.
+  def normalize_continuous_circuit_format(sections)
+    sections.each do |section|
+      next unless section["format"] == "emom" && section["emom_style"] == "rotating"
+      section["format"] = "continuous_circuit"
+      section.delete("emom_style")
+      @fixes << "'#{section["name"]}': normalized legacy emom+rotating to continuous_circuit"
+    end
+  end
 
+  # EMOM circuit: total reps per minute must not exceed the rep cap.
+  # Continuous circuits (one exercise per minute) are their own format and don't
+  # hit this method. Also enforces a per-exercise calorie cap for cardio machines.
+  def fix_emom_reps(section, idx)
     cap       = EMOM_REP_CAP
     exercises = Array(section["exercises"])
     changed   = []
@@ -217,45 +227,43 @@ class WorkoutValidator
   end
 
   # EMOM circuit: max 3 exercises per minute.
-  # EMOM rotating: duration_mins must be a multiple of exercise count.
   def fix_emom_structure(section, idx)
     exercises = Array(section["exercises"])
-    style = section["emom_style"]
 
-    if style == "rotating"
-      n = exercises.size
-      return if n.zero?
-      dur = section["duration_mins"].to_i
-      return if dur.zero? || (dur % n).zero?
-      snapped = ((dur.to_f / n).ceil * n)
-      section["duration_mins"] = snapped
-      section.delete("notes") # LLM notes often contain stale fractional round calculations
-      @fixes << "EMOM rotating '#{section["name"]}': duration_mins #{dur} → #{snapped} (must be multiple of #{n} exercises)"
-    else
-      # circuit — cap exercises. FM sessions allow up to 3 (every-2-min blocks);
-      # standard sessions cap at 2 (one-minute windows).
-      is_fm = @main_tag_slug == "functional-muscle"
-      max_exercises = is_fm ? 3 : 2
-      if exercises.size > max_exercises
-        section["exercises"] = exercises.first(max_exercises)
-        section.delete("notes") # LLM notes reference the old exercise count
-        @fixes << "EMOM circuit '#{section["name"]}': trimmed to #{max_exercises} exercises (was #{exercises.size})"
-        exercises = section["exercises"]
-      end
-
-      # Snap reps to 5 or 10 only for standard EMOMs. FM every-2-min EMOMs use
-      # multiples of 5 with higher totals — handled separately by fix_fm_circuit_emom_reps.
-      unless is_fm && exercises.size == 3
-        exercises.each do |ex|
-          reps = ex["reps"].to_i
-          next if reps <= 0
-          clean = reps <= 7 ? 5 : 10
-          next if clean == reps
-          ex["reps"] = clean
-          @fixes << "EMOM circuit '#{section["name"]}': #{ex["name"]} reps #{reps} → #{clean} (must be 5 or 10)"
-        end
-      end
+    # circuit — cap exercises per minute. Standard EMOMs share one minute, so two
+    # exercises is the practical max (FM allows three legacy 3-ex emoms before they
+    # were promoted to continuous_circuit).
+    is_fm = @main_tag_slug == "functional-muscle"
+    max_exercises = is_fm ? 3 : 2
+    if exercises.size > max_exercises
+      section["exercises"] = exercises.first(max_exercises)
+      section.delete("notes") # LLM notes reference the old exercise count
+      @fixes << "EMOM circuit '#{section["name"]}': trimmed to #{max_exercises} exercises (was #{exercises.size})"
+      exercises = section["exercises"]
     end
+
+    exercises.each do |ex|
+      reps = ex["reps"].to_i
+      next if reps <= 0
+      clean = reps <= 7 ? 5 : 10
+      next if clean == reps
+      ex["reps"] = clean
+      @fixes << "EMOM circuit '#{section["name"]}': #{ex["name"]} reps #{reps} → #{clean} (must be 5 or 10)"
+    end
+  end
+
+  # Continuous circuit: duration_mins must be a multiple of exercise count
+  # (one exercise fills each minute, cycling through the list).
+  def fix_continuous_circuit_structure(section, idx)
+    exercises = Array(section["exercises"])
+    n = exercises.size
+    return if n.zero?
+    dur = section["duration_mins"].to_i
+    return if dur.zero? || (dur % n).zero?
+    snapped = ((dur.to_f / n).ceil * n)
+    section["duration_mins"] = snapped
+    section.delete("notes") # LLM notes often contain stale fractional round calculations
+    @fixes << "Continuous Circuit '#{section["name"]}': duration_mins #{dur} → #{snapped} (must be multiple of #{n} exercises)"
   end
 
   # Tabata exercises must be a factor of 8: 1, 2, 4, or 8.
@@ -473,8 +481,8 @@ class WorkoutValidator
   # - Any section with rounds completely absent (nil) → 3 rounds (LLM forgot to set it)
   # - Unknown/invalid formats get normalised to "rounds"
   # Skips warm-up, cool-down, tabata, emom, amrap, for_time, ladder, mountain.
-  SINGLE_SET_EXEMPT   = %w[tabata emom amrap for_time ladder mountain matrix hundred switchback].freeze
-  KNOWN_FORMATS       = %w[rounds tabata emom amrap for_time ladder mountain matrix hundred switchback].freeze
+  SINGLE_SET_EXEMPT   = %w[tabata emom continuous_circuit amrap for_time ladder mountain matrix hundred switchback].freeze
+  KNOWN_FORMATS       = %w[rounds tabata emom continuous_circuit amrap for_time ladder mountain matrix hundred switchback].freeze
   ABS_PILATES_PATTERN     = /abs|core|pilates|hundred/i
 
   def fix_single_set_sections(sections)
@@ -1052,9 +1060,9 @@ class WorkoutValidator
   EMOM_RESTATE_PATTERN = /\d+\s*(?:cal|reps?|m)\s+\w+[^.]*remain\w*\s+time\s+rest[^.]*\.?\s*/i.freeze
   EMOM_REPEAT_PATTERN  = /repeat\s*[×x]\s*\d+\s*min\w*\.?\s*/i.freeze
 
-  def fix_rotating_emom_reps(sections)
+  def fix_continuous_circuit_exercise_metrics(sections)
     sections.each do |section|
-      next unless section["format"] == "emom" && section["emom_style"] == "rotating"
+      next unless section["format"] == "continuous_circuit"
       Array(section["exercises"]).each do |ex|
         stripped = []
 
@@ -1521,17 +1529,15 @@ class WorkoutValidator
     end
   end
 
-  # FM circuit EMOMs (every-2-min style): reps must be multiples of 5, minimum 5 per
+  # FM continuous circuits (every-2-min [E] block): reps must be multiples of 5, minimum 5 per
   # exercise, and at least 25 total across all exercises. If total < 25, scale up
   # proportionally (preserving ratios) until the minimum is met.
   FM_CIRCUIT_EMOM_MIN_TOTAL = 25
 
-  def fix_fm_circuit_emom_reps(sections)
+  def fix_fm_continuous_circuit_reps(sections)
     sections.each do |section|
-      next unless section["format"] == "emom" && section["emom_style"] != "rotating"
-      # Only every-2-min EMOMs (exactly 3 exercises per the FM [E] block) get
-      # the minimum-25 scale-up. Sections with 1-2 exercises are standard 1-min
-      # EMOMs and stay capped at 10 total reps by fix_emom_reps.
+      next unless section["format"] == "continuous_circuit"
+      # Only the FM [E] block (exactly 3 exercises) gets the minimum-25 scale-up.
       next unless Array(section["exercises"]).size == 3
       exercises = Array(section["exercises"]).select { |e| e["reps"].to_i > 0 }
       next if exercises.empty?
@@ -1557,7 +1563,7 @@ class WorkoutValidator
 
   # FM: strength sections (straight/rounds format, not warm-up/cool-down) must be
   # exactly 5 rounds with either 5 or 10 reps. Fix rounds to 5; snap reps to nearest.
-  FM_STRENGTH_EXEMPT = %w[tabata emom amrap for_time ladder mountain matrix hundred].freeze
+  FM_STRENGTH_EXEMPT = %w[tabata emom continuous_circuit amrap for_time ladder mountain matrix hundred].freeze
   FM_VALID_REPS      = [ 5, 10 ].freeze
 
   def fix_fm_strength_sets(sections)
@@ -1607,7 +1613,7 @@ class WorkoutValidator
   # two: "Upper Body Strength" and "Lower Body Strength", each with rounds: 5.
   # Splits exercises by lower-body keyword; anything that doesn't match goes upper.
   LOWER_BODY_PATTERN = /squat|lunge|deadlift|romanian|leg press|leg extension|calf|glute|hip|hamstring|step.?up|box jump/i.freeze
-  FM_STRENGTH_EXEMPT_FORMATS = %w[tabata emom amrap for_time ladder mountain matrix hundred switchback].freeze
+  FM_STRENGTH_EXEMPT_FORMATS = %w[tabata emom continuous_circuit amrap for_time ladder mountain matrix hundred switchback].freeze
   FM_STRENGTH_EXEMPT_NAMES   = /warm|cool|stretch|recovery|pilates|abs|core|hundred/i.freeze
 
   # Only these exercise name patterns are acceptable in FM strength sections.

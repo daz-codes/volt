@@ -110,6 +110,13 @@ export default class extends Controller {
             <p class="text-xs text-gray-500">Every Minute On the Minute — list the exercises done each minute.</p>
           </div>
         </div>
+        <div data-format-field="continuous_circuit" style="display:none" class="mb-3">
+          <div class="flex items-center gap-3">
+            <input name="sections[${id}][duration_mins]" type="number" min="1" placeholder="Duration (minutes)"
+              class="w-44 bg-zinc-800 border border-zinc-600 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-lime-400 transition-colors">
+            <p class="text-xs text-gray-500">Cycle one exercise per minute — duration must be a multiple of the exercise count.</p>
+          </div>
+        </div>
         <div data-format-field="tabata" style="display:none" class="mb-3">
           <div class="flex items-center gap-2 flex-wrap">
             <input name="sections[${id}][rounds]" type="number" min="1" placeholder="Rounds" value="8" disabled

@@ -17,23 +17,13 @@ module Workout::StructureBuilder
 
     def build_section_from_params(s)
       raw_format = s[:format].to_s
-      # `continuous_circuit` is a synthetic dropdown option that maps to a
-      # rotating EMOM (one exercise per minute, cycling through). Keep the
-      # underlying schema clean by translating to the canonical format here.
-      if raw_format == "continuous_circuit"
-        format     = "emom"
-        emom_style = "rotating"
-      else
-        format     = valid_formats.include?(raw_format) ? raw_format : "straight"
-        emom_style = s[:emom_style].to_s.presence
-      end
+      format     = valid_formats.include?(raw_format) ? raw_format : "straight"
 
       section = {
         "name"     => s[:name].to_s.strip,
         "category" => Workout::CATEGORIES.include?(s[:category]) ? s[:category] : "main",
         "format"   => format
       }
-      section["emom_style"]    = emom_style              if format == "emom" && %w[circuit rotating].include?(emom_style)
       section["intensity_style"] = s[:intensity_style].to_s if %w[zone_2 conditioning max_effort].include?(s[:intensity_style].to_s)
       section["rounds"]        = s[:rounds].to_i         if s[:rounds].present?
       section["duration_mins"] = s[:duration_mins].to_i  if s[:duration_mins].present?

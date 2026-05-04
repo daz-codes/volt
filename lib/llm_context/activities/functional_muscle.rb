@@ -11,8 +11,8 @@ module LLMContext
         allowed_equipment: %w[barbell dumbbells kettlebells pull_up_bar wall_ball jump_rope rowing_machine assault_bike ski_erg],
         banned_equipment:  %w[treadmill sled resistance_bands],
         banned_exercise_patterns: [].freeze,
-        allowed_formats:   %w[straight rounds emom tabata hundred ladder mountain amrap for_time matrix],
-        primary_formats:   %w[rounds emom tabata hundred],
+        allowed_formats:   %w[straight rounds emom continuous_circuit tabata hundred ladder mountain amrap for_time matrix],
+        primary_formats:   %w[rounds emom continuous_circuit tabata hundred],
         signature_formats: %w[tabata hundred mountain switchback],
         warm_up:           :easy_cardio,
         cool_down:         :full_body_stretch,
@@ -31,7 +31,7 @@ module LLMContext
       }.freeze
 
       MOVEMENT_VOCABULARY = <<~VOCAB.freeze
-        Metabolic:  Continuous circuits (EMOM rotating), Interval circuits (rounds every 2 min),
+        Metabolic:  Continuous circuits (format: continuous_circuit), Interval circuits (rounds every 2 min),
                     10-1 ladders, Cardio intervals (1 min hard / 1 min rest), TWENTY20,
                     Up & Down switchback ladders, Death Race, Bear Mountain
         Tabatas:    Compound pairs — Squat Curl and Press, KB Swing with Side Lunge,
@@ -48,7 +48,7 @@ module LLMContext
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "rowing_machine" } ] },
-            { name: "The Grind Loop", format: "emom", duration_mins: 12, rest_secs: 0,
+            { name: "The Grind Loop", format: "continuous_circuit", duration_mins: 12, rest_secs: 0,
               exercises: [
                 { name: "Row", notes: "steady sustainable effort", equipment: "rowing_machine" },
                 { name: "KB Swings", notes: "20 reps, light–moderate", equipment: "kettlebells" },
