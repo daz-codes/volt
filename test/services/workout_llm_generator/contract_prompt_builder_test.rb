@@ -72,6 +72,14 @@ class WorkoutLLMGenerator::ContractPromptBuilderTest < ActiveSupport::TestCase
     assert_match(/rest.*never.*exceed/i, build[/\<global_rules\>(.*?)\<\/global_rules\>/m, 1])
   end
 
+  test "global_rules block tells the LLM to name the intensity style in the goal sentence" do
+    rules = build[/\<global_rules\>(.*?)\<\/global_rules\>/m, 1]
+    refute_nil rules
+    assert_match(/goal.*intensity_style/im, rules)
+    assert_match(/zone 2/, rules)
+    assert_match(/max effort/, rules)
+  end
+
   test "banned_equipment_override merges into contract banned list" do
     prompt = build(banned_override: %w[pull_up_bar])
     banned = prompt[/BANNED EQUIPMENT:([^\n]+)/, 1]
