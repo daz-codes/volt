@@ -81,11 +81,11 @@ module LLMContext
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
-            { name: "Deadlift", format: "straight", rest_secs: 120,
+            { name: "Deadlift", format: "straight", intensity_style: "max_effort", rest_secs: 120,
               exercises: [ { name: "Deadlift", reps: "5 × 3", equipment: "barbell" } ] },
-            { name: "Pull-up Block", format: "rounds", rounds: 5, rest_secs: 90,
+            { name: "Pull-up Block", format: "rounds", intensity_style: "max_effort", rounds: 5, rest_secs: 90,
               exercises: [ { name: "Pull-ups", reps: 5, equipment: "pull_up_bar" } ] },
-            { name: "Ski Erg Finisher", format: "rounds", rounds: 5, rest_secs: 45,
+            { name: "Ski Erg Finisher", format: "rounds", intensity_style: "conditioning", rounds: 5, rest_secs: 45,
               exercises: [ { name: "SkiErg", reps: "250m", equipment: "ski_erg" } ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }

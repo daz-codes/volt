@@ -58,13 +58,13 @@ module LLMContext
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "rowing_machine" } ] },
-            { name: "Sprint Pyramid", format: "emom", duration_mins: 20, rest_secs: 0,
+            { name: "Sprint Pyramid", format: "emom", intensity_style: "max_effort", duration_mins: 20, rest_secs: 0,
               exercises: [
                 { name: "Row sprint",     duration_s: 20, notes: "work 20s, rest 10s", equipment: "rowing_machine" },
                 { name: "Row moderate",   duration_s: 30, notes: "work 30s, rest 30s", equipment: "rowing_machine" },
                 { name: "Ski Erg sprint", duration_s: 30, notes: "work 30s, rest 15s", equipment: "ski_erg" }
               ] },
-            { name: "Steady Finisher", format: "for_time",
+            { name: "Steady Finisher", format: "for_time", intensity_style: "zone_2",
               exercises: [ { name: "Run", reps: "1.5 km", equipment: "treadmill" } ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }

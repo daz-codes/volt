@@ -41,14 +41,14 @@ module LLMContext
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 3,
               exercises: [ { name: "Easy bodyweight cardio + Dynamic stretches", duration_s: 180, equipment: "bodyweight" } ] },
-            { name: "Tabata Blocks", format: "tabata", rounds: 8, rest_secs: 10,
+            { name: "Tabata Blocks", format: "tabata", intensity_style: "conditioning", rounds: 8, rest_secs: 10,
               exercises: [
                 { name: "Burpees", duration_s: 20, equipment: "bodyweight" },
                 { name: "Mountain Climbers", duration_s: 20, equipment: "bodyweight" },
                 { name: "Squat Jumps", duration_s: 20, equipment: "bodyweight" },
                 { name: "Push-ups", duration_s: 20, equipment: "bodyweight" }
               ] },
-            { name: "The Hundred", format: "hundred",
+            { name: "The Hundred", format: "hundred", intensity_style: "conditioning",
               exercises: [ { name: "Sit-ups", reps: 100, equipment: "bodyweight" } ] },
             { name: "Cool-Down", format: "straight", duration_mins: 2,
               exercises: [ { name: "Dynamic stretches", notes: "5 deep breaths" } ] }

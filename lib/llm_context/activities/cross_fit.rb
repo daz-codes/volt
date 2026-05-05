@@ -55,9 +55,9 @@ module LLMContext
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "assault_bike" } ] },
-            { name: "Back Squat", format: "rounds", rounds: 5, rest_secs: 120,
+            { name: "Back Squat", format: "rounds", intensity_style: "max_effort", rounds: 5, rest_secs: 120,
               exercises: [ { name: "Back Squat", reps: 5, equipment: "barbell" } ] },
-            { name: "Metcon", format: "amrap", duration_mins: 12, rest_secs: 0,
+            { name: "Metcon", format: "amrap", intensity_style: "conditioning", duration_mins: 12, rest_secs: 0,
               exercises: [
                 { name: "Box Jumps", reps: 15, equipment: "bodyweight" },
                 { name: "KB Swings", reps: 20, equipment: "kettlebells" },

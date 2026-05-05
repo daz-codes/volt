@@ -68,6 +68,13 @@ class WorkoutLLMGenerator::ContractPromptBuilderTest < ActiveSupport::TestCase
     assert_equal 3, examples_block.scan(/"goal"\s*:/).length
   end
 
+  test "examples surface explicit intensity_style annotations" do
+    examples_block = build(activity_slug: "kettlebell")[/\<examples\>(.*?)\<\/examples\>/m, 1]
+    refute_nil examples_block
+    assert_match(/"intensity_style"\s*:\s*"max_effort"/, examples_block)
+    assert_match(/"intensity_style"\s*:\s*"conditioning"/, examples_block)
+  end
+
   test "global_rules block contains the rest-work rule" do
     assert_match(/rest.*never.*exceed/i, build[/\<global_rules\>(.*?)\<\/global_rules\>/m, 1])
   end

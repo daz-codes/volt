@@ -50,13 +50,13 @@ module LLMContext
           sections: [
             { name: "Warm-Up",  format: "straight", duration_mins: 5,
               exercises: [ { name: "KB activation flow (halos, goblet squats, light swings)", duration_s: 300, equipment: "kettlebells" } ] },
-            { name: "Grind Ladder", format: "ladder",
-              varies: "reps", start: 5, end: 1, step: 1, rest_between_rungs: 60,
+            { name: "Grind Ladder", format: "ladder", intensity_style: "max_effort",
+              varies: "reps", start: 5, end: 1, step: 1, rest_between_rungs: 120,
               exercises: [
                 { name: "KB Front Squat", equipment: "kettlebells" },
                 { name: "KB Press",       equipment: "kettlebells" }
               ] },
-            { name: "Ballistic Finisher", format: "emom", duration_mins: 10, rest_secs: 0,
+            { name: "Ballistic Finisher", format: "emom", intensity_style: "conditioning", duration_mins: 10, rest_secs: 0,
               exercises: [
                 { name: "KB Swing",  reps: 15, equipment: "kettlebells" },
                 { name: "KB Snatch", reps: "5 each side", equipment: "kettlebells" }
