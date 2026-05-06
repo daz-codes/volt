@@ -8,10 +8,10 @@ module LLMContext
         purity: "Hyrox race training — 1 km runs between 8 functional stations. " \
                 "Treadmill running is the backbone of every session. Assault Bike is NOT " \
                 "a Hyrox machine and must never appear.",
-        allowed_equipment: %w[treadmill rowing_machine ski_erg sled wall_ball kettlebells],
-        banned_equipment:  %w[barbell dumbbells pull_up_bar resistance_bands jump_rope assault_bike],
+        allowed_equipment: %w[treadmill rowing_machine ski_erg sled wall_ball kettlebells barbell dumbbells pull_up_bar],
+        banned_equipment:  %w[resistance_bands jump_rope assault_bike],
         banned_exercise_patterns: [
-          /\bassault bike\b/i, /\bair bike\b/i, /\becho bike\b/i, /\bbarbell\b/i, /\bdumbbell\b/i
+          /\bassault bike\b/i, /\bair bike\b/i, /\becho bike\b/i
         ].freeze,
         allowed_formats:   %w[for_time rounds emom amrap tabata ladder hundred mountain],
         primary_formats:   %w[for_time rounds emom],
@@ -24,9 +24,26 @@ module LLMContext
                "mirror the race: SkiErg, Sled Push/Pull, Burpee Broad Jumps, Rowing, " \
                "Farmer's Carry, Sandbag Lunges, Wall Balls. Every section must be " \
                "meaningfully different — do not create two sections with the same " \
-               "exercises and structure but different names. The main stations should " \
-               "dominate every session; supplementary movements (see vocabulary) can " \
-               "appear occasionally for variety but should never displace the race stations. " \
+               "exercises and structure but different names. The race stations remain " \
+               "the headline movements, but workouts cannot be ONLY stations — every " \
+               "session also needs supplementary work. " \
+               "SUPPLEMENTARY MOVEMENTS (most sessions): weave KB Swings, Med Ball Slams, " \
+               "KB Thrusters, Walking Lunges, Push-ups, or burpee variations into station " \
+               "blocks or as their own conditioning piece. These build the strength and " \
+               "engine that race stations alone don't cover — sessions with no supplementary " \
+               "movement at all are too narrow. Only full race-simulation sessions skip them. " \
+               "STRENGTH ACCESSORY (most non-race-simulation sessions): include one strength " \
+               "accessory block — rounds format, 3-6 reps heavy at 120s rest with " \
+               "intensity_style: max_effort, OR 8-10 reps moderate at 90s rest. Draw from " \
+               "the Strength accessory line (Deadlift, Bench Press, Push Press, Bent-Over " \
+               "Row, Pull-ups, Bulgarian Split Squat). Never more than one strength block " \
+               "per session, never the centrepiece, and never replaces a run or a station. " \
+               "DURATION INTERVALS: a 3-4 round work-rest block on a single conditioning " \
+               "movement (Wall Balls, Burpees, Walking Lunges, KB Swings, Med Ball Slams) " \
+               "is a valid alternative to rep-based rounds — use rounds format with " \
+               "duration_s: 120 and rest_secs: 120 for the canonical 2-min work / 2-min " \
+               "rest shape. The clean-minute rule applies only to cardio machines, not " \
+               "to these functional movements. " \
                "An abs finisher (sit-ups, leg raises, planks, V-ups, Russian twists) is a " \
                "good optional close-out before the cool-down."
       }.freeze
@@ -35,7 +52,8 @@ module LLMContext
         Running:           Treadmill 500m, 1km, 400m repeats
         Stations:          SkiErg, Sled Push, Sled Pull, Rowing Machine, Farmer's Carry, Wall Ball, Sandbag Lunges
         Bodyweight:        Burpee Broad Jumps
-        Supplementary:     KB Swings, KB Thrusters, KB High Pull, Walking Lunges, Jump Squats, Push-ups, Med Ball Slams, KB Shoulder Press (use sparingly — race stations remain primary)
+        Supplementary:     KB Swings, KB Thrusters, KB High Pull, Walking Lunges, Jump Squats, Push-ups, Med Ball Slams, KB Shoulder Press (feature in most sessions alongside race stations)
+        Strength accessory: Bench Press, Deadlift, Romanian Deadlift, Sumo Deadlift, Single-Leg Deadlift, Split Squat, Bulgarian Split Squat, B-stance Squat, B-stance Deadlift, Landmine Press, Landmine Row, Push Press, Bent-Over Row, Pull-ups, Chin-ups, Dips, Toes-to-bar (most non-race-simulation sessions — max 1 strength round, never the main work)
         Burpee variations: Box Jump Burpees, Wall Ball Burpees, KB Burpees (in addition to the standard Burpee Broad Jumps)
         Abs finisher:      Sit-ups, Leg Raises, Plank, V-ups, Russian Twists, Hollow Holds
       VOCAB
@@ -52,10 +70,12 @@ module LLMContext
               exercises: [
                 { name: "Run", reps: "500m", equipment: "treadmill" },
                 { name: "SkiErg", reps: "250m", equipment: "ski_erg" },
-                { name: "Wall Balls", reps: 20, equipment: "wall_ball" }
+                { name: "Med Ball Slams", reps: 20, equipment: "wall_ball" }
               ] },
             { name: "Run to Victory", format: "for_time",
               exercises: [ { name: "Run", reps: "1km", equipment: "treadmill" } ] },
+            { name: "Wall Ball Burner", format: "rounds", intensity_style: "conditioning", rounds: 3, rest_secs: 120,
+              exercises: [ { name: "Wall Balls", duration_s: 120, equipment: "wall_ball" } ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
           ]
@@ -73,6 +93,7 @@ module LLMContext
               exercises: [
                 { name: "Sled Push", reps: "20m", equipment: "sled" },
                 { name: "Farmer's Carry", reps: "40m", equipment: "kettlebells" },
+                { name: "KB Swings", reps: 30, equipment: "kettlebells" },
                 { name: "Wall Balls", reps: 30, equipment: "wall_ball" }
               ] },
             { name: "Cool-Down", format: "straight", duration_mins: 2,
@@ -81,23 +102,23 @@ module LLMContext
         },
         {
           name: "Engine & Stations",
-          goal: "Build the running engine with spaced station work.",
+          goal: "Build the engine with runs, heavy lifting, and supplementary station work.",
           duration_mins: 60,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
             { name: "Engine Builder", format: "rounds", rounds: 5, rest_secs: 60,
               exercises: [ { name: "Run", reps: "400m", notes: "hard pace", equipment: "treadmill" } ] },
-            { name: "Heavy Hands", format: "emom", duration_mins: 15, rest_secs: 0,
+            { name: "Iron Lift", format: "rounds", intensity_style: "max_effort", rounds: 4, rest_secs: 120,
               exercises: [
-                { name: "Row", reps: "15 cal", equipment: "rowing_machine" },
-                { name: "Sandbag Lunges", reps: "20m", equipment: "sled" },
-                { name: "SkiErg", reps: "15 cal", equipment: "ski_erg" }
+                { name: "Deadlift", reps: 5, equipment: "barbell" },
+                { name: "Pull-ups", reps: 5, equipment: "pull_up_bar" }
               ] },
-            { name: "Final Boss", format: "for_time",
+            { name: "Heavy Hands", format: "rounds", rounds: 4, rest_secs: 90,
               exercises: [
-                { name: "Run", reps: "1km", equipment: "treadmill" },
-                { name: "Wall Balls", reps: 50, equipment: "wall_ball" }
+                { name: "SkiErg", reps: "250m", equipment: "ski_erg" },
+                { name: "Sandbag Lunges", reps: "20m", equipment: "sled" },
+                { name: "KB Swings", reps: 20, equipment: "kettlebells" }
               ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }

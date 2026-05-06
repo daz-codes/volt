@@ -11,7 +11,7 @@ module LLMContext
         allowed_equipment: %w[treadmill rowing_machine ski_erg assault_bike barbell dumbbells kettlebells wall_ball sled pull_up_bar jump_rope resistance_bands],
         banned_equipment:  %w[],
         banned_exercise_patterns: [].freeze,
-        allowed_formats:   %w[rounds emom for_time amrap tabata ladder],
+        allowed_formats:   %w[rounds emom for_time amrap tabata ladder matrix mountain],
         primary_formats:   %w[rounds emom for_time],
         warm_up:           :easy_cardio,
         cool_down:         :full_body_stretch,
@@ -24,16 +24,33 @@ module LLMContext
                "assault bike do upper body, after treadmill do core or full body. No " \
                "separate activation or abs section. Treadmill-focused variants (formerly " \
                "Tread & Shred) stay within this structure — treadmill is one of the " \
-               "rotating machines, not a whole-session dominant."
+               "rotating machines, not a whole-session dominant. " \
+               "FORMAT VARIETY: do not make every section a rep-based rounds block. Floor " \
+               "strength uses rounds, but conditioning and finishers should rotate through " \
+               "tabatas, ladders, matrices, mountains, AMRAPs, and EMOMs across sessions. " \
+               "STRENGTH SPICE: floor blocks should regularly feature heavy compound lifts " \
+               "(Back Squat, Front Squat, Deadlift, Bench Press, Push Press, Overhead Press, " \
+               "Bent-Over Row) at 5-8 reps with 90-120s rest, not just light DB pairs. " \
+               "CONDITIONING SPICE: Wall Balls, KB Swings, Med Ball Slams, Burpees, and Box " \
+               "Jumps belong in finishers and high-intensity floor blocks — work them in " \
+               "regularly. " \
+               "DURATION INTERVALS: a 3-round work-rest block on a single conditioning " \
+               "movement (Wall Balls, KB Swings, Med Ball Slams, Burpees, Walking Lunges) " \
+               "using rounds with duration_s: 120 and rest_secs: 120 is a valid finisher " \
+               "shape. The clean-minute rule applies only to cardio machines."
       }.freeze
 
       MOVEMENT_VOCABULARY = <<~VOCAB.freeze
-        Cardio:  Row, Ski Erg, Assault Bike, Treadmill
-        Push:    DB Bench, DB Shoulder Press, Push-ups
-        Pull:    DB Row, Pull-ups, Inverted Row
-        Lower:   Goblet Squats, DB Lunges, RDLs, Step-ups
-        Full:    Thrusters, Man Makers, Burpees
-        Core:    Plank, Sit-ups, Russian Twists, V-ups
+        Cardio:             Row, Ski Erg, Assault Bike, Treadmill
+        Push (heavy):       Bench Press, Push Press, Overhead Press, Landmine Press
+        Push (accessory):   DB Bench Press, DB Shoulder Press, Push-ups, Dips
+        Pull (heavy):       Bent-Over Row, Pull-ups, Chin-ups
+        Pull (accessory):   DB Row, Inverted Row, Landmine Row, Face Pulls
+        Lower (heavy):      Back Squat, Front Squat, Deadlift, Romanian Deadlift
+        Lower (accessory):  Goblet Squat, Bulgarian Split Squat, B-stance Squat, B-stance Deadlift, DB Lunges, Walking Lunges, DB RDL, Step-ups
+        Full body:          Thrusters, Man Makers, Burpees, Clean, KB Swings, KB Thrusters, KB High Pull
+        Conditioning spice: Wall Balls, Med Ball Slams, Box Jumps, Burpee Broad Jumps, Box Jump Burpees
+        Core:               Plank, Sit-ups, Russian Twists, V-ups, Toes-to-bar, Hollow Holds
       VOCAB
 
       EXAMPLES = [
@@ -46,18 +63,15 @@ module LLMContext
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 180, equipment: "rowing_machine" } ] },
             { name: "Row Intervals", format: "rounds", rounds: 6, rest_secs: 30,
               exercises: [ { name: "Row", reps: "250m", equipment: "rowing_machine" } ] },
-            { name: "Upper Body Floor", format: "rounds", rounds: 3, rest_secs: 45,
+            { name: "Upper Body Floor", format: "rounds", intensity_style: "max_effort", rounds: 4, rest_secs: 90,
               exercises: [
-                { name: "DB Bench Press", reps: 10, equipment: "dumbbells" },
-                { name: "DB Row each side", reps: 10, equipment: "dumbbells" }
+                { name: "Bench Press", reps: 6, equipment: "barbell" },
+                { name: "Pull-ups", reps: 8, equipment: "pull_up_bar" }
               ] },
             { name: "Assault Bike Sprints", format: "emom", duration_mins: 8, rest_secs: 0,
               exercises: [ { name: "Assault Bike", reps: "10 cal", equipment: "assault_bike" } ] },
-            { name: "Core Floor", format: "rounds", rounds: 3, rest_secs: 30,
-              exercises: [
-                { name: "Plank", duration_s: 45, equipment: "bodyweight" },
-                { name: "V-ups", reps: 20, equipment: "bodyweight" }
-              ] },
+            { name: "Wall Ball Tabata", format: "tabata", intensity_style: "conditioning", rounds: 8, rest_secs: 10,
+              exercises: [ { name: "Wall Balls", duration_s: 20, equipment: "wall_ball" } ] },
             { name: "Cool-Down", format: "straight", duration_mins: 2,
               exercises: [ { name: "Dynamic stretches", notes: "5 deep breaths" } ] }
           ]
@@ -71,17 +85,18 @@ module LLMContext
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
             { name: "Ski Erg Intervals", format: "rounds", rounds: 5, rest_secs: 30,
               exercises: [ { name: "SkiErg", reps: "250m", equipment: "ski_erg" } ] },
-            { name: "Push Floor", format: "rounds", rounds: 3, rest_secs: 45,
+            { name: "Push Floor", format: "rounds", intensity_style: "max_effort", rounds: 4, rest_secs: 90,
               exercises: [
-                { name: "DB Shoulder Press", reps: 10, equipment: "dumbbells" },
-                { name: "Push-ups", reps: 15, equipment: "bodyweight" }
+                { name: "Push Press", reps: 6, equipment: "barbell" },
+                { name: "Chin-ups", reps: 6, equipment: "pull_up_bar" }
               ] },
             { name: "Row Intervals", format: "rounds", rounds: 5, rest_secs: 30,
               exercises: [ { name: "Row", reps: "250m", equipment: "rowing_machine" } ] },
-            { name: "Lower Floor", format: "rounds", rounds: 3, rest_secs: 45,
+            { name: "KB Swing Ladder", format: "ladder",
+              varies: "reps", start: 20, end: 4, step: 4, rest_between_rungs: 30,
               exercises: [
-                { name: "Goblet Squat", reps: 10, equipment: "kettlebells" },
-                { name: "DB RDL", reps: 10, equipment: "dumbbells" }
+                { name: "KB Swings", equipment: "kettlebells" },
+                { name: "Goblet Squat", equipment: "kettlebells" }
               ] },
             { name: "Assault Bike Sprints", format: "emom", duration_mins: 8, rest_secs: 0,
               exercises: [ { name: "Assault Bike", reps: "10 cal", equipment: "assault_bike" } ] },
@@ -98,18 +113,16 @@ module LLMContext
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "treadmill" } ] },
             { name: "Treadmill Intervals", format: "rounds", rounds: 5, rest_secs: 45,
               exercises: [ { name: "Run", reps: "400m", notes: "hard pace", equipment: "treadmill" } ] },
-            { name: "Upper Body Floor", format: "rounds", rounds: 3, rest_secs: 45,
+            { name: "Upper Body Matrix", format: "matrix",
               exercises: [
-                { name: "DB Bench Press", reps: 10, equipment: "dumbbells" },
-                { name: "DB Row each side", reps: 10, equipment: "dumbbells" }
+                { name: "Bench Press", reps: 8, equipment: "barbell" },
+                { name: "Bent-Over Row", reps: 8, equipment: "barbell" },
+                { name: "Push-ups", reps: 12, equipment: "bodyweight" }
               ] },
             { name: "Treadmill Finisher", format: "for_time",
               exercises: [ { name: "Run", reps: "1km", equipment: "treadmill" } ] },
-            { name: "Core Floor", format: "rounds", rounds: 3, rest_secs: 30,
-              exercises: [
-                { name: "Plank", duration_s: 45, equipment: "bodyweight" },
-                { name: "Russian Twists", reps: 30, equipment: "bodyweight" }
-              ] },
+            { name: "Med Ball Slam Burner", format: "rounds", intensity_style: "conditioning", rounds: 3, rest_secs: 120,
+              exercises: [ { name: "Med Ball Slams", duration_s: 120, equipment: "wall_ball" } ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
           ]

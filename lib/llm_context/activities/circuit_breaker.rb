@@ -22,13 +22,22 @@ module LLMContext
                "hundreds make great finishers. Switchback ladders pairing a calorie-cardio " \
                "machine (assault bike, rower, ski erg — never jump rope or treadmill) with " \
                "a functional movement are a signature format. Keep rest short and " \
-               "transitions fast — think F45, not a powerlifting session."
+               "transitions fast — think F45, not a powerlifting session. " \
+               "DURATION INTERVALS: a 3-4 round work-rest block on a single movement " \
+               "(Wall Balls, Burpees, Walking Lunges, KB Swings) — rounds format with " \
+               "duration_s: 120 and rest_secs: 120 — is a valid alternative to rep-based " \
+               "rounds. The clean-minute rule applies only to cardio machines."
       }.freeze
 
       MOVEMENT_VOCABULARY = <<~VOCAB.freeze
-        Strength:      DB Thrusters, Goblet Squats, Deadlifts, Push Press, KB Swings
-        Conditioning:  Burpees, Box Jumps, Wall Balls, Row, SkiErg, Assault Bike
-        Bodyweight:    Push-ups, Sit-ups, Mountain Climbers, Jumping Lunges
+        Strength:      DB Thrusters, Goblet Squats, Deadlifts, Romanian Deadlift, Sumo Deadlift,
+                       Single-Leg Deadlift, Bench Press, Push Press, KB Swings,
+                       Split Squat, Bulgarian Split Squat, B-stance Squat, B-stance Deadlift,
+                       Landmine Press, Landmine Row, Face Pulls (with band)
+        Gymnastics:    Pull-ups, Chin-ups, Dips, Toes-to-bar
+        Conditioning:  Burpees, Box Jumps, Wall Balls, Row, SkiErg, Assault Bike,
+                       Shadow Boxing (1-min rounds)
+        Bodyweight:    Push-ups, Sit-ups, Mountain Climbers, Jumping Lunges, Roll-ups
       VOCAB
 
       EXAMPLES = [
@@ -91,6 +100,8 @@ module LLMContext
                 { name: "Burpees", reps: 10, equipment: "bodyweight" },
                 { name: "Box Jumps", reps: 10, equipment: "bodyweight" }
               ] },
+            { name: "KB Swing Burner", format: "rounds", intensity_style: "conditioning", rounds: 3, rest_secs: 120,
+              exercises: [ { name: "KB Swings", duration_s: 120, equipment: "kettlebells" } ] },
             { name: "Matrix Finisher", format: "matrix",
               exercises: [
                 { name: "Jumping Lunges", reps: 10, equipment: "bodyweight" },

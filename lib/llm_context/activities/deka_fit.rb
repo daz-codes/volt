@@ -7,11 +7,9 @@ module LLMContext
       CONTRACT = {
         purity: "Deka Fit race training — 10-zone event, 5 run zones alternating with " \
                 "5 functional zones. Running is half the race (10 × 500m).",
-        allowed_equipment: %w[treadmill rowing_machine ski_erg assault_bike wall_ball sled kettlebells],
-        banned_equipment:  %w[barbell dumbbells pull_up_bar resistance_bands jump_rope],
-        banned_exercise_patterns: [
-          /\bbarbell\b/i, /\bdumbbell\b/i
-        ].freeze,
+        allowed_equipment: %w[treadmill rowing_machine ski_erg assault_bike wall_ball sled kettlebells barbell dumbbells pull_up_bar],
+        banned_equipment:  %w[resistance_bands jump_rope],
+        banned_exercise_patterns: [].freeze,
         allowed_formats:   %w[for_time rounds emom amrap tabata ladder hundred matrix mountain],
         primary_formats:   %w[for_time rounds emom],
         warm_up:           :easy_cardio,
@@ -23,10 +21,22 @@ module LLMContext
                "RAM Reverse Lunges, Row, Box Jump, Med Ball Sit-up Throw, SkiErg, " \
                "Farmer's Carry, Air Bike, Dead Ball Yoke Over, Sled Push/Pull, Weighted " \
                "Burpees. When race_simulation? is true the builder sets finisher: :required " \
-               "and the session covers all ten zones. The race stations remain the primary " \
-               "movements; supplementary exercises (see vocabulary) can appear occasionally " \
-               "for variety but stations should still dominate. An abs finisher (sit-ups, " \
-               "leg raises, planks, V-ups, Russian twists) is a good optional close-out."
+               "and the session covers all ten zones. The race stations remain the headline " \
+               "movements, but workouts cannot be ONLY stations — every session also needs " \
+               "supplementary work. " \
+               "SUPPLEMENTARY MOVEMENTS (most sessions): weave KB Swings, Med Ball Slams, " \
+               "Wall Balls, KB Thrusters, Walking Lunges, or Push-ups into station blocks " \
+               "or as their own conditioning piece. These build the strength and engine " \
+               "that race stations alone don't cover — sessions with no supplementary " \
+               "movement at all are too narrow. Only full race-simulation sessions skip them. " \
+               "STRENGTH ACCESSORY (most non-race-simulation sessions): include one strength " \
+               "accessory block — rounds format, 3-6 reps heavy at 120s rest with " \
+               "intensity_style: max_effort, OR 8-10 reps moderate at 90s rest. Draw from " \
+               "the Strength accessory line (Deadlift, Bench Press, Push Press, Bent-Over " \
+               "Row, Pull-ups, Bulgarian Split Squat). Never more than one strength block " \
+               "per session, never the centrepiece, and never replaces a run or a station. " \
+               "An abs finisher (sit-ups, leg raises, planks, V-ups, Russian twists) is a " \
+               "good optional close-out."
       }.freeze
 
       MOVEMENT_VOCABULARY = <<~VOCAB.freeze
@@ -34,7 +44,8 @@ module LLMContext
         Functional:        RAM Reverse Lunges, Row 500m, Box Jump / Step Over, Med Ball Sit-up Throw,
                            SkiErg 500m, Farmer's Carry, Air Bike 25 cal, Dead Ball Yoke Over,
                            Sled Push/Pull, RAM Weighted Burpees
-        Supplementary:     KB Swings, KB Thrusters, KB High Pull, Wall Balls, Walking Lunges, Jump Squats, Push-ups, Med Ball Slams, KB Shoulder Press (use sparingly — stations remain primary)
+        Supplementary:     KB Swings, KB Thrusters, KB High Pull, Wall Balls, Walking Lunges, Jump Squats, Push-ups, Med Ball Slams, KB Shoulder Press (feature in most sessions alongside race stations)
+        Strength accessory: Bench Press, Deadlift, Romanian Deadlift, Sumo Deadlift, Single-Leg Deadlift, Split Squat, Bulgarian Split Squat, B-stance Squat, B-stance Deadlift, Landmine Press, Landmine Row, Push Press, Bent-Over Row, Pull-ups, Chin-ups, Dips, Toes-to-bar (most non-race-simulation sessions — max 1 strength round, never the main work)
         Burpee variations: Box Jump Burpees, Plate Burpees, Wall Ball Burpees, KB Burpees
         Abs finisher:      Sit-ups, Leg Raises, Plank, V-ups, Russian Twists, Hollow Holds
       VOCAB

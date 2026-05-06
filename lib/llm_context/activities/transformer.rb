@@ -5,61 +5,63 @@ module LLMContext
       NAME = "Volt Strong"
 
       CONTRACT = {
-        purity: "Strength-leaning functional training — heavy compound lifts built around " \
-                "sets-and-reps, but with at least one cardio-machine section in every " \
-                "session to keep the engine honest. Not a pure lifting session, not a " \
-                "circuit.",
-        allowed_equipment: %w[barbell dumbbells kettlebells pull_up_bar resistance_bands rowing_machine assault_bike ski_erg treadmill],
-        banned_equipment:  %w[wall_ball sled jump_rope],
-        banned_exercise_patterns: [].freeze,
+        purity: "Strength-only functional training — heavy compound lifts built around " \
+                "sets-and-reps, paired with accessory work and bodyweight or duration-" \
+                "interval finishers. No cardio machines, no metabolic conditioning circuits.",
+        allowed_equipment: %w[barbell dumbbells kettlebells pull_up_bar resistance_bands],
+        banned_equipment:  %w[rowing_machine assault_bike ski_erg treadmill wall_ball sled jump_rope],
+        banned_exercise_patterns: [
+          /\bski erg\b/i, /\bassault bike\b/i, /\bair bike\b/i, /\becho bike\b/i, /\btreadmill\b/i
+        ].freeze,
         allowed_formats:   %w[rounds straight emom ladder],
         primary_formats:   %w[rounds straight],
-        warm_up:           :easy_cardio,
+        warm_up:           :bodyweight_activation,
         cool_down:         :full_body_stretch,
         finisher:          :optional,
         core:              :optional,
-        notes: "MANDATORY: every session includes at least one cardio-machine section " \
-               "(rower, assault bike, ski erg, or treadmill) as a warm-up, a finisher, or " \
-               "woven between strength blocks. This is not a metabolic conditioning session " \
-               "— use rounds and straight sets as the main structure. Rep ranges: 3-5 heavy, " \
-               "6-10 hypertrophy, 10-15 accessories only. Plan 60-120s rest between heavy " \
-               "sets. NO CONTINUOUS CIRCUITS: do not chain back-to-back heavy lifts with " \
-               "no rest; every strength section gives clear rest between exercises. Lifts " \
-               "come first, the cardio section supports — think strength coach, not CrossFit."
+        notes: "PURE STRENGTH: no cardio machines (rower, ski erg, assault bike, treadmill) " \
+               "anywhere in the session. Use rounds and straight sets as the main structure. " \
+               "Rep ranges: 3-5 heavy, 6-10 hypertrophy, 10-15 accessories only. Plan 60-120s " \
+               "rest between heavy sets. NO CONTINUOUS CIRCUITS: do not chain back-to-back " \
+               "heavy lifts with no rest; every strength section gives clear rest between " \
+               "exercises. Lifts are the centrepiece — finishers can be bodyweight (push-ups, " \
+               "walking lunges, pull-ups, dips, burpees) or a duration-interval block " \
+               "(e.g. 3 rounds: 2 min walking lunges / 2 min rest). Think strength coach, " \
+               "not CrossFit."
       }.freeze
 
       MOVEMENT_VOCABULARY = <<~VOCAB.freeze
-        Heavy compound:  Back Squat, Front Squat, Deadlift, Bench Press, Overhead Press, Row
-        Hypertrophy:     DB Bench, DB Row, Goblet Squat, RDL, Lunges
-        Accessory:       Biceps Curl, Triceps Extension, Face Pull, Lateral Raise
-        Cardio machines: Row, Assault Bike, Ski Erg, Treadmill
+        Heavy compound:  Back Squat, Front Squat, Deadlift, Bench Press, Overhead Press, Bent-Over Row
+        Hypertrophy:     DB Bench Press, DB Row, Goblet Squat, Romanian Deadlift, Sumo Deadlift, Single-Leg Deadlift, Bulgarian Split Squat, Split Squat, B-stance Squat, B-stance Deadlift, Lunges, Walking Lunges
+        Accessory:       Biceps Curl, Triceps Extension, Face Pull, Lateral Raise, Landmine Press, Landmine Row
+        Bodyweight:      Pull-ups, Chin-ups, Dips, Push-ups, Toes-to-bar, Burpees
       VOCAB
 
       EXAMPLES = [
         {
           name: "Squat & Row",
-          goal: "Heavy squats, strong pulls, and a rower engine block to finish.",
+          goal: "Heavy squats, strong pulls, and a posterior-chain accessory finisher.",
           duration_mins: 45,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
-              exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "rowing_machine" } ] },
+              exercises: [ { name: "Bodyweight activation + Dynamic stretches", duration_s: 300, equipment: "bodyweight" } ] },
             { name: "Back Squat", format: "straight", rest_secs: 120,
               exercises: [ { name: "Back Squat", reps: "5 × 5", equipment: "barbell" } ] },
             { name: "DB Row", format: "rounds", rounds: 4, rest_secs: 90,
               exercises: [ { name: "DB Row each side", reps: 10, equipment: "dumbbells" } ] },
-            { name: "Rower Engine", format: "rounds", rounds: 5, rest_secs: 45,
-              exercises: [ { name: "Row", reps: "250m", equipment: "rowing_machine" } ] },
+            { name: "Romanian Deadlift", format: "rounds", rounds: 3, rest_secs: 90,
+              exercises: [ { name: "Romanian Deadlift", reps: 8, equipment: "barbell" } ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
           ]
         },
         {
           name: "Push Day",
-          goal: "Build the press with a cardio-machine warm-up to wake the system.",
+          goal: "Build the press with focused accessory work to follow.",
           duration_mins: 45,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
-              exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "assault_bike" } ] },
+              exercises: [ { name: "Bodyweight activation + Dynamic stretches", duration_s: 300, equipment: "bodyweight" } ] },
             { name: "Overhead Press", format: "straight", rest_secs: 120,
               exercises: [ { name: "Overhead Press", reps: "5 × 5", equipment: "barbell" } ] },
             { name: "DB Bench Press", format: "rounds", rounds: 4, rest_secs: 90,
@@ -76,17 +78,17 @@ module LLMContext
         },
         {
           name: "Pull Day",
-          goal: "Heavy deadlifts and pulling strength with a ski-erg opener.",
+          goal: "Heavy deadlifts and pulling strength with a duration-interval bodyweight finisher.",
           duration_mins: 45,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
-              exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
+              exercises: [ { name: "Bodyweight activation + Dynamic stretches", duration_s: 300, equipment: "bodyweight" } ] },
             { name: "Deadlift", format: "straight", intensity_style: "max_effort", rest_secs: 120,
               exercises: [ { name: "Deadlift", reps: "5 × 3", equipment: "barbell" } ] },
             { name: "Pull-up Block", format: "rounds", intensity_style: "max_effort", rounds: 5, rest_secs: 90,
               exercises: [ { name: "Pull-ups", reps: 5, equipment: "pull_up_bar" } ] },
-            { name: "Ski Erg Finisher", format: "rounds", intensity_style: "conditioning", rounds: 5, rest_secs: 45,
-              exercises: [ { name: "SkiErg", reps: "250m", equipment: "ski_erg" } ] },
+            { name: "Walking Lunge Burner", format: "rounds", intensity_style: "conditioning", rounds: 3, rest_secs: 120,
+              exercises: [ { name: "Walking Lunges", duration_s: 120, equipment: "bodyweight" } ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
           ]

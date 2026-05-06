@@ -20,12 +20,17 @@ module LLMContext
         notes: "Classic WOD shapes: AMRAP-20, EMOM-12, For Time chippers, rounds-for-strength. " \
                "Switchback ladders and descending clusters belong here. Vary the modality " \
                "(barbell, gymnastics, cardio) each session. Sessions should feel like a box " \
-               "class — short, intense, and measurable."
+               "class — short, intense, and measurable. " \
+               "DURATION INTERVALS: a 3-4 round work-rest block on a single movement " \
+               "(Wall Balls, Burpees, Walking Lunges, KB Swings, Thrusters) — rounds " \
+               "format with duration_s: 120 and rest_secs: 120 — is a valid alternative " \
+               "to rep-based rounds. The clean-minute rule applies only to cardio machines."
       }.freeze
 
       MOVEMENT_VOCABULARY = <<~VOCAB.freeze
-        Barbell:     Squat, Deadlift, Clean, Snatch, Thruster, Press
-        Gymnastics:  Pull-ups, Toes-to-bar, Handstand Push-ups, Muscle-ups, Ring Rows
+        Barbell:     Squat, Front Squat, Back Squat, Overhead Squat, Deadlift, Romanian Deadlift, Sumo Deadlift, Single-Leg Deadlift, Clean, Snatch, Thruster, Press, Bench Press, Push Press, Landmine Press, Landmine Row, Landmine Squat
+        Accessory:   Split Squat, Bulgarian Split Squat, B-stance Squat, B-stance Deadlift, DB Romanian Deadlift, DB Bench Press, DB Press
+        Gymnastics:  Pull-ups, Chin-ups, Toes-to-bar, Dips, Ring Dips, Handstand Push-ups, Muscle-ups, Ring Rows
         Conditioning: Double-unders, Burpees, Box Jumps, Wall Balls, Rower, SkiErg, Assault Bike
       VOCAB
 
@@ -63,6 +68,8 @@ module LLMContext
                 { name: "KB Swings", reps: 20, equipment: "kettlebells" },
                 { name: "Burpees", reps: 10, equipment: "bodyweight" }
               ] },
+            { name: "Wall Ball Burner", format: "rounds", intensity_style: "conditioning", rounds: 3, rest_secs: 120,
+              exercises: [ { name: "Wall Balls", duration_s: 120, equipment: "wall_ball" } ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
           ]

@@ -8,10 +8,10 @@ module LLMContext
         purity: "Deka Strong training — no running. Strength-endurance and station capacity " \
                 "via the 10 weighted functional zones. Most sessions use 4-6 stations with " \
                 "supplementary movement work; full 10-zone sessions are valid but uncommon.",
-        allowed_equipment: %w[rowing_machine ski_erg assault_bike wall_ball sled kettlebells],
-        banned_equipment:  %w[treadmill barbell dumbbells pull_up_bar resistance_bands jump_rope],
+        allowed_equipment: %w[rowing_machine ski_erg assault_bike wall_ball sled kettlebells barbell dumbbells pull_up_bar],
+        banned_equipment:  %w[treadmill resistance_bands jump_rope],
         banned_exercise_patterns: [
-          /\btreadmill\b/i, /\bbarbell\b/i, /\bdumbbell\b/i, /\brun(ning)?\b/i
+          /\btreadmill\b/i, /\brun(ning)?\b/i
         ].freeze,
         allowed_formats:   %w[for_time rounds emom amrap tabata ladder hundred matrix mountain],
         primary_formats:   %w[for_time rounds emom],
@@ -27,8 +27,16 @@ module LLMContext
                "are valid but uncommon — roughly 1 in 5 workouts. **Include 1-2 supplementary " \
                "movements** (KB Swings, KB Thrusters, Wall Balls, walking lunges, burpee " \
                "variations like Box Jump Burpees) in most sessions — they keep training " \
-               "varied and complement the stations. An abs finisher (sit-ups, leg raises, " \
-               "planks, V-ups, Russian twists) is a good optional close-out."
+               "varied and complement the stations. " \
+               "STRENGTH ACCESSORY (most sessions): include one strength accessory block — " \
+               "rounds format, 3-6 reps heavy at 120s rest with intensity_style: max_effort, " \
+               "OR 8-10 reps moderate at 90s rest. Draw from the Strength accessory line " \
+               "(Deadlift, Bench Press, Push Press, Bent-Over Row, Pull-ups, Bulgarian Split " \
+               "Squat). Heavy compound work alongside stations is what makes this variant. " \
+               "Never more than one strength block per session, never the centrepiece, and " \
+               "never replaces a station. " \
+               "An abs finisher (sit-ups, leg raises, planks, V-ups, Russian twists) is a " \
+               "good optional close-out."
       }.freeze
 
       MOVEMENT_VOCABULARY = <<~VOCAB.freeze
@@ -36,6 +44,7 @@ module LLMContext
                            Farmer's Carry, Air Bike 25 cal, Dead Ball Yoke Over, Sled Push/Pull, RAM Weighted Burpees
         Engine:            Ski Erg 500m repeats, Rower 500m repeats, Assault Bike 30s/30s
         Supplementary:     KB Swings, KB Thrusters, KB High Pull, Wall Balls, Walking Lunges, Jump Squats, Push-ups, Med Ball Slams, KB Shoulder Press (include 1-2 per session for variety)
+        Strength accessory: Bench Press, Deadlift, Romanian Deadlift, Sumo Deadlift, Single-Leg Deadlift, Split Squat, Bulgarian Split Squat, B-stance Squat, B-stance Deadlift, Landmine Press, Landmine Row, Push Press, Bent-Over Row, Pull-ups, Chin-ups, Dips, Toes-to-bar (most sessions — max 1 strength round, never the main work)
         Burpee variations: Box Jump Burpees, Plate Burpees, Wall Ball Burpees, KB Burpees
         Abs finisher:      Sit-ups, Leg Raises, Plank, V-ups, Russian Twists, Hollow Holds
       VOCAB

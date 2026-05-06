@@ -210,7 +210,7 @@ module Workout::Exportable
         desc = e2m_rounds > 1 ? "All #{ex_count} exercises every 2 min \u00B7 #{e2m_rounds} rounds" : nil
         [ "E2MOM #{dur}min", desc ]
       else
-        [ "EMOM #{dur}min", rest ? "#{rest}s rest each minute" : nil ]
+        [ "EMOM #{dur}min", rest ? "#{format_rest_secs(rest)} rest each minute" : nil ]
       end
     when "amrap"
       [ "AMRAP #{dur}min", "As many rounds as possible" ]
@@ -218,7 +218,7 @@ module Workout::Exportable
       if rounds && rounds > 1
         label = "#{rounds} Rounds"
         desc_parts = []
-        desc_parts << "#{rest}s rest after each round" if rest && rest > 0
+        desc_parts << "#{format_rest_secs(rest)} rest after each round" if rest && rest > 0
 
         # Pull hard/easy interval description from single-exercise notes
         exercises = Array(section["exercises"])
@@ -253,6 +253,12 @@ module Workout::Exportable
     else
       [ section["name"], nil ]
     end
+  end
+
+  def format_rest_secs(secs)
+    s = secs.to_i
+    return nil if s <= 0
+    s >= 60 && (s % 60).zero? ? "#{s / 60} min" : "#{s}s"
   end
 
   def ladder_sequence(start_val, end_val, step)

@@ -9,11 +9,9 @@ module LLMContext
                 "weighted functional stations. Builds the engine and station capacity for " \
                 "any run-and-stations race format. Each session draws freely from a wide " \
                 "library of stations rather than locking into a fixed event shape.",
-        allowed_equipment: %w[treadmill rowing_machine ski_erg assault_bike sled wall_ball kettlebells],
-        banned_equipment:  %w[barbell dumbbells pull_up_bar resistance_bands jump_rope],
-        banned_exercise_patterns: [
-          /\bbarbell\b/i, /\bdumbbell\b/i
-        ].freeze,
+        allowed_equipment: %w[treadmill rowing_machine ski_erg assault_bike sled wall_ball kettlebells barbell dumbbells pull_up_bar],
+        banned_equipment:  %w[resistance_bands jump_rope],
+        banned_exercise_patterns: [].freeze,
         allowed_formats:   %w[for_time rounds emom amrap tabata ladder hundred matrix mountain],
         primary_formats:   %w[for_time rounds emom],
         warm_up:           :easy_cardio,
@@ -28,8 +26,22 @@ module LLMContext
                "most sessions use 4-6 stations, not all of them. **Include 1-2 supplementary " \
                "movements** (KB Swings, KB Thrusters, Walking Lunges, Jump Squats, Push-ups, " \
                "Med Ball Slams, KB Shoulder Press, burpee variations like Box Jump Burpees) " \
-               "for variety. An abs finisher (sit-ups, leg raises, planks, V-ups, Russian " \
-               "twists) is a good optional close-out."
+               "for variety. " \
+               "STRENGTH ACCESSORY (most sessions): include one strength accessory block — " \
+               "rounds format, 3-6 reps heavy at 120s rest with intensity_style: max_effort, " \
+               "OR 8-10 reps moderate at 90s rest. Draw from the Strength accessory line " \
+               "(Deadlift, Bench Press, Push Press, Bent-Over Row, Pull-ups, Bulgarian Split " \
+               "Squat). Heavy compound work alongside the run-and-station shape is what " \
+               "makes hybrid training. Never more than one strength block per session, " \
+               "never the centrepiece, and never replaces a run or a station. " \
+               "DURATION INTERVALS: a 3-4 round work-rest block on a single conditioning " \
+               "movement (Wall Balls, Burpees, Walking Lunges, KB Swings, Med Ball Slams) " \
+               "is a valid alternative to rep-based rounds — use rounds format with " \
+               "duration_s: 120 and rest_secs: 120 for the canonical 2-min work / 2-min " \
+               "rest shape. The clean-minute rule applies only to cardio machines, not " \
+               "to these functional movements. " \
+               "An abs finisher (sit-ups, leg raises, planks, V-ups, Russian twists) is a " \
+               "good optional close-out."
       }.freeze
 
       MOVEMENT_VOCABULARY = <<~VOCAB.freeze
@@ -40,6 +52,7 @@ module LLMContext
                            Weighted Burpees
         Supplementary:     KB Swings, KB Thrusters, KB High Pull, Walking Lunges, Jump Squats,
                            Push-ups, Med Ball Slams, KB Shoulder Press
+        Strength accessory: Bench Press, Deadlift, Romanian Deadlift, Sumo Deadlift, Single-Leg Deadlift, Split Squat, Bulgarian Split Squat, B-stance Squat, B-stance Deadlift, Landmine Press, Landmine Row, Push Press, Bent-Over Row, Pull-ups, Chin-ups, Dips, Toes-to-bar (most sessions — max 1 strength round, never the main work)
         Burpee variations: Box Jump Burpees, Wall Ball Burpees, KB Burpees, Burpee Broad Jumps
         Abs finisher:      Sit-ups, Leg Raises, Plank, V-ups, Russian Twists, Hollow Holds
       VOCAB
@@ -79,6 +92,8 @@ module LLMContext
                 { name: "KB Thrusters", reps: 12, equipment: "kettlebells" },
                 { name: "Wall Balls", reps: 12, equipment: "wall_ball" }
               ] },
+            { name: "Walking Lunge Burner", format: "rounds", intensity_style: "conditioning", rounds: 3, rest_secs: 120,
+              exercises: [ { name: "Walking Lunges", duration_s: 120, equipment: "bodyweight" } ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
           ]

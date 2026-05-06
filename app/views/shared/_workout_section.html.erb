@@ -65,7 +65,7 @@
    when "rounds"
      r = section["rounds"].to_i
      label  = r > 1 ? "#{r} rounds" : nil
-     detail = section["rest_secs"].to_i > 0 && r > 1 ? "#{section["rest_secs"]}s rest after each round" : nil
+     detail = section["rest_secs"].to_i > 0 && r > 1 ? "#{format_rest_secs(section["rest_secs"])} rest after each round" : nil
      [label, detail]
    when "amrap"
      ["AMRAP", section["duration_mins"] ? "#{section["duration_mins"]} min" : nil]
@@ -113,7 +113,7 @@
      ft_rounds = [ft_rounds, 1].max
      detail_parts = []
      detail_parts << "#{ft_rounds} round#{"s" if ft_rounds > 1}" if ft_rounds > 1
-     detail_parts << "#{section["rest_secs"]}s rest after each round" if section["rest_secs"].to_i > 0
+     detail_parts << "#{format_rest_secs(section["rest_secs"])} rest after each round" if section["rest_secs"].to_i > 0
      ["For Time", detail_parts.join(" · ").presence]
    when "hundred"
      hundred_ex = Array(section["exercises"]).first
@@ -121,12 +121,12 @@
      [hundred_label, "For Time"]
    when "ladder", "mountain"
      parts = [ ladder_seq_str ]
-     parts << "#{section["rest_between_rungs"]}s rest between rungs" if section["rest_between_rungs"].to_i > 0
+     parts << "#{format_rest_secs(section["rest_between_rungs"])} rest between rungs" if section["rest_between_rungs"].to_i > 0
      [sec_format.capitalize, parts.compact.join(" · ").presence]
    when "switchback"
      ["Up & Down Ladder", "Alternate between each exercise"]
    when "matrix"
-     rest = section["rest_secs"].to_i > 0 ? "#{section["rest_secs"]}s rest between rounds" : nil
+     rest = section["rest_secs"].to_i > 0 ? "#{format_rest_secs(section["rest_secs"])} rest between rounds" : nil
      ["Matrix", rest]
    else
      [nil, nil]

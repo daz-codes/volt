@@ -104,6 +104,12 @@ class WorkoutPdfGenerator
     end
   end
 
+  def format_rest_secs(secs)
+    s = secs.to_i
+    return nil if s <= 0
+    s >= 60 && (s % 60).zero? ? "#{s / 60} min" : "#{s}s"
+  end
+
   def build_descriptor(section)
     parts = []
     rounds = section["rounds"].to_i
@@ -112,11 +118,11 @@ class WorkoutPdfGenerator
     case section["format"].to_s
     when "rounds"
       parts << "#{rounds} rounds" if rounds > 0
-      parts << "#{rest}s rest between rounds" if rest > 0
+      parts << "#{format_rest_secs(rest)} rest between rounds" if rest > 0
     when "emom"
       dur = section["duration_mins"].to_i
       parts << "Every 2 minutes · #{dur} min"
-      parts << "#{rest}s rest" if rest > 0
+      parts << "#{format_rest_secs(rest)} rest" if rest > 0
     when "continuous_circuit"
       dur = section["duration_mins"].to_i
       ex_count = Array(section["exercises"]).size
@@ -130,11 +136,11 @@ class WorkoutPdfGenerator
       varies = section["varies"].presence || "reps"
       parts << "Ladder · #{section["start"]} down to #{section["end"]} #{varies}"
       parts << "#{section["step"]} per round" if section["step"].to_i > 1
-      parts << "#{rest}s rest between rungs" if rest > 0
+      parts << "#{format_rest_secs(rest)} rest between rungs" if rest > 0
     when "mountain"
       varies = section["varies"].presence || "reps"
       parts << "Mountain · #{section["start"]}–#{section["peak"]}–#{section["end"]} #{varies}"
-      parts << "#{rest}s rest between rungs" if rest > 0
+      parts << "#{format_rest_secs(rest)} rest between rungs" if rest > 0
     when "amrap"
       parts << "AMRAP · #{section["duration_mins"]} min"
     when "for_time"

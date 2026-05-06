@@ -36,8 +36,12 @@ module LLMContext
                     Up & Down switchback ladders, Death Race, Bear Mountain
         Tabatas:    Compound pairs — Squat Curl and Press, KB Swing with Side Lunge,
                     Bent Over Row to Deadlift, Push-up to T-Rotation, Plate Halo and Twist
-        Strength:   Low Row, Lat Pulldown, Bench Press, Shoulder Press, Leg Press, Squats, Deadlifts, Lunges
-        Abs 100:    Pilates 100, 4–5 abs exercises × 20 reps, single abs × 100
+        Strength:   Low Row, Lat Pulldown, Bench Press, Shoulder Press, Leg Press, Squats, Deadlifts,
+                    Romanian Deadlift, Sumo Deadlift, Single-Leg Deadlift, Lunges, Split Squat,
+                    Bulgarian Split Squat, B-stance Squat, B-stance Deadlift, Landmine Press,
+                    Landmine Row, DB Face Pull, Pull-ups, Chin-ups, Dips
+        Abs 100:    Pilates 100, Roll-ups, Toes-to-bar, 4–5 abs exercises × 20 reps, single abs × 100
+        Other:      Shadow Boxing (1-min rounds, bodyweight conditioning option)
       VOCAB
 
       EXAMPLES = [
