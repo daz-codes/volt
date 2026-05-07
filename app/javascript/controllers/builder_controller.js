@@ -77,7 +77,7 @@ export default class extends Controller {
             <option value="mountain">Mountain</option>
             <option value="matrix">Matrix</option>
             <option value="hundred">Hundred</option>
-            <option value="switchback">Switchback</option>
+            <option value="switchback">Up & Down Ladder</option>
           </select>
           <button type="button" data-action="builder#insertSectionAbove"
             class="text-gray-600 hover:text-lime-400 transition-colors flex-shrink-0 p-1" aria-label="Insert section above" title="Insert section above">

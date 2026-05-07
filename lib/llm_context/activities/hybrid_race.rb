@@ -28,7 +28,7 @@ module LLMContext
                "Med Ball Slams, KB Shoulder Press, burpee variations like Box Jump Burpees) " \
                "for variety. " \
                "STRENGTH ACCESSORY (most sessions): include one strength accessory block — " \
-               "rounds format, 3-6 reps heavy at 120s rest with intensity_style: max_effort, " \
+               "rounds format, 3-6 reps heavy at 120s rest with intensity_style: high, " \
                "OR 8-10 reps moderate at 90s rest. Draw from the Strength accessory line " \
                "(Deadlift, Bench Press, Push Press, Bent-Over Row, Pull-ups, Bulgarian Split " \
                "Squat). Heavy compound work alongside the run-and-station shape is what " \
@@ -92,7 +92,7 @@ module LLMContext
                 { name: "KB Thrusters", reps: 12, equipment: "kettlebells" },
                 { name: "Wall Balls", reps: 12, equipment: "wall_ball" }
               ] },
-            { name: "Walking Lunge Burner", format: "rounds", intensity_style: "conditioning", rounds: 3, rest_secs: 120,
+            { name: "Walking Lunge Burner", format: "rounds", intensity_style: "medium", rounds: 3, rest_secs: 120,
               exercises: [ { name: "Walking Lunges", duration_s: 120, equipment: "bodyweight" } ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }

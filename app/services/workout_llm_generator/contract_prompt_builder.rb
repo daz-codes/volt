@@ -37,7 +37,7 @@ class WorkoutLLMGenerator
       tags << xml(:global_rules, self.class.global_rules)
       tags << xml(:session_shape, session_shape_block)
       tags << xml(:examples, examples_block)
-      tags << xml(:intensity_style, @intensity_style) if @intensity_style.present?
+      tags << xml(:intensity_style, intensity_style_block) if @intensity_style.present?
       tags << xml(:session_notes, @session_notes) if @session_notes.present?
       tags.join("\n\n")
     end
@@ -146,6 +146,17 @@ class WorkoutLLMGenerator
 
         #{json}
       EX
+    end
+
+    # Emits the intensity selection plus the activity's translation of it, when the
+    # contract defines one. Without a guide line the LLM falls back on the global
+    # rules definition, which is right for cardio/strength but wrong for activities
+    # like yoga where "high" means power vinyasa, not max-effort sprints.
+    def intensity_style_block
+      guide = contract[:intensity_guide]&.dig(@intensity_style.to_sym)
+      return @intensity_style.to_s unless guide
+
+      "#{@intensity_style}\n\nFor #{@activity::NAME}, treat `#{@intensity_style}` as: #{guide}"
     end
 
     def xml(tag, body)

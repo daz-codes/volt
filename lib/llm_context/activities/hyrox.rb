@@ -34,7 +34,7 @@ module LLMContext
                "movement at all are too narrow. Only full race-simulation sessions skip them. " \
                "STRENGTH ACCESSORY (most non-race-simulation sessions): include one strength " \
                "accessory block — rounds format, 3-6 reps heavy at 120s rest with " \
-               "intensity_style: max_effort, OR 8-10 reps moderate at 90s rest. Draw from " \
+               "intensity_style: high, OR 8-10 reps moderate at 90s rest. Draw from " \
                "the Strength accessory line (Deadlift, Bench Press, Push Press, Bent-Over " \
                "Row, Pull-ups, Bulgarian Split Squat). Never more than one strength block " \
                "per session, never the centrepiece, and never replaces a run or a station. " \
@@ -66,7 +66,7 @@ module LLMContext
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "rowing_machine" } ] },
-            { name: "Iron Lift", format: "rounds", intensity_style: "max_effort", rounds: 4, rest_secs: 120,
+            { name: "Iron Lift", format: "rounds", intensity_style: "high", rounds: 4, rest_secs: 120,
               exercises: [
                 { name: "Push Press", reps: 5, equipment: "barbell" },
                 { name: "Bent-Over Row", reps: 5, equipment: "barbell" }
@@ -112,7 +112,7 @@ module LLMContext
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
             { name: "Engine Builder", format: "rounds", rounds: 5, rest_secs: 60,
               exercises: [ { name: "Run", distance_m: 400, notes: "hard pace", equipment: "treadmill" } ] },
-            { name: "Iron Lift", format: "rounds", intensity_style: "max_effort", rounds: 4, rest_secs: 120,
+            { name: "Iron Lift", format: "rounds", intensity_style: "high", rounds: 4, rest_secs: 120,
               exercises: [
                 { name: "Deadlift", reps: 5, equipment: "barbell" },
                 { name: "Pull-ups", reps: 5, equipment: "pull_up_bar" }

@@ -22,7 +22,16 @@ module LLMContext
         notes: "A flowing sequence — transitions between poses carry the rhythm. Open " \
                "with a gentle activation flow, close with savasana. Do NOT emit tabata, " \
                "for_time, emom, amrap, or any conditioning format. Movements are slow, " \
-               "controlled, and focused on breath, mobility, and core stability."
+               "controlled, and focused on breath, mobility, and core stability.",
+        intensity_guide: {
+          low:    "Restorative / yin — long passive holds (90-180s), supported postures, deep " \
+                  "breath work, minimal flow. Goal is release, not exertion.",
+          medium: "A standard breath-led vinyasa — moderate flow, balanced holds (30-60s), " \
+                  "warrior sequences, hip and shoulder openers. Steady but not strenuous.",
+          high:   "Power vinyasa — faster transitions, longer strength holds (chair, warrior III, " \
+                  "side plank), arm balances, and core-heavy pilates work. Builds heat without " \
+                  "ever crossing into conditioning — still no tabata, no burpees, no cardio."
+        }
       }.freeze
 
       MOVEMENT_VOCABULARY = <<~VOCAB.freeze

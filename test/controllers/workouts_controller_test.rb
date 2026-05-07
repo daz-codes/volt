@@ -84,8 +84,8 @@ class WorkoutsControllerTest < ActionDispatch::IntegrationTest
 
   test "create_with_llm forwards intensity_style to generator when valid" do
     with_generator_stub do |captured|
-      post workouts_path, params: { activity: "Functional Muscle", duration_mins: 45, intensity_style: "zone_2" }
-      assert_equal "zone_2", captured[:intensity_style]
+      post workouts_path, params: { activity: "Functional Muscle", duration_mins: 45, intensity_style: "low" }
+      assert_equal "low", captured[:intensity_style]
     end
   end
 

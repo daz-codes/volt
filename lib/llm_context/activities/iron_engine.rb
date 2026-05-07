@@ -21,6 +21,18 @@ module LLMContext
         cool_down:         :full_body_stretch,
         finisher:          :optional,
         core:              :never,
+        intensity_guide: {
+          low:    "Light bell, high-volume conditioning day — ballistics at 15-20 reps with a " \
+                  "lighter kettlebell and short rest (30s), OR long unbroken flows / carries at " \
+                  "conversational pace. NEVER running, rowing, or sprints — this activity is " \
+                  "kettlebell-only. Effort cue: easy, sustainable, breath stays smooth.",
+          medium: "Standard kettlebell conditioning — 10-rep ballistics or 8-10 rep grinds, " \
+                  "60-90s rest between rounds, working hard but in control. The default texture.",
+          high:   "Heavy bell, low reps, long rest — grinds at 5 reps (presses, squats, " \
+                  "deadlifts) with 120-180s rest, OR short ballistic bursts (10 heavy snatches " \
+                  "or swings) with full recovery between rounds. NO sprints (no cardio machines " \
+                  "exist here) — high intensity is heavy load, not heart rate."
+        },
         notes: "Complexes, flows, and carries are Iron Engine's signature formats — " \
                "at least one should appear in most sessions. " \
                "REP COUNTS: kettlebells are heavy, so keep reps low. Grinds " \
@@ -50,13 +62,13 @@ module LLMContext
           sections: [
             { name: "Warm-Up",  format: "straight", duration_mins: 5,
               exercises: [ { name: "KB activation flow (halos, goblet squats, light swings)", duration_s: 300, equipment: "kettlebells" } ] },
-            { name: "Grind Ladder", format: "ladder", intensity_style: "max_effort",
+            { name: "Grind Ladder", format: "ladder", intensity_style: "high",
               varies: "reps", start: 5, end: 1, step: 1, rest_between_rungs: 120,
               exercises: [
                 { name: "KB Front Squat", equipment: "kettlebells" },
                 { name: "KB Press",       equipment: "kettlebells" }
               ] },
-            { name: "Ballistic Finisher", format: "emom", intensity_style: "conditioning", duration_mins: 10, rest_secs: 0,
+            { name: "Ballistic Finisher", format: "emom", intensity_style: "medium", duration_mins: 10, rest_secs: 0,
               exercises: [
                 { name: "KB Swing",  reps: 15, equipment: "kettlebells" },
                 { name: "KB Snatch", reps: "5 each side", equipment: "kettlebells" }

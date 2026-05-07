@@ -60,15 +60,15 @@ module LLMContext
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "assault_bike" } ] },
-            { name: "Back Squat", format: "rounds", intensity_style: "max_effort", rounds: 5, rest_secs: 120,
+            { name: "Back Squat", format: "rounds", intensity_style: "high", rounds: 5, rest_secs: 120,
               exercises: [ { name: "Back Squat", reps: 5, equipment: "barbell" } ] },
-            { name: "Metcon", format: "amrap", intensity_style: "conditioning", duration_mins: 12, rest_secs: 0,
+            { name: "Metcon", format: "amrap", intensity_style: "medium", duration_mins: 12, rest_secs: 0,
               exercises: [
                 { name: "Box Jumps", reps: 15, equipment: "bodyweight" },
                 { name: "KB Swings", reps: 20, equipment: "kettlebells" },
                 { name: "Burpees", reps: 10, equipment: "bodyweight" }
               ] },
-            { name: "Wall Ball Burner", format: "rounds", intensity_style: "conditioning", rounds: 3, rest_secs: 120,
+            { name: "Wall Ball Burner", format: "rounds", intensity_style: "medium", rounds: 3, rest_secs: 120,
               exercises: [ { name: "Wall Balls", duration_s: 120, equipment: "wall_ball" } ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }

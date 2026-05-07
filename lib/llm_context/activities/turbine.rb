@@ -23,7 +23,12 @@ module LLMContext
         core:              :never,
         notes: "Never finish with a treadmill tabata (historical bug). Sprint intervals " \
                "use only 20s/10s, 20s/20s, 30s/15s, 30s/30s — rest never exceeds work. " \
-               "Rotate machines across sections; do not use the same machine twice in a row."
+               "Rotate machines across sections; do not use the same machine twice in a row. " \
+               "EVERY cardio exercise — running, jogging, rowing, skiing, biking — must " \
+               "carry an explicit metric per round: distance_m (e.g. 2000), duration_s " \
+               "(e.g. 300), or calories (e.g. 20). Never emit a rounds block with bare " \
+               "exercise names like 'Easy jog' and no metric — the athlete needs to know " \
+               "how far or how long each round lasts."
       }.freeze
 
       MOVEMENT_VOCABULARY = <<~VOCAB.freeze
@@ -35,37 +40,20 @@ module LLMContext
 
       EXAMPLES = [
         {
-          name: "Three-Way Pull",
-          goal: "Rotate through the three pulling machines at threshold with short rest.",
-          duration_mins: 30,
-          sections: [
-            { name: "Warm-Up", format: "straight", duration_mins: 3,
-              exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 180, equipment: "assault_bike" } ] },
-            { name: "Machine Rotation", format: "rounds", rest_secs: 30,
-              exercises: [
-                { name: "Row",          duration_s: 300, equipment: "rowing_machine" },
-                { name: "Ski Erg",      duration_s: 300, equipment: "ski_erg" },
-                { name: "Assault Bike", duration_s: 300, equipment: "assault_bike" }
-              ] },
-            { name: "Cool-Down", format: "straight", duration_mins: 2,
-              exercises: [ { name: "Dynamic stretches", notes: "5 deep breaths" } ] }
-          ]
-        },
-        {
           name: "Pyramid Intervals",
           goal: "Build and shed intensity with a clean sprint pyramid — rest never exceeds work.",
           duration_mins: 45,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "rowing_machine" } ] },
-            { name: "Sprint Pyramid", format: "emom", intensity_style: "max_effort", duration_mins: 20, rest_secs: 0,
+            { name: "Sprint Pyramid", format: "emom", intensity_style: "high", duration_mins: 20, rest_secs: 0,
               exercises: [
                 { name: "Row sprint",     duration_s: 20, notes: "work 20s, rest 10s", equipment: "rowing_machine" },
                 { name: "Row moderate",   duration_s: 30, notes: "work 30s, rest 30s", equipment: "rowing_machine" },
                 { name: "Ski Erg sprint", duration_s: 30, notes: "work 30s, rest 15s", equipment: "ski_erg" }
               ] },
-            { name: "Steady Finisher", format: "for_time", intensity_style: "zone_2",
-              exercises: [ { name: "Run", reps: "1.5 km", equipment: "treadmill" } ] },
+            { name: "Steady Finisher", format: "for_time", intensity_style: "low",
+              exercises: [ { name: "Run", distance_m: 1500, equipment: "treadmill" } ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
           ]
@@ -84,6 +72,25 @@ module LLMContext
               ] },
             { name: "Cool-Down", format: "straight", duration_mins: 2,
               exercises: [ { name: "Dynamic stretches", notes: "5 deep breaths" } ] }
+          ]
+        },
+        {
+          name: "Endless Horizon",
+          goal: "Build aerobic capacity with zone 2 steady-state cardio across all machines — conversational pace throughout.",
+          duration_mins: 60,
+          sections: [
+            { name: "Warm-Up", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "rowing_machine" } ] },
+            { name: "Engine Builder", format: "straight", intensity_style: "low",
+              exercises: [
+                { name: "Row",          duration_s: 300, notes: "conversational pace", equipment: "rowing_machine" },
+                { name: "Ski Erg",      duration_s: 300, notes: "nose-breathing pace", equipment: "ski_erg" },
+                { name: "Assault Bike", duration_s: 300, notes: "easy spin",            equipment: "assault_bike" }
+              ] },
+            { name: "Long Run Home", format: "rounds", intensity_style: "low", rounds: 3, rest_secs: 60,
+              exercises: [ { name: "Easy jog", distance_m: 2000, notes: "conversational pace", equipment: "treadmill" } ] },
+            { name: "Cool-Down", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
           ]
         }
       ].freeze

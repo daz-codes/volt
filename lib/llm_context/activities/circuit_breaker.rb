@@ -100,7 +100,7 @@ module LLMContext
                 { name: "Burpees", reps: 10, equipment: "bodyweight" },
                 { name: "Box Jumps", reps: 10, equipment: "bodyweight" }
               ] },
-            { name: "KB Swing Burner", format: "rounds", intensity_style: "conditioning", rounds: 3, rest_secs: 120,
+            { name: "KB Swing Burner", format: "rounds", intensity_style: "medium", rounds: 3, rest_secs: 120,
               exercises: [ { name: "KB Swings", duration_s: 120, equipment: "kettlebells" } ] },
             { name: "Matrix Finisher", format: "matrix",
               exercises: [

@@ -19,6 +19,7 @@ class WorkoutValidator
   # while sharing that minute with other exercises.
   EMOM_CARDIO_CAL_CAP = 10
   CARDIO_MACHINE_PATTERN = /ski|erg|row|bike|assault|air.?bike|concept|treadmill/i.freeze
+  CARDIO_RUN_PATTERN     = /\b(run|jog|sprint)(ning|s)?\b/i.freeze
 
   # Valid step-size range per ladder/mountain metric.
   # distance_m has no upper bound — just a minimum of 10.
@@ -707,9 +708,9 @@ class WorkoutValidator
       rest = section["rest_secs"].to_i
       next if rest.zero? || rest <= 20  # no rest or very short transition — leave alone
 
-      # Max-effort sections (heavy lifts, sprint intervals) need long rest.
+      # High-intensity sections (heavy lifts, sprint intervals) need long rest.
       # Snap to the wider 90/120/150/180 grid; never coerce to 60s.
-      allowed = section["intensity_style"] == "max_effort" ? ALLOWED_REST_MAX_EFFORT : ALLOWED_REST
+      allowed = section["intensity_style"] == "high" ? ALLOWED_REST_MAX_EFFORT : ALLOWED_REST
       snapped = allowed.min_by { |v| (v - rest).abs }
       next if snapped == rest
       @fixes << "'#{section["name"]}': rest_secs #{rest}s → #{snapped}s"
@@ -724,9 +725,9 @@ class WorkoutValidator
   def fix_rest_ratio(sections)
     sections.each do |section|
       next if section["format"] == "tabata"
-      # max_effort sections deliberately have long rest (heavy lifts, sprint
+      # high-intensity sections deliberately have long rest (heavy lifts, sprint
       # intervals) — rest > work is the point.
-      next if section["intensity_style"] == "max_effort"
+      next if section["intensity_style"] == "high"
       rest = section["rest_secs"].to_i
       next if rest.zero?
 
@@ -1216,17 +1217,25 @@ class WorkoutValidator
       rounds = section["rounds"].to_i.clamp(1, 99)
 
       Array(section["exercises"]).each do |ex|
-        next unless ex["name"].to_s.match?(CARDIO_MACHINE_PATTERN)
-        next if ex["name"].to_s.match?(/\btreadmill\b/i) # treadmill handled separately
+        name = ex["name"].to_s
+        is_machine = name.match?(CARDIO_MACHINE_PATTERN) && !name.match?(/\btreadmill\b/i)
+        is_run     = name.match?(CARDIO_RUN_PATTERN) || name.match?(/\btreadmill\b/i)
+        next unless is_machine || is_run
+
         has_metric = ex["reps"].to_i > 0 || ex["calories"].to_i > 0 ||
                      ex["distance_m"].to_i > 0 || ex["duration_s"].to_i > 0
         next if has_metric
 
-        # Pick a sensible calorie default based on round count
-        bucket = rounds <= 3 ? 1 : rounds <= 6 ? 2 : 3
-        cals = DEFAULT_CARDIO_CALS[bucket]
-        ex["calories"] = cals
-        @fixes << "'#{section["name"]}': #{ex["name"]} had no metric — set #{cals} cal"
+        if is_run
+          # Default running rounds to 1km per round — a sensible zone-2 default.
+          ex["distance_m"] = 1000
+          @fixes << "'#{section["name"]}': #{name} had no metric — set 1000m"
+        else
+          bucket = rounds <= 3 ? 1 : rounds <= 6 ? 2 : 3
+          cals = DEFAULT_CARDIO_CALS[bucket]
+          ex["calories"] = cals
+          @fixes << "'#{section["name"]}': #{name} had no metric — set #{cals} cal"
+        end
       end
     end
   end

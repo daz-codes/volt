@@ -72,14 +72,14 @@ module LLMContext
             { name: "Row Distance Ladder", format: "ladder",
               varies: "distance_m", start: 500, end: 100, step: 100, rest_between_rungs: 30,
               exercises: [ { name: "Row", equipment: "rowing_machine" } ] },
-            { name: "Lower Body Strength", format: "rounds", intensity_style: "max_effort", rounds: 3, rest_secs: 120,
+            { name: "Lower Body Strength", format: "rounds", intensity_style: "high", rounds: 3, rest_secs: 120,
               exercises: [
                 { name: "Front Squat", reps: 5, equipment: "barbell" },
                 { name: "Romanian Deadlift", reps: 5, equipment: "barbell" }
               ] },
             { name: "Assault Bike Sprints", format: "emom", duration_mins: 6, rest_secs: 0,
               exercises: [ { name: "Assault Bike", calories: 10, equipment: "assault_bike" } ] },
-            { name: "Upper Body Tabata", format: "tabata", intensity_style: "conditioning", rounds: 8, rest_secs: 10,
+            { name: "Upper Body Tabata", format: "tabata", intensity_style: "medium", rounds: 8, rest_secs: 10,
               exercises: [
                 { name: "Push-ups", duration_s: 20, equipment: "bodyweight" },
                 { name: "KB High Pull", duration_s: 20, equipment: "kettlebells" }
@@ -98,7 +98,7 @@ module LLMContext
             { name: "Ski Erg Distance Ladder", format: "ladder",
               varies: "distance_m", start: 500, end: 100, step: 100, rest_between_rungs: 30,
               exercises: [ { name: "SkiErg", equipment: "ski_erg" } ] },
-            { name: "Push Floor", format: "rounds", intensity_style: "max_effort", rounds: 4, rest_secs: 120,
+            { name: "Push Floor", format: "rounds", intensity_style: "high", rounds: 4, rest_secs: 120,
               exercises: [
                 { name: "Push Press", reps: 5, equipment: "barbell" },
                 { name: "Chin-ups", reps: 5, equipment: "pull_up_bar" }
@@ -133,7 +133,7 @@ module LLMContext
               ] },
             { name: "Treadmill Finisher", format: "for_time",
               exercises: [ { name: "Run", distance_m: 1000, equipment: "treadmill" } ] },
-            { name: "Med Ball Slam Burner", format: "rounds", intensity_style: "conditioning", rounds: 3, rest_secs: 120,
+            { name: "Med Ball Slam Burner", format: "rounds", intensity_style: "medium", rounds: 3, rest_secs: 120,
               exercises: [ { name: "Med Ball Slams", duration_s: 120, equipment: "wall_ball" } ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }

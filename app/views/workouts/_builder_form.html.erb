@@ -86,7 +86,7 @@
                 ["mountain",            "Mountain"],
                 ["matrix",              "Matrix"],
                 ["hundred",             "Hundred"],
-                ["switchback",          "Switchback"]
+                ["switchback",          "Up & Down Ladder"]
               ].each do |val, label| %>
                 <option value="<%= val %>" <%= "selected" if section["format"] == val %>><%= label %></option>
               <% end %>
@@ -143,6 +143,69 @@
               <span class="text-xs font-bold text-purple-400 bg-purple-500/10 border border-purple-500/25 px-3 py-1.5 rounded-full">20s work · 10s rest</span>
               <p class="text-xs text-gray-500">Add the exercises performed during each work interval.</p>
             </div>
+          </div>
+          <div data-format-field="ladder" class="mb-3 space-y-2" <%= "style=display:none" unless fmt == "ladder" %>>
+            <div class="flex items-center gap-2 flex-wrap">
+              <select name="sections[<%= si %>][varies]" <%= "disabled" unless fmt == "ladder" %>
+                class="bg-zinc-800 border border-zinc-600 rounded-lg px-2 py-1.5 text-xs text-gray-300 focus:outline-none focus:border-lime-400 transition-colors">
+                <% [["reps", "Reps"], ["calories", "Calories"], ["kg", "Weight (kg)"], ["distance_m", "Distance (m)"]].each do |val, label| %>
+                  <option value="<%= val %>" <%= "selected" if section["varies"].to_s == val %>><%= label %></option>
+                <% end %>
+              </select>
+              <input name="sections[<%= si %>][start]" type="number" min="1" placeholder="Start (e.g. 10)"
+                value="<%= section["start"] %>" <%= "disabled" unless fmt == "ladder" %>
+                class="w-32 bg-zinc-800 border border-zinc-600 rounded-lg px-2 py-1.5 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-lime-400 transition-colors">
+              <input name="sections[<%= si %>][end]" type="number" min="1" placeholder="End (e.g. 1)"
+                value="<%= section["end"] %>" <%= "disabled" unless fmt == "ladder" %>
+                class="w-32 bg-zinc-800 border border-zinc-600 rounded-lg px-2 py-1.5 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-lime-400 transition-colors">
+              <input name="sections[<%= si %>][step]" type="number" min="1" placeholder="Step"
+                value="<%= section["step"] || 1 %>" <%= "disabled" unless fmt == "ladder" %>
+                class="w-24 bg-zinc-800 border border-zinc-600 rounded-lg px-2 py-1.5 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-lime-400 transition-colors">
+              <input name="sections[<%= si %>][rest_between_rungs]" type="number" min="0" placeholder="Rest (secs, opt.)"
+                value="<%= section["rest_between_rungs"] %>" <%= "disabled" unless fmt == "ladder" %>
+                class="w-36 bg-zinc-800 border border-zinc-600 rounded-lg px-2 py-1.5 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-lime-400 transition-colors">
+            </div>
+            <p class="text-xs text-gray-600">Add the exercises done each rung — reps/load are set by the sequence above.</p>
+          </div>
+          <div data-format-field="mountain" class="mb-3 space-y-2" <%= "style=display:none" unless fmt == "mountain" %>>
+            <div class="flex items-center gap-2 flex-wrap">
+              <select name="sections[<%= si %>][varies]" <%= "disabled" unless fmt == "mountain" %>
+                class="bg-zinc-800 border border-zinc-600 rounded-lg px-2 py-1.5 text-xs text-gray-300 focus:outline-none focus:border-lime-400 transition-colors">
+                <% [["reps", "Reps"], ["calories", "Calories"], ["kg", "Weight (kg)"], ["distance_m", "Distance (m)"]].each do |val, label| %>
+                  <option value="<%= val %>" <%= "selected" if section["varies"].to_s == val %>><%= label %></option>
+                <% end %>
+              </select>
+              <input name="sections[<%= si %>][start]" type="number" min="1" placeholder="Start (e.g. 1)"
+                value="<%= section["start"] %>" <%= "disabled" unless fmt == "mountain" %>
+                class="w-32 bg-zinc-800 border border-zinc-600 rounded-lg px-2 py-1.5 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-lime-400 transition-colors">
+              <input name="sections[<%= si %>][peak]" type="number" min="1" placeholder="Peak (e.g. 5)"
+                value="<%= section["peak"] %>" <%= "disabled" unless fmt == "mountain" %>
+                class="w-32 bg-zinc-800 border border-zinc-600 rounded-lg px-2 py-1.5 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-lime-400 transition-colors">
+              <input name="sections[<%= si %>][end]" type="number" min="1" placeholder="End (e.g. 1)"
+                value="<%= section["end"] %>" <%= "disabled" unless fmt == "mountain" %>
+                class="w-32 bg-zinc-800 border border-zinc-600 rounded-lg px-2 py-1.5 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-lime-400 transition-colors">
+              <input name="sections[<%= si %>][step]" type="number" min="1" placeholder="Step"
+                value="<%= section["step"] || 1 %>" <%= "disabled" unless fmt == "mountain" %>
+                class="w-24 bg-zinc-800 border border-zinc-600 rounded-lg px-2 py-1.5 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-lime-400 transition-colors">
+              <input name="sections[<%= si %>][rest_between_rungs]" type="number" min="0" placeholder="Rest (secs, opt.)"
+                value="<%= section["rest_between_rungs"] %>" <%= "disabled" unless fmt == "mountain" %>
+                class="w-36 bg-zinc-800 border border-zinc-600 rounded-lg px-2 py-1.5 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-lime-400 transition-colors">
+            </div>
+            <p class="text-xs text-gray-600">Add the exercises done each rung — reps/load climb to the peak then descend.</p>
+          </div>
+          <div data-format-field="switchback" class="mb-3 space-y-2" <%= "style=display:none" unless fmt == "switchback" %>>
+            <div class="flex items-center gap-2 flex-wrap">
+              <input name="sections[<%= si %>][start]" type="number" min="1" placeholder="Start (e.g. 25)"
+                value="<%= section["start"] %>" <%= "disabled" unless fmt == "switchback" %>
+                class="w-32 bg-zinc-800 border border-zinc-600 rounded-lg px-2 py-1.5 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-lime-400 transition-colors">
+              <input name="sections[<%= si %>][end]" type="number" min="1" placeholder="End (e.g. 5)"
+                value="<%= section["end"] %>" <%= "disabled" unless fmt == "switchback" %>
+                class="w-32 bg-zinc-800 border border-zinc-600 rounded-lg px-2 py-1.5 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-lime-400 transition-colors">
+              <input name="sections[<%= si %>][step]" type="number" min="1" placeholder="Step"
+                value="<%= section["step"] || 5 %>" <%= "disabled" unless fmt == "switchback" %>
+                class="w-24 bg-zinc-800 border border-zinc-600 rounded-lg px-2 py-1.5 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-lime-400 transition-colors">
+            </div>
+            <p class="text-xs text-gray-600">First exercise descends from start→end; second ascends end→start.</p>
           </div>
           <div data-exercises-list class="space-y-2 mb-3">
             <% Array(section["exercises"]).each_with_index do |exercise, ei| %>

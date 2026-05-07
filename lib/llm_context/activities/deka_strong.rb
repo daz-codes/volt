@@ -29,7 +29,7 @@ module LLMContext
                "variations like Box Jump Burpees) in most sessions — they keep training " \
                "varied and complement the stations. " \
                "STRENGTH ACCESSORY (most sessions): include one strength accessory block — " \
-               "rounds format, 3-6 reps heavy at 120s rest with intensity_style: max_effort, " \
+               "rounds format, 3-6 reps heavy at 120s rest with intensity_style: high, " \
                "OR 8-10 reps moderate at 90s rest. Draw from the Strength accessory line " \
                "(Deadlift, Bench Press, Push Press, Bent-Over Row, Pull-ups, Bulgarian Split " \
                "Squat). Heavy compound work alongside stations is what makes this variant. " \
@@ -78,7 +78,7 @@ module LLMContext
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "rowing_machine" } ] },
-            { name: "Iron Lift", format: "rounds", intensity_style: "max_effort", rounds: 4, rest_secs: 120,
+            { name: "Iron Lift", format: "rounds", intensity_style: "high", rounds: 4, rest_secs: 120,
               exercises: [
                 { name: "Deadlift", reps: 5, equipment: "barbell" },
                 { name: "Pull-ups", reps: 5, equipment: "pull_up_bar" }

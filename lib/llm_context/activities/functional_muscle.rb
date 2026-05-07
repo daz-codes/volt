@@ -114,7 +114,7 @@ module LLMContext
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
-            { name: "TWENTY20", format: "rounds", intensity_style: "conditioning", rounds: 5, rest_secs: 0,
+            { name: "TWENTY20", format: "rounds", intensity_style: "medium", rounds: 5, rest_secs: 0,
               exercises: [
                 { name: "Row", calories: 20, notes: "hard sustainable effort", equipment: "rowing_machine" },
                 { name: "KB Swings", reps: 20, equipment: "kettlebells" }
@@ -122,11 +122,11 @@ module LLMContext
             { name: "Bear Mountain", format: "mountain",
               varies: "reps", start: 1, peak: 5, end: 1, step: 1, rest_between_rungs: 30,
               exercises: [ { name: "Bear", notes: "moderate barbell — clean → press → front squat → press → back squat = 1 rep", equipment: "barbell" } ] },
-            { name: "Upper Body Strength", format: "rounds", intensity_style: "conditioning", rounds: 5, rest_secs: 60,
+            { name: "Upper Body Strength", format: "rounds", intensity_style: "medium", rounds: 5, rest_secs: 60,
               exercises: [ { name: "Low Row", reps: 10, notes: "working weight", equipment: "dumbbells" } ] },
-            { name: "Lower Body Strength", format: "rounds", intensity_style: "conditioning", rounds: 5, rest_secs: 60,
+            { name: "Lower Body Strength", format: "rounds", intensity_style: "medium", rounds: 5, rest_secs: 60,
               exercises: [ { name: "Deadlifts", reps: 10, notes: "working weight", equipment: "barbell" } ] },
-            { name: "Shoulder Burn", format: "hundred", intensity_style: "conditioning",
+            { name: "Shoulder Burn", format: "hundred", intensity_style: "medium",
               exercises: [ { name: "Lateral Raises", reps: 100, notes: "light DB", equipment: "dumbbells" } ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }

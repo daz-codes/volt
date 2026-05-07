@@ -19,10 +19,21 @@ module LLMContext
         cool_down:         :full_body_stretch,
         finisher:          :optional,
         core:              :optional,
+        intensity_guide: {
+          low:    "Light technique day — submaximal compound lifts at 50-60% intensity for 8-12 " \
+                  "reps with generous rest, OR a mobility/accessory-focused session. NEVER cardio " \
+                  "(this activity has no cardio machines). Effort cue: smooth and easy, leave plenty " \
+                  "in the tank.",
+          medium: "Hypertrophy / volume day — 6-10 reps per set, 90-120s rest, working at " \
+                  "RPE 7-8. The bread-and-butter strength session.",
+          high:   "Heavy day — top-end compound lifts at 3-5 reps, 120-180s rest between sets, " \
+                  "loads at 85%+ where the last rep is genuinely hard. NO sprints, NO cardio " \
+                  "intervals — high intensity here means heavy load, not heart rate."
+        },
         notes: "PURE STRENGTH: no cardio machines (rower, ski erg, assault bike, treadmill) " \
                "anywhere in the session. Use rounds and straight sets as the main structure. " \
                "REP & REST SCHEMES (match the work to the rest): " \
-               "heavy compound 3-5 reps → 120-180s rest (2-3 min, intensity_style: max_effort); " \
+               "heavy compound 3-5 reps → 120-180s rest (2-3 min, intensity_style: high); " \
                "hypertrophy 6-10 reps → 90-120s rest; " \
                "accessory/finisher 10-15 reps → 60-90s rest. " \
                "60s rest is for accessories, never for heavy bench/squat/deadlift. " \
@@ -56,7 +67,7 @@ module LLMContext
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
               exercises: [ { name: "Bodyweight activation + Dynamic stretches", duration_s: 300, equipment: "bodyweight" } ] },
-            { name: "Back Squat", format: "rounds", intensity_style: "max_effort", rounds: 5, rest_secs: 120,
+            { name: "Back Squat", format: "rounds", intensity_style: "high", rounds: 5, rest_secs: 120,
               exercises: [ { name: "Back Squat", reps: 5, equipment: "barbell", notes: "heavy load — last rep should be near failure" } ] },
             { name: "DB Row", format: "rounds", rounds: 4, rest_secs: 90,
               exercises: [ { name: "DB Row each side", reps: 10, equipment: "dumbbells" } ] },
@@ -94,11 +105,11 @@ module LLMContext
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
               exercises: [ { name: "Bodyweight activation + Dynamic stretches", duration_s: 300, equipment: "bodyweight" } ] },
-            { name: "Deadlift", format: "rounds", intensity_style: "max_effort", rounds: 5, rest_secs: 180,
+            { name: "Deadlift", format: "rounds", intensity_style: "high", rounds: 5, rest_secs: 180,
               exercises: [ { name: "Deadlift", reps: 3, equipment: "barbell", notes: "top-end strength — go heavy, full reset between reps" } ] },
             { name: "Pull-up Block", format: "rounds", rounds: 4, rest_secs: 90,
               exercises: [ { name: "Pull-ups", reps: 8, equipment: "pull_up_bar" } ] },
-            { name: "Walking Lunge Burner", format: "rounds", intensity_style: "conditioning", rounds: 3, rest_secs: 120,
+            { name: "Walking Lunge Burner", format: "rounds", intensity_style: "medium", rounds: 3, rest_secs: 120,
               exercises: [ { name: "Walking Lunges", duration_s: 120, equipment: "bodyweight" } ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }

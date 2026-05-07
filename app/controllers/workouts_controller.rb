@@ -458,7 +458,7 @@ class WorkoutsController < ApplicationController
     group_tag_name  = params[:group_code].presence
     equipment       = Array(params[:equipment]).compact_blank.intersection(User::EQUIPMENT_SLUGS)
     injury_notes    = params[:injury_notes].presence
-    intensity_style = params[:intensity_style].to_s.presence_in(%w[zone_2 conditioning max_effort])
+    intensity_style = params[:intensity_style].to_s.presence_in(%w[low medium high])
 
     generator = WorkoutLLMGenerator.new(
       user:            Current.user,

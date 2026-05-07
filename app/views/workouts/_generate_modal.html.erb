@@ -92,10 +92,10 @@
     <div class="mb-6">
       <p class="text-sm font-semibold text-gray-300 uppercase tracking-wide mb-3">Intensity</p>
       <% intensity_options = [
-        { value: "zone_2",       label: "Zone 2",       default: false },
-        { value: "conditioning", label: "Conditioning", default: true  },
-        { value: "max_effort",   label: "Max Effort",   default: false },
-        { value: "",             label: "Mixed",        default: false }
+        { value: "low",    label: "Low",    default: false },
+        { value: "medium", label: "Medium", default: true  },
+        { value: "high",   label: "High",   default: false },
+        { value: "",       label: "Mixed",  default: false }
       ] %>
       <div class="flex flex-wrap gap-2">
         <% intensity_options.each do |opt| %>

@@ -31,7 +31,7 @@ module LLMContext
                "movement at all are too narrow. Only full race-simulation sessions skip them. " \
                "STRENGTH ACCESSORY (most non-race-simulation sessions): include one strength " \
                "accessory block — rounds format, 3-6 reps heavy at 120s rest with " \
-               "intensity_style: max_effort, OR 8-10 reps moderate at 90s rest. Draw from " \
+               "intensity_style: high, OR 8-10 reps moderate at 90s rest. Draw from " \
                "the Strength accessory line (Deadlift, Bench Press, Push Press, Bent-Over " \
                "Row, Pull-ups, Bulgarian Split Squat). Never more than one strength block " \
                "per session, never the centrepiece, and never replaces a run or a station. " \

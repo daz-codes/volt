@@ -33,16 +33,27 @@ class WorkoutLLMGenerator::ContractPromptBuilderTest < ActiveSupport::TestCase
   end
 
   test "includes intensity_style tag when set" do
-    prompt = build(intensity_style: "zone_2")
-    assert_includes prompt, "<intensity_style>\nzone_2\n</intensity_style>"
+    prompt = build(activity_slug: "general-fitness", intensity_style: "low")
+    assert_includes prompt, "<intensity_style>\nlow\n</intensity_style>"
   end
 
   test "intensity_style tag appears before session_notes tag" do
-    prompt = build(intensity_style: "max_effort", session_notes: "no running")
+    prompt = build(intensity_style: "high", session_notes: "no running")
     intensity_pos = prompt.index("<intensity_style>")
     notes_pos = prompt.index("<session_notes>")
     assert intensity_pos && notes_pos, "both tags must be present"
     assert intensity_pos < notes_pos, "intensity_style must come before session_notes"
+  end
+
+  test "intensity_style block embeds the activity's intensity_guide line when defined" do
+    prompt = build(activity_slug: "ohm", intensity_style: "high")
+    assert_match(/<intensity_style>\nhigh\n\nFor Volt Flow, treat `high` as: [^\n]*power vinyasa/i, prompt)
+  end
+
+  test "intensity_style block omits the guide line when the contract does not define one" do
+    # general-fitness has no intensity_guide → tag contains just the value, falls back to global rules
+    prompt = build(activity_slug: "general-fitness", intensity_style: "low")
+    assert_includes prompt, "<intensity_style>\nlow\n</intensity_style>"
   end
 
   test "iron-engine prompt includes KETTLEBELL ONLY purity statement" do
@@ -71,8 +82,8 @@ class WorkoutLLMGenerator::ContractPromptBuilderTest < ActiveSupport::TestCase
   test "examples surface explicit intensity_style annotations" do
     examples_block = build(activity_slug: "kettlebell")[/\<examples\>(.*?)\<\/examples\>/m, 1]
     refute_nil examples_block
-    assert_match(/"intensity_style"\s*:\s*"max_effort"/, examples_block)
-    assert_match(/"intensity_style"\s*:\s*"conditioning"/, examples_block)
+    assert_match(/"intensity_style"\s*:\s*"high"/, examples_block)
+    assert_match(/"intensity_style"\s*:\s*"medium"/, examples_block)
   end
 
   test "global_rules block contains the rest-work rule" do
@@ -83,8 +94,8 @@ class WorkoutLLMGenerator::ContractPromptBuilderTest < ActiveSupport::TestCase
     rules = build[/\<global_rules\>(.*?)\<\/global_rules\>/m, 1]
     refute_nil rules
     assert_match(/goal.*intensity_style/im, rules)
-    assert_match(/zone 2/, rules)
-    assert_match(/max effort/, rules)
+    assert_match(/low/, rules)
+    assert_match(/high/, rules)
   end
 
   test "banned_equipment_override merges into contract banned list" do

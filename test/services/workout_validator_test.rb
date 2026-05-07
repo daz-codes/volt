@@ -215,21 +215,21 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
     assert_equal 60, section["rest_secs"], "no timed work — leave rest alone"
   end
 
-  test "fix_rest_ratio leaves max_effort sections alone (long rest is the point)" do
+  test "fix_rest_ratio leaves high-intensity sections alone (long rest is the point)" do
     data = build_workout_with_sections([
       { "name" => "Heavy Bench", "category" => "main", "format" => "rounds", "rounds" => 5,
-        "intensity_style" => "max_effort", "rest_secs" => 180,
+        "intensity_style" => "high", "rest_secs" => 180,
         "exercises" => [ { "name" => "Bench Press", "duration_s" => 30 } ] }
     ])
     result = WorkoutValidator.new(data, duration_mins: 45, main_tag_slug: "").validate_and_fix
     section = result.dig("structure", "sections").first
-    assert_equal 180, section["rest_secs"], "max_effort rest must not be capped at work duration"
+    assert_equal 180, section["rest_secs"], "high-intensity rest must not be capped at work duration"
   end
 
-  test "fix_rest_secs snaps max_effort rest to wider grid (90/120/150/180)" do
+  test "fix_rest_secs snaps high-intensity rest to wider grid (90/120/150/180)" do
     data = build_workout_with_sections([
       { "name" => "Heavy Squats", "category" => "main", "format" => "rounds", "rounds" => 5,
-        "intensity_style" => "max_effort", "rest_secs" => 100,
+        "intensity_style" => "high", "rest_secs" => 100,
         "exercises" => [ { "name" => "Back Squat", "reps" => 5 } ] }
     ])
     result = WorkoutValidator.new(data, duration_mins: 45, main_tag_slug: "").validate_and_fix

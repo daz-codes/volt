@@ -24,7 +24,7 @@ module Workout::StructureBuilder
         "category" => Workout::CATEGORIES.include?(s[:category]) ? s[:category] : "main",
         "format"   => format
       }
-      section["intensity_style"] = s[:intensity_style].to_s if %w[zone_2 conditioning max_effort].include?(s[:intensity_style].to_s)
+      section["intensity_style"] = s[:intensity_style].to_s if %w[low medium high].include?(s[:intensity_style].to_s)
       section["rounds"]        = s[:rounds].to_i         if s[:rounds].present?
       section["duration_mins"] = s[:duration_mins].to_i  if s[:duration_mins].present?
       section["rest_secs"]     = s[:rest_secs].to_i      if s[:rest_secs].present?
