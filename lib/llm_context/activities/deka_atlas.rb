@@ -56,11 +56,11 @@ module LLMContext
                 { name: "Barbell Thrusters", reps: 20, equipment: "barbell" },
                 { name: "Bar-Facing Burpees Over Bar", reps: 20, equipment: "barbell" },
                 { name: "Single Arm DB Ground to Overhead", reps: 20, equipment: "dumbbells" },
-                { name: "Dumbbell Bear Crawl", reps: "40m", equipment: "dumbbells" },
+                { name: "Dumbbell Bear Crawl", distance_m: 40, equipment: "dumbbells" },
                 { name: "Jump Rope Single Unders", reps: 100, equipment: "jump_rope" }
               ] },
             { name: "Carry Finisher", format: "rounds", rounds: 3, rest_secs: 60,
-              exercises: [ { name: "Farmer's Carry", reps: "60m", equipment: "kettlebells" } ] },
+              exercises: [ { name: "Farmer's Carry", distance_m: 60, equipment: "kettlebells" } ] },
             { name: "Cool-Down", format: "straight", duration_mins: 2,
               exercises: [ { name: "Dynamic stretches", notes: "5 deep breaths" } ] }
           ]
@@ -80,7 +80,7 @@ module LLMContext
             { name: "DB Circuit", format: "rounds", rounds: 4, rest_secs: 45,
               exercises: [
                 { name: "DB Shoulder to Overhead Press", reps: 10, equipment: "dumbbells" },
-                { name: "Dumbbell Bear Crawl", reps: "20m", equipment: "dumbbells" }
+                { name: "Dumbbell Bear Crawl", distance_m: 20, equipment: "dumbbells" }
               ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
@@ -99,12 +99,12 @@ module LLMContext
                 { name: "Bar-Facing Burpees Over Bar", reps: 20, equipment: "barbell" },
                 { name: "Surrender Lunges (weighted)", reps: 20, equipment: "dumbbells" },
                 { name: "Single Arm DB Ground to Overhead", reps: 20, equipment: "dumbbells" },
-                { name: "Dumbbell Bear Crawl", reps: "40m", equipment: "dumbbells" },
+                { name: "Dumbbell Bear Crawl", distance_m: 40, equipment: "dumbbells" },
                 { name: "Weighted Sit-ups", reps: 20, equipment: "dumbbells" },
-                { name: "Farmer's Carry", reps: "60m", equipment: "kettlebells" },
+                { name: "Farmer's Carry", distance_m: 60, equipment: "kettlebells" },
                 { name: "DB Shoulder to Overhead Press", reps: 20, equipment: "dumbbells" },
                 { name: "Jump Rope Single Unders", reps: 100, equipment: "jump_rope" },
-                { name: "Atlas Shoulder to Carry", reps: "100m", equipment: "sled" }
+                { name: "Atlas Shoulder to Carry", distance_m: 100, equipment: "sled" }
               ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }

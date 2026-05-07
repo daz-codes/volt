@@ -67,8 +67,8 @@ module LLMContext
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 180, equipment: "rowing_machine" } ] },
             { name: "Hammer Time", format: "rounds", rounds: 4, rest_secs: 30,
               exercises: [
-                { name: "Run", reps: "500m", equipment: "treadmill" },
-                { name: "Sled Push", reps: "15m", equipment: "sled" },
+                { name: "Run", distance_m: 500, equipment: "treadmill" },
+                { name: "Sled Push", distance_m: 15, equipment: "sled" },
                 { name: "Wall Balls", reps: 15, equipment: "wall_ball" }
               ] },
             { name: "Cooked", format: "for_time",
@@ -85,7 +85,7 @@ module LLMContext
             { name: "Warm-Up", format: "straight", duration_mins: 5,
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
             { name: "Engine Builder", format: "rounds", rounds: 4, rest_secs: 60,
-              exercises: [ { name: "Run", reps: "500m", notes: "hard pace", equipment: "treadmill" } ] },
+              exercises: [ { name: "Run", distance_m: 500, notes: "hard pace", equipment: "treadmill" } ] },
             { name: "Heavy Hands", format: "rounds", rounds: 4, rest_secs: 60,
               exercises: [
                 { name: "RAM Reverse Lunges", reps: 12 },
@@ -107,9 +107,9 @@ module LLMContext
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "rowing_machine" } ] },
             { name: "Tip of the Spear", format: "rounds", rounds: 4, rest_secs: 60,
               exercises: [
-                { name: "Run", reps: "500m", equipment: "treadmill" },
-                { name: "Sled Push", reps: "15m", equipment: "sled" },
-                { name: "Sandbag Lunges", reps: "20m", equipment: "sled" }
+                { name: "Run", distance_m: 500, equipment: "treadmill" },
+                { name: "Sled Push", distance_m: 15, equipment: "sled" },
+                { name: "Sandbag Lunges", distance_m: 20, equipment: "sled" }
               ] },
             { name: "Iron Storm", format: "rounds", rounds: 5, rest_secs: 60,
               exercises: [

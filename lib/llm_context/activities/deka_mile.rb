@@ -57,13 +57,13 @@ module LLMContext
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "treadmill" } ] },
             { name: "Mile Efforts", format: "rounds", rounds: 3, rest_secs: 120,
               exercises: [
-                { name: "Run", reps: "1 mile", notes: "steady-hard", equipment: "treadmill" },
+                { name: "Run", distance_m: 1600, notes: "steady-hard", equipment: "treadmill" },
                 { name: "Box Jump / Step Over", reps: 20, equipment: "bodyweight" }
               ] },
             { name: "Station Finisher", format: "for_time",
               exercises: [
-                { name: "Row", reps: "500m", equipment: "rowing_machine" },
-                { name: "Farmer's Carry", reps: "100m", equipment: "kettlebells" }
+                { name: "Row", distance_m: 500, equipment: "rowing_machine" },
+                { name: "Farmer's Carry", distance_m: 100, equipment: "kettlebells" }
               ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
@@ -77,10 +77,10 @@ module LLMContext
             { name: "Warm-Up", format: "straight", duration_mins: 3,
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 180, equipment: "rowing_machine" } ] },
             { name: "400 Repeats", format: "rounds", rounds: 6, rest_secs: 60,
-              exercises: [ { name: "Run", reps: "400m", notes: "hard pace", equipment: "treadmill" } ] },
+              exercises: [ { name: "Run", distance_m: 400, notes: "hard pace", equipment: "treadmill" } ] },
             { name: "Station Block", format: "emom", duration_mins: 10, rest_secs: 0,
               exercises: [
-                { name: "SkiErg", reps: "15 cal", equipment: "ski_erg" },
+                { name: "SkiErg", calories: 15, equipment: "ski_erg" },
                 { name: "RAM Reverse Lunges", reps: 15 }
               ] },
             { name: "Cool-Down", format: "straight", duration_mins: 2,
@@ -96,14 +96,14 @@ module LLMContext
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "treadmill" } ] },
             { name: "Run-Station Alternation", format: "for_time",
               exercises: [
-                { name: "Run", reps: "1 mile", equipment: "treadmill" },
+                { name: "Run", distance_m: 1600, equipment: "treadmill" },
                 { name: "RAM Reverse Lunges", reps: 30 },
-                { name: "Run", reps: "800m", equipment: "treadmill" },
-                { name: "Row", reps: "500m", equipment: "rowing_machine" },
-                { name: "Run", reps: "800m", equipment: "treadmill" },
+                { name: "Run", distance_m: 800, equipment: "treadmill" },
+                { name: "Row", distance_m: 500, equipment: "rowing_machine" },
+                { name: "Run", distance_m: 800, equipment: "treadmill" },
                 { name: "Box Jump / Step Over", reps: 20, equipment: "bodyweight" },
-                { name: "Run", reps: "800m", equipment: "treadmill" },
-                { name: "SkiErg", reps: "500m", equipment: "ski_erg" }
+                { name: "Run", distance_m: 800, equipment: "treadmill" },
+                { name: "SkiErg", distance_m: 500, equipment: "ski_erg" }
               ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }

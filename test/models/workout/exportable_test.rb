@@ -114,7 +114,7 @@ class Workout::ExportableTest < ActiveSupport::TestCase
     assert_equal "Continuous Circuit", sections.first[:label]
   end
 
-  test "export_sections returns nil label for single-round rounds format" do
+  test "export_sections uses section name as label for single-round rounds format" do
     @workout.structure = {
       "sections" => [
         { "name" => "Block", "category" => "main", "format" => "rounds", "rounds" => 1, "exercises" => [{ "name" => "Push-Up" }] }
@@ -122,7 +122,7 @@ class Workout::ExportableTest < ActiveSupport::TestCase
     }
 
     sections = @workout.export_sections
-    assert_nil sections.first[:label]
+    assert_equal "Block", sections.first[:label]
   end
 
   test "export_sections builds exercise line with reps" do

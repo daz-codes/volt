@@ -59,33 +59,38 @@ module LLMContext
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 180, equipment: "ski_erg" } ] },
             { name: "Five-Station Circuit", format: "for_time",
               exercises: [
-                { name: "Row", reps: "500m", equipment: "rowing_machine" },
+                { name: "Row", distance_m: 500, equipment: "rowing_machine" },
                 { name: "RAM Reverse Lunges", reps: 30 },
-                { name: "SkiErg", reps: "500m", equipment: "ski_erg" },
+                { name: "SkiErg", distance_m: 500, equipment: "ski_erg" },
                 { name: "Box Jump / Step Over", reps: 20, equipment: "bodyweight" },
-                { name: "Air Bike", reps: "25 cal", equipment: "assault_bike" }
+                { name: "Air Bike", calories: 25, equipment: "assault_bike" }
               ] },
             { name: "Sled Finisher", format: "rounds", rounds: 4, rest_secs: 45,
-              exercises: [ { name: "Sled Push / Pull", reps: "50m", equipment: "sled" } ] },
+              exercises: [ { name: "Sled Push / Pull", distance_m: 50, equipment: "sled" } ] },
             { name: "Cool-Down", format: "straight", duration_mins: 2,
               exercises: [ { name: "Dynamic stretches", notes: "5 deep breaths" } ] }
           ]
         },
         {
           name: "Engine & Stations",
-          goal: "Build cardio capacity without a treadmill and finish with heavy stations.",
+          goal: "Heavy lift, machine intervals, and a station block to close.",
           duration_mins: 45,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "rowing_machine" } ] },
-            { name: "Machine Intervals", format: "rounds", rounds: 8, rest_secs: 30,
+            { name: "Iron Lift", format: "rounds", intensity_style: "max_effort", rounds: 4, rest_secs: 120,
               exercises: [
-                { name: "Row", reps: "250m", equipment: "rowing_machine" },
-                { name: "Assault Bike", reps: "10 cal", equipment: "assault_bike" }
+                { name: "Deadlift", reps: 5, equipment: "barbell" },
+                { name: "Pull-ups", reps: 5, equipment: "pull_up_bar" }
               ] },
-            { name: "Station Block", format: "emom", duration_mins: 15, rest_secs: 0,
+            { name: "Machine Intervals", format: "rounds", rounds: 6, rest_secs: 30,
               exercises: [
-                { name: "Farmer's Carry", reps: "40m", equipment: "kettlebells" },
+                { name: "Row", distance_m: 250, equipment: "rowing_machine" },
+                { name: "Assault Bike", calories: 10, equipment: "assault_bike" }
+              ] },
+            { name: "Station Block", format: "emom", duration_mins: 10, rest_secs: 0,
+              exercises: [
+                { name: "Farmer's Carry", distance_m: 40, equipment: "kettlebells" },
                 { name: "Dead Ball Yoke Over", reps: 15 },
                 { name: "RAM Weighted Burpees", reps: 10 }
               ] },
@@ -102,8 +107,8 @@ module LLMContext
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
             { name: "Engine Block", format: "rounds", rounds: 6, rest_secs: 60,
               exercises: [
-                { name: "Row", reps: "500m", equipment: "rowing_machine" },
-                { name: "Air Bike", reps: "20 cal", equipment: "assault_bike" }
+                { name: "Row", distance_m: 500, equipment: "rowing_machine" },
+                { name: "Air Bike", calories: 20, equipment: "assault_bike" }
               ] },
             { name: "Strength Stations", format: "rounds", rounds: 5, rest_secs: 60,
               exercises: [

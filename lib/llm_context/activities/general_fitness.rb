@@ -39,7 +39,7 @@ module LLMContext
               exercises: [
                 { name: "KB Swings", reps: 20, equipment: "kettlebells" },
                 { name: "Push-ups", reps: 10, equipment: "bodyweight" },
-                { name: "Row", reps: "15 cal", equipment: "rowing_machine" }
+                { name: "Row", calories: 15, equipment: "rowing_machine" }
               ] },
             { name: "Cool-Down", format: "straight", duration_mins: 2,
               exercises: [ { name: "Dynamic stretches", notes: "5 deep breaths" } ] }
@@ -59,7 +59,7 @@ module LLMContext
               ] },
             { name: "Conditioning EMOM", format: "emom", duration_mins: 12, rest_secs: 0,
               exercises: [
-                { name: "Row", reps: "15 cal", equipment: "rowing_machine" },
+                { name: "Row", calories: 15, equipment: "rowing_machine" },
                 { name: "Burpees", reps: 10, equipment: "bodyweight" }
               ] },
             { name: "Tabata Finisher", format: "tabata", rounds: 8, rest_secs: 10,
@@ -84,7 +84,7 @@ module LLMContext
               exercises: [
                 { name: "KB Swings", reps: 50, equipment: "kettlebells" },
                 { name: "Wall Balls", reps: 50, equipment: "wall_ball" },
-                { name: "Row", reps: "500m", equipment: "rowing_machine" }
+                { name: "Row", distance_m: 500, equipment: "rowing_machine" }
               ] },
             { name: "The Hundred", format: "hundred",
               exercises: [ { name: "Sit-ups", reps: 100, equipment: "bodyweight" } ] },

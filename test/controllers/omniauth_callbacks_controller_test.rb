@@ -1,6 +1,15 @@
 require "test_helper"
 
 class OmniauthCallbacksControllerTest < ActionDispatch::IntegrationTest
+  setup do
+    OmniAuth.config.test_mode = true
+  end
+
+  teardown do
+    OmniAuth.config.mock_auth[:google_oauth2] = nil
+    OmniAuth.config.test_mode = false
+  end
+
   test "signs in existing user via identity" do
     mock_omniauth(provider: "google_oauth2", uid: "123456", email: "one@example.com", name: "User One")
 
@@ -55,10 +64,11 @@ class OmniauthCallbacksControllerTest < ActionDispatch::IntegrationTest
   private
 
   def mock_omniauth(provider:, uid:, email:, name:)
-    Rails.application.env_config["omniauth.auth"] = OmniAuth::AuthHash.new(
+    OmniAuth.config.mock_auth[provider.to_sym] = OmniAuth::AuthHash.new(
       provider: provider,
       uid: uid,
       info: { email: email, name: name }
     )
+    Rails.application.env_config["omniauth.auth"] = OmniAuth.config.mock_auth[provider.to_sym]
   end
 end

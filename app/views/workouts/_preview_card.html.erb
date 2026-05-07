@@ -75,6 +75,13 @@
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
         Save
       <% end %>
+      <%= button_to persist_preview_workout_path(token: preview_token, intent: "edit"), method: :post,
+          data: { turbo_frame: "_top" },
+          form: { class: "contents" },
+          class: "flex items-center justify-center gap-1.5 py-3 px-4 border border-zinc-600 hover:border-lime-400 hover:text-lime-400 text-gray-300 font-bold rounded-xl text-sm transition-colors cursor-pointer" do %>
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        Edit
+      <% end %>
     </div>
   <% end %>
 

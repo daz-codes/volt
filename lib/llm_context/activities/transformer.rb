@@ -21,13 +21,24 @@ module LLMContext
         core:              :optional,
         notes: "PURE STRENGTH: no cardio machines (rower, ski erg, assault bike, treadmill) " \
                "anywhere in the session. Use rounds and straight sets as the main structure. " \
-               "Rep ranges: 3-5 heavy, 6-10 hypertrophy, 10-15 accessories only. Plan 60-120s " \
-               "rest between heavy sets. NO CONTINUOUS CIRCUITS: do not chain back-to-back " \
-               "heavy lifts with no rest; every strength section gives clear rest between " \
-               "exercises. Lifts are the centrepiece — finishers can be bodyweight (push-ups, " \
-               "walking lunges, pull-ups, dips, burpees) or a duration-interval block " \
-               "(e.g. 3 rounds: 2 min walking lunges / 2 min rest). Think strength coach, " \
-               "not CrossFit."
+               "REP & REST SCHEMES (match the work to the rest): " \
+               "heavy compound 3-5 reps → 120-180s rest (2-3 min, intensity_style: max_effort); " \
+               "hypertrophy 6-10 reps → 90-120s rest; " \
+               "accessory/finisher 10-15 reps → 60-90s rest. " \
+               "60s rest is for accessories, never for heavy bench/squat/deadlift. " \
+               "SET COUNT VIA ROUNDS, NOT STRINGS: a `5×5` block is `format: \"rounds\", " \
+               "rounds: 5, rest_secs: 120, exercises: [{ name: \"Back Squat\", reps: 5 }]`. " \
+               "NEVER put the set count into the reps field as a string (`reps: \"5 × 5\"`, " \
+               "`reps: \"5x3\"`, `reps: \"3 sets of 8\"`). Strings render as `5 × 5 reps` " \
+               "alongside the rounds count and produce nonsense like `3 rounds · 5 × 5 reps`. " \
+               "VARY REP SCHEMES across sessions — not every workout is 5×5. Mix in 5×3 " \
+               "(top-end strength, 180s rest), 4×6 or 4×8 (hypertrophy, 120s rest), 3×10-12 " \
+               "(volume/accessory, 90s rest). Pick the scheme that matches the lift's intent. " \
+               "NO CONTINUOUS CIRCUITS: do not chain back-to-back heavy lifts with no rest; " \
+               "every strength section gives clear rest between exercises. Lifts are the " \
+               "centrepiece — finishers can be bodyweight (push-ups, walking lunges, pull-ups, " \
+               "dips, burpees) or a duration-interval block (e.g. 3 rounds: 2 min walking " \
+               "lunges / 2 min rest). Think strength coach, not CrossFit."
       }.freeze
 
       MOVEMENT_VOCABULARY = <<~VOCAB.freeze
@@ -45,8 +56,8 @@ module LLMContext
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
               exercises: [ { name: "Bodyweight activation + Dynamic stretches", duration_s: 300, equipment: "bodyweight" } ] },
-            { name: "Back Squat", format: "straight", rest_secs: 120,
-              exercises: [ { name: "Back Squat", reps: "5 × 5", equipment: "barbell" } ] },
+            { name: "Back Squat", format: "rounds", intensity_style: "max_effort", rounds: 5, rest_secs: 120,
+              exercises: [ { name: "Back Squat", reps: 5, equipment: "barbell", notes: "heavy load — last rep should be near failure" } ] },
             { name: "DB Row", format: "rounds", rounds: 4, rest_secs: 90,
               exercises: [ { name: "DB Row each side", reps: 10, equipment: "dumbbells" } ] },
             { name: "Romanian Deadlift", format: "rounds", rounds: 3, rest_secs: 90,
@@ -62,8 +73,8 @@ module LLMContext
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
               exercises: [ { name: "Bodyweight activation + Dynamic stretches", duration_s: 300, equipment: "bodyweight" } ] },
-            { name: "Overhead Press", format: "straight", rest_secs: 120,
-              exercises: [ { name: "Overhead Press", reps: "5 × 5", equipment: "barbell" } ] },
+            { name: "Overhead Press", format: "rounds", rounds: 4, rest_secs: 120,
+              exercises: [ { name: "Overhead Press", reps: 6, equipment: "barbell", notes: "controlled descent, explosive drive" } ] },
             { name: "DB Bench Press", format: "rounds", rounds: 4, rest_secs: 90,
               exercises: [ { name: "DB Bench Press", reps: 10, equipment: "dumbbells" } ] },
             { name: "Accessory Ladder", format: "ladder",
@@ -83,10 +94,10 @@ module LLMContext
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
               exercises: [ { name: "Bodyweight activation + Dynamic stretches", duration_s: 300, equipment: "bodyweight" } ] },
-            { name: "Deadlift", format: "straight", intensity_style: "max_effort", rest_secs: 120,
-              exercises: [ { name: "Deadlift", reps: "5 × 3", equipment: "barbell" } ] },
-            { name: "Pull-up Block", format: "rounds", intensity_style: "max_effort", rounds: 5, rest_secs: 90,
-              exercises: [ { name: "Pull-ups", reps: 5, equipment: "pull_up_bar" } ] },
+            { name: "Deadlift", format: "rounds", intensity_style: "max_effort", rounds: 5, rest_secs: 180,
+              exercises: [ { name: "Deadlift", reps: 3, equipment: "barbell", notes: "top-end strength — go heavy, full reset between reps" } ] },
+            { name: "Pull-up Block", format: "rounds", rounds: 4, rest_secs: 90,
+              exercises: [ { name: "Pull-ups", reps: 8, equipment: "pull_up_bar" } ] },
             { name: "Walking Lunge Burner", format: "rounds", intensity_style: "conditioning", rounds: 3, rest_secs: 120,
               exercises: [ { name: "Walking Lunges", duration_s: 120, equipment: "bodyweight" } ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,

@@ -116,7 +116,7 @@ module LLMContext
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
             { name: "TWENTY20", format: "rounds", intensity_style: "conditioning", rounds: 5, rest_secs: 0,
               exercises: [
-                { name: "Row", reps: "20 cal", notes: "hard sustainable effort", equipment: "rowing_machine" },
+                { name: "Row", calories: 20, notes: "hard sustainable effort", equipment: "rowing_machine" },
                 { name: "KB Swings", reps: 20, equipment: "kettlebells" }
               ] },
             { name: "Bear Mountain", format: "mountain",

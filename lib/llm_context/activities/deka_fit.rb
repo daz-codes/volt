@@ -60,13 +60,13 @@ module LLMContext
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 180, equipment: "rowing_machine" } ] },
             { name: "Run-Station Repeats", format: "rounds", rounds: 4, rest_secs: 30,
               exercises: [
-                { name: "Run", reps: "500m", equipment: "treadmill" },
+                { name: "Run", distance_m: 500, equipment: "treadmill" },
                 { name: "Box Jump / Step Over", reps: 20, equipment: "bodyweight" }
               ] },
             { name: "Station Finisher", format: "for_time",
               exercises: [
-                { name: "Row", reps: "500m", equipment: "rowing_machine" },
-                { name: "Farmer's Carry", reps: "100m", equipment: "kettlebells" }
+                { name: "Row", distance_m: 500, equipment: "rowing_machine" },
+                { name: "Farmer's Carry", distance_m: 100, equipment: "kettlebells" }
               ] },
             { name: "Cool-Down", format: "straight", duration_mins: 2,
               exercises: [ { name: "Dynamic stretches", notes: "5 deep breaths" } ] }
@@ -81,15 +81,15 @@ module LLMContext
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
             { name: "Run & Stations", format: "for_time",
               exercises: [
-                { name: "Run", reps: "500m", equipment: "treadmill" },
+                { name: "Run", distance_m: 500, equipment: "treadmill" },
                 { name: "RAM Reverse Lunges", reps: 30 },
-                { name: "Run", reps: "500m", equipment: "treadmill" },
-                { name: "Row", reps: "500m", equipment: "rowing_machine" },
-                { name: "Run", reps: "500m", equipment: "treadmill" },
+                { name: "Run", distance_m: 500, equipment: "treadmill" },
+                { name: "Row", distance_m: 500, equipment: "rowing_machine" },
+                { name: "Run", distance_m: 500, equipment: "treadmill" },
                 { name: "Box Jump / Step Over", reps: 20, equipment: "bodyweight" }
               ] },
             { name: "Engine Block", format: "rounds", rounds: 5, rest_secs: 45,
-              exercises: [ { name: "Run", reps: "400m", notes: "hard pace", equipment: "treadmill" } ] },
+              exercises: [ { name: "Run", distance_m: 400, notes: "hard pace", equipment: "treadmill" } ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
           ]
@@ -103,25 +103,25 @@ module LLMContext
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
             { name: "Race Simulation", format: "for_time",
               exercises: [
-                { name: "Run", reps: "500m", equipment: "treadmill" },
+                { name: "Run", distance_m: 500, equipment: "treadmill" },
                 { name: "RAM Reverse Lunges", reps: 30 },
-                { name: "Run", reps: "500m", equipment: "treadmill" },
-                { name: "Row", reps: "500m", equipment: "rowing_machine" },
-                { name: "Run", reps: "500m", equipment: "treadmill" },
+                { name: "Run", distance_m: 500, equipment: "treadmill" },
+                { name: "Row", distance_m: 500, equipment: "rowing_machine" },
+                { name: "Run", distance_m: 500, equipment: "treadmill" },
                 { name: "Box Jump / Step Over", reps: 20, equipment: "bodyweight" },
-                { name: "Run", reps: "500m", equipment: "treadmill" },
+                { name: "Run", distance_m: 500, equipment: "treadmill" },
                 { name: "Med Ball Sit-up Throw", reps: 25 },
-                { name: "Run", reps: "500m", equipment: "treadmill" },
-                { name: "SkiErg", reps: "500m", equipment: "ski_erg" },
-                { name: "Run", reps: "500m", equipment: "treadmill" },
-                { name: "Farmer's Carry", reps: "100m", equipment: "kettlebells" },
-                { name: "Run", reps: "500m", equipment: "treadmill" },
-                { name: "Air Bike", reps: "25 cal", equipment: "assault_bike" },
-                { name: "Run", reps: "500m", equipment: "treadmill" },
+                { name: "Run", distance_m: 500, equipment: "treadmill" },
+                { name: "SkiErg", distance_m: 500, equipment: "ski_erg" },
+                { name: "Run", distance_m: 500, equipment: "treadmill" },
+                { name: "Farmer's Carry", distance_m: 100, equipment: "kettlebells" },
+                { name: "Run", distance_m: 500, equipment: "treadmill" },
+                { name: "Air Bike", calories: 25, equipment: "assault_bike" },
+                { name: "Run", distance_m: 500, equipment: "treadmill" },
                 { name: "Dead Ball Yoke Over", reps: 20 },
-                { name: "Run", reps: "500m", equipment: "treadmill" },
-                { name: "Sled Push / Pull", reps: "100m", equipment: "sled" },
-                { name: "Run", reps: "500m", equipment: "treadmill" },
+                { name: "Run", distance_m: 500, equipment: "treadmill" },
+                { name: "Sled Push / Pull", distance_m: 100, equipment: "sled" },
+                { name: "Run", distance_m: 500, equipment: "treadmill" },
                 { name: "RAM Weighted Burpees", reps: 20 }
               ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,

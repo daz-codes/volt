@@ -48,7 +48,7 @@ module LLMContext
                 { name: "Pull-ups", reps: "21-15-9", equipment: "pull_up_bar" }
               ] },
             { name: "Bike Finisher", format: "rounds", rounds: 5, rest_secs: 30,
-              exercises: [ { name: "Assault Bike", reps: "10 cal", equipment: "assault_bike" } ] },
+              exercises: [ { name: "Assault Bike", calories: 10, equipment: "assault_bike" } ] },
             { name: "Cool-Down", format: "straight", duration_mins: 2,
               exercises: [ { name: "Dynamic stretches", notes: "5 deep breaths" } ] }
           ]
@@ -85,7 +85,7 @@ module LLMContext
               exercises: [
                 { name: "Hang Power Clean", reps: 5, equipment: "barbell" },
                 { name: "Wall Balls", reps: 15, equipment: "wall_ball" },
-                { name: "Row", reps: "12 cal", equipment: "rowing_machine" },
+                { name: "Row", calories: 12, equipment: "rowing_machine" },
                 { name: "Toes-to-bar", reps: 10, equipment: "pull_up_bar" }
               ] },
             { name: "For Time Chipper", format: "for_time",

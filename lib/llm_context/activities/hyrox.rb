@@ -61,21 +61,24 @@ module LLMContext
       EXAMPLES = [
         {
           name: "Half Race",
-          goal: "Practise four run-station transitions at race pace.",
+          goal: "Heavy press-and-pull, run-station repeats, and a 1km closer at race pace.",
           duration_mins: 45,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "rowing_machine" } ] },
+            { name: "Iron Lift", format: "rounds", intensity_style: "max_effort", rounds: 4, rest_secs: 120,
+              exercises: [
+                { name: "Push Press", reps: 5, equipment: "barbell" },
+                { name: "Bent-Over Row", reps: 5, equipment: "barbell" }
+              ] },
             { name: "Last Mile", format: "rounds", rounds: 4, rest_secs: 30,
               exercises: [
-                { name: "Run", reps: "500m", equipment: "treadmill" },
-                { name: "SkiErg", reps: "250m", equipment: "ski_erg" },
+                { name: "Run", distance_m: 500, equipment: "treadmill" },
+                { name: "SkiErg", distance_m: 250, equipment: "ski_erg" },
                 { name: "Med Ball Slams", reps: 20, equipment: "wall_ball" }
               ] },
             { name: "Run to Victory", format: "for_time",
-              exercises: [ { name: "Run", reps: "1km", equipment: "treadmill" } ] },
-            { name: "Wall Ball Burner", format: "rounds", intensity_style: "conditioning", rounds: 3, rest_secs: 120,
-              exercises: [ { name: "Wall Balls", duration_s: 120, equipment: "wall_ball" } ] },
+              exercises: [ { name: "Run", distance_m: 1000, equipment: "treadmill" } ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
           ]
@@ -88,11 +91,11 @@ module LLMContext
             { name: "Warm-Up", format: "straight", duration_mins: 3,
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 180, equipment: "ski_erg" } ] },
             { name: "Lung Buster", format: "rounds", rest_secs: 45,
-              exercises: [ { name: "Run", reps: "500m", equipment: "treadmill" } ] },
+              exercises: [ { name: "Run", distance_m: 500, equipment: "treadmill" } ] },
             { name: "Cooked", format: "for_time",
               exercises: [
-                { name: "Sled Push", reps: "20m", equipment: "sled" },
-                { name: "Farmer's Carry", reps: "40m", equipment: "kettlebells" },
+                { name: "Sled Push", distance_m: 20, equipment: "sled" },
+                { name: "Farmer's Carry", distance_m: 40, equipment: "kettlebells" },
                 { name: "KB Swings", reps: 30, equipment: "kettlebells" },
                 { name: "Wall Balls", reps: 30, equipment: "wall_ball" }
               ] },
@@ -108,7 +111,7 @@ module LLMContext
             { name: "Warm-Up", format: "straight", duration_mins: 5,
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
             { name: "Engine Builder", format: "rounds", rounds: 5, rest_secs: 60,
-              exercises: [ { name: "Run", reps: "400m", notes: "hard pace", equipment: "treadmill" } ] },
+              exercises: [ { name: "Run", distance_m: 400, notes: "hard pace", equipment: "treadmill" } ] },
             { name: "Iron Lift", format: "rounds", intensity_style: "max_effort", rounds: 4, rest_secs: 120,
               exercises: [
                 { name: "Deadlift", reps: 5, equipment: "barbell" },
@@ -116,8 +119,8 @@ module LLMContext
               ] },
             { name: "Heavy Hands", format: "rounds", rounds: 4, rest_secs: 90,
               exercises: [
-                { name: "SkiErg", reps: "250m", equipment: "ski_erg" },
-                { name: "Sandbag Lunges", reps: "20m", equipment: "sled" },
+                { name: "SkiErg", distance_m: 250, equipment: "ski_erg" },
+                { name: "Sandbag Lunges", distance_m: 20, equipment: "sled" },
                 { name: "KB Swings", reps: 20, equipment: "kettlebells" }
               ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,

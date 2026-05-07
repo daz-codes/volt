@@ -52,7 +52,7 @@ module LLMContext
               exercises: [
                 { name: "DB Thrusters", reps: 10, equipment: "dumbbells" },
                 { name: "Wall Balls", reps: 15, equipment: "wall_ball" },
-                { name: "Row", reps: "15 cal", equipment: "rowing_machine" }
+                { name: "Row", calories: 15, equipment: "rowing_machine" }
               ] },
             { name: "Tabata Finisher", format: "tabata", rounds: 8, rest_secs: 10,
               exercises: [ { name: "Burpees", duration_s: 20, equipment: "bodyweight" } ] },
@@ -92,7 +92,7 @@ module LLMContext
               exercises: [
                 { name: "DB Push Press", reps: 10, equipment: "dumbbells" },
                 { name: "Goblet Squat", reps: 10, equipment: "kettlebells" },
-                { name: "Row", reps: "15 cal", equipment: "rowing_machine" }
+                { name: "Row", calories: 15, equipment: "rowing_machine" }
               ] },
             { name: "Conditioning AMRAP", format: "amrap", duration_mins: 12, rest_secs: 15,
               exercises: [

@@ -25,9 +25,17 @@ module LLMContext
                "separate activation or abs section. Treadmill-focused variants (formerly " \
                "Tread & Shred) stay within this structure — treadmill is one of the " \
                "rotating machines, not a whole-session dominant. " \
-               "FORMAT VARIETY: do not make every section a rep-based rounds block. Floor " \
-               "strength uses rounds, but conditioning and finishers should rotate through " \
-               "tabatas, ladders, matrices, mountains, AMRAPs, and EMOMs across sessions. " \
+               "FORMAT VARIETY (non-negotiable): a session that is mostly `rounds` blocks " \
+               "is broken — that's the most common failure mode for this activity. Aim for " \
+               "AT MOST ONE rep-based rounds block per session (the floor strength block); " \
+               "the rest should rotate through ladders (cardio distance ladders are a " \
+               "signature shape — Row 500-400-300-200-100m, SkiErg or Treadmill the same), " \
+               "mountains (Goblet Squat 5-10-15-10-5), matrices (3-movement triangles), " \
+               "tabatas (8 × 20s/10s on a single conditioning movement), EMOMs (single-machine " \
+               "calorie efforts), AMRAPs, and for_time efforts (single 1km row/run/ski). " \
+               "Cardio blocks especially should NOT default to rounds — pick a ladder or " \
+               "for_time effort about half the time. If you find yourself writing a third " \
+               "rounds block in one session, stop and convert one to a different format. " \
                "STRENGTH SPICE: floor blocks should regularly feature heavy compound lifts " \
                "(Back Squat, Front Squat, Deadlift, Bench Press, Push Press, Overhead Press, " \
                "Bent-Over Row) at 5-8 reps with 90-120s rest, not just light DB pairs. " \
@@ -56,71 +64,75 @@ module LLMContext
       EXAMPLES = [
         {
           name: "Short Switch",
-          goal: "Two cardio machines, two floor blocks, one tight session.",
+          goal: "Cardio ladder, heavy floor block, sprints, and a tabata to close.",
           duration_mins: 30,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 3,
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 180, equipment: "rowing_machine" } ] },
-            { name: "Row Intervals", format: "rounds", rounds: 6, rest_secs: 30,
-              exercises: [ { name: "Row", reps: "250m", equipment: "rowing_machine" } ] },
-            { name: "Upper Body Floor", format: "rounds", intensity_style: "max_effort", rounds: 4, rest_secs: 90,
+            { name: "Row Distance Ladder", format: "ladder",
+              varies: "distance_m", start: 500, end: 100, step: 100, rest_between_rungs: 30,
+              exercises: [ { name: "Row", equipment: "rowing_machine" } ] },
+            { name: "Lower Body Strength", format: "rounds", intensity_style: "max_effort", rounds: 3, rest_secs: 120,
               exercises: [
-                { name: "Bench Press", reps: 6, equipment: "barbell" },
-                { name: "Pull-ups", reps: 8, equipment: "pull_up_bar" }
+                { name: "Front Squat", reps: 5, equipment: "barbell" },
+                { name: "Romanian Deadlift", reps: 5, equipment: "barbell" }
               ] },
-            { name: "Assault Bike Sprints", format: "emom", duration_mins: 8, rest_secs: 0,
-              exercises: [ { name: "Assault Bike", reps: "10 cal", equipment: "assault_bike" } ] },
-            { name: "Wall Ball Tabata", format: "tabata", intensity_style: "conditioning", rounds: 8, rest_secs: 10,
-              exercises: [ { name: "Wall Balls", duration_s: 20, equipment: "wall_ball" } ] },
+            { name: "Assault Bike Sprints", format: "emom", duration_mins: 6, rest_secs: 0,
+              exercises: [ { name: "Assault Bike", calories: 10, equipment: "assault_bike" } ] },
+            { name: "Upper Body Tabata", format: "tabata", intensity_style: "conditioning", rounds: 8, rest_secs: 10,
+              exercises: [
+                { name: "Push-ups", duration_s: 20, equipment: "bodyweight" },
+                { name: "KB High Pull", duration_s: 20, equipment: "kettlebells" }
+              ] },
             { name: "Cool-Down", format: "straight", duration_mins: 2,
               exercises: [ { name: "Dynamic stretches", notes: "5 deep breaths" } ] }
           ]
         },
         {
           name: "Three-Machine Alternator",
-          goal: "Rotate three machines with balanced floor pairs between them.",
+          goal: "Three different machines with three different formats — no two cardio blocks shaped the same.",
           duration_mins: 45,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
-            { name: "Ski Erg Intervals", format: "rounds", rounds: 5, rest_secs: 30,
-              exercises: [ { name: "SkiErg", reps: "250m", equipment: "ski_erg" } ] },
-            { name: "Push Floor", format: "rounds", intensity_style: "max_effort", rounds: 4, rest_secs: 90,
+            { name: "Ski Erg Distance Ladder", format: "ladder",
+              varies: "distance_m", start: 500, end: 100, step: 100, rest_between_rungs: 30,
+              exercises: [ { name: "SkiErg", equipment: "ski_erg" } ] },
+            { name: "Push Floor", format: "rounds", intensity_style: "max_effort", rounds: 4, rest_secs: 120,
               exercises: [
-                { name: "Push Press", reps: 6, equipment: "barbell" },
-                { name: "Chin-ups", reps: 6, equipment: "pull_up_bar" }
+                { name: "Push Press", reps: 5, equipment: "barbell" },
+                { name: "Chin-ups", reps: 5, equipment: "pull_up_bar" }
               ] },
-            { name: "Row Intervals", format: "rounds", rounds: 5, rest_secs: 30,
-              exercises: [ { name: "Row", reps: "250m", equipment: "rowing_machine" } ] },
-            { name: "KB Swing Ladder", format: "ladder",
-              varies: "reps", start: 20, end: 4, step: 4, rest_between_rungs: 30,
+            { name: "Row 1km", format: "for_time",
+              exercises: [ { name: "Row", distance_m: 1000, notes: "all-out — race the clock", equipment: "rowing_machine" } ] },
+            { name: "Lower Body Mountain", format: "mountain",
+              varies: "reps", start: 5, peak: 15, end: 5, step: 5, rest_between_rungs: 30,
               exercises: [
-                { name: "KB Swings", equipment: "kettlebells" },
-                { name: "Goblet Squat", equipment: "kettlebells" }
+                { name: "Goblet Squat", equipment: "kettlebells" },
+                { name: "KB Swings", equipment: "kettlebells" }
               ] },
-            { name: "Assault Bike Sprints", format: "emom", duration_mins: 8, rest_secs: 0,
-              exercises: [ { name: "Assault Bike", reps: "10 cal", equipment: "assault_bike" } ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
           ]
         },
         {
           name: "Treadmill Focus",
-          goal: "A treadmill-led alternator — runs bookend the floor strength work.",
+          goal: "Distance ladder runs, a core matrix, a 1km closer, and a duration-interval finisher.",
           duration_mins: 45,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "treadmill" } ] },
-            { name: "Treadmill Intervals", format: "rounds", rounds: 5, rest_secs: 45,
-              exercises: [ { name: "Run", reps: "400m", notes: "hard pace", equipment: "treadmill" } ] },
-            { name: "Upper Body Matrix", format: "matrix",
+            { name: "Treadmill Distance Ladder", format: "ladder",
+              varies: "distance_m", start: 400, end: 100, step: 100, rest_between_rungs: 60,
+              exercises: [ { name: "Run", notes: "hard pace", equipment: "treadmill" } ] },
+            { name: "Core Matrix", format: "matrix",
               exercises: [
-                { name: "Bench Press", reps: 8, equipment: "barbell" },
-                { name: "Bent-Over Row", reps: 8, equipment: "barbell" },
-                { name: "Push-ups", reps: 12, equipment: "bodyweight" }
+                { name: "Sit-ups", reps: 20, equipment: "bodyweight" },
+                { name: "Russian Twists", reps: 20, equipment: "bodyweight" },
+                { name: "V-ups", reps: 20, equipment: "bodyweight" }
               ] },
             { name: "Treadmill Finisher", format: "for_time",
-              exercises: [ { name: "Run", reps: "1km", equipment: "treadmill" } ] },
+              exercises: [ { name: "Run", distance_m: 1000, equipment: "treadmill" } ] },
             { name: "Med Ball Slam Burner", format: "rounds", intensity_style: "conditioning", rounds: 3, rest_secs: 120,
               exercises: [ { name: "Med Ball Slams", duration_s: 120, equipment: "wall_ball" } ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,

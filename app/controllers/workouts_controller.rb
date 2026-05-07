@@ -51,6 +51,7 @@ class WorkoutsController < ApplicationController
   # PATCH /workouts/:id
   def update
     @workout.assign_attributes(manual_workout_params)
+    assign_activity_from_params(@workout)
     @workout.structure = Workout.structure_from_params(params[:sections])
 
     if @workout.save
@@ -132,8 +133,11 @@ class WorkoutsController < ApplicationController
 
     Rails.cache.delete("workout_preview:#{params[:token]}")
 
-    if params[:intent] == "log"
+    case params[:intent]
+    when "log"
       redirect_to workout_path(workout, do_this: true)
+    when "edit"
+      redirect_to edit_workout_path(workout)
     else
       redirect_to workout_path(workout), notice: "\"#{workout.name}\" saved to your library."
     end
@@ -422,8 +426,15 @@ class WorkoutsController < ApplicationController
     params.permit(:name, :duration_mins)
   end
 
+  def assign_activity_from_params(workout)
+    return unless params.key?(:activity_name)
+    name = params[:activity_name].to_s.strip
+    workout.activity = name.present? ? Activity.find_or_create_by!(name: name) : nil
+  end
+
   def create_manual
     @workout = Current.user.workouts.build(manual_workout_params)
+    assign_activity_from_params(@workout)
     @workout.structure    = Workout.structure_from_params(params[:sections])
     @workout.status       = "active"
     @workout.original_structure = @workout.structure
