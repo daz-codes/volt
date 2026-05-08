@@ -380,37 +380,43 @@ class Workouts::SortableSectionsTest < ApplicationSystemTestCase
 
     fill_in "Workout Name", with: "Drag Test"
 
-    # Add three sections, naming each one A, B, C in DOM order.
-    %w[A B C].each_with_index do |name, i|
+    # Add three sections named A, B, C in DOM order, each with one named exercise
+    # (the exercise name input is required by HTML5 validation).
+    %w[A B C].each do |section_name|
       click_on "+ Add Section"
-      sections = all("[data-builder-target='sectionsList'] [data-section-id]")
-      section_inputs = sections.last.all("input[name$='[name]']")
-      section_inputs.first.fill_in with: name
-      # Each section needs at least one exercise so the form passes validation
-      within(sections.last) do
-        click_on "+ Add Exercise"
-        find("input[name$='[exercises][#{i}][name]']", match: :first, visible: false) rescue nil
-      end
+      section = all("[data-builder-target='sectionsList'] [data-section-id]").last
+
+      # Fill the section's name input. The first input[name$='[name]'] inside the
+      # section is the section name (the exercises haven't been added yet).
+      section.find("input[name$='[name]']", match: :first).set(section_name)
+
+      # Add one exercise and fill its name. Once the exercise row exists, scope
+      # to its [data-exercise-id] wrapper to disambiguate from the section name.
+      within(section) { click_on "+ Add Exercise" }
+      exercise = section.find("[data-exercise-id]", match: :first)
+      exercise.find("input[name$='[name]']").set("#{section_name}-Exercise")
     end
 
-    # Sanity: DOM order is currently A, B, C
-    names = all("[data-builder-target='sectionsList'] [data-section-id] input[name$='[name]']").map { |el| el.value }.first(3)
-    assert_equal %w[A B C], names
+    # Sanity: section name inputs are currently in DOM order A, B, C.
+    section_name_values = all(
+      "[data-builder-target='sectionsList'] > [data-section-id] > div > input[name$='[name]']"
+    ).map(&:value)
+    assert_equal %w[A B C], section_name_values
 
     # Drag section C above section A.
-    sections = all("[data-builder-target='sectionsList'] [data-section-id]")
-    handle = sections[2].find("[data-sortable-handle]")
-    target = sections[0]
-    handle.drag_to(target)
+    sections = all("[data-builder-target='sectionsList'] > [data-section-id]")
+    sections[2].find("[data-sortable-handle]").drag_to(sections[0])
 
-    # DOM order should now be C, A, B (best-effort assertion before submit).
-    names = all("[data-builder-target='sectionsList'] [data-section-id] input[name$='[name]']").map { |el| el.value }.first(3)
-    assert_equal %w[C A B], names
+    # DOM order should now read C, A, B.
+    section_name_values = all(
+      "[data-builder-target='sectionsList'] > [data-section-id] > div > input[name$='[name]']"
+    ).map(&:value)
+    assert_equal %w[C A B], section_name_values
 
-    # Submit the form (the section needs a duration etc; the new workout form already supplies defaults).
-    click_on "Save"
+    # Submit. Label is set in app/views/workouts/new.html.erb.
+    click_on "Save & Log Workout"
 
-    # The created workout should persist the dragged order.
+    # Persisted order must reflect the drag.
     workout = Workout.where(name: "Drag Test").last
     assert workout, "expected a workout named 'Drag Test' to be created"
     assert_equal %w[C A B], workout.structure["sections"].map { |s| s["name"] }
@@ -419,9 +425,9 @@ end
 ```
 
 Notes for the implementer:
-- The test depends on `users(:one)` existing in `test/fixtures/users.yml` (it does — `email_address: one@example.com`, password `"password"`).
-- The submit button label depends on `_builder_form.html.erb`'s caller. For `new`, this is typically "Save" or "Create Workout"; if `click_on "Save"` does not match, look at `app/views/workouts/new.html.erb` for the exact `submit_label` and adjust the test.
-- Each newly-added section in this test gets one empty-exercise to satisfy the existing form's "exercises[][name] required" inputs. If the form lets you submit a section without exercises, you can simplify by removing the `+ Add Exercise` block.
+- `users(:one)` (`email_address: one@example.com`, password `"password"`) is provided by `test/fixtures/users.yml`.
+- The selector `[data-builder-target='sectionsList'] > [data-section-id] > div > input[name$='[name]']` targets only the first immediate-`<input name=…[name]>` inside each section's header `<div>`, avoiding accidental matches against exercise name inputs deeper in the section.
+- `.set(value)` is the correct Capybara node-level write API. `fill_in` requires a locator argument and is used at the page level (or inside a `within` block) — calling it directly on a found node will not behave as expected.
 - `drag_to` is provided by Capybara and works with Sortable.js because `forceFallback` is `false` (the default). If CI flakes, see Risks in the spec.
 
 - [ ] **Step 2: Run the test and verify PASS**
@@ -433,8 +439,6 @@ bin/rails test test/system/workouts/sortable_sections_test.rb
 ```
 
 Expected: 1 run, multiple assertions, 0 failures, 0 errors.
-
-If the test fails on the submit step (button label mismatch), open `app/views/workouts/new.html.erb` and check what `submit_label` it passes to the partial; adjust the `click_on` argument.
 
 If the test fails on the `assert_equal %w[C A B]` check after submit, the most likely cause is that submit-time re-indexing didn't run; verify the form has `data-controller="sortable-sections"` on its sections list (Task 4 step 1).
 
