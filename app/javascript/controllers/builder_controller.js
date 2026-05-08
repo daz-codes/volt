@@ -33,6 +33,42 @@ export default class extends Controller {
     event.currentTarget.closest("[data-exercise-id]").remove()
   }
 
+  duplicateExercise(event) {
+    const section = event.currentTarget.closest("[data-section-id]")
+    const list    = section.querySelector("[data-exercises-list]")
+    const last    = list.querySelector("[data-exercise-id]:last-child")
+    if (!last) return
+
+    const newId = Date.now() + Math.floor(Math.random() * 1000)
+    const oldId = last.dataset.exerciseId
+
+    const clone = last.cloneNode(true)
+    clone.dataset.exerciseId = newId
+    clone.querySelectorAll("[name]").forEach(el => {
+      el.name = el.name.replace(`[exercises][${oldId}]`, `[exercises][${newId}]`)
+    })
+
+    // cloneNode preserves the DOM but not user-edited input/select values
+    const origFields  = last.querySelectorAll("input, select, textarea")
+    const cloneFields = clone.querySelectorAll("input, select, textarea")
+    origFields.forEach((orig, i) => {
+      const target = cloneFields[i]
+      if (orig.type === "checkbox" || orig.type === "radio") {
+        target.checked = orig.checked
+      } else {
+        target.value = orig.value
+      }
+    })
+
+    list.appendChild(clone)
+
+    const nameInput = clone.querySelector('input[name$="[name]"]')
+    if (nameInput) {
+      nameInput.focus()
+      nameInput.select()
+    }
+  }
+
   toggleFormat(event) {
     const section = event.currentTarget.closest("[data-section-id]")
     const format  = event.currentTarget.value
@@ -168,10 +204,16 @@ export default class extends Controller {
           <p class="text-xs text-gray-600">Add the exercises done each rung — reps/load are set by the sequence above.</p>
         </div>
         <div data-exercises-list class="space-y-2 mb-3"></div>
-        <button type="button" data-action="builder#addExercise"
-          class="text-sm text-lime-400 hover:text-lime-400 transition-colors font-medium">
-          + Add Exercise
-        </button>
+        <div class="flex items-center gap-4">
+          <button type="button" data-action="builder#addExercise"
+            class="text-sm text-lime-400 hover:text-lime-400 transition-colors font-medium">
+            + Add Exercise
+          </button>
+          <button type="button" data-action="builder#duplicateExercise"
+            class="text-sm text-gray-400 hover:text-lime-400 transition-colors font-medium">
+            + Duplicate Last
+          </button>
+        </div>
       </div>`
   }
 

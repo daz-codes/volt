@@ -283,10 +283,16 @@
               </div>
             <% end %>
           </div>
-          <button type="button" data-action="builder#addExercise"
-            class="text-sm text-lime-400 hover:text-lime-400 transition-colors font-medium">
-            + Add Exercise
-          </button>
+          <div class="flex items-center gap-4">
+            <button type="button" data-action="builder#addExercise"
+              class="text-sm text-lime-400 hover:text-lime-400 transition-colors font-medium">
+              + Add Exercise
+            </button>
+            <button type="button" data-action="builder#duplicateExercise"
+              class="text-sm text-gray-400 hover:text-lime-400 transition-colors font-medium">
+              + Duplicate Last
+            </button>
+          </div>
         </div>
       <% end %>
     </div>
