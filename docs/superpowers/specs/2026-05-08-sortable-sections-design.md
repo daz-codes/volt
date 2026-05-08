@@ -20,7 +20,9 @@ Let users reorder workout sections by drag-and-drop while editing or creating a 
 
 ## Solution overview
 
-Introduce Sortable.js as an importmap dependency and wire it up via a small dedicated Stimulus controller (`sortable-sections`) attached to the existing sections list container. A grip handle is added at the far left of each section's header row; only the handle initiates a drag. The "insert section above" button is removed since drag fully supersedes it. No server-side or schema changes are required — DOM order on submit already drives section order through Rails param parsing.
+Introduce Sortable.js as an importmap dependency and wire it up via a small dedicated Stimulus controller (`sortable-sections`) attached to the existing sections list container. A grip handle is added at the far left of each section's header row; only the handle initiates a drag. The "insert section above" button is removed since drag fully supersedes it.
+
+`Workout::StructureBuilder.structure_from_params` sorts sections (and exercises within them) by the integer value of their hash key, not by submission order. Pre-rendered sections use keys `0, 1, 2, …` and JS-added sections use timestamp keys, so a naive DOM rearrangement would not change submitted order. To fix this, the `sortable-sections` controller re-indexes section field names to sequential `0, 1, 2, …` in DOM order on form submit. The server contract is unchanged.
 
 ## Affected code
 
@@ -44,7 +46,7 @@ This adds a single `pin "sortablejs"` line to `config/importmap.rb` pointing to 
 
 ### 2. New controller — `sortable_sections_controller.js`
 
-Mounts on the sections list container and instantiates one `Sortable` against `this.element`. Lifecycle is bound to Stimulus `connect`/`disconnect` so Turbo navigations don't leak instances.
+Mounts on the sections list container, instantiates one `Sortable` against `this.element`, and listens for the parent form's `submit` event to re-index section field names. Lifecycle is bound to Stimulus `connect`/`disconnect` so Turbo navigations don't leak instances.
 
 ```js
 import { Controller } from "@hotwired/stimulus"
@@ -56,14 +58,30 @@ export default class extends Controller {
       handle: "[data-sortable-handle]",
       animation: 150,
       ghostClass: "opacity-40",
-      chosenClass: "ring-2",
-      forceFallback: false
+      chosenClass: "ring-2"
     })
+
+    this.form = this.element.closest("form")
+    this.reindexBound = this.reindex.bind(this)
+    this.form?.addEventListener("submit", this.reindexBound)
   }
 
   disconnect() {
     this.sortable?.destroy()
     this.sortable = null
+    this.form?.removeEventListener("submit", this.reindexBound)
+    this.form = null
+  }
+
+  reindex() {
+    const sections = this.element.querySelectorAll("[data-section-id]")
+    sections.forEach((section, i) => {
+      const oldId = section.dataset.sectionId
+      section.dataset.sectionId = i
+      section.querySelectorAll("[name]").forEach(el => {
+        el.name = el.name.replace(`sections[${oldId}]`, `sections[${i}]`)
+      })
+    })
   }
 }
 ```
@@ -73,7 +91,8 @@ Notes:
 - `animation: 150` gives a smooth swap as siblings move out of the way.
 - `ghostClass` styles the placeholder slot during drag.
 - `chosenClass` adds a ring outline to the picked-up card.
-- No `onEnd` callback needed — the DOM is the model, and submission order follows DOM order.
+- `reindex` runs once on form submit. It rewrites the `data-section-id` and every `name="sections[<oldId>]..."` to use a sequential index reflecting DOM order. This makes the existing `sort_by { |k, _| k.to_i }` in `Workout::StructureBuilder` produce DOM order. Exercise indexing inside each section is untouched.
+- The `oldId` may be a timestamp like `1715174400000` or an integer like `0`; the simple `replace` is safe because section IDs are unique and the replacement string starts with `sections[` followed by the exact captured ID.
 
 ### 3. Markup — sections list container
 
@@ -128,9 +147,9 @@ This drops the up-arrow that previously sat between the format select and the tr
 
 ## Why no server change
 
-Section field names use the form `sections[<id>][...]` where `<id>` is a timestamp (or stable index for pre-rendered sections). Browsers serialise form fields in DOM order, and Rails param parsing preserves the order keys are first encountered. So when Sortable rearranges DOM nodes, the resulting params arrive at the controller in the new visual order — and `Workout::StructureBuilder` already iterates `sections` in that same order to build the structure JSON. No re-indexing or hidden position field is needed.
+`Workout::StructureBuilder.structure_from_params` sorts section params by the integer value of their key (`sort_by { |k, _| k.to_i }`). The client-side re-indexing on submit (Section 2 above) renames every section's key to a sequential integer that reflects its current DOM position, so the existing server sort produces DOM order. No model, schema, or controller change is required.
 
-This invariant should be **explicitly tested** (see Testing) so a future refactor that breaks DOM-order serialisation is caught immediately.
+The re-indexing approach is preferable to dropping the server-side sort because the sort also normalises non-numeric or sparse keys defensively; preserving it keeps the server tolerant of any future client variations.
 
 ## Edge cases
 
@@ -142,14 +161,33 @@ This invariant should be **explicitly tested** (see Testing) so a future refacto
 
 ## Testing
 
-**System test** (Capybara + headless Chrome with drag support):
+**System test** (Capybara + headless Chrome) at `test/system/workouts/sortable_sections_test.rb`:
 
-1. Build a workout with three named sections: A, B, C.
-2. Use Capybara's drag-and-drop on section C's grip handle to a position above A.
-3. Submit the form.
-4. Assert the persisted `workout.structure["sections"]` order is `[C, A, B]`.
+1. Sign in, visit the new-workout builder.
+2. Add three sections named A, B, C.
+3. Drag section C's grip handle above section A.
+4. Submit the form.
+5. Reload the workout and assert `workout.structure["sections"].map { |s| s["name"] }` equals `["C", "A", "B"]`.
 
-If Capybara drag is flaky in CI for this Sortable setup, fall back to a Stimulus-controller unit test that asserts `Sortable.create` is called with the expected options on `connect`, plus a controller-level test that constructs params with reordered sections and asserts `StructureBuilder` honours that order. The latter already passes today — its inclusion is to lock the invariant in place.
+Selenium's `drag_to` works for Sortable.js with `forceFallback: false`. If it proves flaky, the fallback is to dispatch synthetic pointer events directly (Sortable accepts them) — but try the simple path first.
+
+**Model test** at `test/models/workout/structure_builder_test.rb` to lock the order invariant after re-indexing:
+
+```ruby
+test "sections preserve order of integer-keyed params" do
+  params = ActionController::Parameters.new(
+    "0" => { name: "C", category: "main", format: "straight" },
+    "1" => { name: "A", category: "main", format: "straight" },
+    "2" => { name: "B", category: "main", format: "straight" }
+  )
+
+  structure = Workout.structure_from_params(params)
+
+  assert_equal %w[C A B], structure["sections"].map { |s| s["name"] }
+end
+```
+
+This locks in the contract that "client re-indexes to 0,1,2,… in DOM order, server iterates by integer key" produces the right result, so a future refactor of either side is caught.
 
 **Manual QA checklist:**
 
