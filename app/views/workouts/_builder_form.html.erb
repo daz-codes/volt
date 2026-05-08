@@ -57,12 +57,20 @@
   <div class="mb-4">
     <p class="text-sm font-semibold text-gray-300 uppercase tracking-wide mb-3">Sections</p>
 
-    <div data-builder-target="sectionsList" class="space-y-4 mb-4">
+    <div data-builder-target="sectionsList" data-controller="sortable-sections" class="space-y-4 mb-4">
       <%# Pre-render existing sections when editing %>
       <% existing_sections = workout.structure.is_a?(Hash) ? Array(workout.structure["sections"]) : [] %>
       <% existing_sections.each_with_index do |section, si| %>
         <div data-section-id="<%= si %>" class="border border-zinc-600 rounded-2xl p-4">
           <div class="flex items-center gap-2 mb-3">
+            <span data-sortable-handle aria-label="Drag to reorder" title="Drag to reorder"
+              class="text-gray-600 hover:text-lime-400 transition-colors flex-shrink-0 p-1 cursor-grab active:cursor-grabbing">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                   fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="9" cy="5" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="9" cy="19" r="1"/>
+                <circle cx="15" cy="5" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="19" r="1"/>
+              </svg>
+            </span>
             <input name="sections[<%= si %>][name]" type="text"
               value="<%= section["name"] %>" placeholder="Section name" required
               class="flex-1 bg-zinc-800 border border-zinc-600 rounded-xl px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-lime-400 transition-colors">
@@ -91,12 +99,6 @@
                 <option value="<%= val %>" <%= "selected" if section["format"] == val %>><%= label %></option>
               <% end %>
             </select>
-            <button type="button" data-action="builder#insertSectionAbove"
-              class="text-gray-600 hover:text-lime-400 transition-colors flex-shrink-0 p-1" aria-label="Insert section above" title="Insert section above">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/>
-              </svg>
-            </button>
             <button type="button" data-action="builder#removeSection"
               class="text-gray-600 hover:text-red-500 transition-colors flex-shrink-0 p-1" aria-label="Remove section">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
