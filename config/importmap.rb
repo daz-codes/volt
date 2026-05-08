@@ -10,3 +10,4 @@ pin "Chart", to: "https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"
 pin "chartjs-adapter-date-fns", to: "https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"
 pin "rubymonkey" # @1.4.0
 pin "@daz4126/helium", to: "@daz4126--helium.js" # @0.30.0
+pin "sortablejs" # @1.15.7
