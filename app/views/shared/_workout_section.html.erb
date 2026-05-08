@@ -31,7 +31,14 @@
    switchback_up_str = nil
    if %w[ladder mountain].include?(sec_format)
      step = [section["step"].to_f, 1.0].max
-     varies_lbl = { "reps" => "reps", "calories" => "cal", "kg" => "kg", "distance_m" => "m" }.fetch(section["varies"].to_s, section["varies"].to_s)
+     ladder_metric_unit = { "reps" => "reps", "calories" => "cal", "kg" => "kg", "distance_m" => "m" }
+     ladder_effective_metrics = Array(section["exercises"]).map { |e| e["metric"].presence || section["varies"].to_s }
+     ladder_metrics_mixed = ladder_effective_metrics.uniq.size > 1
+     varies_lbl = if ladder_metrics_mixed
+       ""
+     else
+       ladder_metric_unit.fetch(section["varies"].to_s, section["varies"].to_s)
+     end
      if sec_format == "ladder"
        sv = section["start"].to_f; ev = section["end"].to_f
        vals = []

@@ -72,6 +72,7 @@ module Workout::StructureBuilder
         ex["duration_s"] = total_s if total_s > 0
       end
       ex["weight_kg"]  = e[:weight_kg].to_f   if e[:weight_kg].present?
+      ex["metric"]     = e[:metric].to_s      if %w[reps calories distance_m].include?(e[:metric].to_s)
       ex
     end
   end

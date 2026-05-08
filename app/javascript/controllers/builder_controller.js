@@ -176,37 +176,30 @@ export default class extends Controller {
   }
 
   exerciseTemplate(sectionId, exId, format = "straight") {
-    const isLadderMtn   = ["ladder", "mountain"].includes(format)
+    const isLadderLike  = ["ladder", "mountain", "switchback"].includes(format)
     const isTimedFormat = ["tabata", "emom"].includes(format)
 
-    const repsOption = isLadderMtn   ? "" : `<option value="reps">Reps</option>`
-    const timeOption = isTimedFormat ? "" : `<option value="duration">Time</option>`
-
-    // First option drives which metric div is visible by default
-    const repsVisible = !isLadderMtn
-    const calVisible  = isLadderMtn
-
-    return `
-      <div data-exercise-id="${exId}" class="bg-zinc-900/60 border border-zinc-700 rounded-xl p-3 space-y-2">
-        <div class="flex items-start gap-2">
-          <div class="flex-1 space-y-2">
-            <input name="sections[${sectionId}][exercises][${exId}][name]" type="text" placeholder="Exercise name" required
-              class="w-full bg-zinc-800 border border-zinc-600 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-lime-400 transition-colors">
-            <input name="sections[${sectionId}][exercises][${exId}][notes]" type="text" placeholder="Description or cue (optional)"
-              class="w-full bg-zinc-800 border border-zinc-600 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-lime-400 transition-colors">
-            <div class="flex items-center gap-2 flex-wrap">
+    const valueRow = isLadderLike ? `
+              <select name="sections[${sectionId}][exercises][${exId}][metric]"
+                class="bg-zinc-800 border border-zinc-600 rounded-lg px-2 py-1.5 text-xs text-gray-300 focus:outline-none focus:border-lime-400 transition-colors">
+                <option value="">Same as section</option>
+                <option value="reps">Reps</option>
+                <option value="calories">Calories</option>
+                <option value="distance_m">Distance (m)</option>
+              </select>
+              <span class="text-xs text-gray-600 italic">override metric (optional)</span>` : `
               <select data-action="change->builder#toggleMetric"
                 class="bg-zinc-800 border border-zinc-600 rounded-lg px-2 py-1.5 text-xs text-gray-300 focus:outline-none focus:border-lime-400 transition-colors">
-                ${repsOption}
+                <option value="reps">Reps</option>
                 <option value="calories">Calories</option>
                 <option value="distance">Distance</option>
-                ${timeOption}
+                ${isTimedFormat ? "" : `<option value="duration">Time</option>`}
               </select>
-              <div data-metric="reps" ${repsVisible ? "" : 'style="display:none"'}>
+              <div data-metric="reps">
                 <input name="sections[${sectionId}][exercises][${exId}][reps]" type="number" min="1" placeholder="Reps"
                   class="w-20 bg-zinc-800 border border-zinc-600 rounded-lg px-2 py-1.5 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-lime-400 transition-colors">
               </div>
-              <div data-metric="calories" ${calVisible ? "" : 'style="display:none"'}>
+              <div data-metric="calories" style="display:none">
                 <input name="sections[${sectionId}][exercises][${exId}][calories]" type="number" min="1" placeholder="Calories"
                   class="w-24 bg-zinc-800 border border-zinc-600 rounded-lg px-2 py-1.5 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-lime-400 transition-colors">
               </div>
@@ -223,7 +216,17 @@ export default class extends Controller {
                 <span class="text-xs text-gray-600">s</span>
               </div>
               <input name="sections[${sectionId}][exercises][${exId}][weight_kg]" type="number" min="0" step="0.5" placeholder="kg (opt.)"
-                class="w-24 bg-zinc-800 border border-zinc-600 rounded-lg px-2 py-1.5 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-lime-400 transition-colors">
+                class="w-24 bg-zinc-800 border border-zinc-600 rounded-lg px-2 py-1.5 text-xs text-white placeholder-gray-600 focus:outline-none focus:border-lime-400 transition-colors">`
+
+    return `
+      <div data-exercise-id="${exId}" class="bg-zinc-900/60 border border-zinc-700 rounded-xl p-3 space-y-2">
+        <div class="flex items-start gap-2">
+          <div class="flex-1 space-y-2">
+            <input name="sections[${sectionId}][exercises][${exId}][name]" type="text" placeholder="Exercise name" required
+              class="w-full bg-zinc-800 border border-zinc-600 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-lime-400 transition-colors">
+            <input name="sections[${sectionId}][exercises][${exId}][notes]" type="text" placeholder="Description or cue (optional)"
+              class="w-full bg-zinc-800 border border-zinc-600 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-lime-400 transition-colors">
+            <div class="flex items-center gap-2 flex-wrap">${valueRow}
             </div>
           </div>
           <button type="button" data-action="builder#removeExercise"
