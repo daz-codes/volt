@@ -52,4 +52,16 @@ class Workout::StructureBuilderTest < ActiveSupport::TestCase
 
     refute structure["sections"].first["exercises"].first.key?("metric")
   end
+
+  test "sections are returned in integer-key order regardless of hash insertion order" do
+    params = ActionController::Parameters.new(
+      "2" => { name: "B", category: "main", format: "straight" },
+      "0" => { name: "C", category: "main", format: "straight" },
+      "1" => { name: "A", category: "main", format: "straight" }
+    )
+
+    structure = Workout.structure_from_params(params)
+
+    assert_equal %w[C A B], structure["sections"].map { |s| s["name"] }
+  end
 end
