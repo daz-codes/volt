@@ -11,12 +11,6 @@ export default class extends Controller {
     this.sectionsListTarget.insertAdjacentHTML("beforeend", this.sectionTemplate(id))
   }
 
-  insertSectionAbove(event) {
-    const id = Date.now()
-    const section = event.currentTarget.closest("[data-section-id]")
-    section.insertAdjacentHTML("beforebegin", this.sectionTemplate(id))
-  }
-
   removeSection(event) {
     event.currentTarget.closest("[data-section-id]").remove()
   }
@@ -91,6 +85,14 @@ export default class extends Controller {
     return `
       <div data-section-id="${id}" class="border border-zinc-600 rounded-2xl p-4">
         <div class="flex items-center gap-2 mb-3">
+          <span data-sortable-handle aria-label="Drag to reorder" title="Drag to reorder"
+            class="text-gray-600 hover:text-lime-400 transition-colors flex-shrink-0 p-1 cursor-grab active:cursor-grabbing">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="9" cy="5" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="9" cy="19" r="1"/>
+              <circle cx="15" cy="5" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="19" r="1"/>
+            </svg>
+          </span>
           <input name="sections[${id}][name]" type="text" placeholder="Section name (e.g. Warm Up, Main Set)" required
             class="flex-1 bg-zinc-800 border border-zinc-600 rounded-xl px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-lime-400 transition-colors">
           <select name="sections[${id}][category]"
@@ -115,12 +117,6 @@ export default class extends Controller {
             <option value="hundred">Hundred</option>
             <option value="switchback">Up & Down Ladder</option>
           </select>
-          <button type="button" data-action="builder#insertSectionAbove"
-            class="text-gray-600 hover:text-lime-400 transition-colors flex-shrink-0 p-1" aria-label="Insert section above" title="Insert section above">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/>
-            </svg>
-          </button>
           <button type="button" data-action="builder#removeSection"
             class="text-gray-600 hover:text-red-500 transition-colors flex-shrink-0 p-1" aria-label="Remove section">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
