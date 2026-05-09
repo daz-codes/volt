@@ -102,4 +102,26 @@ class WorkoutsControllerTest < ActionDispatch::IntegrationTest
       assert_nil captured[:intensity_style]
     end
   end
+
+  test "manual create persists sections in integer-key order — covers sortable reindex contract" do
+    post workouts_path, params: {
+      source:        "manual",
+      name:          "Drag Reorder Test",
+      activity_name: "Functional Muscle",
+      duration_mins: 30,
+      sections: {
+        "0" => { name: "C", category: "main", format: "straight",
+                 exercises: { "0" => { name: "C-Exercise", reps: 10 } } },
+        "1" => { name: "A", category: "main", format: "straight",
+                 exercises: { "0" => { name: "A-Exercise", reps: 10 } } },
+        "2" => { name: "B", category: "main", format: "straight",
+                 exercises: { "0" => { name: "B-Exercise", reps: 10 } } }
+      }
+    }
+
+    workout = Workout.where(name: "Drag Reorder Test").last
+    assert workout, "expected workout to be created"
+    assert_redirected_to log_workout_path(workout)
+    assert_equal %w[C A B], workout.structure["sections"].map { |s| s["name"] }
+  end
 end
