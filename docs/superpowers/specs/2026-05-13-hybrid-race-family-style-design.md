@@ -56,16 +56,16 @@ Five labelled sections. The file uses concrete schema-field references so the LL
 > Hybrid sessions must lean heavily on these four shapes. Most sessions use 2-3 of them. A long for_time chipper is allowed occasionally (roughly 1 in 8-10 sessions) — never the default.
 
 - **EMOM family** (`format: emom`) — 8-15 min blocks.
-  - 1 or 2 exercises render as **EMOM** (every 1 min). Both exercises share each minute when 2 are listed.
-  - 3+ exercises render as **E2MOM** (every 2 min, all exercises in the cycle). The LLM may program these as "all exercises each minute" OR "exercises rotate across rounds" — both are valid.
-  - Canonical EMOM movements: **wall balls, lunges, burpees, dead ball yoke over, sit-ups, box step-overs, KB swings, med ball slams, KB thrusters, shoulder press, floor-to-ceilings.**
+  - 1 or 2 exercises render as **EMOM** (every 1 min). Both exercises share each minute when 2 are listed. Alternatively more exercises can be given on a rotating basis, so each exercise is completed every round.The LLM may program these as "all exercises each minute" OR "exercises rotate across rounds" — both are valid.
+  - 3+ exercises render as **E2MOM** (every 2 min, all exercises in the cycle). 
+  - Canonical EMOM movements (priority should be given to the movements that are in the event, if known): **wall balls, lunges, burpees, dead ball yoke over, sit-ups, box step-overs, KB swings, med ball slams, KB thrusters, shoulder press, floor-to-ceilings.**
 - **30s hard / 30s rest cardio blocks** (`format: rounds`, `duration_s: 30`, `rest_secs: 30`):
   - Single-machine: 10-20 min on one cardio modality (~10-20 rounds).
   - Multi-machine: ~5 min per machine across 2-4 machines (e.g. row 5 min → ski 5 min → bike 5 min, 30/30 throughout).
   - Use any cardio modality the activity allows — row, ski, bike, treadmill, OR jump rope for activities that allow it. The activity contract's `allowed_equipment` filters down.
 - **Compromised-running rounds** (`format: rounds`):
-  - 3-4 rounds of `Compromised Run` (400-800m) + 2-3 heavy partner movements + a carry.
-  - Canonical: `3 rounds: 800m Compromised Run + 30 Wall Balls + 20 Burpee Broad Jumps + 40m Farmer's Carry`.
+  - 3-4 rounds of `Compromised Run` (400-800m) + 2-3 exercises from the event.
+  - Canonical (for Hyrox): `3 rounds: 800m Compromised Run + 30 Wall Balls + 20 Burpee Broad Jumps + 40m Farmer's Carry`.
   - Pushes the global_rules baseline of 3-4 rounds × 400-800m run × 30+ partner reps; this is the headline shape for race-day specificity.
 - **Continuous circuits** (`format: continuous_circuit`):
   - 1 min straight per exercise, no reps, rotate through the list. `duration_mins` must be a multiple of the exercise count.
@@ -87,6 +87,9 @@ The same cue is NOT used outside the EMOM family — a `rounds` or `for_time` se
 - Most sessions include 1 EMOM block (10 min typical) AND a cardio block (30/30 or compromised running).
 - A session with only an EMOM and no cardio block — or only cardio and no EMOM — is fine occasionally but should not be the default.
 - One long for_time chipper is allowed roughly 1 in 8-10 sessions (2 examples across the 21).
+- Other modalities such as ladders, up and down ladders, mountains etc can be used, but the bread and butter should be EMOMs
+- It's also fine to use other cardio rounds (such as 4 rounds of 250m row), but the 30/30 pattern should be used often, especially if intensity is set to high
+- Do NOT use 30/30 sets if intensity is set to low
 
 ### 4. Race stations remain race stations
 

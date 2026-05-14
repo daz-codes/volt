@@ -1213,7 +1213,7 @@ class WorkoutValidator
 
   def fix_cardio_missing_metric(sections)
     sections.each do |section|
-      next if section["format"] == "emom" # EMOMs have their own rules
+      next if %w[emom continuous_circuit].include?(section["format"]) # each minute is the metric
       rounds = section["rounds"].to_i.clamp(1, 99)
 
       Array(section["exercises"]).each do |ex|

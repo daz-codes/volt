@@ -119,6 +119,27 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
     assert_nil section["emom_style"]
   end
 
+  test "continuous_circuit cardio exercises do not get a default metric back-filled" do
+    workout_data = build_workout_with_sections([
+      { "name" => "Engine Ignition", "category" => "main", "format" => "continuous_circuit",
+        "duration_mins" => 12,
+        "exercises" => [
+          { "name" => "Ski Erg",    "calories" => 25, "notes" => "hard sustainable effort" },
+          { "name" => "Wall Balls", "reps" => 15, "notes" => "explosive catch" },
+          { "name" => "Dips",       "reps" => 10, "notes" => "controlled tempo" }
+        ] }
+    ])
+
+    result = WorkoutValidator.new(workout_data, duration_mins: 60, main_tag_slug: "").validate_and_fix
+
+    exercises = result.dig("structure", "sections").first["exercises"]
+    exercises.each do |ex|
+      %w[reps calories distance_m duration_s].each do |field|
+        assert_nil ex[field], "#{ex["name"]} should not carry a per-exercise #{field} target in a continuous_circuit"
+      end
+    end
+  end
+
   # -- Iron Engine (kettlebell) KB-only enforcement --
 
   test "fix_kettlebell_non_kb_exercises strips non-KB exercises from main sections" do
