@@ -18,7 +18,15 @@ Canonical movements: wall balls, walking lunges, burpees (including box jump bur
 
 `format: emom`, 2 exercises, **`alternating: true`**. Each exercise gets its own minute (M1 = A, M2 = B, M3 = A, …). 10-20 min long. Each exercise uses the cue with blank reps. Use this when each exercise needs ~30-45s on its own — typically pairing two demanding floor movements (e.g. Burpee Broad Jumps alternating Walking Lunges).
 
-### 3. 30s hard / 30s rest cardio
+### 3. Continuous circuit (multi-exercise minute rotation, no rest)
+
+`format: continuous_circuit`, 3-4 exercises, `duration_mins` MUST be a multiple of the exercise count (12, 15, 18, 20 min are common). Each minute the athlete works on one exercise for the full 60 seconds — no rest — then rotates to the next exercise next minute. Exercises rotate continuously through the full block. Distinct from EMOM (which has rest-within-minute) — continuous circuit fills every minute with work.
+
+Exercises do NOT carry `reps` or the cue — the prescription is "fill the minute". Pair a cardio movement with 1-2 functional movements for variety: e.g. `Row` + `Box Jump Burpees` + `KB Swings` over 18 min = 6 rounds each. Excellent substitute for two stacked single-exercise EMOMs when you want continuous work without the rest-each-minute pattern.
+
+Canonical pattern: 3 exercises × 6 rounds = 18 min, OR 3 exercises × 5 rounds = 15 min, OR 4 exercises × 3 rounds = 12 min. **This is a core hybrid modality — use it as often as you reach for EMOMs.**
+
+### 4. 30s hard / 30s rest cardio
 
 `format: rounds`, each exercise `duration_s: 30`, section `rest_secs: 30`. 1:1 work-rest is the fixed pattern — `rest_secs` is ALWAYS 30 here. Leave `intensity_style` unset or use `medium`; the hard work is intrinsic to the 30/30 structure. Variants:
 - **Single-machine long**: 10-20 rounds (10-20 min) on one cardio modality.
@@ -28,23 +36,23 @@ Modalities: row, ski, bike, treadmill (and jump rope for activities that allow i
 
 This is the headline cardio shape. Use it in most sessions.
 
-### 4. Compromised running rounds
+### 5. Compromised running rounds
 
 `format: rounds`, 3-4 rounds, each round mixes run (400-800m) with 1-3 functional movements. Name the running movement `Compromised Run` per global_rules. Canonical: `4 rounds × 500m run + 20 wall balls + 30m farmer's carry`. Variants include compromised cardio (no run available) — substitute machine work for the run.
 
-### 5. Compromised run ladder
+### 6. Compromised run ladder
 
 A chipper-shaped descending-run / ascending-rep ladder. Express as `format: for_time` with the full alternating sequence in the exercise list. Canonical: `1000m run / 10 wall balls / 800m run / 20 WB / 600m run / 30 WB / 400m run / 40 WB / 200m run / 50 WB`. Counts as a chipper but is also a hybrid headline shape; it's NOT subject to the "1 in 8-10 chippers" rule that limits typical full-race chippers.
 
-### 6. Strength accessory
+### 7. Strength accessory
 
 `format: rounds`, 4-5 rounds, 1-2 heavy compound exercises (Deadlift, Bench Press, Push Press, Bent-Over Row, Pull-ups, Bulgarian Split Squat, etc.), **3-6 reps**, `rest_secs: 120`, `intensity_style: high`. **Include in MOST sessions** (~4 of 5). Never replaces a conditioning block; sits alongside one.
 
-### 7. Hundred finisher
+### 8. Hundred finisher
 
 `format: hundred`, single bodyweight or light movement, 100 reps for time. "The Centurion." Movements: Wall Balls 100, Burpees 100, KB Swings 100, Sit-ups 100, Burpee Broad Jumps 100, Box Jumps 100. **Use in most sessions as the close-out** — alternative is an abs finisher.
 
-### 8. Abs finisher
+### 9. Abs finisher
 
 `format: rounds`, 3 rounds × Sit-ups + V-ups + Plank (or similar). Alternative close-out to the hundred. 20 reps + 20 reps + 45s plank is the standard mix.
 

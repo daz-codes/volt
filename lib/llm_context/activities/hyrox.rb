@@ -77,7 +77,7 @@ module LLMContext
         },
         {
           name: "Two Engines",
-          goal: "Compromised cardio, a long 30/30 treadmill grinder, two stacked EMOMs, and a hundred to finish.",
+          goal: "Compromised cardio, a long 30/30 treadmill grinder, a rotating continuous circuit, and a hundred to finish.",
           duration_mins: 60,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
@@ -93,13 +93,11 @@ module LLMContext
               exercises: [
                 { name: "Run", duration_s: 30, notes: "hard pace", equipment: "treadmill" }
               ] },
-            { name: "Bouncing", format: "emom", duration_mins: 10, rest_secs: 0,
+            { name: "Engine Room", format: "continuous_circuit", duration_mins: 18,
               exercises: [
-                { name: "Box Jump Burpees", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "bodyweight" }
-              ] },
-            { name: "Hammer Time", format: "emom", duration_mins: 10, rest_secs: 0,
-              exercises: [
-                { name: "KB Swings", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "kettlebells" }
+                { name: "Rowing Machine", equipment: "rowing_machine" },
+                { name: "Box Jump Burpees", equipment: "bodyweight" },
+                { name: "KB Swings", equipment: "kettlebells" }
               ] },
             { name: "The Centurion", format: "hundred",
               exercises: [
