@@ -74,7 +74,7 @@ module LLMContext
         },
         {
           name: "Tuesday's Regret",
-          goal: "30/30 treadmill engine, compromised 800m runs, a swing EMOM grind, then a hundred burpee finisher.",
+          goal: "30/30 treadmill engine, compromised 800m runs, a rotating continuous circuit on row, wall balls and KB swings, then a hundred burpee finisher.",
           duration_mins: 60,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
@@ -89,9 +89,11 @@ module LLMContext
                 { name: "Wall Balls", reps: 30, equipment: "wall_ball" },
                 { name: "Farmer's Carry", distance_m: 30, equipment: "kettlebells" }
               ] },
-            { name: "Swing Time", format: "emom", duration_mins: 16, rest_secs: 0,
+            { name: "Engine Builder", format: "continuous_circuit", duration_mins: 15,
               exercises: [
-                { name: "KB Swings", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "kettlebells" }
+                { name: "Rowing Machine", equipment: "rowing_machine" },
+                { name: "Wall Balls", equipment: "wall_ball" },
+                { name: "KB Swings", equipment: "kettlebells" }
               ] },
             { name: "The Centurion", format: "hundred",
               exercises: [
