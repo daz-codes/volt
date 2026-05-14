@@ -48,6 +48,7 @@ class WorkoutLLMGenerator
                   peak:               { type: "number", description: "Peak value for mountain sections — REQUIRED for mountain format." },
                   step:               { type: "number", description: "Increment between rungs — REQUIRED for ladder/mountain/switchback. Must be appropriate for the metric: reps → 1–5, distance_m → 10–20 (never less than 10), calories → 5–10 (never less than 5), kg → 5–10." },
                   rest_between_rungs: { type: "integer", description: "Rest in seconds between each rung (optional)" },
+                  alternating: { type: "boolean", description: "For format: emom with exactly 2 exercises: when true, exercises alternate across minutes (M1=A, M2=B, M3=A, M4=B, ...) instead of both each minute. Use when each exercise needs ~30-45s and won't fit alongside the other in one minute (e.g. Burpee Broad Jumps alternating with Walking Lunges). Default false." },
                   exercises: {
                     type: "array",
                     items: {

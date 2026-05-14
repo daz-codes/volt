@@ -99,6 +99,22 @@ class Workout::ExportableTest < ActiveSupport::TestCase
     assert_equal "EMOM 10min", sections.first[:label]
   end
 
+  test "export_sections renders alternating 2-exercise EMOM with 'Alternating each minute' description" do
+    @workout.structure = {
+      "sections" => [
+        { "name" => "Final Boss", "category" => "main", "format" => "emom", "duration_mins" => 20, "alternating" => true,
+          "exercises" => [
+            { "name" => "Burpee Broad Jumps", "notes" => "~50% of your 1-min max (leaves ~20s rest)" },
+            { "name" => "Walking Lunges",     "notes" => "~50% of your 1-min max (leaves ~20s rest)" }
+          ] }
+      ]
+    }
+
+    sections = @workout.export_sections
+    assert_equal "EMOM 20min", sections.first[:label]
+    assert_equal "Alternating each minute", sections.first[:description]
+  end
+
   test "export_sections renders continuous_circuit format as Continuous Circuit" do
     @workout.structure = {
       "sections" => [
