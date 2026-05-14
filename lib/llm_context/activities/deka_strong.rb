@@ -87,7 +87,7 @@ module LLMContext
         },
         {
           name: "Triple Machine Grind",
-          goal: "Compromised cardio rounds, a wall-ball EMOM grind, an alternating EMOM, then a hundred to close.",
+          goal: "Compromised cardio rounds, a wall-ball EMOM grind, a rotating continuous circuit on row, KB swings and box step-overs, then a hundred to close.",
           duration_mins: 60,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
@@ -103,10 +103,11 @@ module LLMContext
               exercises: [
                 { name: "Wall Balls", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "wall_ball" }
               ] },
-            { name: "Two Left Feet", format: "emom", duration_mins: 10, rest_secs: 0, alternating: true,
+            { name: "Strong Rotation", format: "continuous_circuit", duration_mins: 12,
               exercises: [
-                { name: "KB Swings", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "kettlebells" },
-                { name: "Box Step-overs", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "bodyweight" }
+                { name: "Rowing Machine", equipment: "rowing_machine" },
+                { name: "KB Swings", equipment: "kettlebells" },
+                { name: "Box Step-overs", equipment: "bodyweight" }
               ] },
             { name: "The Centurion", format: "hundred",
               exercises: [
