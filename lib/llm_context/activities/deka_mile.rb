@@ -32,7 +32,7 @@ module LLMContext
       EXAMPLES = [
         {
           name: "Quick One",
-          goal: "6 × 400m treadmill repeats then a your-call EMOM to finish the legs.",
+          goal: "6 × 400m treadmill repeats then a single-exercise walking-lunge EMOM to cook the legs.",
           duration_mins: 30,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 3,
@@ -41,10 +41,9 @@ module LLMContext
               exercises: [
                 { name: "Run", distance_m: 400, notes: "hard pace", equipment: "treadmill" }
               ] },
-            { name: "Happy Lungs", format: "emom", duration_mins: 10, rest_secs: 0,
+            { name: "Walking Death", format: "emom", duration_mins: 10, rest_secs: 0,
               exercises: [
-                { name: "Wall Balls", reps: 8, equipment: "wall_ball" },
-                { name: "KB Swings", reps: 8, equipment: "kettlebells" }
+                { name: "Walking Lunges", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "bodyweight" }
               ] },
             { name: "Cool-Down", format: "straight", duration_mins: 2,
               exercises: [ { name: "Dynamic stretches", notes: "5 deep breaths" } ] }
@@ -52,21 +51,22 @@ module LLMContext
         },
         {
           name: "Death by Threes",
-          goal: "Three compromised mile rounds with stations between, then a your-call EMOM cool the engines.",
+          goal: "Three mile-repeat treadmill rounds, a single-exercise wall-ball EMOM, then a heavy deadlift accessory.",
           duration_mins: 45,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "treadmill" } ] },
-            { name: "The Long Way Round", format: "rounds", rounds: 3, rest_secs: 90,
+            { name: "The Long Way Round", format: "rounds", rounds: 3, rest_secs: 120,
               exercises: [
-                { name: "Compromised Run", distance_m: 1600, equipment: "treadmill" },
-                { name: "RAM Reverse Lunges", reps: 20 },
-                { name: "Box Jump / Step Over", reps: 15, equipment: "bodyweight" }
+                { name: "Run", distance_m: 1600, notes: "hard pace", equipment: "treadmill" }
               ] },
-            { name: "Fried Eggs", format: "emom", duration_mins: 10, rest_secs: 0,
+            { name: "Wall Builder", format: "emom", duration_mins: 10, rest_secs: 0,
               exercises: [
-                { name: "KB Thrusters", reps: 6, equipment: "kettlebells" },
-                { name: "RAM Weighted Burpees", reps: 5, equipment: "bodyweight" }
+                { name: "Wall Balls", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "wall_ball" }
+              ] },
+            { name: "Iron Lift", format: "rounds", intensity_style: "high", rounds: 4, rest_secs: 120,
+              exercises: [
+                { name: "Deadlift", reps: 5, equipment: "barbell" }
               ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
@@ -74,30 +74,28 @@ module LLMContext
         },
         {
           name: "Tuesday's Regret",
-          goal: "30/30 treadmill engine, a your-call EMOM, then compromised 800m runs with stations.",
+          goal: "30/30 treadmill engine, compromised 800m runs, a swing EMOM grind, then a hundred burpee finisher.",
           duration_mins: 60,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "rowing_machine" } ] },
-            { name: "Light and Easy", format: "rounds", intensity_style: "high", rounds: 12, rest_secs: 30,
+            { name: "Tread the Line", format: "rounds", rounds: 24, rest_secs: 30,
               exercises: [
                 { name: "Run", duration_s: 30, notes: "hard pace", equipment: "treadmill" }
-              ] },
-            { name: "Run to Victory", format: "emom", duration_mins: 10, rest_secs: 0,
-              exercises: [
-                { name: "KB Swings", reps: 8, equipment: "kettlebells" },
-                { name: "Box Step-overs", reps: 6, equipment: "bodyweight" },
-                { name: "Med Ball Slams", reps: 8, equipment: "wall_ball" }
               ] },
             { name: "Pavement Pounder", format: "rounds", rounds: 4, rest_secs: 60,
               exercises: [
                 { name: "Compromised Run", distance_m: 800, equipment: "treadmill" },
-                { name: "Farmer's Carry", distance_m: 40, equipment: "kettlebells" },
-                { name: "SkiErg", calories: 15, equipment: "ski_erg" }
+                { name: "Wall Balls", reps: 30, equipment: "wall_ball" },
+                { name: "Farmer's Carry", distance_m: 30, equipment: "kettlebells" }
               ] },
-            { name: "Final Lap", format: "emom", duration_mins: 5, rest_secs: 0,
+            { name: "Swing Time", format: "emom", duration_mins: 16, rest_secs: 0,
               exercises: [
-                { name: "Box Step-overs", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "bodyweight" }
+                { name: "KB Swings", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "kettlebells" }
+              ] },
+            { name: "The Centurion", format: "hundred",
+              exercises: [
+                { name: "Burpees", reps: 100, equipment: "bodyweight" }
               ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
