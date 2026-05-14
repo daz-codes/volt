@@ -22,16 +22,12 @@ module LLMContext
         notes: "Stations: Barbell Thrusters, Bar-Facing Burpees Over Bar, Surrender " \
                "Lunges (weighted), Single Arm DB Ground to Overhead, Dumbbell Bear Crawl, " \
                "Weighted Sit-ups, Farmer's Carry, DB Shoulder to Overhead Press, Jump Rope " \
-               "Single Unders, Atlas Shoulder to Carry. No running. Pair heavy stations " \
-               "with machine conditioning to manage fatigue. The race stations remain the " \
-               "headline movements, but workouts cannot be ONLY stations — every session " \
-               "also needs supplementary work. " \
-               "SUPPLEMENTARY MOVEMENTS (most sessions): weave KB Swings, KB Thrusters, " \
-               "DB Devil Press, Walking Lunges, or Push-ups into station blocks or as " \
-               "their own conditioning piece. These build the strength and conditioning " \
-               "base that race stations alone don't cover — sessions with no supplementary " \
-               "movement at all are too narrow. An abs finisher (sit-ups, leg raises, " \
-               "planks, V-ups, Russian twists) is a good optional close-out."
+               "Single Unders, Atlas Shoulder to Carry. No running. Jump rope (Single/Double " \
+               "Unders) is the race-relevant cardio modality — machines exist for warm-up " \
+               "and engine work but the race-station cardio is jump rope. Pair heavy " \
+               "stations with machine conditioning to manage fatigue. The race stations " \
+               "remain the headline movements, but workouts cannot be ONLY stations — every " \
+               "session also needs supplementary work."
       }.freeze
 
       MOVEMENT_VOCABULARY = <<~VOCAB.freeze
@@ -39,73 +35,78 @@ module LLMContext
         Dumbbell:          Single Arm DB Ground to Overhead, DB Shoulder to Overhead Press, Bear Crawl
         Carries:           Farmer's Carry, Atlas Shoulder to Carry
         Bodyweight:        Surrender Lunges (weighted), Weighted Sit-ups, Jump Rope Single Unders
-        Supplementary:     KB Swings, KB Thrusters, KB High Pull, DB Devil Press, Walking Lunges, Jump Squats, Push-ups, KB/DB Shoulder Press (feature in most sessions alongside race stations)
-        Burpee variations: Box Jump Burpees, Plate Burpees, KB Burpees, DB Burpees
-        Abs finisher:      Sit-ups, Leg Raises, Plank, V-ups, Russian Twists, Hollow Holds
       VOCAB
 
       EXAMPLES = [
         {
-          name: "Atlas Taste",
-          goal: "Touch five Atlas stations at race intensity.",
+          name: "Atlas Awakens",
+          goal: "DB station EMOM into jump-rope 30/30 — short, sharp, no machines on the main work.",
           duration_mins: 30,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 3,
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 180, equipment: "rowing_machine" } ] },
-            { name: "Five-Station Circuit", format: "for_time",
+            { name: "Strongman Hour", format: "emom", duration_mins: 12, rest_secs: 0,
               exercises: [
-                { name: "Barbell Thrusters", reps: 20, equipment: "barbell" },
-                { name: "Bar-Facing Burpees Over Bar", reps: 20, equipment: "barbell" },
-                { name: "Single Arm DB Ground to Overhead", reps: 20, equipment: "dumbbells" },
-                { name: "Dumbbell Bear Crawl", distance_m: 40, equipment: "dumbbells" },
-                { name: "Jump Rope Single Unders", reps: 100, equipment: "jump_rope" }
+                { name: "Dumbbell Bear Crawl", distance_m: 15, equipment: "dumbbells" },
+                { name: "DB Shoulder to Overhead Press", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "dumbbells" },
+                { name: "Weighted Sit-ups", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "dumbbells" }
               ] },
-            { name: "Carry Finisher", format: "rounds", rounds: 3, rest_secs: 60,
-              exercises: [ { name: "Farmer's Carry", distance_m: 60, equipment: "kettlebells" } ] },
+            { name: "Skip & Smash", format: "rounds", intensity_style: "high", rounds: 10, rest_secs: 30,
+              exercises: [
+                { name: "Jump Rope Single Unders", duration_s: 30, notes: "hard pace", equipment: "jump_rope" }
+              ] },
             { name: "Cool-Down", format: "straight", duration_mins: 2,
               exercises: [ { name: "Dynamic stretches", notes: "5 deep breaths" } ] }
           ]
         },
         {
-          name: "Heavy Hands",
-          goal: "Build strength-endurance on the loaded stations.",
+          name: "Heavy Metal",
+          goal: "Barbell EMOM, then a jump-rope 30/30 engine block, finished with Atlas carries.",
           duration_mins: 45,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
-            { name: "Barbell EMOM", format: "emom", duration_mins: 15, rest_secs: 0,
+            { name: "The Yoke", format: "emom", duration_mins: 12, rest_secs: 0,
               exercises: [
-                { name: "Barbell Thrusters", reps: 5, equipment: "barbell" },
-                { name: "Bar-Facing Burpees Over Bar", reps: 10, equipment: "barbell" }
+                { name: "Barbell Thrusters", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "barbell" },
+                { name: "Bar-Facing Burpees Over Bar", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "barbell" }
               ] },
-            { name: "DB Circuit", format: "rounds", rounds: 4, rest_secs: 45,
+            { name: "Iron Will", format: "rounds", intensity_style: "high", rounds: 20, rest_secs: 30,
               exercises: [
-                { name: "DB Shoulder to Overhead Press", reps: 10, equipment: "dumbbells" },
-                { name: "Dumbbell Bear Crawl", distance_m: 20, equipment: "dumbbells" }
+                { name: "Jump Rope Single Unders", duration_s: 30, notes: "hard pace", equipment: "jump_rope" }
+              ] },
+            { name: "Carry the Weight", format: "rounds", rounds: 4, rest_secs: 60,
+              exercises: [
+                { name: "Atlas Shoulder to Carry", distance_m: 50, equipment: "sled" },
+                { name: "Farmer's Carry", distance_m: 50, equipment: "kettlebells" }
               ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
           ]
         },
         {
-          name: "Ten-Station Simulation",
-          goal: "Run the full Atlas race in one hit.",
+          name: "Power Hour",
+          goal: "Compromised jump-rope/carry/DB triplets, a barbell EMOM, and an abs close-out.",
           duration_mins: 60,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "rowing_machine" } ] },
-            { name: "Race Simulation", format: "for_time",
+            { name: "The Boulder", format: "rounds", rounds: 4, rest_secs: 60,
               exercises: [
-                { name: "Barbell Thrusters", reps: 20, equipment: "barbell" },
-                { name: "Bar-Facing Burpees Over Bar", reps: 20, equipment: "barbell" },
-                { name: "Surrender Lunges (weighted)", reps: 20, equipment: "dumbbells" },
-                { name: "Single Arm DB Ground to Overhead", reps: 20, equipment: "dumbbells" },
-                { name: "Dumbbell Bear Crawl", distance_m: 40, equipment: "dumbbells" },
+                { name: "Jump Rope Single Unders", duration_s: 60, equipment: "jump_rope" },
+                { name: "Atlas Shoulder to Carry", distance_m: 50, equipment: "sled" },
+                { name: "DB Devil Press", reps: 12, equipment: "dumbbells" }
+              ] },
+            { name: "Stone Cold", format: "emom", duration_mins: 10, rest_secs: 0,
+              exercises: [
+                { name: "Barbell Thrusters", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "barbell" },
+                { name: "Bar-Facing Burpees Over Bar", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "barbell" }
+              ] },
+            { name: "Atlas Hold", format: "rounds", rounds: 3, rest_secs: 30,
+              exercises: [
                 { name: "Weighted Sit-ups", reps: 20, equipment: "dumbbells" },
-                { name: "Farmer's Carry", distance_m: 60, equipment: "kettlebells" },
-                { name: "DB Shoulder to Overhead Press", reps: 20, equipment: "dumbbells" },
-                { name: "Jump Rope Single Unders", reps: 100, equipment: "jump_rope" },
-                { name: "Atlas Shoulder to Carry", distance_m: 100, equipment: "sled" }
+                { name: "V-ups", reps: 15, equipment: "bodyweight" },
+                { name: "Plank", duration_s: 45, equipment: "bodyweight" }
               ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
