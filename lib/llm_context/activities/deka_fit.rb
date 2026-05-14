@@ -44,8 +44,8 @@ module LLMContext
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 180, equipment: "rowing_machine" } ] },
             { name: "The Anvil", format: "emom", duration_mins: 10, rest_secs: 0,
               exercises: [
-                { name: "Wall Balls", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "wall_ball" },
-                { name: "Box Step-overs", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "bodyweight" }
+                { name: "Wall Balls", reps: 8, equipment: "wall_ball" },
+                { name: "Box Step-overs", reps: 6, equipment: "bodyweight" }
               ] },
             { name: "Sprint Finish", format: "rounds", intensity_style: "high", rounds: 10, rest_secs: 30,
               exercises: [
@@ -70,8 +70,8 @@ module LLMContext
               ] },
             { name: "No Mercy", format: "emom", duration_mins: 10, rest_secs: 0,
               exercises: [
-                { name: "KB Swings", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "kettlebells" },
-                { name: "RAM Weighted Burpees", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "bodyweight" }
+                { name: "KB Swings", reps: 8, equipment: "kettlebells" },
+                { name: "RAM Weighted Burpees", reps: 5, equipment: "bodyweight" }
               ] },
             { name: "Last Word", format: "emom", duration_mins: 5, rest_secs: 0,
               exercises: [

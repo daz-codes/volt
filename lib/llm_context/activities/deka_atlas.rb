@@ -47,9 +47,9 @@ module LLMContext
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 180, equipment: "rowing_machine" } ] },
             { name: "Strongman Hour", format: "emom", duration_mins: 12, rest_secs: 0,
               exercises: [
-                { name: "Dumbbell Bear Crawl", distance_m: 15, equipment: "dumbbells" },
-                { name: "DB Shoulder to Overhead Press", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "dumbbells" },
-                { name: "Weighted Sit-ups", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "dumbbells" }
+                { name: "Dumbbell Bear Crawl", distance_m: 10, equipment: "dumbbells" },
+                { name: "DB Shoulder to Overhead Press", reps: 6, equipment: "dumbbells" },
+                { name: "Weighted Sit-ups", reps: 8, equipment: "dumbbells" }
               ] },
             { name: "Skip & Smash", format: "rounds", intensity_style: "high", rounds: 10, rest_secs: 30,
               exercises: [
@@ -68,8 +68,8 @@ module LLMContext
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
             { name: "The Yoke", format: "emom", duration_mins: 12, rest_secs: 0,
               exercises: [
-                { name: "Barbell Thrusters", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "barbell" },
-                { name: "Bar-Facing Burpees Over Bar", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "barbell" }
+                { name: "Barbell Thrusters", reps: 5, equipment: "barbell" },
+                { name: "Bar-Facing Burpees Over Bar", reps: 4, equipment: "barbell" }
               ] },
             { name: "Iron Will", format: "rounds", intensity_style: "high", rounds: 20, rest_secs: 30,
               exercises: [
@@ -99,8 +99,8 @@ module LLMContext
               ] },
             { name: "Stone Cold", format: "emom", duration_mins: 10, rest_secs: 0,
               exercises: [
-                { name: "Barbell Thrusters", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "barbell" },
-                { name: "Bar-Facing Burpees Over Bar", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "barbell" }
+                { name: "Barbell Thrusters", reps: 5, equipment: "barbell" },
+                { name: "Bar-Facing Burpees Over Bar", reps: 4, equipment: "barbell" }
               ] },
             { name: "Atlas Hold", format: "emom", duration_mins: 6, rest_secs: 0,
               exercises: [

@@ -43,8 +43,8 @@ module LLMContext
               ] },
             { name: "Happy Lungs", format: "emom", duration_mins: 10, rest_secs: 0,
               exercises: [
-                { name: "Wall Balls", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "wall_ball" },
-                { name: "KB Swings", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "kettlebells" }
+                { name: "Wall Balls", reps: 8, equipment: "wall_ball" },
+                { name: "KB Swings", reps: 8, equipment: "kettlebells" }
               ] },
             { name: "Cool-Down", format: "straight", duration_mins: 2,
               exercises: [ { name: "Dynamic stretches", notes: "5 deep breaths" } ] }
@@ -65,8 +65,8 @@ module LLMContext
               ] },
             { name: "Fried Eggs", format: "emom", duration_mins: 10, rest_secs: 0,
               exercises: [
-                { name: "KB Thrusters", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "kettlebells" },
-                { name: "RAM Weighted Burpees", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "bodyweight" }
+                { name: "KB Thrusters", reps: 6, equipment: "kettlebells" },
+                { name: "RAM Weighted Burpees", reps: 5, equipment: "bodyweight" }
               ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
@@ -85,9 +85,9 @@ module LLMContext
               ] },
             { name: "Run to Victory", format: "emom", duration_mins: 10, rest_secs: 0,
               exercises: [
-                { name: "KB Swings", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "kettlebells" },
-                { name: "Box Step-overs", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "bodyweight" },
-                { name: "Med Ball Slams", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "wall_ball" }
+                { name: "KB Swings", reps: 8, equipment: "kettlebells" },
+                { name: "Box Step-overs", reps: 6, equipment: "bodyweight" },
+                { name: "Med Ball Slams", reps: 8, equipment: "wall_ball" }
               ] },
             { name: "Pavement Pounder", format: "rounds", rounds: 4, rest_secs: 60,
               exercises: [

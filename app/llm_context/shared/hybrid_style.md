@@ -6,9 +6,9 @@ Hybrid sessions must lean heavily on these four shapes. Most sessions use 2-3 of
 
 - **EMOM family** (`format: emom`) — 8-15 min blocks.
   - **Single-exercise EMOM** (1 exercise) is the headline shape — every minute, same movement, your-call reps with the cue below. Reach for this MOST often.
-  - **Two-exercise EMOM** (2 exercises) renders as "both exercises each minute". The HARD constraint is total work per minute ≤ ~30-45s, leaving ~15-30s rest. Cardio + floor pairings ARE fine when both are kept SHORT — e.g. `SkiErg 5 cal + Med Ball Sit-up Throw 5 reps` (each ~15s), `Row 100m + Burpees 5`, `Sled Pull 10m + KB Swings 5`. AVOID pairings where either exercise needs ≥30s alone (e.g. `KB Swings 15 + SkiErg 10 cal` — both ~25-30s, total ~55s, no room for rest).
+  - **Two-exercise EMOM** (2 exercises) renders as "both exercises each minute". The HARD constraint is total work per minute ≤ ~30-45s, leaving ~15-30s rest. **Use SMALL ABSOLUTE rep/cal/distance numbers — typically 5/5, 8/8, 10 cal/5 reps, 100m/5 reps — NOT the `~50% of your 1-min max` cue.** The cue is sized for single-exercise EMOMs where one movement fills the minute; with two movements that math breaks. Examples: `SkiErg 5 cal + Med Ball Sit-up Throw 5 reps` (each ~15s), `Row 100m + Burpees 5`, `Sandbag Lunges 5 + KB Swings 5`, `Wall Balls 8 + KB Swings 8`. AVOID pairings where either exercise needs ≥30s alone (e.g. `KB Swings 15 + SkiErg 10 cal` — both ~25-30s, total ~55s, no room for rest).
   - **For alternating-per-minute feel** (cardio one minute, floor the next): emit as TWO separate single-exercise EMOM sections back-to-back — e.g. `EMOM 5 min · Wall Balls` followed by `EMOM 5 min · SkiErg 10 cal`. The LLM does NOT have a single-section "alternating EMOM" format available; do not try to encode one with a 2-exercise EMOM.
-  - **E2MOM** (3+ exercises) renders as "all exercises every 2 minutes". Use when all listed exercises together fit in ~60-90s of work across the 2-minute cycle. Cardio + floor in an E2MOM is fine — the 2-min frame leaves room.
+  - **E2MOM** (3+ exercises) renders as "all exercises every 2 minutes". Use SMALL ABSOLUTE numbers (typically 5-10 reps, 5-10 cal, 50-100m per exercise) so the total work across all listed exercises fits ~60-90s of the 2-minute cycle, leaving ~30-60s rest. Do NOT use the `~50% of 1-min max` cue — that's a single-exercise EMOM cue. Cardio + floor in an E2MOM is fine — the 2-min frame leaves room.
   - Canonical EMOM movements (priority should be given to the movements that are in the event, if known): **wall balls, lunges, burpees, dead ball yoke over, sit-ups, box step-overs, KB swings, med ball slams, KB thrusters, shoulder press, floor-to-ceilings.**
 - **30s hard / 30s rest cardio blocks** (`format: rounds`, `duration_s: 30`, `rest_secs: 30`):
   - Single-machine: 10-20 min on one cardio modality (~10-20 rounds).
@@ -25,14 +25,16 @@ Hybrid sessions must lean heavily on these four shapes. Most sessions use 2-3 of
 
 ## 2. Your-call reps cueing
 
-For canonical EMOM movements (the list in section 1) when they appear inside an EMOM / E2MOM:
+For canonical EMOM movements (the list in section 1) when they appear inside a **single-exercise EMOM** (1 exercise, every minute the same movement):
 
 - Leave `reps` blank on the exercise.
 - Write the per-exercise `notes` cue as: **`~50% of your 1-min max (leaves ~20s rest)`**.
 
 The athlete supplies the actual rep number. Distance-based movements (Farmer's Carry, Sled, Bear Crawl) keep `distance_m`. Duration-holds keep `duration_s`.
 
-The same cue is NOT used outside the EMOM family — a `rounds` or `for_time` section with wall balls still prescribes a concrete rep count.
+**The cue is ONLY for single-exercise EMOMs.** Multi-exercise EMOMs (2-ex EMOM, 3+-ex E2MOM) use SMALL ABSOLUTE numbers instead — 5 reps, 5 cal, 100m — chosen so the per-minute (or per-2-min for E2MOM) work fits the time budget. The cue assumes one movement fills the minute; with two or more movements that math breaks.
+
+The cue is NOT used outside the EMOM family — a `rounds` or `for_time` section with wall balls still prescribes a concrete rep count.
 
 ## 3. Volume targets
 

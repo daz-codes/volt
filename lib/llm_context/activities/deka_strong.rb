@@ -44,8 +44,8 @@ module LLMContext
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 180, equipment: "rowing_machine" } ] },
             { name: "The Forge", format: "emom", duration_mins: 10, rest_secs: 0,
               exercises: [
-                { name: "Wall Balls", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "wall_ball" },
-                { name: "KB Swings", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "kettlebells" }
+                { name: "Wall Balls", reps: 8, equipment: "wall_ball" },
+                { name: "KB Swings", reps: 8, equipment: "kettlebells" }
               ] },
             { name: "Iron Storm", format: "rounds", rounds: 4, rest_secs: 45,
               exercises: [
@@ -70,8 +70,8 @@ module LLMContext
               ] },
             { name: "The Minotaur", format: "emom", duration_mins: 10, rest_secs: 0,
               exercises: [
-                { name: "KB Thrusters", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "kettlebells" },
-                { name: "RAM Weighted Burpees", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "bodyweight" }
+                { name: "KB Thrusters", reps: 6, equipment: "kettlebells" },
+                { name: "RAM Weighted Burpees", reps: 5, equipment: "bodyweight" }
               ] },
             { name: "Last Stand", format: "rounds", intensity_style: "high", rounds: 4, rest_secs: 120,
               exercises: [
@@ -97,9 +97,9 @@ module LLMContext
               ] },
             { name: "Two Left Feet", format: "emom", duration_mins: 10, rest_secs: 0,
               exercises: [
-                { name: "Box Step-overs", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "bodyweight" },
-                { name: "KB Swings", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "kettlebells" },
-                { name: "Med Ball Slams", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "wall_ball" }
+                { name: "Box Step-overs", reps: 6, equipment: "bodyweight" },
+                { name: "KB Swings", reps: 8, equipment: "kettlebells" },
+                { name: "Med Ball Slams", reps: 8, equipment: "wall_ball" }
               ] },
             { name: "The Centurion", format: "hundred",
               exercises: [

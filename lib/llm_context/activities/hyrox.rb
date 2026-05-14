@@ -45,8 +45,8 @@ module LLMContext
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 180, equipment: "treadmill" } ] },
             { name: "Hammer Time", format: "emom", duration_mins: 10, rest_secs: 0,
               exercises: [
-                { name: "Wall Balls", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "wall_ball" },
-                { name: "KB Swings", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "kettlebells" }
+                { name: "Wall Balls", reps: 8, equipment: "wall_ball" },
+                { name: "KB Swings", reps: 8, equipment: "kettlebells" }
               ] },
             { name: "Lung Buster", format: "rounds", rounds: 3, rest_secs: 60,
               exercises: [
@@ -100,9 +100,9 @@ module LLMContext
               ] },
             { name: "Final Boss", format: "emom", duration_mins: 10, rest_secs: 0,
               exercises: [
-                { name: "KB Thrusters", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "kettlebells" },
-                { name: "Box Step-overs", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "bodyweight" },
-                { name: "Med Ball Slams", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "wall_ball" }
+                { name: "KB Thrusters", reps: 6, equipment: "kettlebells" },
+                { name: "Box Step-overs", reps: 6, equipment: "bodyweight" },
+                { name: "Med Ball Slams", reps: 8, equipment: "wall_ball" }
               ] },
             { name: "The Anvil", format: "emom", duration_mins: 6, rest_secs: 0,
               exercises: [
