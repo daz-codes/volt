@@ -35,23 +35,18 @@ module LLMContext
       EXAMPLES = [
         {
           name: "Race Taste",
-          goal: "Short and sharp — your-call EMOM reps then 30/30 cardio to finish.",
+          goal: "Single-exercise thruster EMOM then a 30/30 row engine to finish.",
           duration_mins: 30,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 3,
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 180, equipment: "rowing_machine" } ] },
-            { name: "Hammer Time", format: "emom", duration_mins: 10, rest_secs: 0,
+            { name: "Thruster Hour", format: "emom", duration_mins: 10, rest_secs: 0,
               exercises: [
-                { name: "Wall Balls", reps: 8, equipment: "wall_ball" },
-                { name: "KB Swings", reps: 8, equipment: "kettlebells" }
+                { name: "KB Thrusters", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "kettlebells" }
               ] },
-            { name: "Engine Builder", format: "rounds", intensity_style: "high", rounds: 10, rest_secs: 30,
+            { name: "Row Sprint", format: "rounds", rounds: 16, rest_secs: 30,
               exercises: [
-                { name: "Run", duration_s: 30, notes: "hard pace", equipment: "treadmill" }
-              ] },
-            { name: "Closer", format: "emom", duration_mins: 4, rest_secs: 0,
-              exercises: [
-                { name: "Burpees", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "bodyweight" }
+                { name: "Row", duration_s: 30, notes: "hard pace", equipment: "rowing_machine" }
               ] },
             { name: "Cool-Down", format: "straight", duration_mins: 2,
               exercises: [ { name: "Dynamic stretches", notes: "5 deep breaths" } ] }
@@ -59,7 +54,7 @@ module LLMContext
         },
         {
           name: "Zone Mix",
-          goal: "Compromised running into your-call EMOM cycles, then a heavy strength accessory.",
+          goal: "Compromised running, dual-machine 30/30 engine, a med-ball EMOM, then a heavy bench accessory.",
           duration_mins: 45,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
@@ -68,16 +63,23 @@ module LLMContext
               exercises: [
                 { name: "Compromised Run", distance_m: 500, equipment: "treadmill" },
                 { name: "RAM Reverse Lunges", reps: 20 },
-                { name: "Med Ball Slams", reps: 20, equipment: "wall_ball" }
+                { name: "Sled Push", distance_m: 30, equipment: "sled" }
               ] },
-            { name: "Final Boss", format: "emom", duration_mins: 8, rest_secs: 0,
+            { name: "Row Sprint", format: "rounds", rounds: 10, rest_secs: 30,
               exercises: [
-                { name: "KB Thrusters", reps: 6, equipment: "kettlebells" },
-                { name: "Box Step-overs", reps: 6, equipment: "bodyweight" }
+                { name: "Row", duration_s: 30, notes: "hard pace", equipment: "rowing_machine" }
               ] },
-            { name: "Iron Lift", format: "rounds", intensity_style: "high", rounds: 4, rest_secs: 120,
+            { name: "Ski Sprint", format: "rounds", rounds: 10, rest_secs: 30,
               exercises: [
-                { name: "Deadlift", reps: 5, equipment: "barbell" }
+                { name: "SkiErg", duration_s: 30, notes: "hard pace", equipment: "ski_erg" }
+              ] },
+            { name: "Slam Time", format: "emom", duration_mins: 10, rest_secs: 0,
+              exercises: [
+                { name: "Med Ball Slams", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "wall_ball" }
+              ] },
+            { name: "Iron Press", format: "rounds", intensity_style: "high", rounds: 4, rest_secs: 120,
+              exercises: [
+                { name: "Bench Press", reps: 5, equipment: "barbell" }
               ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
