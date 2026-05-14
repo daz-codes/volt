@@ -57,7 +57,7 @@ module LLMContext
         },
         {
           name: "Heavy Hands",
-          goal: "Compromised running, a 30/30 ski engine, then a single-exercise swing EMOM.",
+          goal: "Compromised running, a 30/30 ski engine, then a rotating continuous circuit on row, wall ball, and KB swings.",
           duration_mins: 45,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
@@ -72,9 +72,11 @@ module LLMContext
               exercises: [
                 { name: "SkiErg", duration_s: 30, notes: "hard pace", equipment: "ski_erg" }
               ] },
-            { name: "Swing Time", format: "emom", duration_mins: 10, rest_secs: 0,
+            { name: "Engine Room", format: "continuous_circuit", duration_mins: 12,
               exercises: [
-                { name: "KB Swings", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "kettlebells" }
+                { name: "Rowing Machine", equipment: "rowing_machine" },
+                { name: "Wall Balls", equipment: "wall_ball" },
+                { name: "KB Swings", equipment: "kettlebells" }
               ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
