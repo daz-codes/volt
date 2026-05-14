@@ -37,19 +37,19 @@ module LLMContext
       EXAMPLES = [
         {
           name: "Wake the Dead",
-          goal: "Your-call EMOM reps then 30/30 sprint cardio — short, sharp, high intensity.",
+          goal: "Alternating EMOM of box jumps and RAM lunges then a 30/30 ski engine to finish.",
           duration_mins: 30,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 3,
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 180, equipment: "rowing_machine" } ] },
-            { name: "The Anvil", format: "emom", duration_mins: 10, rest_secs: 0,
+            { name: "The Anvil", format: "emom", duration_mins: 10, rest_secs: 0, alternating: true,
               exercises: [
-                { name: "Wall Balls", reps: 8, equipment: "wall_ball" },
-                { name: "Box Step-overs", reps: 6, equipment: "bodyweight" }
+                { name: "Box Jump", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "bodyweight" },
+                { name: "RAM Reverse Lunges", notes: "~50% of your 1-min max (leaves ~20s rest)" }
               ] },
-            { name: "Sprint Finish", format: "rounds", intensity_style: "high", rounds: 10, rest_secs: 30,
+            { name: "Ski Sprint", format: "rounds", rounds: 12, rest_secs: 30,
               exercises: [
-                { name: "Run", duration_s: 30, notes: "hard pace", equipment: "treadmill" }
+                { name: "SkiErg", duration_s: 30, notes: "hard pace", equipment: "ski_erg" }
               ] },
             { name: "Cool-Down", format: "straight", duration_mins: 2,
               exercises: [ { name: "Dynamic stretches", notes: "5 deep breaths" } ] }
@@ -57,7 +57,7 @@ module LLMContext
         },
         {
           name: "Death March",
-          goal: "Compromised 500m runs alternating with functional zones, then your-call EMOM cycles.",
+          goal: "Compromised running, a single-exercise wall-ball EMOM, then a heavy deadlift accessory.",
           duration_mins: 45,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
@@ -65,17 +65,16 @@ module LLMContext
             { name: "The Crucible", format: "rounds", rounds: 4, rest_secs: 60,
               exercises: [
                 { name: "Compromised Run", distance_m: 500, equipment: "treadmill" },
-                { name: "RAM Reverse Lunges", reps: 20 },
-                { name: "Med Ball Sit-up Throw", reps: 20, equipment: "wall_ball" }
+                { name: "Wall Balls", reps: 20, equipment: "wall_ball" },
+                { name: "Med Ball Sit-up Throw", reps: 25, equipment: "wall_ball" }
               ] },
-            { name: "No Mercy", format: "emom", duration_mins: 10, rest_secs: 0,
-              exercises: [
-                { name: "KB Swings", reps: 8, equipment: "kettlebells" },
-                { name: "RAM Weighted Burpees", reps: 5, equipment: "bodyweight" }
-              ] },
-            { name: "Last Word", format: "emom", duration_mins: 5, rest_secs: 0,
+            { name: "Last Word", format: "emom", duration_mins: 10, rest_secs: 0,
               exercises: [
                 { name: "Wall Balls", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "wall_ball" }
+              ] },
+            { name: "Iron Lift", format: "rounds", intensity_style: "high", rounds: 4, rest_secs: 120,
+              exercises: [
+                { name: "Deadlift", reps: 5, equipment: "barbell" }
               ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
