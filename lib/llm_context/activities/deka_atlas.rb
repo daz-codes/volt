@@ -40,18 +40,16 @@ module LLMContext
       EXAMPLES = [
         {
           name: "Atlas Awakens",
-          goal: "DB station EMOM into jump-rope 30/30 — short, sharp, no machines on the main work.",
+          goal: "Single-exercise bar-facing-burpee EMOM then a jump-rope 30/30 engine to finish.",
           duration_mins: 30,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 3,
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 180, equipment: "rowing_machine" } ] },
-            { name: "Strongman Hour", format: "emom", duration_mins: 12, rest_secs: 0,
+            { name: "Bar Burner", format: "emom", duration_mins: 10, rest_secs: 0,
               exercises: [
-                { name: "Dumbbell Bear Crawl", distance_m: 10, equipment: "dumbbells" },
-                { name: "DB Shoulder to Overhead Press", reps: 6, equipment: "dumbbells" },
-                { name: "Weighted Sit-ups", reps: 8, equipment: "dumbbells" }
+                { name: "Bar-Facing Burpees Over Bar", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "barbell" }
               ] },
-            { name: "Skip & Smash", format: "rounds", intensity_style: "high", rounds: 10, rest_secs: 30,
+            { name: "Skip & Smash", format: "rounds", rounds: 12, rest_secs: 30,
               exercises: [
                 { name: "Jump Rope Single Unders", duration_s: 30, notes: "hard pace", equipment: "jump_rope" }
               ] },
@@ -61,24 +59,22 @@ module LLMContext
         },
         {
           name: "Heavy Metal",
-          goal: "Barbell EMOM, then a jump-rope 30/30 engine block, finished with Atlas carries.",
+          goal: "Single-exercise barbell thruster EMOM, a jump-rope 30/30 engine block, finished with Atlas carries.",
           duration_mins: 45,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
-            { name: "The Yoke", format: "emom", duration_mins: 12, rest_secs: 0,
+            { name: "The Yoke", format: "emom", duration_mins: 10, rest_secs: 0,
               exercises: [
-                { name: "Barbell Thrusters", reps: 5, equipment: "barbell" },
-                { name: "Bar-Facing Burpees Over Bar", reps: 4, equipment: "barbell" }
+                { name: "Barbell Thrusters", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "barbell" }
               ] },
-            { name: "Iron Will", format: "rounds", intensity_style: "high", rounds: 20, rest_secs: 30,
+            { name: "Iron Will", format: "rounds", rounds: 20, rest_secs: 30,
               exercises: [
                 { name: "Jump Rope Single Unders", duration_s: 30, notes: "hard pace", equipment: "jump_rope" }
               ] },
             { name: "Carry the Weight", format: "rounds", rounds: 4, rest_secs: 60,
               exercises: [
-                { name: "Atlas Shoulder to Carry", distance_m: 50, equipment: "sled" },
-                { name: "Farmer's Carry", distance_m: 50, equipment: "kettlebells" }
+                { name: "Atlas Shoulder to Carry", distance_m: 50, equipment: "sled" }
               ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
@@ -86,7 +82,7 @@ module LLMContext
         },
         {
           name: "Power Hour",
-          goal: "Compromised jump-rope/carry/DB triplets, a barbell EMOM, and an abs close-out.",
+          goal: "Compromised strongman rounds, an alternating EMOM, jump-rope 30/30, strength accessory, and a hundred to close.",
           duration_mins: 60,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
@@ -97,14 +93,22 @@ module LLMContext
                 { name: "Atlas Shoulder to Carry", distance_m: 50, equipment: "sled" },
                 { name: "DB Devil Press", reps: 12, equipment: "dumbbells" }
               ] },
-            { name: "Stone Cold", format: "emom", duration_mins: 10, rest_secs: 0,
+            { name: "Stone Cold", format: "emom", duration_mins: 12, rest_secs: 0, alternating: true,
               exercises: [
-                { name: "Barbell Thrusters", reps: 5, equipment: "barbell" },
-                { name: "Bar-Facing Burpees Over Bar", reps: 4, equipment: "barbell" }
+                { name: "Surrender Lunges", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "dumbbells" },
+                { name: "DB Ground to Overhead", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "dumbbells" }
               ] },
-            { name: "Atlas Hold", format: "emom", duration_mins: 6, rest_secs: 0,
+            { name: "Skip Sprint", format: "rounds", rounds: 16, rest_secs: 30,
               exercises: [
-                { name: "Weighted Sit-ups", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "dumbbells" }
+                { name: "Jump Rope Single Unders", duration_s: 30, notes: "hard pace", equipment: "jump_rope" }
+              ] },
+            { name: "Iron Press", format: "rounds", intensity_style: "high", rounds: 4, rest_secs: 120,
+              exercises: [
+                { name: "DB Shoulder to Overhead Press", reps: 5, equipment: "dumbbells" }
+              ] },
+            { name: "The Centurion", format: "hundred",
+              exercises: [
+                { name: "KB Swings", reps: 100, equipment: "kettlebells" }
               ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
