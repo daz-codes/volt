@@ -49,11 +49,11 @@ module LLMContext
                 { name: "Wall Balls", reps: 20, equipment: "wall_ball" },
                 { name: "Farmer's Carry", distance_m: 30, equipment: "kettlebells" }
               ] },
-            { name: "Ski Sprint", format: "rounds", intensity_style: "high", rounds: 5, rest_secs: 30,
+            { name: "Ski Sprint", format: "rounds", rounds: 5, rest_secs: 30,
               exercises: [
                 { name: "SkiErg", duration_s: 30, notes: "hard pace", equipment: "ski_erg" }
               ] },
-            { name: "Row Sprint", format: "rounds", intensity_style: "high", rounds: 5, rest_secs: 30,
+            { name: "Row Sprint", format: "rounds", rounds: 5, rest_secs: 30,
               exercises: [
                 { name: "Row", duration_s: 30, notes: "hard pace", equipment: "rowing_machine" }
               ] },
@@ -89,7 +89,7 @@ module LLMContext
                 { name: "SkiErg", distance_m: 500, equipment: "ski_erg" },
                 { name: "Sled Push", distance_m: 30, equipment: "sled" }
               ] },
-            { name: "Tread the Line", format: "rounds", intensity_style: "high", rounds: 16, rest_secs: 30,
+            { name: "Tread the Line", format: "rounds", rounds: 16, rest_secs: 30,
               exercises: [
                 { name: "Run", duration_s: 30, notes: "hard pace", equipment: "treadmill" }
               ] },
@@ -116,7 +116,7 @@ module LLMContext
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "treadmill" } ] },
-            { name: "Lung Buster", format: "rounds", intensity_style: "high", rounds: 10, rest_secs: 30,
+            { name: "Lung Buster", format: "rounds", rounds: 10, rest_secs: 30,
               exercises: [
                 { name: "SkiErg", duration_s: 30, notes: "hard pace", equipment: "ski_erg" }
               ] },

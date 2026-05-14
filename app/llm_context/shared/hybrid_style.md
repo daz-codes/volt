@@ -20,7 +20,7 @@ Canonical movements: wall balls, walking lunges, burpees (including box jump bur
 
 ### 3. 30s hard / 30s rest cardio
 
-`format: rounds`, each exercise `duration_s: 30`, section `rest_secs: 30`, `intensity_style: high`. 1:1 work-rest is the fixed pattern — do NOT use 60s, 90s, or 120s rest. Variants:
+`format: rounds`, each exercise `duration_s: 30`, section `rest_secs: 30`. 1:1 work-rest is the fixed pattern — do NOT use 60s, 90s, or 120s rest. **Do NOT set `intensity_style: high`** on a 30/30 block; that triggers the wrong rest rule (90-120s full recovery for max sprints). Leave `intensity_style` unset or use `medium` — the pattern's hard work is intrinsic. Variants:
 - **Single-machine long**: 10-20 rounds (10-20 min) on one cardio modality.
 - **Multi-machine split**: 2-3 SEPARATE sections back-to-back, ~5-min each, different machines (e.g. 5 min SkiErg, then 5 min Rower).
 
