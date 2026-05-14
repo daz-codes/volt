@@ -12,6 +12,8 @@
 class WorkoutLLMGenerator
   include AnthropicApi
 
+  class WorkoutGenerationError < StandardError; end
+
   MODEL   = "claude-haiku-4-5-20251001".freeze
 
   TOOL_DEFINITION = {
@@ -127,8 +129,6 @@ class WorkoutLLMGenerator
     workout_data = validate_and_fix(workout_data)
     workout_data = collapse_duplicate_exercises(workout_data)
     collapse_set_notation(workout_data)
-  rescue LLMContext::Activities::UnknownActivity
-    raise WorkoutGenerationError, "Unknown activity: #{@activity.inspect}"
   end
 
   # E.g. 5 × { name: "Freestyle", distance_m: 25 } → rounds: 5, exercises: [{ name: "Freestyle", distance_m: 25 }]
@@ -588,7 +588,8 @@ class WorkoutLLMGenerator
       session_notes:             sanitized_session_notes,
       intensity_style:           @intensity_style,
       banned_equipment_override: profile_banned_equipment + session_note_banned_equipment,
-      contract_override:         contract
+      contract_override:         contract,
+      user_activity_name:        @activity
     ).build
   end
 

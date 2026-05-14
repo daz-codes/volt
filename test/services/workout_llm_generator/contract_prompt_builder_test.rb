@@ -160,5 +160,20 @@ class WorkoutLLMGenerator::ContractPromptBuilderTest < ActiveSupport::TestCase
     assert global_pos && hybrid_pos, "both tags must be present"
     assert global_pos < hybrid_pos, "hybrid_style must come after global_rules"
   end
+
+  test "task tag uses the activity module name when user_activity_name is absent" do
+    prompt = build(activity_slug: "hyrox")
+    assert_match(%r{<task>\nGenerate a \d+-minute Hyrox session\.\n</task>}, prompt)
+  end
+
+  test "task tag uses user_activity_name when provided (free-form typed activity)" do
+    prompt = WorkoutLLMGenerator::ContractPromptBuilder.new(
+      activity:           LLMContext::Activities.for!("general-fitness"),
+      duration_mins:      45,
+      athlete_block:      "test athlete",
+      user_activity_name: "Dumbbell workout"
+    ).build
+    assert_match(%r{<task>\nGenerate a 45-minute Dumbbell workout session\.\n</task>}, prompt)
+  end
 end
 

@@ -24,10 +24,13 @@ class LLMContext::ActivitiesTest < ActiveSupport::TestCase
     assert_nil LLMContext::Activities.for("does-not-exist")
   end
 
-  test "for! raises on unknown slug" do
-    assert_raises(LLMContext::Activities::UnknownActivity) do
-      LLMContext::Activities.for!("does-not-exist")
-    end
+  test "for! falls back to GeneralFitness on unknown slug" do
+    assert_equal LLMContext::Activities::GeneralFitness, LLMContext::Activities.for!("does-not-exist")
+  end
+
+  test "for! falls back on free-form names like 'Dumbbell workout'" do
+    slug = "Dumbbell workout".parameterize
+    assert_equal LLMContext::Activities::GeneralFitness, LLMContext::Activities.for!(slug)
   end
 
   test "tread-shred slug routes to Alternator" do

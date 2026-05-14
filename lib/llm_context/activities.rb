@@ -76,8 +76,13 @@ module LLMContext
       const_get(constant)
     end
 
+    # Always returns a module. Unknown slugs fall back to GeneralFitness so
+    # free-form activity names (typed in the generate form) still produce a
+    # workout — the user's typed name flows through to the prompt as session
+    # intent, and the LLM shapes the session from the typed name + the
+    # permissive GeneralFitness contract.
     def self.for!(slug)
-      self.for(slug) || raise(UnknownActivity, "no activity module for slug #{slug.inspect}")
+      self.for(slug) || GeneralFitness
     end
   end
 end

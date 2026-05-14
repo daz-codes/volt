@@ -19,7 +19,7 @@ class WorkoutLLMGenerator
     GLOBAL_RULES_PATH = Rails.root.join("app/llm_context/shared/global_rules.md").freeze
     HYBRID_STYLE_PATH = Rails.root.join("app/llm_context/shared/hybrid_style.md").freeze
 
-    def initialize(activity:, duration_mins:, athlete_block:, session_notes: nil, banned_equipment_override: [], contract_override: nil, intensity_style: nil)
+    def initialize(activity:, duration_mins:, athlete_block:, session_notes: nil, banned_equipment_override: [], contract_override: nil, intensity_style: nil, user_activity_name: nil)
       @activity = activity
       @duration_mins = duration_mins
       @athlete_block = athlete_block
@@ -27,13 +27,14 @@ class WorkoutLLMGenerator
       @banned_override = Array(banned_equipment_override)
       @contract_override = contract_override
       @intensity_style = intensity_style
+      @user_activity_name = user_activity_name.presence
     end
 
     def build
       tags = []
       tags << xml(:role, ROLE_TEXT)
       tags << xml(:athlete, @athlete_block)
-      tags << xml(:task, "Generate a #{@duration_mins}-minute #{@activity::NAME} session.")
+      tags << xml(:task, "Generate a #{@duration_mins}-minute #{@user_activity_name || @activity::NAME} session.")
       tags << xml(:contract, contract_block)
       tags << xml(:global_rules, self.class.global_rules)
       tags << xml(:hybrid_style, self.class.hybrid_style) if contract[:hybrid_family]
