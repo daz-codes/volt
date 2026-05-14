@@ -37,21 +37,18 @@ module LLMContext
       EXAMPLES = [
         {
           name: "Station Capacity",
-          goal: "Short and sharp — your-call EMOM reps then a multi-station circuit, no running.",
+          goal: "Single-exercise KB swing EMOM then a 30/30 row engine to finish.",
           duration_mins: 30,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 3,
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 180, equipment: "rowing_machine" } ] },
             { name: "The Forge", format: "emom", duration_mins: 10, rest_secs: 0,
               exercises: [
-                { name: "Wall Balls", reps: 8, equipment: "wall_ball" },
-                { name: "KB Swings", reps: 8, equipment: "kettlebells" }
+                { name: "KB Swings", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "kettlebells" }
               ] },
-            { name: "Iron Storm", format: "rounds", rounds: 4, rest_secs: 45,
+            { name: "Row Sprint", format: "rounds", rounds: 12, rest_secs: 30,
               exercises: [
-                { name: "RAM Reverse Lunges", reps: 20 },
-                { name: "Box Jump / Step Over", reps: 15, equipment: "bodyweight" },
-                { name: "Sled Push / Pull", distance_m: 30, equipment: "sled" }
+                { name: "Row", duration_s: 30, notes: "hard pace", equipment: "rowing_machine" }
               ] },
             { name: "Cool-Down", format: "straight", duration_mins: 2,
               exercises: [ { name: "Dynamic stretches", notes: "5 deep breaths" } ] }
@@ -59,24 +56,30 @@ module LLMContext
         },
         {
           name: "Engine & Iron",
-          goal: "30/30 row engine, your-call EMOM cycles, then a heavy strength accessory.",
+          goal: "Triple-machine 30/30 engine block, a thruster EMOM, then a heavy deadlift accessory.",
           duration_mins: 45,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
-            { name: "Slow Burn", format: "rounds", intensity_style: "high", rounds: 15, rest_secs: 30,
+            { name: "Row Sprint", format: "rounds", rounds: 10, rest_secs: 30,
               exercises: [
                 { name: "Row", duration_s: 30, notes: "hard pace", equipment: "rowing_machine" }
               ] },
+            { name: "Ski Sprint", format: "rounds", rounds: 10, rest_secs: 30,
+              exercises: [
+                { name: "SkiErg", duration_s: 30, notes: "hard pace", equipment: "ski_erg" }
+              ] },
+            { name: "Bike Sprint", format: "rounds", rounds: 10, rest_secs: 30,
+              exercises: [
+                { name: "Air Bike", duration_s: 30, notes: "hard pace", equipment: "assault_bike" }
+              ] },
             { name: "The Minotaur", format: "emom", duration_mins: 10, rest_secs: 0,
               exercises: [
-                { name: "KB Thrusters", reps: 6, equipment: "kettlebells" },
-                { name: "RAM Weighted Burpees", reps: 5, equipment: "bodyweight" }
+                { name: "KB Thrusters", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "kettlebells" }
               ] },
             { name: "Last Stand", format: "rounds", intensity_style: "high", rounds: 4, rest_secs: 120,
               exercises: [
-                { name: "Deadlift", reps: 5, equipment: "barbell" },
-                { name: "Pull-ups", reps: 5, equipment: "pull_up_bar" }
+                { name: "Deadlift", reps: 5, equipment: "barbell" }
               ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
@@ -84,7 +87,7 @@ module LLMContext
         },
         {
           name: "Triple Machine Grind",
-          goal: "Compromised-cardio triplet rounds across all three machines, your-call EMOM cycles, then an abs close-out.",
+          goal: "Compromised cardio rounds, a wall-ball EMOM grind, an alternating EMOM, then a hundred to close.",
           duration_mins: 60,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
@@ -92,14 +95,18 @@ module LLMContext
             { name: "Desert Rain", format: "rounds", rounds: 4, rest_secs: 60,
               exercises: [
                 { name: "Row", distance_m: 250, equipment: "rowing_machine" },
+                { name: "RAM Reverse Lunges", reps: 20 },
                 { name: "SkiErg", distance_m: 250, equipment: "ski_erg" },
-                { name: "Air Bike", calories: 15, equipment: "assault_bike" }
+                { name: "Sled Push", distance_m: 30, equipment: "sled" }
               ] },
-            { name: "Two Left Feet", format: "emom", duration_mins: 10, rest_secs: 0,
+            { name: "Wall Builder", format: "emom", duration_mins: 16, rest_secs: 0,
               exercises: [
-                { name: "Box Step-overs", reps: 6, equipment: "bodyweight" },
-                { name: "KB Swings", reps: 8, equipment: "kettlebells" },
-                { name: "Med Ball Slams", reps: 8, equipment: "wall_ball" }
+                { name: "Wall Balls", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "wall_ball" }
+              ] },
+            { name: "Two Left Feet", format: "emom", duration_mins: 10, rest_secs: 0, alternating: true,
+              exercises: [
+                { name: "KB Swings", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "kettlebells" },
+                { name: "Box Step-overs", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "bodyweight" }
               ] },
             { name: "The Centurion", format: "hundred",
               exercises: [
