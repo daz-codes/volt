@@ -57,7 +57,7 @@ module LLMContext
         },
         {
           name: "Death March",
-          goal: "Compromised running, a single-exercise wall-ball EMOM, then a heavy deadlift accessory.",
+          goal: "Compromised running, a rotating continuous circuit on row, wall balls and box jumps, then a heavy deadlift accessory.",
           duration_mins: 45,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
@@ -68,9 +68,11 @@ module LLMContext
                 { name: "Wall Balls", reps: 20, equipment: "wall_ball" },
                 { name: "Med Ball Sit-up Throw", reps: 25, equipment: "wall_ball" }
               ] },
-            { name: "Last Word", format: "emom", duration_mins: 10, rest_secs: 0,
+            { name: "Rotation Room", format: "continuous_circuit", duration_mins: 12,
               exercises: [
-                { name: "Wall Balls", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "wall_ball" }
+                { name: "Rowing Machine", equipment: "rowing_machine" },
+                { name: "Wall Balls", equipment: "wall_ball" },
+                { name: "Box Jump", equipment: "bodyweight" }
               ] },
             { name: "Iron Lift", format: "rounds", intensity_style: "high", rounds: 4, rest_secs: 120,
               exercises: [
