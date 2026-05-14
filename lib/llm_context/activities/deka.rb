@@ -54,7 +54,7 @@ module LLMContext
         },
         {
           name: "Zone Mix",
-          goal: "Compromised running, dual-machine 30/30 engine, a med-ball EMOM, then a heavy bench accessory.",
+          goal: "Compromised running, dual-machine 30/30 engine, a continuous circuit on row, RAM lunges and slams, then a heavy bench accessory.",
           duration_mins: 45,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
@@ -73,9 +73,11 @@ module LLMContext
               exercises: [
                 { name: "SkiErg", duration_s: 30, notes: "hard pace", equipment: "ski_erg" }
               ] },
-            { name: "Slam Time", format: "emom", duration_mins: 10, rest_secs: 0,
+            { name: "Three Engines", format: "continuous_circuit", duration_mins: 12,
               exercises: [
-                { name: "Med Ball Slams", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "wall_ball" }
+                { name: "Rowing Machine", equipment: "rowing_machine" },
+                { name: "RAM Reverse Lunges", equipment: "bodyweight" },
+                { name: "Med Ball Slams", equipment: "wall_ball" }
               ] },
             { name: "Iron Press", format: "rounds", intensity_style: "high", rounds: 4, rest_secs: 120,
               exercises: [
