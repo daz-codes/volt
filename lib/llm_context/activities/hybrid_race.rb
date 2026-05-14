@@ -38,17 +38,16 @@ module LLMContext
       EXAMPLES = [
         {
           name: "Sprint & Stations",
-          goal: "Short and sharp — your-call EMOM reps then 30/30 cardio to finish.",
+          goal: "Single-exercise wall-ball EMOM then a 30/30 row engine to finish.",
           duration_mins: 30,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 3,
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 180, equipment: "rowing_machine" } ] },
             { name: "Hammer Time", format: "emom", duration_mins: 10, rest_secs: 0,
               exercises: [
-                { name: "Wall Balls", reps: 8, equipment: "wall_ball" },
-                { name: "KB Swings", reps: 8, equipment: "kettlebells" }
+                { name: "Wall Balls", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "wall_ball" }
               ] },
-            { name: "Engine Builder", format: "rounds", intensity_style: "high", rounds: 10, rest_secs: 30,
+            { name: "Row Sprint", format: "rounds", rounds: 16, rest_secs: 30,
               exercises: [
                 { name: "Row", duration_s: 30, notes: "hard pace", equipment: "rowing_machine" }
               ] },
@@ -58,7 +57,7 @@ module LLMContext
         },
         {
           name: "Heavy Hands",
-          goal: "Compromised running into your-call EMOM cycles, then a heavy strength accessory.",
+          goal: "Compromised running, a 30/30 ski engine, then a single-exercise swing EMOM.",
           duration_mins: 45,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
@@ -66,17 +65,16 @@ module LLMContext
             { name: "Last Mile", format: "rounds", rounds: 4, rest_secs: 60,
               exercises: [
                 { name: "Compromised Run", distance_m: 500, equipment: "treadmill" },
-                { name: "Wall Balls", reps: 30, equipment: "wall_ball" },
-                { name: "KB Swings", reps: 30, equipment: "kettlebells" }
+                { name: "Wall Balls", reps: 20, equipment: "wall_ball" },
+                { name: "Farmer's Carry", distance_m: 30, equipment: "kettlebells" }
               ] },
-            { name: "Final Boss", format: "emom", duration_mins: 8, rest_secs: 0,
+            { name: "Ski Sprint", format: "rounds", rounds: 20, rest_secs: 30,
               exercises: [
-                { name: "KB Thrusters", reps: 6, equipment: "kettlebells" },
-                { name: "Box Step-overs", reps: 6, equipment: "bodyweight" }
+                { name: "SkiErg", duration_s: 30, notes: "hard pace", equipment: "ski_erg" }
               ] },
-            { name: "Iron Lift", format: "rounds", intensity_style: "high", rounds: 4, rest_secs: 120,
+            { name: "Swing Time", format: "emom", duration_mins: 10, rest_secs: 0,
               exercises: [
-                { name: "Deadlift", reps: 5, equipment: "barbell" }
+                { name: "KB Swings", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "kettlebells" }
               ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
@@ -84,30 +82,43 @@ module LLMContext
         },
         {
           name: "Triple Threat",
-          goal: "30/30 multi-machine engine, compromised-running circuit, then an abs close-out.",
+          goal: "Compromised run ladder, a walking-lunge EMOM grind, multi-machine 30/30, strength, then a hundred to close.",
           duration_mins: 60,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
-              exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "rowing_machine" } ] },
-            { name: "Engine Builder", format: "rounds", intensity_style: "high", rounds: 10, rest_secs: 30,
+              exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "treadmill" } ] },
+            { name: "Up & Down", format: "for_time",
               exercises: [
-                { name: "Row", duration_s: 30, notes: "hard pace", equipment: "rowing_machine" }
+                { name: "Run", distance_m: 1000, equipment: "treadmill" },
+                { name: "Wall Balls", reps: 10, equipment: "wall_ball" },
+                { name: "Run", distance_m: 800, equipment: "treadmill" },
+                { name: "Wall Balls", reps: 20, equipment: "wall_ball" },
+                { name: "Run", distance_m: 600, equipment: "treadmill" },
+                { name: "Wall Balls", reps: 30, equipment: "wall_ball" },
+                { name: "Run", distance_m: 400, equipment: "treadmill" },
+                { name: "Wall Balls", reps: 40, equipment: "wall_ball" },
+                { name: "Run", distance_m: 200, equipment: "treadmill" },
+                { name: "Wall Balls", reps: 50, equipment: "wall_ball" }
               ] },
-            { name: "Strong Stations", format: "emom", duration_mins: 12, rest_secs: 0,
+            { name: "Walking Death", format: "emom", duration_mins: 16, rest_secs: 0,
               exercises: [
-                { name: "KB Thrusters", reps: 6, equipment: "kettlebells" },
-                { name: "Box Step-overs", reps: 6, equipment: "bodyweight" },
-                { name: "Med Ball Slams", reps: 8, equipment: "wall_ball" }
+                { name: "Walking Lunges", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "bodyweight" }
               ] },
-            { name: "Tip of the Spear", format: "rounds", rounds: 4, rest_secs: 60,
+            { name: "Ski Sprint", format: "rounds", rounds: 10, rest_secs: 30,
               exercises: [
-                { name: "Compromised Run", distance_m: 500, equipment: "treadmill" },
-                { name: "Sled Push", distance_m: 15, equipment: "sled" },
-                { name: "Sandbag Lunges", distance_m: 20, equipment: "sled" }
+                { name: "SkiErg", duration_s: 30, notes: "hard pace", equipment: "ski_erg" }
+              ] },
+            { name: "Bike Sprint", format: "rounds", rounds: 10, rest_secs: 30,
+              exercises: [
+                { name: "Air Bike", duration_s: 30, notes: "hard pace", equipment: "assault_bike" }
+              ] },
+            { name: "Iron Lift", format: "rounds", intensity_style: "high", rounds: 4, rest_secs: 120,
+              exercises: [
+                { name: "Deadlift", reps: 5, equipment: "barbell" }
               ] },
             { name: "The Centurion", format: "hundred",
               exercises: [
-                { name: "Burpee Broad Jumps", reps: 100, equipment: "bodyweight" }
+                { name: "Wall Balls", reps: 100, equipment: "wall_ball" }
               ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
