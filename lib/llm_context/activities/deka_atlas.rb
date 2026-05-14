@@ -82,7 +82,7 @@ module LLMContext
         },
         {
           name: "Power Hour",
-          goal: "Compromised strongman rounds, an alternating EMOM, jump-rope 30/30, strength accessory, and a hundred to close.",
+          goal: "Compromised strongman rounds, a rotating continuous circuit on jump rope, DB press and weighted sit-ups, jump-rope 30/30, strength accessory, and a hundred to close.",
           duration_mins: 60,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
@@ -93,10 +93,11 @@ module LLMContext
                 { name: "Atlas Shoulder to Carry", distance_m: 50, equipment: "sled" },
                 { name: "DB Devil Press", reps: 12, equipment: "dumbbells" }
               ] },
-            { name: "Stone Cold", format: "emom", duration_mins: 12, rest_secs: 0, alternating: true,
+            { name: "Strongman Rotation", format: "continuous_circuit", duration_mins: 12,
               exercises: [
-                { name: "Surrender Lunges", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "dumbbells" },
-                { name: "DB Ground to Overhead", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "dumbbells" }
+                { name: "Jump Rope Single Unders", equipment: "jump_rope" },
+                { name: "DB Shoulder to Overhead Press", equipment: "dumbbells" },
+                { name: "Weighted Sit-ups", equipment: "dumbbells" }
               ] },
             { name: "Skip Sprint", format: "rounds", rounds: 16, rest_secs: 30,
               exercises: [
