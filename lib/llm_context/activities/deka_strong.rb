@@ -25,99 +25,83 @@ module LLMContext
                "Row, Box Jump, Med Ball Sit-up Throw, SkiErg, Farmer's Carry, Air Bike, " \
                "Dead Ball Yoke Over, Sled Push/Pull, RAM Weighted Burpees. **Most sessions " \
                "use 4-6 stations** with supplementary movement work; full 10-zone sessions " \
-               "are valid but uncommon — roughly 1 in 5 workouts. **Include 1-2 supplementary " \
-               "movements** (KB Swings, KB Thrusters, Wall Balls, walking lunges, burpee " \
-               "variations like Box Jump Burpees) in most sessions — they keep training " \
-               "varied and complement the stations. " \
-               "STRENGTH ACCESSORY (most sessions): include one strength accessory block — " \
-               "rounds format, 3-6 reps heavy at 120s rest with intensity_style: high, " \
-               "OR 8-10 reps moderate at 90s rest. Draw from the Strength accessory line " \
-               "(Deadlift, Bench Press, Push Press, Bent-Over Row, Pull-ups, Bulgarian Split " \
-               "Squat). Heavy compound work alongside stations is what makes this variant. " \
-               "Never more than one strength block per session, never the centrepiece, and " \
-               "never replaces a station. " \
-               "An abs finisher (sit-ups, leg raises, planks, V-ups, Russian twists) is a " \
-               "good optional close-out."
+               "are valid but uncommon — roughly 1 in 5 workouts."
       }.freeze
 
       MOVEMENT_VOCABULARY = <<~VOCAB.freeze
         Stations:          RAM Reverse Lunges, Row 500m, Box Jump, Med Ball Sit-up Throw, SkiErg 500m,
                            Farmer's Carry, Air Bike 25 cal, Dead Ball Yoke Over, Sled Push/Pull, RAM Weighted Burpees
         Engine:            Ski Erg 500m repeats, Rower 500m repeats, Assault Bike 30s/30s
-        Supplementary:     KB Swings, KB Thrusters, KB High Pull, Wall Balls, Walking Lunges, Jump Squats, Push-ups, Med Ball Slams, KB Shoulder Press (include 1-2 per session for variety)
-        Strength accessory: Bench Press, Deadlift, Romanian Deadlift, Sumo Deadlift, Single-Leg Deadlift, Split Squat, Bulgarian Split Squat, B-stance Squat, B-stance Deadlift, Landmine Press, Landmine Row, Push Press, Bent-Over Row, Pull-ups, Chin-ups, Dips, Toes-to-bar (most sessions — max 1 strength round, never the main work)
-        Burpee variations: Box Jump Burpees, Plate Burpees, Wall Ball Burpees, KB Burpees
-        Abs finisher:      Sit-ups, Leg Raises, Plank, V-ups, Russian Twists, Hollow Holds
       VOCAB
 
       EXAMPLES = [
         {
           name: "Station Capacity",
-          goal: "Hit five stations with short transitions — no running, all grit.",
+          goal: "Short and sharp — your-call EMOM reps then a multi-station circuit, no running.",
           duration_mins: 30,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 3,
-              exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 180, equipment: "ski_erg" } ] },
-            { name: "Five-Station Circuit", format: "for_time",
+              exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 180, equipment: "rowing_machine" } ] },
+            { name: "The Forge", format: "emom", duration_mins: 10, rest_secs: 0,
               exercises: [
-                { name: "Row", distance_m: 500, equipment: "rowing_machine" },
-                { name: "RAM Reverse Lunges", reps: 30 },
-                { name: "SkiErg", distance_m: 500, equipment: "ski_erg" },
-                { name: "Box Jump / Step Over", reps: 20, equipment: "bodyweight" },
-                { name: "Air Bike", calories: 25, equipment: "assault_bike" }
+                { name: "Wall Balls", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "wall_ball" },
+                { name: "KB Swings", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "kettlebells" }
               ] },
-            { name: "Sled Finisher", format: "rounds", rounds: 4, rest_secs: 45,
-              exercises: [ { name: "Sled Push / Pull", distance_m: 50, equipment: "sled" } ] },
+            { name: "Iron Storm", format: "rounds", rounds: 4, rest_secs: 45,
+              exercises: [
+                { name: "RAM Reverse Lunges", reps: 20 },
+                { name: "Box Jump / Step Over", reps: 15, equipment: "bodyweight" },
+                { name: "Sled Push / Pull", distance_m: 30, equipment: "sled" }
+              ] },
             { name: "Cool-Down", format: "straight", duration_mins: 2,
               exercises: [ { name: "Dynamic stretches", notes: "5 deep breaths" } ] }
           ]
         },
         {
-          name: "Engine & Stations",
-          goal: "Heavy lift, machine intervals, and a station block to close.",
+          name: "Engine & Iron",
+          goal: "30/30 row engine, your-call EMOM cycles, then a heavy strength accessory.",
           duration_mins: 45,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
-              exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "rowing_machine" } ] },
-            { name: "Iron Lift", format: "rounds", intensity_style: "high", rounds: 4, rest_secs: 120,
+              exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
+            { name: "Slow Burn", format: "rounds", intensity_style: "high", rounds: 15, rest_secs: 30,
+              exercises: [
+                { name: "Row", duration_s: 30, notes: "hard pace", equipment: "rowing_machine" }
+              ] },
+            { name: "The Minotaur", format: "emom", duration_mins: 10, rest_secs: 0,
+              exercises: [
+                { name: "KB Thrusters", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "kettlebells" },
+                { name: "RAM Weighted Burpees", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "bodyweight" }
+              ] },
+            { name: "Last Stand", format: "rounds", intensity_style: "high", rounds: 4, rest_secs: 120,
               exercises: [
                 { name: "Deadlift", reps: 5, equipment: "barbell" },
                 { name: "Pull-ups", reps: 5, equipment: "pull_up_bar" }
-              ] },
-            { name: "Machine Intervals", format: "rounds", rounds: 6, rest_secs: 30,
-              exercises: [
-                { name: "Row", distance_m: 250, equipment: "rowing_machine" },
-                { name: "Assault Bike", calories: 10, equipment: "assault_bike" }
-              ] },
-            { name: "Station Block", format: "emom", duration_mins: 10, rest_secs: 0,
-              exercises: [
-                { name: "Farmer's Carry", distance_m: 40, equipment: "kettlebells" },
-                { name: "Dead Ball Yoke Over", reps: 15 },
-                { name: "RAM Weighted Burpees", reps: 10 }
               ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
           ]
         },
         {
-          name: "Long Mixed Strong",
-          goal: "Engine, station strength with supplementary work and a burpee variation, abs close — not a race simulation.",
+          name: "Triple Machine Grind",
+          goal: "Compromised-cardio triplet rounds across all three machines, your-call EMOM cycles, then an abs close-out.",
           duration_mins: 60,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
-              exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
-            { name: "Engine Block", format: "rounds", rounds: 6, rest_secs: 60,
+              exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "rowing_machine" } ] },
+            { name: "Desert Rain", format: "rounds", rounds: 4, rest_secs: 60,
               exercises: [
-                { name: "Row", distance_m: 500, equipment: "rowing_machine" },
-                { name: "Air Bike", calories: 20, equipment: "assault_bike" }
+                { name: "Row", distance_m: 250, equipment: "rowing_machine" },
+                { name: "SkiErg", distance_m: 250, equipment: "ski_erg" },
+                { name: "Air Bike", calories: 15, equipment: "assault_bike" }
               ] },
-            { name: "Strength Stations", format: "rounds", rounds: 5, rest_secs: 60,
+            { name: "Two Left Feet", format: "emom", duration_mins: 10, rest_secs: 0,
               exercises: [
-                { name: "RAM Reverse Lunges", reps: 12 },
-                { name: "KB Thrusters", reps: 12, equipment: "kettlebells" },
-                { name: "Box Jump Burpees", reps: 12, equipment: "bodyweight" }
+                { name: "Box Step-overs", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "bodyweight" },
+                { name: "KB Swings", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "kettlebells" },
+                { name: "Med Ball Slams", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "wall_ball" }
               ] },
-            { name: "Abs Finisher", format: "rounds", rounds: 3, rest_secs: 30,
+            { name: "Cooked", format: "rounds", rounds: 3, rest_secs: 30,
               exercises: [
                 { name: "V-ups", reps: 20, equipment: "bodyweight" },
                 { name: "Russian Twists", reps: 20, equipment: "bodyweight" },
