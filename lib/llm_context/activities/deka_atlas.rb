@@ -7,6 +7,7 @@ module LLMContext
       CONTRACT = {
         purity: "Deka Atlas race training — ten strongman-style weighted stations, no " \
                 "running. Barbell and dumbbell work feature alongside classic carries.",
+        hybrid_family: true,
         allowed_equipment: %w[barbell dumbbells kettlebells sled jump_rope rowing_machine ski_erg assault_bike],
         banned_equipment:  %w[treadmill wall_ball pull_up_bar resistance_bands],
         banned_exercise_patterns: [

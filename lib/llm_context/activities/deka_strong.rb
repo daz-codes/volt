@@ -8,6 +8,7 @@ module LLMContext
         purity: "Deka Strong training — no running. Strength-endurance and station capacity " \
                 "via the 10 weighted functional zones. Most sessions use 4-6 stations with " \
                 "supplementary movement work; full 10-zone sessions are valid but uncommon.",
+        hybrid_family: true,
         allowed_equipment: %w[rowing_machine ski_erg assault_bike wall_ball sled kettlebells barbell dumbbells pull_up_bar],
         banned_equipment:  %w[treadmill resistance_bands jump_rope],
         banned_exercise_patterns: [

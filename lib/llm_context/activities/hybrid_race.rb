@@ -9,6 +9,7 @@ module LLMContext
                 "weighted functional stations. Builds the engine and station capacity for " \
                 "any run-and-stations race format. Each session draws freely from a wide " \
                 "library of stations rather than locking into a fixed event shape.",
+        hybrid_family: true,
         allowed_equipment: %w[treadmill rowing_machine ski_erg assault_bike sled wall_ball kettlebells barbell dumbbells pull_up_bar],
         banned_equipment:  %w[resistance_bands jump_rope],
         banned_exercise_patterns: [].freeze,

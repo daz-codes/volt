@@ -7,6 +7,7 @@ module LLMContext
       CONTRACT = {
         purity: "Deka Mile race training — running-heavy Deka variant. Treadmill mileage " \
                 "is the backbone of every session.",
+        hybrid_family: true,
         allowed_equipment: %w[treadmill rowing_machine ski_erg assault_bike wall_ball sled kettlebells barbell dumbbells pull_up_bar],
         banned_equipment:  %w[resistance_bands jump_rope],
         banned_exercise_patterns: [].freeze,

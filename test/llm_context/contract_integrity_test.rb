@@ -13,6 +13,16 @@ class LLMContext::ContractIntegrityTest < ActiveSupport::TestCase
 
   VALID_EQUIPMENT_TERMS = (User::EQUIPMENT_SLUGS + %w[bodyweight]).freeze
 
+  RACE_FAMILY_MODULES = [
+    LLMContext::Activities::Hyrox,
+    LLMContext::Activities::HybridRace,
+    LLMContext::Activities::Deka,
+    LLMContext::Activities::DekaFit,
+    LLMContext::Activities::DekaStrong,
+    LLMContext::Activities::DekaMile,
+    LLMContext::Activities::DekaAtlas
+  ].freeze
+
   def assert_activity_valid(mod)
     contract = mod::CONTRACT
     REQUIRED_CONTRACT_KEYS.each do |k|
@@ -131,5 +141,12 @@ class LLMContext::ContractIntegrityTest < ActiveSupport::TestCase
 
   test "Hybrid Race contract is valid" do
     assert_activity_valid(LLMContext::Activities::HybridRace)
+  end
+
+  test "all race-family contracts have hybrid_family: true" do
+    RACE_FAMILY_MODULES.each do |mod|
+      assert_equal true, mod::CONTRACT[:hybrid_family],
+        "#{mod} must set hybrid_family: true to opt into the shared style"
+    end
   end
 end

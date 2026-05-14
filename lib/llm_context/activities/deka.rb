@@ -7,6 +7,7 @@ module LLMContext
       CONTRACT = {
         purity: "Deka race training — 10-zone event covering all Deka variants generically. " \
                 "Five run zones alternate with five functional zones.",
+        hybrid_family: true,
         allowed_equipment: %w[treadmill rowing_machine ski_erg assault_bike wall_ball sled kettlebells barbell dumbbells pull_up_bar],
         banned_equipment:  %w[resistance_bands jump_rope],
         banned_exercise_patterns: [].freeze,
