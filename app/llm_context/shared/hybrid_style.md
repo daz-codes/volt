@@ -6,7 +6,7 @@ Hybrid sessions must lean heavily on these four shapes. Most sessions use 2-3 of
 
 - **EMOM family** (`format: emom`) — 8-15 min blocks.
   - **Single-exercise EMOM** (1 exercise) is the headline shape — every minute, same movement, your-call reps with the cue below. Reach for this MOST often.
-  - **Two-exercise EMOM** (2 exercises) renders as "both exercises each minute". ONLY use this when both exercises together fit in ~30-45s of work — typically two short floor movements (e.g. 5 burpees + 5 sit-ups, or KB Swings + Push-ups). **NEVER pair a cardio machine (row, ski, bike, treadmill, jump rope) with a floor or carry station in a 2-exercise EMOM** — the cardio fills 30-40s of the minute, leaving no room for the floor work.
+  - **Two-exercise EMOM** (2 exercises) renders as "both exercises each minute". The HARD constraint is total work per minute ≤ ~30-45s, leaving ~15-30s rest. Cardio + floor pairings ARE fine when both are kept SHORT — e.g. `SkiErg 5 cal + Med Ball Sit-up Throw 5 reps` (each ~15s), `Row 100m + Burpees 5`, `Sled Pull 10m + KB Swings 5`. AVOID pairings where either exercise needs ≥30s alone (e.g. `KB Swings 15 + SkiErg 10 cal` — both ~25-30s, total ~55s, no room for rest).
   - **For alternating-per-minute feel** (cardio one minute, floor the next): emit as TWO separate single-exercise EMOM sections back-to-back — e.g. `EMOM 5 min · Wall Balls` followed by `EMOM 5 min · SkiErg 10 cal`. The LLM does NOT have a single-section "alternating EMOM" format available; do not try to encode one with a 2-exercise EMOM.
   - **E2MOM** (3+ exercises) renders as "all exercises every 2 minutes". Use when all listed exercises together fit in ~60-90s of work across the 2-minute cycle. Cardio + floor in an E2MOM is fine — the 2-min frame leaves room.
   - Canonical EMOM movements (priority should be given to the movements that are in the event, if known): **wall balls, lunges, burpees, dead ball yoke over, sit-ups, box step-overs, KB swings, med ball slams, KB thrusters, shoulder press, floor-to-ceilings.**
@@ -36,11 +36,13 @@ The same cue is NOT used outside the EMOM family — a `rounds` or `for_time` se
 
 ## 3. Volume targets
 
-- Most sessions include 1 EMOM block (10 min typical) AND a cardio block (30/30 or compromised running).
-- A session with only an EMOM and no cardio block — or only cardio and no EMOM — is fine occasionally but should not be the default.
+- **EMOMs are the bread and butter of hybrid sessions.** Most sessions include AT LEAST 1 EMOM block. **Roughly 1 in 3 sessions feature TWO EMOM blocks** — typically an EMOM main piece (10-12 min) plus a shorter EMOM finisher (5-8 min). Use different canonical movements across the two blocks.
+- **30/30 cardio blocks MUST appear in roughly 1 in 3 sessions** — at least once across every 3 generated workouts. This is the headline cardio shape; do not skip it.
+- Most sessions also include a cardio block (30/30 or compromised running) alongside the EMOM(s).
+- **`hundred` format finishers** (100 reps of one movement for time — "The Centurion") are excellent close-outs for race-prep sessions; use them in **roughly 1 in 5 sessions**. Movements: Wall Balls 100, Burpees 100, KB Swings 100, Sit-ups 100, Burpee Broad Jumps 100, Box Jumps 100 (whatever's in the activity's allowed equipment).
 - One long for_time chipper is allowed roughly 1 in 8-10 sessions.
-- Other modalities such as ladders, up-and-down ladders, mountains, etc. can be used, but the bread and butter should be EMOMs.
-- It's also fine to use other cardio rounds (such as 4 rounds of 250m row), but the 30/30 pattern should be used often. 30/30 is its own self-contained intensity — sustainable hard threshold work, not max-effort sprints and not easy steady cardio.
+- Other modalities (ladders, up-and-down ladders, mountains, continuous_circuit) can be used for variety, but the bread and butter is EMOMs + 30/30 + compromised running.
+- Other cardio rounds (such as 4 rounds of 250m row) are fine but DON'T default to them — pick 30/30 first if cardio is the goal.
 - Do NOT use 30/30 sets if intensity is set to `low`.
 
 ## 4. Race stations remain race stations
@@ -51,7 +53,7 @@ Race-day stations (Hyrox's 8, Deka's 10, Atlas's strongman stations) stay the **
 
 - Defaulting to a long for_time chipper every session — fine occasionally, not the norm.
 - Prescribing a numeric `reps` value on canonical EMOM movements *inside* an EMOM (let the cue do it).
-- Pairing a cardio machine (row, ski, bike, treadmill, jump rope) with a floor or carry station inside a 1- or 2-exercise EMOM. The cardio fills 30-40s of the minute, leaving no room for the floor work. For cardio + floor pairings: split into separate single-exercise EMOM sections, OR use a 3+ exercise E2MOM (the 2-min cycle leaves room), OR use `format: rounds` with explicit `rest_secs`.
+- Oversizing the work inside a 2-exercise EMOM. Total work must fit ~30-45s per minute. BAD: `KB Swings 15 + SkiErg 10 cal` — both need ~25-30s, total ~55s, no room for rest. GOOD: `KB Swings 5 + SkiErg 5 cal` — both ~15s, total ~30s. If you want longer cardio + floor work, split into separate single-exercise EMOM sections, use a 3+ exercise E2MOM, or use `format: rounds` with explicit `rest_secs`.
 
 ## 6. Shared movement vocabulary
 

@@ -95,6 +95,10 @@ module LLMContext
                 { name: "Farmer's Carry", distance_m: 40, equipment: "kettlebells" },
                 { name: "SkiErg", calories: 15, equipment: "ski_erg" }
               ] },
+            { name: "Final Lap", format: "emom", duration_mins: 5, rest_secs: 0,
+              exercises: [
+                { name: "Box Step-overs", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "bodyweight" }
+              ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
           ]

@@ -101,11 +101,9 @@ module LLMContext
                 { name: "KB Swings", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "kettlebells" },
                 { name: "Med Ball Slams", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "wall_ball" }
               ] },
-            { name: "Cooked", format: "rounds", rounds: 3, rest_secs: 30,
+            { name: "The Centurion", format: "hundred",
               exercises: [
-                { name: "V-ups", reps: 20, equipment: "bodyweight" },
-                { name: "Russian Twists", reps: 20, equipment: "bodyweight" },
-                { name: "Plank", duration_s: 45, equipment: "bodyweight" }
+                { name: "KB Swings", reps: 100, equipment: "kettlebells" }
               ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }

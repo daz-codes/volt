@@ -73,6 +73,10 @@ module LLMContext
                 { name: "KB Swings", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "kettlebells" },
                 { name: "RAM Weighted Burpees", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "bodyweight" }
               ] },
+            { name: "Last Word", format: "emom", duration_mins: 5, rest_secs: 0,
+              exercises: [
+                { name: "Wall Balls", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "wall_ball" }
+              ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
           ]

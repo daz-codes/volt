@@ -104,11 +104,9 @@ module LLMContext
                 { name: "Box Step-overs", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "bodyweight" },
                 { name: "Med Ball Slams", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "wall_ball" }
               ] },
-            { name: "Gut Check", format: "rounds", rounds: 3, rest_secs: 30,
+            { name: "The Anvil", format: "emom", duration_mins: 6, rest_secs: 0,
               exercises: [
-                { name: "Sit-ups", reps: 20, equipment: "bodyweight" },
-                { name: "V-ups", reps: 15, equipment: "bodyweight" },
-                { name: "Plank", duration_s: 45, equipment: "bodyweight" }
+                { name: "Wall Balls", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "wall_ball" }
               ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }

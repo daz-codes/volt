@@ -49,6 +49,10 @@ module LLMContext
               exercises: [
                 { name: "Run", duration_s: 30, notes: "hard pace", equipment: "treadmill" }
               ] },
+            { name: "Closer", format: "emom", duration_mins: 4, rest_secs: 0,
+              exercises: [
+                { name: "Burpees", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "bodyweight" }
+              ] },
             { name: "Cool-Down", format: "straight", duration_mins: 2,
               exercises: [ { name: "Dynamic stretches", notes: "5 deep breaths" } ] }
           ]

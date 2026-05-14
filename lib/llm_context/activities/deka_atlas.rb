@@ -102,11 +102,9 @@ module LLMContext
                 { name: "Barbell Thrusters", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "barbell" },
                 { name: "Bar-Facing Burpees Over Bar", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "barbell" }
               ] },
-            { name: "Atlas Hold", format: "rounds", rounds: 3, rest_secs: 30,
+            { name: "Atlas Hold", format: "emom", duration_mins: 6, rest_secs: 0,
               exercises: [
-                { name: "Weighted Sit-ups", reps: 20, equipment: "dumbbells" },
-                { name: "V-ups", reps: 15, equipment: "bodyweight" },
-                { name: "Plank", duration_s: 45, equipment: "bodyweight" }
+                { name: "Weighted Sit-ups", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "dumbbells" }
               ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }

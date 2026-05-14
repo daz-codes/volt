@@ -89,17 +89,15 @@ module LLMContext
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "rowing_machine" } ] },
-            { name: "Engine Builder I", format: "rounds", intensity_style: "high", rounds: 5, rest_secs: 30,
+            { name: "Engine Builder", format: "rounds", intensity_style: "high", rounds: 10, rest_secs: 30,
               exercises: [
                 { name: "Row", duration_s: 30, notes: "hard pace", equipment: "rowing_machine" }
               ] },
-            { name: "Engine Builder II", format: "rounds", intensity_style: "high", rounds: 5, rest_secs: 30,
+            { name: "Strong Stations", format: "emom", duration_mins: 12, rest_secs: 0,
               exercises: [
-                { name: "SkiErg", duration_s: 30, notes: "hard pace", equipment: "ski_erg" }
-              ] },
-            { name: "Engine Builder III", format: "rounds", intensity_style: "high", rounds: 5, rest_secs: 30,
-              exercises: [
-                { name: "Air Bike", duration_s: 30, notes: "hard pace", equipment: "assault_bike" }
+                { name: "KB Thrusters", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "kettlebells" },
+                { name: "Box Step-overs", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "bodyweight" },
+                { name: "Med Ball Slams", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "wall_ball" }
               ] },
             { name: "Tip of the Spear", format: "rounds", rounds: 4, rest_secs: 60,
               exercises: [
@@ -107,11 +105,9 @@ module LLMContext
                 { name: "Sled Push", distance_m: 15, equipment: "sled" },
                 { name: "Sandbag Lunges", distance_m: 20, equipment: "sled" }
               ] },
-            { name: "Gut Check", format: "rounds", rounds: 3, rest_secs: 30,
+            { name: "The Centurion", format: "hundred",
               exercises: [
-                { name: "V-ups", reps: 20, equipment: "bodyweight" },
-                { name: "Russian Twists", reps: 20, equipment: "bodyweight" },
-                { name: "Plank", duration_s: 45, equipment: "bodyweight" }
+                { name: "Burpee Broad Jumps", reps: 100, equipment: "bodyweight" }
               ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
