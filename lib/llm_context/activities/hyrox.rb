@@ -8,6 +8,7 @@ module LLMContext
         purity: "Hyrox race training — 1 km runs between 8 functional stations. " \
                 "Treadmill running is the backbone of every session. Assault Bike is NOT " \
                 "a Hyrox machine and must never appear.",
+        hybrid_family: true,
         allowed_equipment: %w[treadmill rowing_machine ski_erg sled wall_ball kettlebells barbell dumbbells pull_up_bar],
         banned_equipment:  %w[resistance_bands jump_rope assault_bike],
         banned_exercise_patterns: [

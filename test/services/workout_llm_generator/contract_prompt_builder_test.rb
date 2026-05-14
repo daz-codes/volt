@@ -142,5 +142,23 @@ class WorkoutLLMGenerator::ContractPromptBuilderTest < ActiveSupport::TestCase
     refute_match(/Cool-down \(\d+ min\)/, shape)
     assert_match(/continuous flowing sequence/i, shape)
   end
+
+  test "omits hybrid_style tag for non-race activities" do
+    refute_includes build(activity_slug: "kettlebell"), "<hybrid_style>"
+  end
+
+  test "injects hybrid_style tag for race-family activities" do
+    prompt = build(activity_slug: "hyrox")
+    assert_includes prompt, "<hybrid_style>"
+    assert_includes prompt, "</hybrid_style>"
+  end
+
+  test "hybrid_style tag appears immediately after global_rules" do
+    prompt = build(activity_slug: "hyrox")
+    global_pos = prompt.index("</global_rules>")
+    hybrid_pos = prompt.index("<hybrid_style>")
+    assert global_pos && hybrid_pos, "both tags must be present"
+    assert global_pos < hybrid_pos, "hybrid_style must come after global_rules"
+  end
 end
 

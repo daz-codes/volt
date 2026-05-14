@@ -17,6 +17,7 @@ class WorkoutLLMGenerator
     }.freeze
 
     GLOBAL_RULES_PATH = Rails.root.join("app/llm_context/shared/global_rules.md").freeze
+    HYBRID_STYLE_PATH = Rails.root.join("app/llm_context/shared/hybrid_style.md").freeze
 
     def initialize(activity:, duration_mins:, athlete_block:, session_notes: nil, banned_equipment_override: [], contract_override: nil, intensity_style: nil)
       @activity = activity
@@ -35,6 +36,7 @@ class WorkoutLLMGenerator
       tags << xml(:task, "Generate a #{@duration_mins}-minute #{@activity::NAME} session.")
       tags << xml(:contract, contract_block)
       tags << xml(:global_rules, self.class.global_rules)
+      tags << xml(:hybrid_style, self.class.hybrid_style) if contract[:hybrid_family]
       tags << xml(:session_shape, session_shape_block)
       tags << xml(:examples, examples_block)
       tags << xml(:intensity_style, intensity_style_block) if @intensity_style.present?
@@ -44,6 +46,10 @@ class WorkoutLLMGenerator
 
     def self.global_rules
       @global_rules ||= File.read(GLOBAL_RULES_PATH).sub(/\A# .*\n+/, "").strip
+    end
+
+    def self.hybrid_style
+      @hybrid_style ||= File.read(HYBRID_STYLE_PATH).sub(/\A# .*\n+/, "").strip
     end
 
     private
