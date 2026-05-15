@@ -102,6 +102,92 @@ module LLMContext
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
           ]
+        },
+        {
+          name: "Stations Stacked",
+          goal: "Compromised 800m running, an alternating EMOM of Box Jump and RAM Reverse Lunges, and a tabata burner to close.",
+          duration_mins: 45,
+          sections: [
+            { name: "Warm-Up", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
+            { name: "Mile Repeats", format: "rounds", rounds: 4, rest_secs: 60,
+              exercises: [
+                { name: "Compromised Run", distance_m: 800, equipment: "treadmill" },
+                { name: "Med Ball Sit-up Throw", reps: 20, equipment: "wall_ball" },
+                { name: "Farmer's Carry", distance_m: 30, equipment: "kettlebells" }
+              ] },
+            { name: "Box Cycle", format: "emom", duration_mins: 16, rest_secs: 0, alternating: true,
+              exercises: [
+                { name: "Box Jump", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "bodyweight" },
+                { name: "RAM Reverse Lunges", notes: "~50% of your 1-min max (leaves ~20s rest)" }
+              ] },
+            { name: "Burpee Bash", format: "tabata",
+              exercises: [
+                { name: "RAM Weighted Burpees", equipment: "bodyweight" },
+                { name: "Sit-ups", equipment: "bodyweight" }
+              ] },
+            { name: "Cool-Down", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
+          ]
+        },
+        {
+          name: "Carry Day",
+          goal: "30/30 treadmill engine, a heavy carry-and-sled triplet, a single-exercise RAM Reverse Lunges grind, and a hundred Box Jumps to finish.",
+          duration_mins: 60,
+          sections: [
+            { name: "Warm-Up", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "rowing_machine" } ] },
+            { name: "Engine Build", format: "rounds", rounds: 10, rest_secs: 30,
+              exercises: [
+                { name: "Run", duration_s: 30, notes: "hard pace", equipment: "treadmill" }
+              ] },
+            { name: "Three Carries", format: "rounds", rounds: 4, rest_secs: 60,
+              exercises: [
+                { name: "Farmer's Carry", distance_m: 60, equipment: "kettlebells" },
+                { name: "Sled Push", distance_m: 40, equipment: "sled" },
+                { name: "Sled Pull", distance_m: 20, equipment: "sled" }
+              ] },
+            { name: "Lunge March", format: "emom", duration_mins: 16, rest_secs: 0,
+              exercises: [
+                { name: "RAM Reverse Lunges", notes: "~50% of your 1-min max (leaves ~20s rest)" }
+              ] },
+            { name: "Hundred Boxes", format: "hundred",
+              exercises: [
+                { name: "Box Jump", reps: 100, equipment: "bodyweight" }
+              ] },
+            { name: "Cool-Down", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
+          ]
+        },
+        {
+          name: "Mile Descent",
+          goal: "One long mile-broken descending pyramid — 1600m runs between tiers of Med Ball Sit-up Throw, Sled Push and RAM Reverse Lunges, four tiers down.",
+          duration_mins: 60,
+          sections: [
+            { name: "Warm-Up", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
+            { name: "Down the Miles", format: "for_time",
+              exercises: [
+                { name: "Run", distance_m: 1600, equipment: "treadmill" },
+                { name: "Med Ball Sit-up Throw", reps: 80, equipment: "wall_ball" },
+                { name: "Sled Push", distance_m: 80, equipment: "sled" },
+                { name: "RAM Reverse Lunges", reps: 80 },
+                { name: "Run", distance_m: 1600, equipment: "treadmill" },
+                { name: "Med Ball Sit-up Throw", reps: 60, equipment: "wall_ball" },
+                { name: "Sled Push", distance_m: 60, equipment: "sled" },
+                { name: "RAM Reverse Lunges", reps: 60 },
+                { name: "Run", distance_m: 1600, equipment: "treadmill" },
+                { name: "Med Ball Sit-up Throw", reps: 40, equipment: "wall_ball" },
+                { name: "Sled Push", distance_m: 40, equipment: "sled" },
+                { name: "RAM Reverse Lunges", reps: 40 },
+                { name: "Run", distance_m: 1600, equipment: "treadmill" },
+                { name: "Med Ball Sit-up Throw", reps: 20, equipment: "wall_ball" },
+                { name: "Sled Push", distance_m: 20, equipment: "sled" },
+                { name: "RAM Reverse Lunges", reps: 20 }
+              ] },
+            { name: "Cool-Down", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
+          ]
         }
       ].freeze
     end
