@@ -14,6 +14,8 @@ Pick **4-6 of these per 60-min session** (3-5 for 45 min, 2-3 for 30 min). Aim f
 
 Canonical movements: wall balls, walking lunges, burpees (including box jump burpees, burpee broad jumps), KB swings, KB thrusters, box step-overs, sit-ups, med ball slams, shoulder press, floor-to-ceilings, dead ball yoke over, sandbag lunges.
 
+**Activity race stations take precedence.** When an activity has named race-day stations (Hyrox's 8, Deka's 10 zones, Atlas's strongman stations), those stations are the headline movements for that activity's sessions. Draw EMOMs and continuous_circuits primarily from the race-station list before reaching for the generic canonical list above. Hyrox-leaning movements like Wall Balls, Walking Lunges, Burpee Broad Jumps belong in Hyrox sessions — they can appear occasionally in Deka sessions as supplementary work but should NOT dominate main blocks. For Deka variants, prefer: RAM Reverse Lunges, Box Jump / Step Over, Med Ball Sit-up Throw, Farmer's Carry, Dead Ball Yoke Over, RAM Weighted Burpees, plus the machine zones (Row, SkiErg, Air Bike) and Sled Push/Pull.
+
 ### 2. Alternating EMOM (2-exercise EMOM with `alternating: true`)
 
 `format: emom`, 2 exercises, **`alternating: true`**. Each exercise gets its own minute (M1 = A, M2 = B, M3 = A, …). 10-20 min long. Each exercise uses the cue with blank reps. Use this when each exercise needs ~30-45s on its own — typically pairing two demanding floor movements (e.g. Burpee Broad Jumps alternating Walking Lunges).
