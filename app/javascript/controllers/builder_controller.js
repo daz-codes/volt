@@ -83,9 +83,10 @@ export default class extends Controller {
 
   sectionTemplate(id) {
     return `
-      <div data-section-id="${id}" class="border border-zinc-600 rounded-2xl p-4">
-        <div class="flex items-center gap-2 mb-3">
-          <span data-sortable-handle aria-label="Drag to reorder" title="Drag to reorder"
+      <details data-section-id="${id}" data-controller="section-toggle" class="border border-zinc-600 rounded-2xl" open>
+        <summary class="flex items-center gap-2 p-4 cursor-pointer list-none select-none">
+          <span data-sortable-handle data-action="click->section-toggle#stopBubble"
+            aria-label="Drag to reorder" title="Drag to reorder"
             class="text-gray-600 hover:text-lime-400 transition-colors flex-shrink-0 p-1 cursor-grab active:cursor-grabbing">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                  fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -93,7 +94,26 @@ export default class extends Controller {
               <circle cx="15" cy="5" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="19" r="1"/>
             </svg>
           </span>
+          <span class="flex-1 text-sm text-white font-medium truncate" data-section-toggle-target="display">
+            Untitled section
+          </span>
+          <button type="button" data-action="click->section-toggle#stopBubble click->builder#removeSection"
+            class="text-gray-600 hover:text-red-500 transition-colors flex-shrink-0 p-1" aria-label="Remove section">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+              <path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
+            </svg>
+          </button>
+          <svg data-section-toggle-target="chevron" class="transition-transform text-gray-500 flex-shrink-0"
+               xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+               fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </summary>
+        <div class="px-4 pb-4 pt-3 border-t border-zinc-700 space-y-3">
+        <div class="flex items-center gap-2">
           <input name="sections[${id}][name]" type="text" placeholder="Section name (e.g. Warm Up, Main Set)" required
+            data-action="input->section-toggle#syncDisplay"
             class="flex-1 bg-zinc-800 border border-zinc-600 rounded-xl px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-lime-400 transition-colors">
           <select name="sections[${id}][category]"
             class="bg-zinc-800 border border-zinc-600 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-lime-400 transition-colors">
@@ -117,13 +137,6 @@ export default class extends Controller {
             <option value="hundred">Hundred</option>
             <option value="switchback">Up & Down Ladder</option>
           </select>
-          <button type="button" data-action="builder#removeSection"
-            class="text-gray-600 hover:text-red-500 transition-colors flex-shrink-0 p-1" aria-label="Remove section">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-              <path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
-            </svg>
-          </button>
         </div>
         <div data-format-field="rounds" style="display:none" class="flex items-center gap-2 mb-3">
           <input name="sections[${id}][rounds]" type="number" min="1" placeholder="Number of rounds"
@@ -210,7 +223,8 @@ export default class extends Controller {
             + Duplicate Last
           </button>
         </div>
-      </div>`
+        </div>
+      </details>`
   }
 
   exerciseTemplate(sectionId, exId, format = "straight") {
