@@ -131,6 +131,8 @@ GOOD (`format: straight` — one block, drills run in sequence):
 
 **Stations**: Light load, 15-25 reps, technique-focused. 20-30s rest between rounds — "keep moving". Notes on every exercise about form (3-sec eccentric, hip hinge mechanics, knee tracking, full range, controlled tempo).
 
+**Weight prescription (low)**: LIGHT loads, well below the athlete's race/competition weight. If race-day wall ball is 9kg, low intensity is 5-6kg. If race-day sled push uses 1.5× bodyweight, low intensity is 0.5-0.75× bodyweight. The point is form rehearsal and base building — load is incidental. Notes should explicitly call out "light" or "well below race weight" so the athlete knows not to chase weight.
+
 **Avoid for low intensity**: 30/30 cardio, EMOMs, tabata, hundred finishers, heavy strength at 3-6 reps, sprint repeats, compromised running, compromised run ladders, descending pyramids. These are medium/high modalities.
 
 **Cool-down**: 5 min active recovery on a cardio modality (easy ski / row at conversational pace) + 3-5 longer-hold stretches. Different from the woven mobility flows — these are static end-of-session stretches.
@@ -151,11 +153,15 @@ Warm-up can also mention mobility prep in its notes — rotate the focus the sam
 
 **Movements**: heavy compound at 3-5 reps with 180s rest, sprint repeats (15-45s work, 90s+ rest), heavy sled (max load), all-out tabata. Sprint repeats can be 200m runs, 30s machine sprints, 15m heavy sled sprints — full recovery between.
 
+**Weight prescription (high)**: HEAVIER than race/competition weight. Heavy compound accessories (deadlift, bench, push press) use proper strength-training loads — 3-5 reps at near-max, well above race-day fatigue loads. Sled push, heavy carries, and weighted-station work go ABOVE competition weight to train over-tolerance — if Hyrox race sled is 152kg/men, high-intensity sled training is 180kg+. The athlete should feel race weights are easy on race day because they've handled heavier. Notes should explicitly say "heavier than race weight" or "above competition load".
+
 **Avoid for high intensity**: continuous easy cardio, technique-focused light work, slow tempo training, 30/30 (that's threshold, not high), low-rep high-volume rounds.
 
 ### Medium intensity (the default)
 
 Most race-family sessions land here. Mix EMOMs, 30/30 cardio, compromised running, strength accessory, hundreds, tabatas, continuous circuits — the full menu. 60 min, 4-6 main blocks.
+
+**Weight prescription (medium)**: RACE / COMPETITION weights — exactly what the athlete would use on race day. For Hyrox men: 9kg wall ball, 24kg-per-hand farmer's carry, full race sled. For Deka: the prescribed zone weights. Medium intensity sessions REHEARSE race-day load — that's what makes them race-prep. Notes can call this out: "race weight", "competition load", or "the load you'll lift on race day".
 
 ## Reps cueing
 
