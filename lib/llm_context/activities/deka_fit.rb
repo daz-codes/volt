@@ -201,6 +201,124 @@ module LLMContext
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
           ]
+        },
+        {
+          name: "Long Ski",
+          goal: "A long continuous zone 2 ski, a T-spine mobility flow, light Deka technique stations, then a quiet cool-down — mobility woven through.",
+          duration_mins: 60,
+          intensity_style: "low",
+          sections: [
+            { name: "Warm-Up", format: "straight", duration_mins: 5,
+              exercises: [
+                { name: "Easy treadmill walk + Deka mobility prep", duration_s: 300, notes: "thoracic open books, cat-cow, world's greatest stretch, ankle circles", equipment: "treadmill" }
+              ] },
+            { name: "Long SkiErg", format: "straight", duration_mins: 25,
+              exercises: [
+                { name: "SkiErg", duration_s: 1500, notes: "conversational pace — nose-breathing where possible, building aerobic engine", equipment: "ski_erg" }
+              ] },
+            { name: "T-spine Flow", format: "straight", duration_mins: 5,
+              exercises: [
+                { name: "Foam Roller Thoracic Extensions", duration_s: 120, notes: "slow controlled extensions over a foam roller" },
+                { name: "Thoracic Open Books", duration_s: 120, notes: "T-spine rotation — 60s per side, breath into each rep" },
+                { name: "Cat-Cow", duration_s: 60, notes: "spinal articulation, breath into each phase" }
+              ] },
+            { name: "Technique Stations", format: "rounds", rounds: 4, rest_secs: 25,
+              exercises: [
+                { name: "Box Jump / Step Over", reps: 15, notes: "soft landings, full hip extension at the top", equipment: "bodyweight" },
+                { name: "Med Ball Sit-up Throw", reps: 20, notes: "light ball, smooth throw mechanics, full sit-up", equipment: "wall_ball" },
+                { name: "Farmer's Carry", distance_m: 30, notes: "light load, tall posture, breath stays calm", equipment: "kettlebells" }
+              ] },
+            { name: "Cool-Down", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
+          ]
+        },
+        {
+          name: "Easy Engine",
+          goal: "A steady row, an ankle mobility flow, an easy circuit with mobility woven into each round, then a quiet cool-down.",
+          duration_mins: 60,
+          intensity_style: "low",
+          sections: [
+            { name: "Warm-Up", format: "straight", duration_mins: 5,
+              exercises: [
+                { name: "Easy row + Deka mobility prep", duration_s: 300, notes: "ankle circles, calf stretches, dynamic lunges", equipment: "rowing_machine" }
+              ] },
+            { name: "Steady Row", format: "straight", duration_mins: 22,
+              exercises: [
+                { name: "Row", duration_s: 1320, notes: "easy aerobic pace — sustain the same effort the whole way, breath stays calm", equipment: "rowing_machine" }
+              ] },
+            { name: "Ankle Flow", format: "straight", duration_mins: 4,
+              exercises: [
+                { name: "Ankle Circles", duration_s: 60, notes: "both ankles, full range in both directions" },
+                { name: "Calf Stretch", duration_s: 120, notes: "gastrocnemius and soleus — 60s per side" },
+                { name: "Eccentric Calf Raises", duration_s: 60, notes: "controlled 3-second descent, bodyweight" }
+              ] },
+            { name: "Easy Circuit", format: "rounds", rounds: 4, rest_secs: 30,
+              exercises: [
+                { name: "RAM Reverse Lunges", reps: 20, notes: "deliberate steps, focus on knee tracking" },
+                { name: "90/90 Hip Switches", duration_s: 60, notes: "smooth controlled transitions — 30s per side" },
+                { name: "Med Ball Sit-up Throw", reps: 20, notes: "light ball, smooth throw mechanics, full sit-up", equipment: "wall_ball" }
+              ] },
+            { name: "Cool-Down", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
+          ]
+        },
+        {
+          name: "Race Day Sharpener",
+          goal: "Heavy deadlift triples, all-out 500m race-distance sprint repeats, heavy sled work, then a tabata finisher.",
+          duration_mins: 45,
+          intensity_style: "high",
+          sections: [
+            { name: "Warm-Up", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "treadmill" } ] },
+            { name: "Heavy Pull", format: "rounds", intensity_style: "high", rounds: 5, rest_secs: 180,
+              exercises: [
+                { name: "Deadlift", reps: 3, notes: "near-max — last rep should be a fight", equipment: "barbell" }
+              ] },
+            { name: "500m Sprints", format: "rounds", rounds: 5, rest_secs: 90,
+              exercises: [
+                { name: "Run", distance_m: 500, notes: "all-out at race distance — every rep is maximum effort", equipment: "treadmill" }
+              ] },
+            { name: "Heavy Sled", format: "rounds", intensity_style: "high", rounds: 4, rest_secs: 120,
+              exercises: [
+                { name: "Sled Push", distance_m: 25, notes: "heaviest load you can drive 25m without breaking", equipment: "sled" }
+              ] },
+            { name: "Tabata Cooker", format: "tabata",
+              exercises: [
+                { name: "RAM Weighted Burpees", equipment: "bodyweight" },
+                { name: "Sit-ups", equipment: "bodyweight" }
+              ] },
+            { name: "Cool-Down", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
+          ]
+        },
+        {
+          name: "Power Hour",
+          goal: "Heavy bench press, all-out air bike sprint repeats, heavy farmer's carries, then a tabata burner. Short, sharp, full-recovery work.",
+          duration_mins: 45,
+          intensity_style: "high",
+          sections: [
+            { name: "Warm-Up", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
+            { name: "Heavy Press", format: "rounds", intensity_style: "high", rounds: 5, rest_secs: 180,
+              exercises: [
+                { name: "Bench Press", reps: 3, notes: "near-max load — full recovery between sets", equipment: "barbell" }
+              ] },
+            { name: "Air Bike Sprints", format: "rounds", rounds: 6, rest_secs: 90,
+              exercises: [
+                { name: "Air Bike", calories: 15, notes: "all-out — every rep is maximum, full recovery between", equipment: "assault_bike" }
+              ] },
+            { name: "Heavy Carry", format: "rounds", intensity_style: "high", rounds: 4, rest_secs: 120,
+              exercises: [
+                { name: "Farmer's Carry", distance_m: 40, notes: "heaviest load you can carry the full distance unbroken", equipment: "kettlebells" }
+              ] },
+            { name: "Tabata Burner", format: "tabata",
+              exercises: [
+                { name: "Box Jump", equipment: "bodyweight" },
+                { name: "Med Ball Sit-up Throw", equipment: "wall_ball" }
+              ] },
+            { name: "Cool-Down", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
+          ]
         }
       ].freeze
     end
