@@ -65,13 +65,13 @@ module LLMContext
             { name: "The Crucible", format: "rounds", rounds: 4, rest_secs: 60,
               exercises: [
                 { name: "Compromised Run", distance_m: 500, equipment: "treadmill" },
-                { name: "Wall Balls", reps: 20, equipment: "wall_ball" },
+                { name: "RAM Reverse Lunges", reps: 20 },
                 { name: "Med Ball Sit-up Throw", reps: 25, equipment: "wall_ball" }
               ] },
             { name: "Rotation Room", format: "continuous_circuit", duration_mins: 12,
               exercises: [
                 { name: "Rowing Machine", equipment: "rowing_machine" },
-                { name: "Wall Balls", equipment: "wall_ball" },
+                { name: "Med Ball Sit-up Throw", equipment: "wall_ball" },
                 { name: "Box Jump", equipment: "bodyweight" }
               ] },
             { name: "Iron Lift", format: "rounds", intensity_style: "high", rounds: 4, rest_secs: 120,
