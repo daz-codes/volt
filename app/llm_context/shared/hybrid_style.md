@@ -135,13 +135,15 @@ GOOD (`format: straight` — one block, drills run in sequence):
 
 **Cool-down**: 5 min active recovery on a cardio modality (easy ski / row at conversational pace) + 3-5 longer-hold stretches. Different from the woven mobility flows — these are static end-of-session stretches.
 
-**Named Hyrox mobility drills** to use anywhere (warm-up notes, mobility flows, station rounds, cool-down):
-- **Hip**: 90/90 Hip Switches, Couch Stretch, Hip CARs, Kneeling Hip Flexor Stretch, Dynamic Lunge Variations
-- **Thoracic spine**: Foam Roller Thoracic Extensions, Thoracic Open Books, Cat-Cow
-- **Ankle**: Ankle Circles + Calf Stretch, Ankle Banded Mobilizations, Eccentric Calf Raises
-- **Full-body**: World's Greatest Stretch
+**Rotate the mobility focus across sessions.** Each low-intensity session should feature a DIFFERENT primary mobility area — don't default to hip mobility every time. The four areas to rotate through:
+- **Hip mobility**: 90/90 Hip Switches, Couch Stretch, Hip CARs, Kneeling Hip Flexor Stretch, Dynamic Lunge Variations
+- **Thoracic spine mobility**: Foam Roller Thoracic Extensions, Thoracic Open Books, Cat-Cow, Wall Slides
+- **Ankle mobility**: Ankle Circles, Calf Stretch (gastrocnemius + soleus), Ankle Banded Mobilizations, Eccentric Calf Raises
+- **Full-body / posterior chain**: World's Greatest Stretch, Pigeon, Down Dog to Cobra, Spinal Twist
 
-Warm-up can also mention mobility prep in its notes (90/90 hip switches, ankle circles, T-spine open books).
+A session can have one or two mobility flow sections — if two, pick from DIFFERENT areas (e.g. T-spine flow + ankle flow, NOT two hip flows).
+
+Warm-up can also mention mobility prep in its notes — rotate the focus the same way.
 
 ### High intensity (near max, RPE 9-10)
 

@@ -259,11 +259,11 @@ module LLMContext
               exercises: [
                 { name: "SkiErg", duration_s: 1500, notes: "conversational pace — nose-breathing where possible, building aerobic engine", equipment: "ski_erg" }
               ] },
-            { name: "Hip Mobility", format: "straight", duration_mins: 5,
+            { name: "T-spine Flow", format: "straight", duration_mins: 5,
               exercises: [
-                { name: "90/90 Hip Switches", duration_s: 90, notes: "internal/external hip rotation — 45s per side" },
-                { name: "Couch Stretch", duration_s: 120, notes: "60s per side, posterior pelvic tilt" },
-                { name: "Hip CARs", duration_s: 90, notes: "controlled articular rotations — full active hip circles, both legs" }
+                { name: "Foam Roller Thoracic Extensions", duration_s: 120, notes: "slow controlled extensions over a foam roller" },
+                { name: "Thoracic Open Books", duration_s: 120, notes: "T-spine rotation for rowing and wall ball posture — 60s per side" },
+                { name: "Cat-Cow", duration_s: 60, notes: "spinal articulation, breath into each phase" }
               ] },
             { name: "Technique Stations", format: "rounds", rounds: 3, rest_secs: 20,
               exercises: [
@@ -271,11 +271,11 @@ module LLMContext
                 { name: "KB Swings", reps: 20, notes: "light kettlebell, hip hinge mechanics, smooth and even", equipment: "kettlebells" },
                 { name: "Farmer's Carry", distance_m: 30, notes: "light load, tall posture, breath stays calm", equipment: "kettlebells" }
               ] },
-            { name: "T-spine Flow", format: "straight", duration_mins: 4,
+            { name: "Ankle Flow", format: "straight", duration_mins: 4,
               exercises: [
-                { name: "Foam Roller Thoracic Extensions", duration_s: 90, notes: "slow controlled extensions over a foam roller" },
-                { name: "Thoracic Open Books", duration_s: 90, notes: "T-spine rotation for rowing and wall ball posture — 45s per side" },
-                { name: "Cat-Cow", duration_s: 60, notes: "spinal articulation, breath into each phase" }
+                { name: "Ankle Circles", duration_s: 60, notes: "both ankles, full range in both directions" },
+                { name: "Calf Stretch", duration_s: 120, notes: "gastrocnemius and soleus — 60s per side" },
+                { name: "Eccentric Calf Raises", duration_s: 60, notes: "controlled 3-second descent, bodyweight" }
               ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
@@ -298,13 +298,13 @@ module LLMContext
             { name: "Easy Circuit", format: "rounds", rounds: 4, rest_secs: 30,
               exercises: [
                 { name: "Wall Balls", reps: 20, notes: "light ball, controlled tempo, full range", equipment: "wall_ball" },
-                { name: "90/90 Hip Switch", duration_s: 60, notes: "mobility hold — 30s per side, breath into the rotation" },
+                { name: "Ankle Banded Mobilizations", duration_s: 60, notes: "ankle dorsiflexion prep — 30s per side, drive knee forward" },
                 { name: "Walking Lunges", reps: 20, notes: "deliberate steps, focus on knee tracking", equipment: "bodyweight" }
               ] },
             { name: "Slow Goblet", format: "rounds", rounds: 4, rest_secs: 30,
               exercises: [
                 { name: "Goblet Squat", reps: 12, notes: "light bell, 3-second eccentric, focus on form and depth", equipment: "kettlebells" },
-                { name: "World's Greatest Stretch", duration_s: 60, notes: "between sets — 30s per side, deep lunge with rotation" }
+                { name: "Wall Slides", duration_s: 60, notes: "shoulder and T-spine mobility between sets — slow controlled overhead reach" }
               ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
