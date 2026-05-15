@@ -125,6 +125,92 @@ module LLMContext
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
           ]
+        },
+        {
+          name: "Stations Stacked",
+          goal: "Compromised running, an alternating EMOM on burpees and wall balls, and a tabata burner to close.",
+          duration_mins: 45,
+          sections: [
+            { name: "Warm-Up", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
+            { name: "Race Repeats", format: "rounds", rounds: 4, rest_secs: 60,
+              exercises: [
+                { name: "Compromised Run", distance_m: 500, equipment: "treadmill" },
+                { name: "Sandbag Lunges", reps: 20, equipment: "sled" },
+                { name: "Farmer's Carry", distance_m: 30, equipment: "kettlebells" }
+              ] },
+            { name: "Broad Strokes", format: "emom", duration_mins: 16, rest_secs: 0, alternating: true,
+              exercises: [
+                { name: "Burpee Broad Jumps", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "bodyweight" },
+                { name: "Wall Balls", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "wall_ball" }
+              ] },
+            { name: "Tabata Cooker", format: "tabata",
+              exercises: [
+                { name: "KB Swings", equipment: "kettlebells" },
+                { name: "Sit-ups", equipment: "bodyweight" }
+              ] },
+            { name: "Cool-Down", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
+          ]
+        },
+        {
+          name: "Carry Day",
+          goal: "30/30 air bike engine, a heavy carry-and-sled triplet, a single-exercise wall ball grind, and a hundred burpees to finish.",
+          duration_mins: 60,
+          sections: [
+            { name: "Warm-Up", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "rowing_machine" } ] },
+            { name: "Bike Build", format: "rounds", rounds: 10, rest_secs: 30,
+              exercises: [
+                { name: "Air Bike", duration_s: 30, notes: "hard pace", equipment: "assault_bike" }
+              ] },
+            { name: "Three Carries", format: "rounds", rounds: 4, rest_secs: 60,
+              exercises: [
+                { name: "Farmer's Carry", distance_m: 60, equipment: "kettlebells" },
+                { name: "Sled Push", distance_m: 40, equipment: "sled" },
+                { name: "Sled Pull", distance_m: 20, equipment: "sled" }
+              ] },
+            { name: "Wall Work", format: "emom", duration_mins: 16, rest_secs: 0,
+              exercises: [
+                { name: "Wall Balls", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "wall_ball" }
+              ] },
+            { name: "Hundred Burpees", format: "hundred",
+              exercises: [
+                { name: "Burpees", reps: 100, equipment: "bodyweight" }
+              ] },
+            { name: "Cool-Down", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
+          ]
+        },
+        {
+          name: "Descent",
+          goal: "One long run-broken pyramid — 1km repeats interleaved with wall balls, sled pushes and KB swings, descending 80 to 20.",
+          duration_mins: 60,
+          sections: [
+            { name: "Warm-Up", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
+            { name: "Down the Stairs", format: "for_time",
+              exercises: [
+                { name: "Run", distance_m: 1000, equipment: "treadmill" },
+                { name: "Wall Balls", reps: 80, equipment: "wall_ball" },
+                { name: "Sled Push", distance_m: 80, equipment: "sled" },
+                { name: "KB Swings", reps: 80, equipment: "kettlebells" },
+                { name: "Run", distance_m: 1000, equipment: "treadmill" },
+                { name: "Wall Balls", reps: 60, equipment: "wall_ball" },
+                { name: "Sled Push", distance_m: 60, equipment: "sled" },
+                { name: "KB Swings", reps: 60, equipment: "kettlebells" },
+                { name: "Run", distance_m: 1000, equipment: "treadmill" },
+                { name: "Wall Balls", reps: 40, equipment: "wall_ball" },
+                { name: "Sled Push", distance_m: 40, equipment: "sled" },
+                { name: "KB Swings", reps: 40, equipment: "kettlebells" },
+                { name: "Run", distance_m: 1000, equipment: "treadmill" },
+                { name: "Wall Balls", reps: 20, equipment: "wall_ball" },
+                { name: "Sled Push", distance_m: 20, equipment: "sled" },
+                { name: "KB Swings", reps: 20, equipment: "kettlebells" }
+              ] },
+            { name: "Cool-Down", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
+          ]
         }
       ].freeze
     end
