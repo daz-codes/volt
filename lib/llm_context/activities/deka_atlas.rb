@@ -114,6 +114,92 @@ module LLMContext
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
           ]
+        },
+        {
+          name: "Stations Stacked",
+          goal: "Compromised strongman rounds, an alternating EMOM of Surrender Lunges and Single Arm DB Ground to Overhead, and a tabata burner to close.",
+          duration_mins: 45,
+          sections: [
+            { name: "Warm-Up", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
+            { name: "Rope Repeats", format: "rounds", rounds: 4, rest_secs: 60,
+              exercises: [
+                { name: "Jump Rope Single Unders", reps: 50, equipment: "jump_rope" },
+                { name: "Bar-Facing Burpees Over Bar", reps: 20, equipment: "barbell" },
+                { name: "Atlas Shoulder to Carry", distance_m: 50, equipment: "sled" }
+              ] },
+            { name: "Strongman Cycle", format: "emom", duration_mins: 16, rest_secs: 0, alternating: true,
+              exercises: [
+                { name: "Surrender Lunges", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "dumbbells" },
+                { name: "Single Arm DB Ground to Overhead", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "dumbbells" }
+              ] },
+            { name: "Devil's Tabata", format: "tabata",
+              exercises: [
+                { name: "DB Devil Press", equipment: "dumbbells" },
+                { name: "Weighted Sit-ups", equipment: "dumbbells" }
+              ] },
+            { name: "Cool-Down", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
+          ]
+        },
+        {
+          name: "Atlas Carry Day",
+          goal: "30/30 jump rope engine, an Atlas carry-and-sled triplet, a single-exercise DB Shoulder to Overhead Press grind, and a hundred Box Jumps to finish.",
+          duration_mins: 60,
+          sections: [
+            { name: "Warm-Up", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "rowing_machine" } ] },
+            { name: "Rope Build", format: "rounds", rounds: 10, rest_secs: 30,
+              exercises: [
+                { name: "Jump Rope Single Unders", duration_s: 30, notes: "hard pace", equipment: "jump_rope" }
+              ] },
+            { name: "Three Carries", format: "rounds", rounds: 4, rest_secs: 60,
+              exercises: [
+                { name: "Atlas Shoulder to Carry", distance_m: 50, equipment: "sled" },
+                { name: "Sled Push", distance_m: 40, equipment: "sled" },
+                { name: "Farmer's Carry", distance_m: 60, equipment: "kettlebells" }
+              ] },
+            { name: "Press On", format: "emom", duration_mins: 16, rest_secs: 0,
+              exercises: [
+                { name: "DB Shoulder to Overhead Press", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "dumbbells" }
+              ] },
+            { name: "Hundred Boxes", format: "hundred",
+              exercises: [
+                { name: "Box Jump", reps: 100, equipment: "bodyweight" }
+              ] },
+            { name: "Cool-Down", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
+          ]
+        },
+        {
+          name: "Atlas Descent",
+          goal: "One long rope-broken descending pyramid — Jump Rope Single Unders between tiers of Atlas Shoulder to Carry, Surrender Lunges and DB Shoulder to Overhead Press, four tiers down.",
+          duration_mins: 60,
+          sections: [
+            { name: "Warm-Up", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
+            { name: "Down the Stack", format: "for_time",
+              exercises: [
+                { name: "Jump Rope Single Unders", reps: 50, equipment: "jump_rope" },
+                { name: "Atlas Shoulder to Carry", distance_m: 50, equipment: "sled" },
+                { name: "Surrender Lunges", reps: 40, equipment: "dumbbells" },
+                { name: "DB Shoulder to Overhead Press", reps: 40, equipment: "dumbbells" },
+                { name: "Jump Rope Single Unders", reps: 50, equipment: "jump_rope" },
+                { name: "Atlas Shoulder to Carry", distance_m: 40, equipment: "sled" },
+                { name: "Surrender Lunges", reps: 30, equipment: "dumbbells" },
+                { name: "DB Shoulder to Overhead Press", reps: 30, equipment: "dumbbells" },
+                { name: "Jump Rope Single Unders", reps: 50, equipment: "jump_rope" },
+                { name: "Atlas Shoulder to Carry", distance_m: 30, equipment: "sled" },
+                { name: "Surrender Lunges", reps: 20, equipment: "dumbbells" },
+                { name: "DB Shoulder to Overhead Press", reps: 20, equipment: "dumbbells" },
+                { name: "Jump Rope Single Unders", reps: 50, equipment: "jump_rope" },
+                { name: "Atlas Shoulder to Carry", distance_m: 20, equipment: "sled" },
+                { name: "Surrender Lunges", reps: 10, equipment: "dumbbells" },
+                { name: "DB Shoulder to Overhead Press", reps: 10, equipment: "dumbbells" }
+              ] },
+            { name: "Cool-Down", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
+          ]
         }
       ].freeze
     end
