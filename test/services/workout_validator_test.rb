@@ -1,6 +1,36 @@
 require "test_helper"
 
 class WorkoutValidatorTest < ActiveSupport::TestCase
+  # -- Long cardio in rounds → straight (the production bug) --
+
+  test "fix_long_cardio_rounds_to_straight converts 3 rounds × 24 min run to one straight 24 min block" do
+    data = build_workout_with_sections([
+      { "name" => "Warm-Up", "format" => "straight", "duration_mins" => 5,
+        "exercises" => [{ "name" => "Easy ski", "duration_s" => 300 }] },
+      { "name" => "The Long Run", "format" => "rounds", "rounds" => 3, "rest_secs" => 60,
+        "exercises" => [{ "name" => "Run", "duration_s" => 1440, "equipment" => "treadmill" }] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 60, main_tag_slug: "").validate_and_fix
+    long = result.dig("structure", "sections")[1]
+    assert_equal "straight", long["format"]
+    assert_equal 24, long["duration_mins"]
+    assert_nil long["rounds"]
+    assert_nil long["rest_secs"]
+  end
+
+  test "fix_long_cardio_rounds_to_straight leaves short interval rounds alone" do
+    data = build_workout_with_sections([
+      { "name" => "Warm-Up", "format" => "straight", "duration_mins" => 5,
+        "exercises" => [{ "name" => "Easy ski", "duration_s" => 300 }] },
+      { "name" => "Row Intervals", "format" => "rounds", "rounds" => 4, "rest_secs" => 60,
+        "exercises" => [{ "name" => "Row", "duration_s" => 300, "equipment" => "rowing_machine" }] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 60, main_tag_slug: "").validate_and_fix
+    intervals = result.dig("structure", "sections")[1]
+    assert_equal "rounds", intervals["format"]
+    assert_equal 4, intervals["rounds"]
+  end
+
   # -- Section category inference --
 
   test "ensure_section_categories infers warm_up from name" do

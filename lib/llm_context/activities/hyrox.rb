@@ -277,12 +277,8 @@ module LLMContext
                 { name: "Thoracic Open Books", duration_s: 90, notes: "T-spine rotation for rowing and wall ball posture — 45s per side" },
                 { name: "Cat-Cow", duration_s: 60, notes: "spinal articulation, breath into each phase" }
               ] },
-            { name: "Cool-Down", format: "straight", duration_mins: 8,
-              exercises: [
-                { name: "Easy SkiErg", duration_s: 240, notes: "active recovery — conversational pace, breath stays calm", equipment: "ski_erg" },
-                { name: "Ankle Circles + Calf Stretch", duration_s: 120, notes: "dorsiflexion prep for stride and sled push — both ankles" },
-                { name: "Kneeling Hip Flexor Stretch", duration_s: 120, notes: "60s per side, drive hips forward" }
-              ] }
+            { name: "Cool-Down", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
           ]
         },
         {
@@ -295,9 +291,9 @@ module LLMContext
               exercises: [
                 { name: "Easy row + Hyrox mobility prep", duration_s: 300, notes: "cat-cow, ankle circles, kneeling hip flexor stretch, dynamic lunges", equipment: "rowing_machine" }
               ] },
-            { name: "Steady State", format: "straight", duration_mins: 22,
+            { name: "Steady State", format: "straight", duration_mins: 25,
               exercises: [
-                { name: "Row", duration_s: 1320, notes: "easy aerobic pace — sustain the same effort the whole way, breath stays calm", equipment: "rowing_machine" }
+                { name: "Row", duration_s: 1500, notes: "easy aerobic pace — sustain the same effort the whole way, breath stays calm", equipment: "rowing_machine" }
               ] },
             { name: "Easy Circuit", format: "rounds", rounds: 4, rest_secs: 30,
               exercises: [
@@ -310,12 +306,8 @@ module LLMContext
                 { name: "Goblet Squat", reps: 12, notes: "light bell, 3-second eccentric, focus on form and depth", equipment: "kettlebells" },
                 { name: "World's Greatest Stretch", duration_s: 60, notes: "between sets — 30s per side, deep lunge with rotation" }
               ] },
-            { name: "Cool-Down", format: "straight", duration_mins: 6,
-              exercises: [
-                { name: "Easy SkiErg", duration_s: 180, notes: "active recovery — conversational pace", equipment: "ski_erg" },
-                { name: "Foam Roller Thoracic Extensions", duration_s: 90, notes: "T-spine opening — slow controlled extensions" },
-                { name: "Couch Stretch", duration_s: 90, notes: "hip flexor — 45s per side" }
-              ] }
+            { name: "Cool-Down", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
           ]
         },
         {

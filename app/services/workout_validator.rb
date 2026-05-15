@@ -75,6 +75,7 @@ class WorkoutValidator
     fix_treadmill_calories(sections)
     fix_rest_secs(sections)
     fix_rest_ratio(sections)
+    fix_long_cardio_rounds_to_straight(sections)
     fix_single_set_sections(sections)
     fix_tabata_exercise_metrics(sections)
     fix_tabata_exercise_names(sections)
@@ -482,9 +483,34 @@ class WorkoutValidator
   # - Any section with rounds completely absent (nil) → 3 rounds (LLM forgot to set it)
   # - Unknown/invalid formats get normalised to "rounds"
   # Skips warm-up, cool-down, tabata, emom, amrap, for_time, ladder, mountain.
-  SINGLE_SET_EXEMPT   = %w[tabata emom continuous_circuit amrap for_time ladder mountain matrix hundred switchback].freeze
-  KNOWN_FORMATS       = %w[rounds tabata emom continuous_circuit amrap for_time ladder mountain matrix hundred switchback].freeze
+  SINGLE_SET_EXEMPT   = %w[straight tabata emom continuous_circuit amrap for_time ladder mountain matrix hundred switchback].freeze
+  KNOWN_FORMATS       = %w[straight rounds tabata emom continuous_circuit amrap for_time ladder mountain matrix hundred switchback].freeze
   ABS_PILATES_PATTERN     = /abs|core|pilates|hundred/i
+
+  # A `format: rounds` section with a single exercise whose `duration_s` is
+  # 10 minutes or longer is almost always the LLM trying to express a
+  # continuous zone 2 cardio block but defaulting to rounds. Multiplying
+  # the duration by the round count blows the session budget (e.g.
+  # `3 rounds × Run 24min` = 72 min of cardio in a 60-min session).
+  # Convert to `format: straight` with a single round.
+  def fix_long_cardio_rounds_to_straight(sections)
+    sections.each do |section|
+      next unless section["format"] == "rounds"
+      exercises = Array(section["exercises"])
+      next unless exercises.size == 1
+
+      ex = exercises.first
+      dur_s = ex["duration_s"].to_i
+      next if dur_s < 600 # under 10 min per round is plausible interval work
+
+      original_rounds = section["rounds"].to_i
+      section["format"] = "straight"
+      section["duration_mins"] = (dur_s / 60.0).round
+      section.delete("rounds")
+      section.delete("rest_secs")
+      @fixes << "'#{section["name"]}': #{original_rounds} rounds × #{dur_s}s cardio → straight (one #{section["duration_mins"]} min block)"
+    end
+  end
 
   def fix_single_set_sections(sections)
     sections.each do |section|

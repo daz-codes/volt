@@ -86,7 +86,9 @@ When the request carries an `intensity_style` (low / medium / high), adjust the 
 
 **Session shape (60 min)**: 5 min warm-up + ONE 22-28 min continuous cardio block + 1-2 short mobility flow sections (3-5 min each) woven into the main session + 8-12 min light technique stations + 8-12 min cool-down. Around 4-6 main blocks total — mobility flows count as their own blocks.
 
-**Cardio — the hard rule**: long zone 2 cardio MUST use `format: straight` with `duration_mins` set to the total length. **NEVER use `format: rounds` for the main cardio block at low intensity.** Whenever you write a long cardio section at low intensity, set `format: "straight"` and OMIT the `rounds` field entirely.
+**Cardio — the hard rule**:
+- **Long zone 2 cardio (≥10 min on one machine) MUST use `format: straight`** with `duration_mins` set to a round number — typically **15, 20, or 25 min**. Use 12 min only when the rest of the session is dense. NEVER use `format: rounds` for a long single-cardio block at low intensity. Omit the `rounds:` field entirely on these sections.
+- **Short cardio intervals are still valid in `format: rounds`** — e.g. `4 rounds × Row 5 min easy` (`duration_s: 300, rest_secs: 60`). The rule is per-round duration: if each round is ≤ 5 min of cardio work, `rounds` is fine. If each round is ≥ 10 min of cardio, it MUST be `straight`.
 
 BAD (a `rounds` block — wrong format, multiplies the duration):
 ```
