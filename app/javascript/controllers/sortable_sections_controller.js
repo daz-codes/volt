@@ -11,7 +11,26 @@ export default class extends Controller {
       handle: "[data-sortable-handle]",
       animation: 150,
       ghostClass: "opacity-40",
-      chosenClass: "ring-2"
+      chosenClass: "ring-2",
+      forceFallback: true,
+      fallbackClass: "sortable-drag-fallback",
+      onStart: (evt) => {
+        // Collapse the dragged <details> for the duration of the drag so its
+        // expanded body doesn't visually overlap with sections below.
+        // Remember the prior state so we can restore it on drop.
+        const item = evt.item
+        if (item.tagName === "DETAILS" && item.open) {
+          item.dataset.wasOpen = "true"
+          item.open = false
+        }
+      },
+      onEnd: (evt) => {
+        const item = evt.item
+        if (item.dataset.wasOpen === "true") {
+          item.open = true
+          delete item.dataset.wasOpen
+        }
+      }
     })
 
     this.form = this.element.closest("form")
