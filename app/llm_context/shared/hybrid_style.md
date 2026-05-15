@@ -78,6 +78,40 @@ A single-block descending pyramid: a 1km run before each tier of 3 movements (ty
 
 `format: rounds`, 3 rounds × Sit-ups + V-ups + Plank (or similar). Alternative close-out to the hundred. 20 reps + 20 reps + 45s plank is the standard mix.
 
+## Intensity guidance
+
+When the request carries an `intensity_style` (low / medium / high), adjust the session shape accordingly. The headline modalities above are mostly tuned for medium — low and high need different choices.
+
+### Low intensity (zone 2, conversational, RPE 4-5)
+
+**Session shape (60 min)**: 5 min warm-up + ONE 25-30 min continuous cardio block + 10-15 min light station rounds (technique-focused) + 10-15 min mobility cool-down with active recovery. Maximum **3 main blocks** — keep the structure simple.
+
+**Cardio**: Use `format: straight` with `duration_mins: 25-30` for one continuous easy-paced block. The Long Run / Steady Row pattern. **DO NOT write `3 rounds × 20 min cardio`** — that's 60 min of cardio in a 60-min session with no room left. ALWAYS one continuous block at low intensity. Notes describe the pace: `conversational pace — nose-breathing where possible, building aerobic base`.
+
+**Stations**: Light load, 15-25 reps, technique-focused. 20-30s rest between rounds — "keep moving". Notes on every exercise about form (3-sec eccentric, hip hinge mechanics, knee tracking, full range, controlled tempo).
+
+**Avoid for low intensity**: 30/30 cardio (too hard), EMOMs (too intense), tabata (max effort), hundred finishers (race pace), heavy strength at 3-6 reps, sprint repeats, compromised running, compromised run ladders, descending pyramids. These are medium/high modalities.
+
+**Cool-down (mobility-rich, OVERRIDES the default `full_body_stretch`)**: Include 5 min active recovery on a cardio modality (easy ski / row / treadmill at conversational pace) followed by named Hyrox mobility drills. Total cool-down 10-15 min. Pull from:
+- **Hip**: 90/90 Hip Switches, Couch Stretch, Hip CARs, Kneeling Hip Flexor Stretch, Dynamic Lunge Variations
+- **Thoracic spine**: Foam Roller Thoracic Extensions, Thoracic Open Books, Cat-Cow
+- **Ankle**: Ankle Circles + Calf Stretch, Ankle Banded Mobilizations, Eccentric Calf Raises
+- **Full-body**: World's Greatest Stretch
+
+Warm-up can also mention mobility prep in its notes (90/90 hip switches, ankle circles, T-spine open books).
+
+### High intensity (near max, RPE 9-10)
+
+**Session shape (~45 min, shorter than standard)**: 5 min warm-up + 3-4 short heavy/sprint blocks + 5 min cool-down.
+
+**Movements**: heavy compound at 3-5 reps with 180s rest, sprint repeats (15-45s work, 90s+ rest), heavy sled (max load), all-out tabata. Sprint repeats can be 200m runs, 30s machine sprints, 15m heavy sled sprints — full recovery between.
+
+**Avoid for high intensity**: continuous easy cardio, technique-focused light work, slow tempo training, 30/30 (that's threshold, not high), low-rep high-volume rounds.
+
+### Medium intensity (the default)
+
+Most race-family sessions land here. Mix EMOMs, 30/30 cardio, compromised running, strength accessory, hundreds, tabatas, continuous circuits — the full menu. 60 min, 4-6 main blocks.
+
 ## Reps cueing
 
 The cue `~50% of your 1-min max (leaves ~20s rest)` is for **single-exercise EMOMs AND alternating EMOMs** (each exercise gets its own minute). In those cases, leave `reps` blank and set the cue in `notes`.
