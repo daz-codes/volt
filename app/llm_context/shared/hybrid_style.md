@@ -84,15 +84,29 @@ When the request carries an `intensity_style` (low / medium / high), adjust the 
 
 ### Low intensity (zone 2, conversational, RPE 4-5)
 
-**Session shape (60 min)**: 5 min warm-up + ONE 25-30 min continuous cardio block + 10-15 min light station rounds (technique-focused) + 10-15 min mobility cool-down with active recovery. Maximum **3 main blocks** — keep the structure simple.
+**Session shape (60 min)**: 5 min warm-up + ONE 22-28 min continuous cardio block + 1-2 short mobility flow sections (3-5 min each) woven into the main session + 8-12 min light technique stations + 8-12 min cool-down. Around 4-6 main blocks total — mobility flows count as their own blocks.
 
-**Cardio**: Use `format: straight` with `duration_mins: 25-30` for one continuous easy-paced block. The Long Run / Steady Row pattern. **DO NOT write `3 rounds × 20 min cardio`** — that's 60 min of cardio in a 60-min session with no room left. ALWAYS one continuous block at low intensity. Notes describe the pace: `conversational pace — nose-breathing where possible, building aerobic base`.
+**Cardio — the hard rule**: long zone 2 cardio MUST use `format: straight` with `duration_mins` set to the total length. **NEVER use `format: rounds` for the main cardio block at low intensity.** Multiple rounds of long cardio is forbidden regardless of the per-round duration:
+- BAD: `3 rounds × Run 20min` → 60 min of cardio, no room for anything else.
+- BAD: `3 rounds × Run 28min` → 84 min of cardio in a 60-min session.
+- BAD: any rounds block whose total per-round work exceeds ~5 min for a low-intensity main cardio piece.
+- GOOD: `format: straight, duration_mins: 25, exercises: [{ name: "Run", duration_s: 1500, notes: "conversational pace" }]`.
+
+The Long Run / Steady Row pattern is always one continuous block. Notes describe the pace: `conversational pace — nose-breathing where possible, building aerobic engine`.
+
+**Mobility woven into the main session — LOW INTENSITY ONLY.** Mobility is part of the prescribed work alongside the cardio, not just an end-of-session add-on. Two valid shapes:
+
+1. **Standalone mobility flow sections** between cardio and stations, or between stations and cool-down. `format: straight` with `duration_mins: 3-5`, listing 2-4 named drills with `duration_s` per drill. Name the section after the area (e.g. "Hip Mobility", "T-spine Flow", "Ankle Prep") — NOT "recovery" or "reset" (those are banned by the global mid-workout recovery rule, which applies to medium/high; LOW intensity is exempt because mobility IS the work).
+
+2. **Mobility moves WITHIN station rounds**: include one duration-based mobility exercise alongside the rep-based functional movements. Duration holds are exempt from the same-rep rule. Example: `4 rounds × Wall Balls 20 (light) + 90/90 Hip Switch 60s + KB Swings 20 (light)`.
 
 **Stations**: Light load, 15-25 reps, technique-focused. 20-30s rest between rounds — "keep moving". Notes on every exercise about form (3-sec eccentric, hip hinge mechanics, knee tracking, full range, controlled tempo).
 
-**Avoid for low intensity**: 30/30 cardio (too hard), EMOMs (too intense), tabata (max effort), hundred finishers (race pace), heavy strength at 3-6 reps, sprint repeats, compromised running, compromised run ladders, descending pyramids. These are medium/high modalities.
+**Avoid for low intensity**: 30/30 cardio, EMOMs, tabata, hundred finishers, heavy strength at 3-6 reps, sprint repeats, compromised running, compromised run ladders, descending pyramids. These are medium/high modalities.
 
-**Cool-down (mobility-rich, OVERRIDES the default `full_body_stretch`)**: Include 5 min active recovery on a cardio modality (easy ski / row / treadmill at conversational pace) followed by named Hyrox mobility drills. Total cool-down 10-15 min. Pull from:
+**Cool-down**: 5 min active recovery on a cardio modality (easy ski / row at conversational pace) + 3-5 longer-hold stretches. Different from the woven mobility flows — these are static end-of-session stretches.
+
+**Named Hyrox mobility drills** to use anywhere (warm-up notes, mobility flows, station rounds, cool-down):
 - **Hip**: 90/90 Hip Switches, Couch Stretch, Hip CARs, Kneeling Hip Flexor Stretch, Dynamic Lunge Variations
 - **Thoracic spine**: Foam Roller Thoracic Extensions, Thoracic Open Books, Cat-Cow
 - **Ankle**: Ankle Circles + Calf Stretch, Ankle Banded Mobilizations, Eccentric Calf Raises

@@ -247,7 +247,7 @@ module LLMContext
         },
         {
           name: "Zone Two Engine",
-          goal: "A long zone 2 run, technique-led light station rounds, then active recovery and Hyrox mobility work — easy aerobic, build the engine, polish the form.",
+          goal: "A long continuous zone 2 run, a mid-session hip mobility flow, light technique stations, T-spine mobility, and a quiet cool-down — mobility woven through, not just bolted on.",
           duration_mins: 60,
           intensity_style: "low",
           sections: [
@@ -255,29 +255,39 @@ module LLMContext
               exercises: [
                 { name: "Easy SkiErg + Hyrox mobility prep", duration_s: 300, notes: "90/90 hip switches, ankle circles, thoracic open books, world's greatest stretch", equipment: "ski_erg" }
               ] },
-            { name: "The Long Way", format: "straight", duration_mins: 30,
+            { name: "The Long Way", format: "straight", duration_mins: 25,
               exercises: [
-                { name: "Run", duration_s: 1800, notes: "conversational pace — nose-breathing where possible, building aerobic base", equipment: "treadmill" }
+                { name: "Run", duration_s: 1500, notes: "conversational pace — nose-breathing where possible, building aerobic engine", equipment: "treadmill" }
               ] },
-            { name: "Technique Stations", format: "rounds", rounds: 4, rest_secs: 20,
+            { name: "Hip Mobility", format: "straight", duration_mins: 5,
+              exercises: [
+                { name: "90/90 Hip Switches", duration_s: 90, notes: "internal/external hip rotation — 45s per side" },
+                { name: "Couch Stretch", duration_s: 120, notes: "60s per side, posterior pelvic tilt" },
+                { name: "Hip CARs", duration_s: 90, notes: "controlled articular rotations — full active hip circles, both legs" }
+              ] },
+            { name: "Technique Stations", format: "rounds", rounds: 3, rest_secs: 20,
               exercises: [
                 { name: "Wall Balls", reps: 20, notes: "light ball, full squat depth, controlled tempo", equipment: "wall_ball" },
                 { name: "KB Swings", reps: 20, notes: "light kettlebell, hip hinge mechanics, smooth and even", equipment: "kettlebells" },
                 { name: "Farmer's Carry", distance_m: 30, notes: "light load, tall posture, breath stays calm", equipment: "kettlebells" }
               ] },
-            { name: "Cool-Down", format: "straight", duration_mins: 13,
+            { name: "T-spine Flow", format: "straight", duration_mins: 4,
               exercises: [
-                { name: "Easy SkiErg", duration_s: 300, notes: "active recovery — conversational pace, breath stays calm", equipment: "ski_erg" },
-                { name: "90/90 Hip Switches", duration_s: 120, notes: "internal and external hip rotation — 60s per side, breath into the rotation" },
-                { name: "Couch Stretch", duration_s: 120, notes: "hip flexor opener — 60s per side, posterior pelvic tilt" },
-                { name: "Thoracic Open Books", duration_s: 120, notes: "T-spine rotation for rowing and wall ball posture — 60s per side" },
-                { name: "Ankle Circles + Calf Stretch", duration_s: 120, notes: "dorsiflexion prep for stride and sled push — both ankles" }
+                { name: "Foam Roller Thoracic Extensions", duration_s: 90, notes: "slow controlled extensions over a foam roller" },
+                { name: "Thoracic Open Books", duration_s: 90, notes: "T-spine rotation for rowing and wall ball posture — 45s per side" },
+                { name: "Cat-Cow", duration_s: 60, notes: "spinal articulation, breath into each phase" }
+              ] },
+            { name: "Cool-Down", format: "straight", duration_mins: 8,
+              exercises: [
+                { name: "Easy SkiErg", duration_s: 240, notes: "active recovery — conversational pace, breath stays calm", equipment: "ski_erg" },
+                { name: "Ankle Circles + Calf Stretch", duration_s: 120, notes: "dorsiflexion prep for stride and sled push — both ankles" },
+                { name: "Kneeling Hip Flexor Stretch", duration_s: 120, notes: "60s per side, drive hips forward" }
               ] }
           ]
         },
         {
           name: "Aerobic Build",
-          goal: "A long steady row, low-effort AMRAP at sustainable pace, slow technique-focused goblet squats, then mobility and active recovery.",
+          goal: "A long steady row, an easy circuit with mobility woven into each round, slow technique-focused goblet squats, then a quiet cool-down.",
           duration_mins: 60,
           intensity_style: "low",
           sections: [
@@ -285,26 +295,26 @@ module LLMContext
               exercises: [
                 { name: "Easy row + Hyrox mobility prep", duration_s: 300, notes: "cat-cow, ankle circles, kneeling hip flexor stretch, dynamic lunges", equipment: "rowing_machine" }
               ] },
-            { name: "Steady State", format: "straight", duration_mins: 25,
+            { name: "Steady State", format: "straight", duration_mins: 22,
               exercises: [
-                { name: "Row", duration_s: 1500, notes: "easy aerobic pace — sustain the same effort the whole way, breath stays calm", equipment: "rowing_machine" }
+                { name: "Row", duration_s: 1320, notes: "easy aerobic pace — sustain the same effort the whole way, breath stays calm", equipment: "rowing_machine" }
               ] },
-            { name: "Easy AMRAP", format: "amrap", duration_mins: 12,
+            { name: "Easy Circuit", format: "rounds", rounds: 4, rest_secs: 30,
               exercises: [
                 { name: "Wall Balls", reps: 20, notes: "light ball, controlled tempo, full range", equipment: "wall_ball" },
-                { name: "Walking Lunges", reps: 20, notes: "deliberate steps, focus on knee tracking", equipment: "bodyweight" },
-                { name: "Burpee Broad Jumps", reps: 10, notes: "smooth — quality over speed, soft landings", equipment: "bodyweight" }
+                { name: "90/90 Hip Switch", duration_s: 60, notes: "mobility hold — 30s per side, breath into the rotation" },
+                { name: "Walking Lunges", reps: 20, notes: "deliberate steps, focus on knee tracking", equipment: "bodyweight" }
               ] },
             { name: "Slow Goblet", format: "rounds", rounds: 4, rest_secs: 30,
               exercises: [
-                { name: "Goblet Squat", reps: 12, notes: "light bell, 3-second eccentric, focus on form and depth", equipment: "kettlebells" }
+                { name: "Goblet Squat", reps: 12, notes: "light bell, 3-second eccentric, focus on form and depth", equipment: "kettlebells" },
+                { name: "World's Greatest Stretch", duration_s: 60, notes: "between sets — 30s per side, deep lunge with rotation" }
               ] },
-            { name: "Cool-Down", format: "straight", duration_mins: 8,
+            { name: "Cool-Down", format: "straight", duration_mins: 6,
               exercises: [
-                { name: "Easy SkiErg", duration_s: 240, notes: "active recovery — conversational pace", equipment: "ski_erg" },
-                { name: "Foam Roller Thoracic Extensions", duration_s: 90, notes: "T-spine opening over a foam roller — slow controlled extensions" },
-                { name: "World's Greatest Stretch", duration_s: 120, notes: "lunge with rotation — both sides, hold each rep" },
-                { name: "Hip CARs", duration_s: 90, notes: "controlled articular rotations — full active hip circles, both legs" }
+                { name: "Easy SkiErg", duration_s: 180, notes: "active recovery — conversational pace", equipment: "ski_erg" },
+                { name: "Foam Roller Thoracic Extensions", duration_s: 90, notes: "T-spine opening — slow controlled extensions" },
+                { name: "Couch Stretch", duration_s: 90, notes: "hip flexor — 45s per side" }
               ] }
           ]
         },
