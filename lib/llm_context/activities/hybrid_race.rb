@@ -116,7 +116,7 @@ module LLMContext
               ] },
             { name: "Iron Lift", format: "rounds", intensity_style: "high", rounds: 4, rest_secs: 120,
               exercises: [
-                { name: "Deadlift", reps: 5, equipment: "barbell" }
+                { name: "Deadlift", reps: 5, notes: "heavier than race weight — strength-training load, last rep should be a fight", equipment: "barbell" }
               ] },
             { name: "The Centurion", format: "hundred",
               exercises: [
@@ -166,9 +166,9 @@ module LLMContext
               ] },
             { name: "Three Carries", format: "rounds", rounds: 4, rest_secs: 60,
               exercises: [
-                { name: "Farmer's Carry", distance_m: 60, equipment: "kettlebells" },
-                { name: "Sled Push", distance_m: 40, equipment: "sled" },
-                { name: "Sled Pull", distance_m: 20, equipment: "sled" }
+                { name: "Farmer's Carry", distance_m: 60, notes: "race weight — competition load", equipment: "kettlebells" },
+                { name: "Sled Push", distance_m: 40, notes: "race weight — full Hyrox competition sled", equipment: "sled" },
+                { name: "Sled Pull", distance_m: 20, notes: "race weight — full Hyrox competition sled", equipment: "sled" }
               ] },
             { name: "Wall Work", format: "emom", duration_mins: 16, rest_secs: 0,
               exercises: [
@@ -193,7 +193,7 @@ module LLMContext
               exercises: [
                 { name: "Run", distance_m: 1000, equipment: "treadmill" },
                 { name: "Wall Balls", reps: 80, equipment: "wall_ball" },
-                { name: "Sled Push", distance_m: 80, equipment: "sled" },
+                { name: "Sled Push", distance_m: 80, notes: "race weight — full competition sled across all tiers", equipment: "sled" },
                 { name: "KB Swings", reps: 80, equipment: "kettlebells" },
                 { name: "Run", distance_m: 1000, equipment: "treadmill" },
                 { name: "Wall Balls", reps: 60, equipment: "wall_ball" },

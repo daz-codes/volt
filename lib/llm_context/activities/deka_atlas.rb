@@ -159,7 +159,7 @@ module LLMContext
             { name: "Three Carries", format: "rounds", rounds: 4, rest_secs: 60,
               exercises: [
                 { name: "Atlas Shoulder to Carry", distance_m: 50, equipment: "sled" },
-                { name: "Sled Push", distance_m: 40, equipment: "sled" },
+                { name: "Sled Push", distance_m: 40, notes: "race weight — full competition sled", equipment: "sled" },
                 { name: "Farmer's Carry", distance_m: 60, equipment: "kettlebells" }
               ] },
             { name: "Press On", format: "emom", duration_mins: 16, rest_secs: 0,
@@ -226,8 +226,8 @@ module LLMContext
               ] },
             { name: "Technique Stations", format: "rounds", rounds: 3, rest_secs: 25,
               exercises: [
-                { name: "Surrender Lunges", reps: 12, notes: "light DB or unweighted — slow descent, full ground contact, drive through the front foot, focus on knee tracking", equipment: "dumbbells" },
-                { name: "Weighted Sit-ups", reps: 15, notes: "light load — controlled tempo, full range, anchor the feet, smooth transition", equipment: "dumbbells" },
+                { name: "Surrender Lunges", reps: 12, notes: "light DB or unweighted — well below race weight, slow descent, full ground contact, drive through the front foot, focus on knee tracking", equipment: "dumbbells" },
+                { name: "Weighted Sit-ups", reps: 15, notes: "light load — well below race weight, controlled tempo, full range, anchor the feet, smooth transition", equipment: "dumbbells" },
                 { name: "Bear Crawl", distance_m: 20, notes: "bodyweight — slow and controlled, hips low and stable, opposite hand-foot, no rotation through the hips", equipment: "bodyweight" }
               ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
@@ -256,9 +256,9 @@ module LLMContext
               ] },
             { name: "Easy Circuit", format: "rounds", rounds: 4, rest_secs: 30,
               exercises: [
-                { name: "Goblet Squat", reps: 10, notes: "light KB — 3-second eccentric, full depth, knees track over toes, no rushing", equipment: "kettlebells" },
+                { name: "Goblet Squat", reps: 10, notes: "light KB — well below race weight, 3-second eccentric, full depth, knees track over toes, no rushing", equipment: "kettlebells" },
                 { name: "Wall Slides", duration_s: 60, notes: "shoulder and T-spine mobility — slow controlled overhead reach, ribs stay down" },
-                { name: "DB Shoulder to Overhead Press", reps: 10, notes: "light DBs — strict press, no leg drive, focus on lockout and controlled descent", equipment: "dumbbells" }
+                { name: "DB Shoulder to Overhead Press", reps: 10, notes: "light DBs — well below race weight, strict press, no leg drive, focus on lockout and controlled descent", equipment: "dumbbells" }
               ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
@@ -282,7 +282,7 @@ module LLMContext
               ] },
             { name: "Heavy Sled", format: "rounds", intensity_style: "high", rounds: 4, rest_secs: 120,
               exercises: [
-                { name: "Sled Push", distance_m: 20, notes: "heaviest load you can drive 20m without breaking", equipment: "sled" }
+                { name: "Sled Push", distance_m: 20, notes: "heavier than race weight — above competition load, drive 20m without breaking", equipment: "sled" }
               ] },
             { name: "Tabata Cooker", format: "tabata",
               exercises: [
@@ -311,7 +311,7 @@ module LLMContext
               ] },
             { name: "Atlas Carry Sprints", format: "rounds", rounds: 5, rest_secs: 90,
               exercises: [
-                { name: "Atlas Shoulder to Carry", distance_m: 25, notes: "heavy load — sprint with the carry, no walking", equipment: "sled" }
+                { name: "Atlas Shoulder to Carry", distance_m: 25, notes: "heavier than race weight — sprint with the carry, no walking", equipment: "sled" }
               ] },
             { name: "Tabata Burner", format: "tabata",
               exercises: [

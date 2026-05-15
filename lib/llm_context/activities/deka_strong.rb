@@ -79,7 +79,7 @@ module LLMContext
               ] },
             { name: "Last Stand", format: "rounds", intensity_style: "high", rounds: 4, rest_secs: 120,
               exercises: [
-                { name: "Deadlift", reps: 5, equipment: "barbell" }
+                { name: "Deadlift", reps: 5, notes: "heavier than race weight — strength-training load, last rep should be a fight", equipment: "barbell" }
               ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
@@ -158,8 +158,8 @@ module LLMContext
             { name: "Three Carries", format: "rounds", rounds: 4, rest_secs: 60,
               exercises: [
                 { name: "Farmer's Carry", distance_m: 60, equipment: "kettlebells" },
-                { name: "Sled Push", distance_m: 40, equipment: "sled" },
-                { name: "Sled Pull", distance_m: 20, equipment: "sled" }
+                { name: "Sled Push", distance_m: 40, notes: "race weight — full competition sled", equipment: "sled" },
+                { name: "Sled Pull", distance_m: 20, notes: "race weight — full competition sled", equipment: "sled" }
               ] },
             { name: "Throw Down", format: "emom", duration_mins: 16, rest_secs: 0,
               exercises: [
@@ -184,7 +184,7 @@ module LLMContext
               exercises: [
                 { name: "Row", distance_m: 500, equipment: "rowing_machine" },
                 { name: "Med Ball Sit-up Throw", reps: 80, equipment: "wall_ball" },
-                { name: "Sled Push", distance_m: 80, equipment: "sled" },
+                { name: "Sled Push", distance_m: 80, notes: "race weight — full competition sled across all tiers", equipment: "sled" },
                 { name: "RAM Reverse Lunges", reps: 80 },
                 { name: "SkiErg", distance_m: 500, equipment: "ski_erg" },
                 { name: "Med Ball Sit-up Throw", reps: 60, equipment: "wall_ball" },
@@ -192,7 +192,7 @@ module LLMContext
                 { name: "RAM Reverse Lunges", reps: 60 },
                 { name: "Air Bike", calories: 25, equipment: "assault_bike" },
                 { name: "Med Ball Sit-up Throw", reps: 40, equipment: "wall_ball" },
-                { name: "Sled Push", distance_m: 40, equipment: "sled" },
+                { name: "Sled Push", distance_m: 40, notes: "race weight — full competition sled", equipment: "sled" },
                 { name: "RAM Reverse Lunges", reps: 40 },
                 { name: "Row", distance_m: 500, equipment: "rowing_machine" },
                 { name: "Med Ball Sit-up Throw", reps: 20, equipment: "wall_ball" },
@@ -227,7 +227,7 @@ module LLMContext
               exercises: [
                 { name: "RAM Reverse Lunges", reps: 20, notes: "deliberate, controlled descent, focus on knee tracking" },
                 { name: "Box Jump", reps: 15, notes: "soft landings, full hip extension at the top", equipment: "bodyweight" },
-                { name: "Farmer's Carry", distance_m: 30, notes: "light load, tall posture, breath stays calm", equipment: "kettlebells" }
+                { name: "Farmer's Carry", distance_m: 30, notes: "light load — well below race weight, tall posture, breath stays calm", equipment: "kettlebells" }
               ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
@@ -255,9 +255,9 @@ module LLMContext
               ] },
             { name: "Easy Circuit", format: "rounds", rounds: 4, rest_secs: 30,
               exercises: [
-                { name: "Med Ball Sit-up Throw", reps: 20, notes: "light ball, smooth throw mechanics, full sit-up", equipment: "wall_ball" },
+                { name: "Med Ball Sit-up Throw", reps: 20, notes: "light ball — well below race weight, smooth throw mechanics, full sit-up", equipment: "wall_ball" },
                 { name: "World's Greatest Stretch", duration_s: 60, notes: "30s per side, full breath into the rotation" },
-                { name: "Wall Balls", reps: 20, notes: "light ball, controlled tempo, full range", equipment: "wall_ball" }
+                { name: "Wall Balls", reps: 20, notes: "light ball — well below race weight, controlled tempo, full range", equipment: "wall_ball" }
               ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
@@ -273,7 +273,7 @@ module LLMContext
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "rowing_machine" } ] },
             { name: "Heavy Pull", format: "rounds", intensity_style: "high", rounds: 5, rest_secs: 180,
               exercises: [
-                { name: "Deadlift", reps: 3, notes: "near-max — last rep should be a fight", equipment: "barbell" }
+                { name: "Deadlift", reps: 3, notes: "near-max — heavier than race weight, last rep should be a fight", equipment: "barbell" }
               ] },
             { name: "Row Sprints", format: "rounds", rounds: 6, rest_secs: 90,
               exercises: [
@@ -281,7 +281,7 @@ module LLMContext
               ] },
             { name: "Heavy Sled", format: "rounds", intensity_style: "high", rounds: 4, rest_secs: 120,
               exercises: [
-                { name: "Sled Push", distance_m: 20, notes: "heaviest load you can drive 20m without breaking", equipment: "sled" }
+                { name: "Sled Push", distance_m: 20, notes: "heavier than race weight — above competition load, drive 20m without breaking", equipment: "sled" }
               ] },
             { name: "Tabata Cooker", format: "tabata",
               exercises: [
@@ -302,7 +302,7 @@ module LLMContext
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
             { name: "Heavy Press", format: "rounds", intensity_style: "high", rounds: 5, rest_secs: 180,
               exercises: [
-                { name: "Push Press", reps: 3, notes: "near-max load — full recovery between sets", equipment: "barbell" }
+                { name: "Push Press", reps: 3, notes: "near-max — heavier than race weight, full recovery between sets", equipment: "barbell" }
               ] },
             { name: "Bike Sprints", format: "rounds", rounds: 6, rest_secs: 90,
               exercises: [
@@ -310,7 +310,7 @@ module LLMContext
               ] },
             { name: "Sled Sprints", format: "rounds", rounds: 6, rest_secs: 90,
               exercises: [
-                { name: "Sled Push", distance_m: 15, notes: "sprint with the sled — heavy but fast, no walking", equipment: "sled" }
+                { name: "Sled Push", distance_m: 15, notes: "heavier than race weight — sprint with the sled, heavy but fast", equipment: "sled" }
               ] },
             { name: "Tabata Burner", format: "tabata",
               exercises: [
