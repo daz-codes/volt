@@ -90,6 +90,8 @@ When the request carries an `intensity_style` (low / medium / high), adjust the 
 - **Long zone 2 cardio (≥10 min on one machine) MUST use `format: straight`** with `duration_mins` set to a round number — typically **15, 20, or 25 min**. Use 12 min only when the rest of the session is dense. NEVER use `format: rounds` for a long single-cardio block at low intensity. Omit the `rounds:` field entirely on these sections.
 - **Short cardio intervals are still valid in `format: rounds`** — e.g. `4 rounds × Row 5 min easy` (`duration_s: 300, rest_secs: 60`). The rule is per-round duration: if each round is ≤ 5 min of cardio work, `rounds` is fine. If each round is ≥ 10 min of cardio, it MUST be `straight`.
 
+**Rotate the cardio modality across sessions.** The long zone 2 block can be Run (treadmill), Row (rowing_machine), or SkiErg (ski_erg) — and Air Bike for contracts that allow it. **Don't default to Run every session.** Pick a different modality each time so a week of low-intensity sessions covers all three: one easy run, one easy row, one easy ski. The "treadmill is the backbone" rule for race-prep applies to interval and compromised-running work; for the long zone 2 block specifically, all three machines are equally valid.
+
 BAD (a `rounds` block — wrong format, multiplies the duration):
 ```
 { "format": "rounds", "rounds": 3, "exercises": [{ "name": "Run", "duration_s": 1440 }] }

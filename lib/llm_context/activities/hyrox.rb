@@ -247,17 +247,17 @@ module LLMContext
         },
         {
           name: "Zone Two Engine",
-          goal: "A long continuous zone 2 run, a mid-session hip mobility flow, light technique stations, T-spine mobility, and a quiet cool-down — mobility woven through, not just bolted on.",
+          goal: "A long continuous zone 2 ski, a mid-session hip mobility flow, light technique stations, T-spine mobility, and a quiet cool-down — mobility woven through, not just bolted on.",
           duration_mins: 60,
           intensity_style: "low",
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
               exercises: [
-                { name: "Easy SkiErg + Hyrox mobility prep", duration_s: 300, notes: "90/90 hip switches, ankle circles, thoracic open books, world's greatest stretch", equipment: "ski_erg" }
+                { name: "Easy treadmill walk + Hyrox mobility prep", duration_s: 300, notes: "90/90 hip switches, ankle circles, thoracic open books, world's greatest stretch", equipment: "treadmill" }
               ] },
             { name: "The Long Way", format: "straight", duration_mins: 25,
               exercises: [
-                { name: "Run", duration_s: 1500, notes: "conversational pace — nose-breathing where possible, building aerobic engine", equipment: "treadmill" }
+                { name: "SkiErg", duration_s: 1500, notes: "conversational pace — nose-breathing where possible, building aerobic engine", equipment: "ski_erg" }
               ] },
             { name: "Hip Mobility", format: "straight", duration_mins: 5,
               exercises: [
