@@ -22,9 +22,12 @@ module LLMContext
         notes: "Stations: Barbell Thrusters, Bar-Facing Burpees Over Bar, Surrender " \
                "Lunges (weighted), Single Arm DB Ground to Overhead, Dumbbell Bear Crawl, " \
                "Weighted Sit-ups, Farmer's Carry, DB Shoulder to Overhead Press, Jump Rope " \
-               "Single Unders, Atlas Shoulder to Carry. No running. Jump rope (Single/Double " \
-               "Unders) is the race-relevant cardio modality — machines exist for warm-up " \
-               "and engine work but the race-station cardio is jump rope. Pair heavy " \
+               "Single Unders, Atlas Shoulder to Carry. No running. **Jump rope is the ONLY " \
+               "main-block cardio modality for medium and high intensity sessions** — never " \
+               "row/ski/bike sprint sets at those intensities, only Jump Rope (Single or " \
+               "Double Unders). Machines (row/ski/bike) appear in warm-ups and the long " \
+               "continuous zone 2 cardio block at LOW intensity — that is the ONE exception, " \
+               "because zone 2 base building benefits from machine variety. Pair heavy " \
                "stations with machine conditioning to manage fatigue. The race stations " \
                "remain the headline movements, but workouts cannot be ONLY stations — every " \
                "session also needs supplementary work."
@@ -292,19 +295,19 @@ module LLMContext
         },
         {
           name: "Strongman Fire",
-          goal: "Heavy DB shoulder-to-overhead press, all-out ski sprints, heavy atlas carry sprints, then a tabata burner. Short, sharp, full-recovery work.",
+          goal: "Heavy DB shoulder-to-overhead press, all-out jump rope sprints, heavy atlas carry sprints, then a tabata burner. Short, sharp, full-recovery work.",
           duration_mins: 45,
           intensity_style: "high",
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
-              exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
+              exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "rowing_machine" } ] },
             { name: "Heavy Press", format: "rounds", intensity_style: "high", rounds: 5, rest_secs: 180,
               exercises: [
                 { name: "DB Shoulder to Overhead Press", reps: 5, notes: "near-max heavy DBs — full recovery between sets", equipment: "dumbbells" }
               ] },
-            { name: "Ski Sprints", format: "rounds", rounds: 6, rest_secs: 90,
+            { name: "Rope Sprints", format: "rounds", rounds: 6, rest_secs: 90,
               exercises: [
-                { name: "SkiErg", duration_s: 30, notes: "all-out — every 30s is maximum, full recovery between", equipment: "ski_erg" }
+                { name: "Jump Rope Single Unders", duration_s: 30, notes: "max speed — every 30s is maximum, full recovery between", equipment: "jump_rope" }
               ] },
             { name: "Atlas Carry Sprints", format: "rounds", rounds: 5, rest_secs: 90,
               exercises: [
