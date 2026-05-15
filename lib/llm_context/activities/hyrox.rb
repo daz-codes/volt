@@ -147,6 +147,103 @@ module LLMContext
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
           ]
+        },
+        {
+          name: "The Workshop",
+          goal: "Continuous circuit opener, a carry-and-sled triplet, heavy goblet squats, 1km repeats, then a tabata finisher.",
+          duration_mins: 60,
+          sections: [
+            { name: "Warm-Up", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
+            { name: "Rotation Room", format: "continuous_circuit", duration_mins: 12,
+              exercises: [
+                { name: "SkiErg", equipment: "ski_erg" },
+                { name: "Walking Lunges", equipment: "bodyweight" },
+                { name: "Wall Balls", equipment: "wall_ball" }
+              ] },
+            { name: "Hardware", format: "rounds", rounds: 4, rest_secs: 60,
+              exercises: [
+                { name: "Farmer's Carry", distance_m: 60, equipment: "kettlebells" },
+                { name: "Sled Push", distance_m: 40, equipment: "sled" },
+                { name: "Sled Pull", distance_m: 20, equipment: "sled" }
+              ] },
+            { name: "Iron Lift", format: "rounds", intensity_style: "high", rounds: 4, rest_secs: 120,
+              exercises: [
+                { name: "Goblet Squats", reps: 5, equipment: "kettlebells" }
+              ] },
+            { name: "Race Pace", format: "rounds", rounds: 5, rest_secs: 90,
+              exercises: [
+                { name: "Run", distance_m: 1000, notes: "race pace — 90s easy jog rest between rounds", equipment: "treadmill" }
+              ] },
+            { name: "Tabata Cooker", format: "tabata",
+              exercises: [
+                { name: "Box Jump Burpees", equipment: "bodyweight" },
+                { name: "Shoulder Press", equipment: "barbell" }
+              ] },
+            { name: "Cool-Down", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
+          ]
+        },
+        {
+          name: "Mixed Methods",
+          goal: "An E2MOM triplet, a classic row-and-wall-ball couplet, 30/30 treadmill, then a thruster-and-slam tabata.",
+          duration_mins: 60,
+          sections: [
+            { name: "Warm-Up", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
+            { name: "Triple Trouble", format: "emom", duration_mins: 16, rest_secs: 0,
+              exercises: [
+                { name: "Burpees", reps: 5, equipment: "bodyweight" },
+                { name: "Walking Lunges", reps: 10, equipment: "bodyweight" },
+                { name: "Farmer's Carry", distance_m: 20, equipment: "kettlebells" }
+              ] },
+            { name: "Couplet Crunch", format: "rounds", rounds: 5, rest_secs: 60,
+              exercises: [
+                { name: "Row", calories: 20, equipment: "rowing_machine" },
+                { name: "Wall Balls", reps: 20, equipment: "wall_ball" }
+              ] },
+            { name: "Tread the Line", format: "rounds", rounds: 10, rest_secs: 30,
+              exercises: [
+                { name: "Run", duration_s: 30, notes: "hard pace", equipment: "treadmill" }
+              ] },
+            { name: "Tabata Cooker", format: "tabata",
+              exercises: [
+                { name: "Thrusters", equipment: "kettlebells" },
+                { name: "Med Ball Slams", equipment: "wall_ball" }
+              ] },
+            { name: "Cool-Down", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
+          ]
+        },
+        {
+          name: "Descent",
+          goal: "One long run-broken pyramid — 1km repeats interleaved with ski-sled-wall ball tiers, descending 80 → 20. Pace the start, race the finish.",
+          duration_mins: 60,
+          sections: [
+            { name: "Warm-Up", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
+            { name: "Down the Stairs", format: "for_time",
+              exercises: [
+                { name: "Run", distance_m: 1000, equipment: "treadmill" },
+                { name: "SkiErg", calories: 80, equipment: "ski_erg" },
+                { name: "Sled Push", distance_m: 80, equipment: "sled" },
+                { name: "Wall Balls", reps: 80, equipment: "wall_ball" },
+                { name: "Run", distance_m: 1000, equipment: "treadmill" },
+                { name: "SkiErg", calories: 60, equipment: "ski_erg" },
+                { name: "Sled Push", distance_m: 60, equipment: "sled" },
+                { name: "Wall Balls", reps: 60, equipment: "wall_ball" },
+                { name: "Run", distance_m: 1000, equipment: "treadmill" },
+                { name: "SkiErg", calories: 40, equipment: "ski_erg" },
+                { name: "Sled Push", distance_m: 40, equipment: "sled" },
+                { name: "Wall Balls", reps: 40, equipment: "wall_ball" },
+                { name: "Run", distance_m: 1000, equipment: "treadmill" },
+                { name: "SkiErg", calories: 20, equipment: "ski_erg" },
+                { name: "Sled Push", distance_m: 20, equipment: "sled" },
+                { name: "Wall Balls", reps: 20, equipment: "wall_ball" }
+              ] },
+            { name: "Cool-Down", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
+          ]
         }
       ].freeze
     end

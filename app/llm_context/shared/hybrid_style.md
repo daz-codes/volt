@@ -42,19 +42,39 @@ This is the headline cardio shape. Use it in most sessions.
 
 `format: rounds`, 3-4 rounds, each round mixes run (400-800m) with 1-3 functional movements. Name the running movement `Compromised Run` per global_rules. Canonical: `4 rounds × 500m run + 20 wall balls + 30m farmer's carry`. Variants include compromised cardio (no run available) — substitute machine work for the run.
 
-### 6. Compromised run ladder
+### 6. Hyrox couplets and carry combos
+
+Simple `format: rounds` blocks with 2-3 exercises in each round, NOT mixed with running. Two classic shapes:
+- **Couplet**: 5 rounds × `Row 20 cal + Wall Balls 20` (cardio paired with one functional movement). `rest_secs: 60` typical.
+- **Carry combo (triplet)**: 4 rounds × `Farmer's Carry 60m + Sled Push 40m + Sled Pull 20m` (carries and sled work stacked). `rest_secs: 60` typical.
+
+Use these for variety alongside compromised running. Keep rep counts uniform across rep-based exercises in a round (e.g. 20 cal row + 20 wall balls).
+
+### 7. Run intervals with active rest
+
+For pure run-repeat sections (not paired with floor work), use `format: rounds` with longer `rest_secs` (60-120s) and a notes hint about active rest. Canonical: `5 rounds × Run 1km, rest_secs: 90` with notes `race pace — 90s easy jog rest between rounds`. Also valid: `6 rounds × Run 400m, rest_secs: 60`, `3 rounds × Run 1600m (mile), rest_secs: 120`. This is DIFFERENT from the 30/30 pattern — longer work, longer rest, intervals at race pace.
+
+### 8. Tabata finisher
+
+`format: tabata` — 8 rounds × 20s work / 10s rest (the schema bakes this in). 1 exercise (single-movement tabata) OR 2 genuinely different exercises alternating. Canonical for hybrid: `Box Jump Burpees alt Shoulder Press`, `Thrusters alt Med Ball Slams`, `KB Swings`, `Burpees alt Sit-ups`. Excellent 4-min close-out alongside (or instead of) a hundred finisher.
+
+### 9. Compromised run ladder
 
 A chipper-shaped descending-run / ascending-rep ladder. Express as `format: for_time` with the full alternating sequence in the exercise list. Canonical: `1000m run / 10 wall balls / 800m run / 20 WB / 600m run / 30 WB / 400m run / 40 WB / 200m run / 50 WB`. Counts as a chipper but is also a hybrid headline shape; it's NOT subject to the "1 in 8-10 chippers" rule that limits typical full-race chippers.
 
-### 7. Strength accessory
+### 10. Descending pyramid chipper
+
+A single-block descending pyramid: a 1km run before each tier of 3 movements (typically cardio + sled + functional), 4 tiers of descending volume. `format: for_time` with 16 exercises listed (4 tiers × (Run + 3 movements)). Canonical: `1000m Run / 80 cal Ski / 80m Sled Push / 80 Wall Balls / 1000m Run / 60 cal Ski / 60m Sled Push / 60 Wall Balls / 1000m Run / 40 cal Ski / 40m Sled Push / 40 Wall Balls / 1000m Run / 20 cal Ski / 20m Sled Push / 20 Wall Balls`. ONE main block, ~45-60 min of work. Use rarely (1 in 6 sessions or so) — when you do, the session is just warm-up + this + cool-down. The 1km runs between tiers are essential to the pattern; do NOT omit them. For activities without running, substitute another cardio (Row 1000m or SkiErg 1000m) between tiers.
+
+### 11. Strength accessory
 
 `format: rounds`, 4-5 rounds, 1-2 heavy compound exercises (Deadlift, Bench Press, Push Press, Bent-Over Row, Pull-ups, Bulgarian Split Squat, etc.), **3-6 reps**, `rest_secs: 120`, `intensity_style: high`. **Include in MOST sessions** (~4 of 5). Never replaces a conditioning block; sits alongside one.
 
-### 8. Hundred finisher
+### 12. Hundred finisher
 
 `format: hundred`, single bodyweight or light movement, 100 reps for time. "The Centurion." Movements: Wall Balls 100, Burpees 100, KB Swings 100, Sit-ups 100, Burpee Broad Jumps 100, Box Jumps 100. **Use in most sessions as the close-out** — alternative is an abs finisher.
 
-### 9. Abs finisher
+### 13. Abs finisher
 
 `format: rounds`, 3 rounds × Sit-ups + V-ups + Plank (or similar). Alternative close-out to the hundred. 20 reps + 20 reps + 45s plank is the standard mix.
 
