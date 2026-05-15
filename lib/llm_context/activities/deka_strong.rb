@@ -87,7 +87,7 @@ module LLMContext
         },
         {
           name: "Triple Machine Grind",
-          goal: "Compromised cardio rounds, a wall-ball EMOM grind, a rotating continuous circuit on row, KB swings and box step-overs, then a hundred to close.",
+          goal: "Compromised cardio rounds, a med-ball sit-up throw EMOM grind, a rotating continuous circuit on row, KB swings and box step-overs, then a hundred to close.",
           duration_mins: 60,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
@@ -99,9 +99,9 @@ module LLMContext
                 { name: "SkiErg", distance_m: 250, equipment: "ski_erg" },
                 { name: "Sled Push", distance_m: 30, equipment: "sled" }
               ] },
-            { name: "Wall Builder", format: "emom", duration_mins: 16, rest_secs: 0,
+            { name: "Throw Down", format: "emom", duration_mins: 16, rest_secs: 0,
               exercises: [
-                { name: "Wall Balls", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "wall_ball" }
+                { name: "Med Ball Sit-up Throw", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "wall_ball" }
               ] },
             { name: "Strong Rotation", format: "continuous_circuit", duration_mins: 12,
               exercises: [
