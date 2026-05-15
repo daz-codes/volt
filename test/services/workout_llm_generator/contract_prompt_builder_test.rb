@@ -166,16 +166,20 @@ class WorkoutLLMGenerator::ContractPromptBuilderTest < ActiveSupport::TestCase
     assert_match(%r{<task>\nGenerate a \d+-minute Hyrox session\.\n</task>}, prompt)
   end
 
-  test "filters examples by intensity_style when set, keeping unflagged examples" do
-    # Hyrox has 6 unflagged + 2 low + 2 high examples after the variety expansion
+  test "filters examples strictly to matching intensity_style — drops unflagged" do
+    # Hyrox has 6 unflagged + 2 low + 2 high examples. With strict filtering,
+    # a high request shows only the 2 high-tagged examples — the unflagged
+    # "flexible" examples are excluded to avoid biasing the LLM back toward
+    # medium-flavoured patterns.
     high_prompt = build(activity_slug: "hyrox", intensity_style: "high")
     high_block = high_prompt[/\<examples\>(.*?)\<\/examples\>/m, 1]
     refute_nil high_block
-    # Should include the 6 unflagged + 2 high-tagged examples, exclude the 2 low ones
     high_count = high_block.scan(/"goal"\s*:/).length
-    assert_equal 8, high_count, "high request should keep 6 unflagged + 2 high = 8 examples"
+    assert_equal 2, high_count, "high request should keep ONLY the 2 high-tagged examples"
     refute_match(/"Zone Two Engine"/, high_block)
     refute_match(/"Aerobic Build"/, high_block)
+    refute_match(/"Mixed Hybrid"/, high_block)
+    refute_match(/"Two Engines"/, high_block)
     assert_match(/"Race Day Test"/, high_block)
     assert_match(/"Iron & Fire"/, high_block)
   end

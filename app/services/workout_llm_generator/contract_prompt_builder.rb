@@ -1,6 +1,24 @@
 class WorkoutLLMGenerator
   class ContractPromptBuilder
-    ROLE_TEXT = "You are an expert personal trainer who writes creative, effective gym workouts."
+    ROLE_TEXT = <<~ROLE.strip
+      You are a top-level personal trainer specialising in Hyrox, Deka, hybrid race-prep,
+      and functional fitness. You write inspiring, creative workouts that athletes look
+      forward to — every session should feel like a coach designed it, not a template
+      filled in.
+
+      The example workouts you'll see show the quality bar, structural shapes, and naming style.
+      Study them — then create something fresh in the same spirit. Do NOT copy them.
+      **Surprise the athlete with variety**:
+      - Rotate cardio modalities across sessions: run, row, ski, bike (where allowed).
+        Don't default to whatever the examples use most.
+      - Rotate mobility focus: hips, thoracic spine, ankles, full-body. If recent sessions
+        leaned on one area, deliberately pick a different one.
+      - Mix modality combinations: an EMOM here, a continuous circuit there, a tabata
+        finisher one day, a hundred the next.
+      - Pick punchy original section names — never reuse the example names directly.
+
+      Be the coach the athlete remembers. Lean into creativity, not pattern repetition.
+    ROLE
 
     WARM_UP_VOCAB = {
       easy_cardio:            "Easy cardio at conversational pace plus \"Dynamic stretches\". Do not list individual stretches.",
@@ -150,23 +168,31 @@ class WorkoutLLMGenerator
       <<~EX.strip
         #{examples.size} #{@activity::NAME} workouts that show the quality bar and style. Study structure,
         exercise selection, format variety, and naming. Create something fresh in the same
-        spirit — do not copy.
+        spirit — do NOT copy.
+
+        **Variety mandate**: deliberately choose differently from the examples where you can:
+        - If the examples use one cardio modality, pick a different one (run / row / ski / bike).
+        - If the examples lean toward one mobility area (hip / T-spine / ankle / full-body), pick a different one.
+        - Reach for less-common modalities (alternating EMOM, continuous_circuit, tabata, hundred, descending pyramid) when they fit — don't default to compromised running every session.
+        - Section names must be ORIGINAL — never reuse a name from the examples. Pick fresh punchy names.
+
+        The examples are the quality bar. Your job is to MATCH that quality while bringing something the athlete hasn't seen.
 
         #{json}
       EX
     end
 
     # When the user has requested a specific intensity_style, narrow the
-    # examples shown to the LLM to those matching that intensity. Examples
-    # without an intensity_style tag are flexible — they're included regardless.
-    # If filtering would leave the LLM with zero examples, fall back to all
-    # examples so the prompt doesn't lose its quality bar.
+    # examples shown to the LLM to those matching that intensity. STRICT
+    # filtering: when intensity is set, show ONLY matched examples (drop
+    # the unflagged "flexible" examples too). This prevents the unflagged
+    # medium-flavoured examples from biasing low/high sessions back toward
+    # medium patterns. Falls back to all examples if no matches exist.
     def filtered_examples
       return @activity::EXAMPLES unless @intensity_style.present?
 
       matched = @activity::EXAMPLES.select do |ex|
-        ex_intensity = ex[:intensity_style]
-        ex_intensity.nil? || ex_intensity.to_s == @intensity_style.to_s
+        ex[:intensity_style].to_s == @intensity_style.to_s
       end
 
       matched.presence || @activity::EXAMPLES
