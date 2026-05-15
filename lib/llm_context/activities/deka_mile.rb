@@ -17,14 +17,15 @@ module LLMContext
         cool_down:         :full_body_stretch,
         finisher:          :optional,
         core:              :optional,
-        notes: "MANDATORY: every session includes at least 2 treadmill intervals, and " \
-               "runs are usually longer than the 500m Deka Fit zone (800m–mile repeats " \
-               "are common). Engine-building blocks on treadmill should appear regularly " \
-               "(400m repeats, mile repeats, 4min hard efforts)."
+        notes: "MANDATORY: every session includes at least 2 treadmill intervals. The Deka " \
+               "Mile race is 10 × 160m runs alternating with 10 functional zones — sessions " \
+               "reflect this with HIGH-ROUND-COUNT short run repeats (10-12 × 160m / 200m, " \
+               "or 6-8 × 400m). MAXIMUM individual run distance is 400m — never longer. " \
+               "Engine-building blocks favour short fast repeats over long efforts."
       }.freeze
 
       MOVEMENT_VOCABULARY = <<~VOCAB.freeze
-        Run blocks:        Treadmill 400m–mile repeats, 4min hard efforts, tempo runs
+        Run blocks:        Treadmill 160m / 200m / 400m repeats (10-12 rounds typical), short sprint intervals — never longer than 400m per repeat
         Stations:          RAM Reverse Lunges, Row, Box Jump, SkiErg, Farmer's Carry, Air Bike,
                            Dead Ball Yoke Over, Sled Push/Pull, RAM Weighted Burpees
       VOCAB
@@ -50,15 +51,15 @@ module LLMContext
           ]
         },
         {
-          name: "Death by Threes",
-          goal: "Three mile-repeat treadmill rounds, a single-exercise Med Ball Sit-up Throw EMOM, then a heavy deadlift accessory.",
+          name: "Death by Tens",
+          goal: "Ten 200m race-pace treadmill repeats, a single-exercise Med Ball Sit-up Throw EMOM, then a heavy deadlift accessory.",
           duration_mins: 45,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "treadmill" } ] },
-            { name: "The Long Way Round", format: "rounds", rounds: 3, rest_secs: 120,
+            { name: "Race Pace", format: "rounds", rounds: 10, rest_secs: 60,
               exercises: [
-                { name: "Run", distance_m: 1600, notes: "hard pace", equipment: "treadmill" }
+                { name: "Run", distance_m: 200, notes: "race pace", equipment: "treadmill" }
               ] },
             { name: "Throw Down", format: "emom", duration_mins: 10, rest_secs: 0,
               exercises: [
@@ -74,7 +75,7 @@ module LLMContext
         },
         {
           name: "Tuesday's Regret",
-          goal: "30/30 treadmill engine, compromised 800m runs, a rotating continuous circuit on row, RAM reverse lunges and box jump, then a hundred burpee finisher.",
+          goal: "30/30 treadmill engine, compromised 400m runs, a rotating continuous circuit on row, RAM reverse lunges and box jump, then a hundred burpee finisher.",
           duration_mins: 60,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
@@ -83,10 +84,10 @@ module LLMContext
               exercises: [
                 { name: "Run", duration_s: 30, notes: "hard pace", equipment: "treadmill" }
               ] },
-            { name: "Pavement Pounder", format: "rounds", rounds: 4, rest_secs: 60,
+            { name: "Pavement Pounder", format: "rounds", rounds: 6, rest_secs: 60,
               exercises: [
-                { name: "Compromised Run", distance_m: 800, equipment: "treadmill" },
-                { name: "Med Ball Sit-up Throw", reps: 30, equipment: "wall_ball" },
+                { name: "Compromised Run", distance_m: 400, equipment: "treadmill" },
+                { name: "Med Ball Sit-up Throw", reps: 20, equipment: "wall_ball" },
                 { name: "Farmer's Carry", distance_m: 30, equipment: "kettlebells" }
               ] },
             { name: "Engine Builder", format: "continuous_circuit", duration_mins: 15,
@@ -105,16 +106,16 @@ module LLMContext
         },
         {
           name: "Stations Stacked",
-          goal: "Compromised 800m running, an alternating EMOM of Box Jump and RAM Reverse Lunges, and a tabata burner to close.",
+          goal: "Compromised 400m running across six rounds, an alternating EMOM of Box Jump and RAM Reverse Lunges, and a tabata burner to close.",
           duration_mins: 45,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
-            { name: "Mile Repeats", format: "rounds", rounds: 4, rest_secs: 60,
+            { name: "Race Repeats", format: "rounds", rounds: 6, rest_secs: 60,
               exercises: [
-                { name: "Compromised Run", distance_m: 800, equipment: "treadmill" },
-                { name: "Med Ball Sit-up Throw", reps: 20, equipment: "wall_ball" },
-                { name: "Farmer's Carry", distance_m: 30, equipment: "kettlebells" }
+                { name: "Compromised Run", distance_m: 400, equipment: "treadmill" },
+                { name: "Med Ball Sit-up Throw", reps: 15, equipment: "wall_ball" },
+                { name: "Farmer's Carry", distance_m: 20, equipment: "kettlebells" }
               ] },
             { name: "Box Cycle", format: "emom", duration_mins: 16, rest_secs: 0, alternating: true,
               exercises: [
@@ -160,27 +161,27 @@ module LLMContext
           ]
         },
         {
-          name: "Mile Descent",
-          goal: "One long mile-broken descending pyramid — 1600m runs between tiers of Med Ball Sit-up Throw, Sled Push and RAM Reverse Lunges, four tiers down.",
+          name: "Sprint Descent",
+          goal: "One long sprint-broken descending pyramid — 400m runs between tiers of Med Ball Sit-up Throw, Sled Push and RAM Reverse Lunges, four tiers down.",
           duration_mins: 60,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
-            { name: "Down the Miles", format: "for_time",
+            { name: "Down the Sprints", format: "for_time",
               exercises: [
-                { name: "Run", distance_m: 1600, equipment: "treadmill" },
+                { name: "Run", distance_m: 400, equipment: "treadmill" },
                 { name: "Med Ball Sit-up Throw", reps: 80, equipment: "wall_ball" },
                 { name: "Sled Push", distance_m: 80, equipment: "sled" },
                 { name: "RAM Reverse Lunges", reps: 80 },
-                { name: "Run", distance_m: 1600, equipment: "treadmill" },
+                { name: "Run", distance_m: 400, equipment: "treadmill" },
                 { name: "Med Ball Sit-up Throw", reps: 60, equipment: "wall_ball" },
                 { name: "Sled Push", distance_m: 60, equipment: "sled" },
                 { name: "RAM Reverse Lunges", reps: 60 },
-                { name: "Run", distance_m: 1600, equipment: "treadmill" },
+                { name: "Run", distance_m: 400, equipment: "treadmill" },
                 { name: "Med Ball Sit-up Throw", reps: 40, equipment: "wall_ball" },
                 { name: "Sled Push", distance_m: 40, equipment: "sled" },
                 { name: "RAM Reverse Lunges", reps: 40 },
-                { name: "Run", distance_m: 1600, equipment: "treadmill" },
+                { name: "Run", distance_m: 400, equipment: "treadmill" },
                 { name: "Med Ball Sit-up Throw", reps: 20, equipment: "wall_ball" },
                 { name: "Sled Push", distance_m: 20, equipment: "sled" },
                 { name: "RAM Reverse Lunges", reps: 20 }
