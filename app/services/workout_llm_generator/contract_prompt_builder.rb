@@ -145,14 +145,31 @@ class WorkoutLLMGenerator
     end
 
     def examples_block
-      json = JSON.pretty_generate(@activity::EXAMPLES.map { |ex| ex.deep_stringify_keys })
+      examples = filtered_examples
+      json = JSON.pretty_generate(examples.map { |ex| ex.deep_stringify_keys })
       <<~EX.strip
-        Three #{@activity::NAME} workouts that show the quality bar and style. Study structure,
+        #{examples.size} #{@activity::NAME} workouts that show the quality bar and style. Study structure,
         exercise selection, format variety, and naming. Create something fresh in the same
         spirit — do not copy.
 
         #{json}
       EX
+    end
+
+    # When the user has requested a specific intensity_style, narrow the
+    # examples shown to the LLM to those matching that intensity. Examples
+    # without an intensity_style tag are flexible — they're included regardless.
+    # If filtering would leave the LLM with zero examples, fall back to all
+    # examples so the prompt doesn't lose its quality bar.
+    def filtered_examples
+      return @activity::EXAMPLES unless @intensity_style.present?
+
+      matched = @activity::EXAMPLES.select do |ex|
+        ex_intensity = ex[:intensity_style]
+        ex_intensity.nil? || ex_intensity.to_s == @intensity_style.to_s
+      end
+
+      matched.presence || @activity::EXAMPLES
     end
 
     # Emits the intensity selection plus the activity's translation of it, when the

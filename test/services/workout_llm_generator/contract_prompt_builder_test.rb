@@ -166,6 +166,27 @@ class WorkoutLLMGenerator::ContractPromptBuilderTest < ActiveSupport::TestCase
     assert_match(%r{<task>\nGenerate a \d+-minute Hyrox session\.\n</task>}, prompt)
   end
 
+  test "filters examples by intensity_style when set, keeping unflagged examples" do
+    # Hyrox has 6 unflagged + 2 low + 2 high examples after the variety expansion
+    high_prompt = build(activity_slug: "hyrox", intensity_style: "high")
+    high_block = high_prompt[/\<examples\>(.*?)\<\/examples\>/m, 1]
+    refute_nil high_block
+    # Should include the 6 unflagged + 2 high-tagged examples, exclude the 2 low ones
+    high_count = high_block.scan(/"goal"\s*:/).length
+    assert_equal 8, high_count, "high request should keep 6 unflagged + 2 high = 8 examples"
+    refute_match(/"Zone Two Engine"/, high_block)
+    refute_match(/"Aerobic Build"/, high_block)
+    assert_match(/"Race Day Test"/, high_block)
+    assert_match(/"Iron & Fire"/, high_block)
+  end
+
+  test "shows all examples when intensity_style is unset" do
+    prompt = build(activity_slug: "hyrox")
+    block = prompt[/\<examples\>(.*?)\<\/examples\>/m, 1]
+    refute_nil block
+    assert_equal 10, block.scan(/"goal"\s*:/).length
+  end
+
   test "task tag uses user_activity_name when provided (free-form typed activity)" do
     prompt = WorkoutLLMGenerator::ContractPromptBuilder.new(
       activity:           LLMContext::Activities.for!("general-fitness"),

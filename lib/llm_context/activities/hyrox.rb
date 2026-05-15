@@ -244,6 +244,126 @@ module LLMContext
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
           ]
+        },
+        {
+          name: "Zone Two Engine",
+          goal: "A long zone 2 run, technique-led light station rounds, then active recovery and Hyrox mobility work — easy aerobic, build the engine, polish the form.",
+          duration_mins: 60,
+          intensity_style: "low",
+          sections: [
+            { name: "Warm-Up", format: "straight", duration_mins: 5,
+              exercises: [
+                { name: "Easy SkiErg + Hyrox mobility prep", duration_s: 300, notes: "90/90 hip switches, ankle circles, thoracic open books, world's greatest stretch", equipment: "ski_erg" }
+              ] },
+            { name: "The Long Way", format: "straight", duration_mins: 30,
+              exercises: [
+                { name: "Run", duration_s: 1800, notes: "conversational pace — nose-breathing where possible, building aerobic base", equipment: "treadmill" }
+              ] },
+            { name: "Technique Stations", format: "rounds", rounds: 4, rest_secs: 20,
+              exercises: [
+                { name: "Wall Balls", reps: 20, notes: "light ball, full squat depth, controlled tempo", equipment: "wall_ball" },
+                { name: "KB Swings", reps: 20, notes: "light kettlebell, hip hinge mechanics, smooth and even", equipment: "kettlebells" },
+                { name: "Farmer's Carry", distance_m: 30, notes: "light load, tall posture, breath stays calm", equipment: "kettlebells" }
+              ] },
+            { name: "Cool-Down", format: "straight", duration_mins: 13,
+              exercises: [
+                { name: "Easy SkiErg", duration_s: 300, notes: "active recovery — conversational pace, breath stays calm", equipment: "ski_erg" },
+                { name: "90/90 Hip Switches", duration_s: 120, notes: "internal and external hip rotation — 60s per side, breath into the rotation" },
+                { name: "Couch Stretch", duration_s: 120, notes: "hip flexor opener — 60s per side, posterior pelvic tilt" },
+                { name: "Thoracic Open Books", duration_s: 120, notes: "T-spine rotation for rowing and wall ball posture — 60s per side" },
+                { name: "Ankle Circles + Calf Stretch", duration_s: 120, notes: "dorsiflexion prep for stride and sled push — both ankles" }
+              ] }
+          ]
+        },
+        {
+          name: "Aerobic Build",
+          goal: "A long steady row, low-effort AMRAP at sustainable pace, slow technique-focused goblet squats, then mobility and active recovery.",
+          duration_mins: 60,
+          intensity_style: "low",
+          sections: [
+            { name: "Warm-Up", format: "straight", duration_mins: 5,
+              exercises: [
+                { name: "Easy row + Hyrox mobility prep", duration_s: 300, notes: "cat-cow, ankle circles, kneeling hip flexor stretch, dynamic lunges", equipment: "rowing_machine" }
+              ] },
+            { name: "Steady State", format: "straight", duration_mins: 25,
+              exercises: [
+                { name: "Row", duration_s: 1500, notes: "easy aerobic pace — sustain the same effort the whole way, breath stays calm", equipment: "rowing_machine" }
+              ] },
+            { name: "Easy AMRAP", format: "amrap", duration_mins: 12,
+              exercises: [
+                { name: "Wall Balls", reps: 20, notes: "light ball, controlled tempo, full range", equipment: "wall_ball" },
+                { name: "Walking Lunges", reps: 20, notes: "deliberate steps, focus on knee tracking", equipment: "bodyweight" },
+                { name: "Burpee Broad Jumps", reps: 10, notes: "smooth — quality over speed, soft landings", equipment: "bodyweight" }
+              ] },
+            { name: "Slow Goblet", format: "rounds", rounds: 4, rest_secs: 30,
+              exercises: [
+                { name: "Goblet Squat", reps: 12, notes: "light bell, 3-second eccentric, focus on form and depth", equipment: "kettlebells" }
+              ] },
+            { name: "Cool-Down", format: "straight", duration_mins: 8,
+              exercises: [
+                { name: "Easy SkiErg", duration_s: 240, notes: "active recovery — conversational pace", equipment: "ski_erg" },
+                { name: "Foam Roller Thoracic Extensions", duration_s: 90, notes: "T-spine opening over a foam roller — slow controlled extensions" },
+                { name: "World's Greatest Stretch", duration_s: 120, notes: "lunge with rotation — both sides, hold each rep" },
+                { name: "Hip CARs", duration_s: 90, notes: "controlled articular rotations — full active hip circles, both legs" }
+              ] }
+          ]
+        },
+        {
+          name: "Race Day Test",
+          goal: "Heavy deadlift triples, all-out 200m sprint repeats, heavy sled work, then a tabata finisher. Full recovery between every set — every effort is maximal.",
+          duration_mins: 45,
+          intensity_style: "high",
+          sections: [
+            { name: "Warm-Up", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "treadmill" } ] },
+            { name: "Heavy Pull", format: "rounds", intensity_style: "high", rounds: 5, rest_secs: 180,
+              exercises: [
+                { name: "Deadlift", reps: 3, notes: "near-max — last rep should be a fight", equipment: "barbell" }
+              ] },
+            { name: "Sprint Repeats", format: "rounds", rounds: 8, rest_secs: 90,
+              exercises: [
+                { name: "Run", distance_m: 200, notes: "all-out — every rep is maximum effort", equipment: "treadmill" }
+              ] },
+            { name: "Heavy Sled", format: "rounds", intensity_style: "high", rounds: 4, rest_secs: 120,
+              exercises: [
+                { name: "Sled Push", distance_m: 20, notes: "heaviest load you can drive 20m without breaking", equipment: "sled" }
+              ] },
+            { name: "Tabata Cooker", format: "tabata",
+              exercises: [
+                { name: "Burpees", equipment: "bodyweight" },
+                { name: "KB Swings", equipment: "kettlebells" }
+              ] },
+            { name: "Cool-Down", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
+          ]
+        },
+        {
+          name: "Iron & Fire",
+          goal: "Heavy push press, ski sprint repeats, all-out sled sprints, then a tabata burner. Short, sharp, full-recovery work.",
+          duration_mins: 45,
+          intensity_style: "high",
+          sections: [
+            { name: "Warm-Up", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
+            { name: "Heavy Press", format: "rounds", intensity_style: "high", rounds: 5, rest_secs: 180,
+              exercises: [
+                { name: "Push Press", reps: 3, notes: "near-max load — full recovery between sets", equipment: "barbell" }
+              ] },
+            { name: "Ski Sprints", format: "rounds", rounds: 6, rest_secs: 90,
+              exercises: [
+                { name: "SkiErg", duration_s: 30, notes: "all-out — every 30s is maximum, full recovery between", equipment: "ski_erg" }
+              ] },
+            { name: "Sled Sprints", format: "rounds", rounds: 6, rest_secs: 90,
+              exercises: [
+                { name: "Sled Push", distance_m: 15, notes: "sprint with the sled — heavy but fast, no walking", equipment: "sled" }
+              ] },
+            { name: "Tabata Burner", format: "tabata",
+              exercises: [
+                { name: "Box Jump Burpees", equipment: "bodyweight" }
+              ] },
+            { name: "Cool-Down", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
+          ]
         }
       ].freeze
     end
