@@ -32,7 +32,7 @@ module LLMContext
       EXAMPLES = [
         {
           name: "Quick One",
-          goal: "6 × 400m treadmill repeats then a single-exercise walking-lunge EMOM to cook the legs.",
+          goal: "6 × 400m treadmill repeats then a single-exercise RAM Reverse Lunges EMOM to cook the legs.",
           duration_mins: 30,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 3,
@@ -41,9 +41,9 @@ module LLMContext
               exercises: [
                 { name: "Run", distance_m: 400, notes: "hard pace", equipment: "treadmill" }
               ] },
-            { name: "Walking Death", format: "emom", duration_mins: 10, rest_secs: 0,
+            { name: "Lunge March", format: "emom", duration_mins: 10, rest_secs: 0,
               exercises: [
-                { name: "Walking Lunges", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "bodyweight" }
+                { name: "RAM Reverse Lunges", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "bodyweight" }
               ] },
             { name: "Cool-Down", format: "straight", duration_mins: 2,
               exercises: [ { name: "Dynamic stretches", notes: "5 deep breaths" } ] }
@@ -51,7 +51,7 @@ module LLMContext
         },
         {
           name: "Death by Threes",
-          goal: "Three mile-repeat treadmill rounds, a single-exercise wall-ball EMOM, then a heavy deadlift accessory.",
+          goal: "Three mile-repeat treadmill rounds, a single-exercise Med Ball Sit-up Throw EMOM, then a heavy deadlift accessory.",
           duration_mins: 45,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
@@ -60,9 +60,9 @@ module LLMContext
               exercises: [
                 { name: "Run", distance_m: 1600, notes: "hard pace", equipment: "treadmill" }
               ] },
-            { name: "Wall Builder", format: "emom", duration_mins: 10, rest_secs: 0,
+            { name: "Throw Down", format: "emom", duration_mins: 10, rest_secs: 0,
               exercises: [
-                { name: "Wall Balls", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "wall_ball" }
+                { name: "Med Ball Sit-up Throw", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "wall_ball" }
               ] },
             { name: "Iron Lift", format: "rounds", intensity_style: "high", rounds: 4, rest_secs: 120,
               exercises: [
@@ -74,7 +74,7 @@ module LLMContext
         },
         {
           name: "Tuesday's Regret",
-          goal: "30/30 treadmill engine, compromised 800m runs, a rotating continuous circuit on row, wall balls and KB swings, then a hundred burpee finisher.",
+          goal: "30/30 treadmill engine, compromised 800m runs, a rotating continuous circuit on row, RAM reverse lunges and box jump, then a hundred burpee finisher.",
           duration_mins: 60,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
@@ -86,14 +86,14 @@ module LLMContext
             { name: "Pavement Pounder", format: "rounds", rounds: 4, rest_secs: 60,
               exercises: [
                 { name: "Compromised Run", distance_m: 800, equipment: "treadmill" },
-                { name: "Wall Balls", reps: 30, equipment: "wall_ball" },
+                { name: "Med Ball Sit-up Throw", reps: 30, equipment: "wall_ball" },
                 { name: "Farmer's Carry", distance_m: 30, equipment: "kettlebells" }
               ] },
             { name: "Engine Builder", format: "continuous_circuit", duration_mins: 15,
               exercises: [
                 { name: "Rowing Machine", equipment: "rowing_machine" },
-                { name: "Wall Balls", equipment: "wall_ball" },
-                { name: "KB Swings", equipment: "kettlebells" }
+                { name: "RAM Reverse Lunges", equipment: "bodyweight" },
+                { name: "Box Jump", equipment: "bodyweight" }
               ] },
             { name: "The Centurion", format: "hundred",
               exercises: [
