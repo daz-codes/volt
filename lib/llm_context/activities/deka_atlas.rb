@@ -200,6 +200,124 @@ module LLMContext
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
           ]
+        },
+        {
+          name: "Strongman Engine",
+          goal: "A long continuous zone 2 ski, a hip mobility flow, light strongman technique stations, then a quiet cool-down — mobility woven into the main session.",
+          duration_mins: 60,
+          intensity_style: "low",
+          sections: [
+            { name: "Warm-Up", format: "straight", duration_mins: 5,
+              exercises: [
+                { name: "Easy row + Atlas mobility prep", duration_s: 300, notes: "90/90 hip switches, ankle circles, thoracic open books, world's greatest stretch", equipment: "rowing_machine" }
+              ] },
+            { name: "Long SkiErg", format: "straight", duration_mins: 25,
+              exercises: [
+                { name: "SkiErg", duration_s: 1500, notes: "conversational pace — nose-breathing where possible, building aerobic engine", equipment: "ski_erg" }
+              ] },
+            { name: "Hip Mobility", format: "straight", duration_mins: 5,
+              exercises: [
+                { name: "90/90 Hip Switches", duration_s: 120, notes: "60s per side, smooth controlled transitions" },
+                { name: "Couch Stretch", duration_s: 120, notes: "60s per side, square hips, breath stays calm" },
+                { name: "Hip CARs", duration_s: 60, notes: "both legs, full controlled range of motion" }
+              ] },
+            { name: "Technique Stations", format: "rounds", rounds: 3, rest_secs: 25,
+              exercises: [
+                { name: "Surrender Lunges", reps: 15, notes: "light DB, deliberate descent, focus on knee tracking", equipment: "dumbbells" },
+                { name: "Weighted Sit-ups", reps: 20, notes: "light load, smooth controlled tempo, full range", equipment: "dumbbells" },
+                { name: "DB Bear Crawl", distance_m: 20, notes: "light DBs, slow controlled, hips low and stable", equipment: "dumbbells" }
+              ] },
+            { name: "Cool-Down", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
+          ]
+        },
+        {
+          name: "Easy Strongman",
+          goal: "A steady row, a T-spine mobility flow, an easy circuit with mobility woven into each round, then a quiet cool-down.",
+          duration_mins: 60,
+          intensity_style: "low",
+          sections: [
+            { name: "Warm-Up", format: "straight", duration_mins: 5,
+              exercises: [
+                { name: "Easy bike + Atlas mobility prep", duration_s: 300, notes: "thoracic open books, cat-cow, dynamic lunges", equipment: "assault_bike" }
+              ] },
+            { name: "Steady Row", format: "straight", duration_mins: 22,
+              exercises: [
+                { name: "Row", duration_s: 1320, notes: "easy aerobic pace — sustain the same effort the whole way, breath stays calm", equipment: "rowing_machine" }
+              ] },
+            { name: "T-spine Flow", format: "straight", duration_mins: 4,
+              exercises: [
+                { name: "Foam Roller Thoracic Extensions", duration_s: 120, notes: "slow controlled extensions over a foam roller" },
+                { name: "Thoracic Open Books", duration_s: 60, notes: "T-spine rotation — 30s per side, breath into each rep" },
+                { name: "Cat-Cow", duration_s: 60, notes: "spinal articulation, breath into each phase" }
+              ] },
+            { name: "Easy Circuit", format: "rounds", rounds: 4, rest_secs: 30,
+              exercises: [
+                { name: "Goblet Squat", reps: 12, notes: "light KB, 3-second eccentric, focus on form and depth", equipment: "kettlebells" },
+                { name: "Wall Slides", duration_s: 60, notes: "shoulder and T-spine mobility — slow controlled overhead reach" },
+                { name: "DB Shoulder to Overhead Press", reps: 12, notes: "light DBs, smooth pressing, controlled tempo", equipment: "dumbbells" }
+              ] },
+            { name: "Cool-Down", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
+          ]
+        },
+        {
+          name: "Atlas Power",
+          goal: "Heavy barbell thruster triples, all-out jump rope sprints, heavy sled work, then a tabata finisher. Full recovery between every set.",
+          duration_mins: 45,
+          intensity_style: "high",
+          sections: [
+            { name: "Warm-Up", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "rowing_machine" } ] },
+            { name: "Heavy Thrusters", format: "rounds", intensity_style: "high", rounds: 5, rest_secs: 180,
+              exercises: [
+                { name: "Barbell Thrusters", reps: 3, notes: "near-max — last rep should be a fight", equipment: "barbell" }
+              ] },
+            { name: "Jump Rope Sprints", format: "rounds", rounds: 6, rest_secs: 90,
+              exercises: [
+                { name: "Jump Rope Single Unders", duration_s: 30, notes: "max speed — every 30s is maximum, full recovery between", equipment: "jump_rope" }
+              ] },
+            { name: "Heavy Sled", format: "rounds", intensity_style: "high", rounds: 4, rest_secs: 120,
+              exercises: [
+                { name: "Sled Push", distance_m: 20, notes: "heaviest load you can drive 20m without breaking", equipment: "sled" }
+              ] },
+            { name: "Tabata Cooker", format: "tabata",
+              exercises: [
+                { name: "Bar-Facing Burpees Over Bar", equipment: "barbell" },
+                { name: "DB Devil Press", equipment: "dumbbells" }
+              ] },
+            { name: "Cool-Down", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
+          ]
+        },
+        {
+          name: "Strongman Fire",
+          goal: "Heavy DB shoulder-to-overhead press, all-out ski sprints, heavy atlas carry sprints, then a tabata burner. Short, sharp, full-recovery work.",
+          duration_mins: 45,
+          intensity_style: "high",
+          sections: [
+            { name: "Warm-Up", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
+            { name: "Heavy Press", format: "rounds", intensity_style: "high", rounds: 5, rest_secs: 180,
+              exercises: [
+                { name: "DB Shoulder to Overhead Press", reps: 5, notes: "near-max heavy DBs — full recovery between sets", equipment: "dumbbells" }
+              ] },
+            { name: "Ski Sprints", format: "rounds", rounds: 6, rest_secs: 90,
+              exercises: [
+                { name: "SkiErg", duration_s: 30, notes: "all-out — every 30s is maximum, full recovery between", equipment: "ski_erg" }
+              ] },
+            { name: "Atlas Carry Sprints", format: "rounds", rounds: 5, rest_secs: 90,
+              exercises: [
+                { name: "Atlas Shoulder to Carry", distance_m: 25, notes: "heavy load — sprint with the carry, no walking", equipment: "sled" }
+              ] },
+            { name: "Tabata Burner", format: "tabata",
+              exercises: [
+                { name: "Surrender Lunges", equipment: "dumbbells" },
+                { name: "Weighted Sit-ups", equipment: "dumbbells" }
+              ] },
+            { name: "Cool-Down", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
+          ]
         }
       ].freeze
     end
