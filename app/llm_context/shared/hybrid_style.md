@@ -86,17 +86,42 @@ When the request carries an `intensity_style` (low / medium / high), adjust the 
 
 **Session shape (60 min)**: 5 min warm-up + ONE 22-28 min continuous cardio block + 1-2 short mobility flow sections (3-5 min each) woven into the main session + 8-12 min light technique stations + 8-12 min cool-down. Around 4-6 main blocks total — mobility flows count as their own blocks.
 
-**Cardio — the hard rule**: long zone 2 cardio MUST use `format: straight` with `duration_mins` set to the total length. **NEVER use `format: rounds` for the main cardio block at low intensity.** Multiple rounds of long cardio is forbidden regardless of the per-round duration:
-- BAD: `3 rounds × Run 20min` → 60 min of cardio, no room for anything else.
-- BAD: `3 rounds × Run 28min` → 84 min of cardio in a 60-min session.
-- BAD: any rounds block whose total per-round work exceeds ~5 min for a low-intensity main cardio piece.
-- GOOD: `format: straight, duration_mins: 25, exercises: [{ name: "Run", duration_s: 1500, notes: "conversational pace" }]`.
+**Cardio — the hard rule**: long zone 2 cardio MUST use `format: straight` with `duration_mins` set to the total length. **NEVER use `format: rounds` for the main cardio block at low intensity.** Whenever you write a long cardio section at low intensity, set `format: "straight"` and OMIT the `rounds` field entirely.
 
-The Long Run / Steady Row pattern is always one continuous block. Notes describe the pace: `conversational pace — nose-breathing where possible, building aerobic engine`.
+BAD (a `rounds` block — wrong format, multiplies the duration):
+```
+{ "format": "rounds", "rounds": 3, "exercises": [{ "name": "Run", "duration_s": 1440 }] }
+```
+That renders as `3 rounds × 24min Run = 72 min of cardio`. Wrong.
+
+GOOD (a single `straight` block):
+```
+{ "format": "straight", "duration_mins": 24, "exercises": [{ "name": "Run", "duration_s": 1440, "notes": "conversational pace — nose-breathing where possible, building aerobic engine" }] }
+```
+That renders as `Long Run · 24 min`. Correct.
+
+The Long Run / Steady Row pattern is always one `straight` block, regardless of how long the run is.
 
 **Mobility woven into the main session — LOW INTENSITY ONLY.** Mobility is part of the prescribed work alongside the cardio, not just an end-of-session add-on. Two valid shapes:
 
-1. **Standalone mobility flow sections** between cardio and stations, or between stations and cool-down. `format: straight` with `duration_mins: 3-5`, listing 2-4 named drills with `duration_s` per drill. Name the section after the area (e.g. "Hip Mobility", "T-spine Flow", "Ankle Prep") — NOT "recovery" or "reset" (those are banned by the global mid-workout recovery rule, which applies to medium/high; LOW intensity is exempt because mobility IS the work).
+1. **Standalone mobility flow sections** between cardio and stations, or between stations and cool-down. **MUST use `format: "straight"`, NEVER `format: "rounds"`** — a mobility flow is ONE block that lists multiple drills, each with its own `duration_s`. Set the section's `duration_mins` to the total. Name the section after the area (e.g. "Hip Mobility", "T-spine Flow", "Ankle Prep") — NOT "recovery" or "reset" (those are banned by the global mid-workout recovery rule, which applies to medium/high; LOW intensity is exempt because mobility IS the work).
+
+BAD (`format: rounds` — wrong, multiplies the durations):
+```
+{ "format": "rounds", "rounds": 3, "exercises": [
+  { "name": "90/90 Hip Switches", "duration_s": 90 },
+  { "name": "Couch Stretch", "duration_s": 120 }
+] }
+```
+
+GOOD (`format: straight` — one block, drills run in sequence):
+```
+{ "format": "straight", "duration_mins": 4, "exercises": [
+  { "name": "90/90 Hip Switches", "duration_s": 90, "notes": "45s per side" },
+  { "name": "Couch Stretch", "duration_s": 120, "notes": "60s per side" },
+  { "name": "Hip CARs", "duration_s": 90, "notes": "both legs" }
+] }
+```
 
 2. **Mobility moves WITHIN station rounds**: include one duration-based mobility exercise alongside the rep-based functional movements. Duration holds are exempt from the same-rep rule. Example: `4 rounds × Wall Balls 20 (light) + 90/90 Hip Switch 60s + KB Swings 20 (light)`.
 
