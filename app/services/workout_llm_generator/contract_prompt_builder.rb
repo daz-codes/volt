@@ -24,12 +24,11 @@ class WorkoutLLMGenerator
       the same spirit:
 
       Eye of the Tiger · Gonna Fly Now · Hearts on Fire · Burning Heart · No Easy Way Out ·
-      Going the Distance · Risin' Up · Thrill of the Fight · Hangin' Tough · Stalked in the
-      Night · Training Montage · Living in America · Danger Zone · Mighty Wings · Take My
-      Breath · Highway to the Zone · Need for Speed · Playing with the Boys · You're the Best ·
-      Moment of Truth · Glory of Love · Cross My Heart · Sweep the Leg · Crane Kick · Wax On
-      Wax Off · Meet Me Halfway · Winner Takes It All · Fight to Survive · The Touch · Push
-      the Limit
+      Going the Distance · Risin' Up · Thrill of the Fight · Hangin' Tough · Training Montage ·
+      Living in America · Danger Zone · Mighty Wings · Take My Breath · Highway to the Zone ·
+      Need for Speed · Playing with the Boys · You're the Best · Moment of Truth · Glory of
+      Love · Cross My Heart · Sweep the Leg · Crane Kick · Wax On Wax Off · Meet Me Halfway ·
+      Winner Takes It All · Fight to Survive · The Touch · Push the Limit
 
       Use a different name for every section in a workout — never repeat. Across sessions,
       rotate through the list so the same names don't appear back to back.
