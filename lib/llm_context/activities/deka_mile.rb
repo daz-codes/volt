@@ -18,17 +18,19 @@ module LLMContext
         finisher:          :optional,
         core:              :optional,
         notes: "The Deka Mile race is 10 × 160m runs alternating with 10 functional zones. " \
-               "**COMPROMISED RUNNING IS THE HEADLINE SHAPE** — even short race-pace runs " \
-               "(160m / 200m / 400m) should usually be paired with 1-2 functional exercises " \
-               "AFTER each run, making the round compromised (e.g. `10 rounds: 200m Run + " \
-               "10 Med Ball Sit-up Throws + 10 RAM Reverse Lunges`). Bare run repeats with " \
-               "nothing after are the exception, not the default — reserve them for ONE " \
-               "session out of 4-5 (the pure race-pace test). " \
-               "Run shapes: (a) RACE-PACE compromised — 8-12 rounds × 160m/200m run + 2 " \
-               "short functional exercises (the primary shape); (b) THRESHOLD compromised — " \
-               "3-4 rounds × 500m run + 2-3 functional exercises (occasional, for distance); " \
-               "(c) MIXED compromised — 5-6 rounds × 400m run + 2-3 exercises. MAXIMUM " \
-               "individual run distance is 500m. " \
+               "**COMPROMISED RUNNING IS THE HEADLINE SHAPE** — but compromised runs in Deka " \
+               "Mile are STRICTLY ≤ 200m. Nobody runs more than 200m at a time on race day " \
+               "so compromised runs reflect that. Canonical shape: `10 rounds: 200m Run + " \
+               "1-2 functional exercises` (e.g. `10 rounds: 200m Run + 10 Med Ball Sit-up " \
+               "Throws + 10 RAM Reverse Lunges`). " \
+               "Run shape options: (a) COMPROMISED race-pace — 8-12 rounds × 160m or 200m " \
+               "run + 1-2 short functional exercises (the primary shape, ~70% of sessions " \
+               "that include running); (b) PURE race-pace test — 10 × 160m bare sprints, " \
+               "no station after each (the ONE bare-sprint session out of every 4-5); " \
+               "(c) THRESHOLD bare intervals — 4-5 × 500m, NOT compromised, just bare runs " \
+               "with active rest (occasional, for distance and tempo). " \
+               "**Compromised runs NEVER exceed 200m.** Bare interval runs can go up to 500m " \
+               "but they're not the headline shape — they're an occasional change of pace. " \
                "**MACHINE CARDIO IS ALSO COMPROMISED** — Air Bike, SkiErg, and Row blocks " \
                "should pair the machine with 1-2 functional exercises per round, NOT stand " \
                "alone. **Twin Machines** (Air Bike + SkiErg paired in one round) is a great " \
@@ -39,8 +41,8 @@ module LLMContext
                "**Vary where the run block sits in the session** — not always first. Sometimes " \
                "lead with an EMOM, alt EMOM, or strength accessory, THEN do the compromised " \
                "runs. " \
-               "Don't default to 10 × 200m every session — vary round count, distance, " \
-               "exercise pairings, position, and sometimes machines only."
+               "Don't default to the same shape every session — vary round count, exercise " \
+               "pairings, position, and sometimes machines only."
       }.freeze
 
       MOVEMENT_VOCABULARY = <<~VOCAB.freeze
@@ -71,8 +73,8 @@ module LLMContext
           ]
         },
         {
-          name: "Half Mile Compromised",
-          goal: "Open with a Med Ball Sit-up Throw EMOM, then three compromised 500m rounds paired with sled and lunges, then heavy deadlifts to close. Occasional longer-run shape.",
+          name: "Half Mile Threshold",
+          goal: "Open with a Med Ball Sit-up Throw EMOM, then four bare 500m threshold runs (no stations — occasional longer-run shape, not compromised), then heavy deadlifts to close.",
           duration_mins: 45,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
@@ -81,11 +83,9 @@ module LLMContext
               exercises: [
                 { name: "Med Ball Sit-up Throw", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "wall_ball" }
               ] },
-            { name: "Long Compromised", format: "rounds", rounds: 3, rest_secs: 90,
+            { name: "Threshold", format: "rounds", rounds: 4, rest_secs: 120,
               exercises: [
-                { name: "Compromised Run", distance_m: 500, notes: "threshold pace — sustained hard but not all-out", equipment: "treadmill" },
-                { name: "Sled Push", distance_m: 20, notes: "race weight — full competition sled", equipment: "sled" },
-                { name: "RAM Reverse Lunges", reps: 20 }
+                { name: "Run", distance_m: 500, notes: "threshold pace — sustained hard but not all-out, 2 min easy jog rest between rounds", equipment: "treadmill" }
               ] },
             { name: "Iron Lift", format: "rounds", intensity_style: "high", rounds: 4, rest_secs: 120,
               exercises: [
@@ -108,9 +108,9 @@ module LLMContext
               ] },
             { name: "Pavement Pounder", format: "rounds", rounds: 6, rest_secs: 60,
               exercises: [
-                { name: "Compromised Run", distance_m: 400, equipment: "treadmill" },
-                { name: "Med Ball Sit-up Throw", reps: 20, equipment: "wall_ball" },
-                { name: "Farmer's Carry", distance_m: 30, equipment: "kettlebells" }
+                { name: "Compromised Run", distance_m: 200, equipment: "treadmill" },
+                { name: "Med Ball Sit-up Throw", reps: 12, equipment: "wall_ball" },
+                { name: "Farmer's Carry", distance_m: 20, equipment: "kettlebells" }
               ] },
             { name: "Engine Builder", format: "continuous_circuit", duration_mins: 15,
               exercises: [
@@ -135,9 +135,9 @@ module LLMContext
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
             { name: "Race Repeats", format: "rounds", rounds: 6, rest_secs: 60,
               exercises: [
-                { name: "Compromised Run", distance_m: 400, equipment: "treadmill" },
-                { name: "Med Ball Sit-up Throw", reps: 15, equipment: "wall_ball" },
-                { name: "Farmer's Carry", distance_m: 20, equipment: "kettlebells" }
+                { name: "Compromised Run", distance_m: 200, equipment: "treadmill" },
+                { name: "Med Ball Sit-up Throw", reps: 10, equipment: "wall_ball" },
+                { name: "Farmer's Carry", distance_m: 15, equipment: "kettlebells" }
               ] },
             { name: "Box Cycle", format: "emom", duration_mins: 16, rest_secs: 0, alternating: true,
               exercises: [

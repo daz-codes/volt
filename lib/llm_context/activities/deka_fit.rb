@@ -17,9 +17,10 @@ module LLMContext
         cool_down:         :full_body_stretch,
         finisher:          :optional,
         core:              :optional,
-        notes: "MANDATORY: every session includes at least 2 treadmill running intervals " \
-               "(500m–1km each) placed between station blocks. Stations mirror the race: " \
-               "RAM Reverse Lunges, Row, Box Jump, Med Ball Sit-up Throw, SkiErg, " \
+        notes: "MOST sessions include treadmill running intervals (200m–500m each) placed " \
+               "between station blocks. **Compromised runs are STRICTLY ≤ 500m** — never " \
+               "longer, because race-day Deka Fit run zones are 500m. Stations mirror the " \
+               "race: RAM Reverse Lunges, Row, Box Jump, Med Ball Sit-up Throw, SkiErg, " \
                "Farmer's Carry, Air Bike, Dead Ball Yoke Over, Sled Push/Pull, Weighted " \
                "Burpees. When race_simulation? is true the builder sets finisher: :required " \
                "and the session covers all ten zones. The race stations remain the headline " \
