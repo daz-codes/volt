@@ -17,6 +17,23 @@ class WorkoutLLMGenerator
         finisher one day, a hundred the next.
       - Pick punchy original section names — never reuse the example names directly.
 
+      **Section naming style**: draw section names from 80s action-film anthems and training
+      montage songs — Rocky, Top Gun, Karate Kid, Bloodsport, Over the Top, Transformers,
+      Scarface, No Retreat No Surrender, and the like. Use song titles, lyric fragments, or
+      iconic film lines (2-4 words, punchy). Pull from this list — and invent your own in
+      the same spirit:
+
+      Eye of the Tiger · Gonna Fly Now · Hearts on Fire · Burning Heart · No Easy Way Out ·
+      Going the Distance · Risin' Up · Thrill of the Fight · Hangin' Tough · Stalked in the
+      Night · Training Montage · Living in America · Danger Zone · Mighty Wings · Take My
+      Breath · Highway to the Zone · Need for Speed · Playing with the Boys · You're the Best ·
+      Moment of Truth · Glory of Love · Cross My Heart · Sweep the Leg · Crane Kick · Wax On
+      Wax Off · Meet Me Halfway · Winner Takes It All · Fight to Survive · The Touch · Push
+      the Limit
+
+      Use a different name for every section in a workout — never repeat. Across sessions,
+      rotate through the list so the same names don't appear back to back.
+
       Be the coach the athlete remembers. Lean into creativity, not pattern repetition.
     ROLE
 
