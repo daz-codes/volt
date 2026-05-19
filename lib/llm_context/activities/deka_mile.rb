@@ -18,14 +18,20 @@ module LLMContext
         finisher:          :optional,
         core:              :optional,
         notes: "The Deka Mile race is 10 × 160m runs alternating with 10 functional zones. " \
-               "MOST sessions include treadmill running (the race shape) but a session can " \
-               "skip running entirely once in a while and build the engine on Air Bike + " \
-               "SkiErg + Rower instead — variety matters. Run shapes (rotate across sessions): " \
-               "(a) RACE-PACE short repeats — 10-12 × 160m / 200m, the primary shape for " \
-               "race-pace work; (b) THRESHOLD longer repeats — 4-5 × 500m, occasionally used " \
-               "for tempo and distance accumulation; (c) MIXED — 6-8 × 400m. MAXIMUM " \
-               "individual run distance is 500m. Don't default to 10 × 200m every session — " \
-               "vary the round count and distance, and sometimes use machines only."
+               "Run shapes (rotate across sessions): (a) RACE-PACE short repeats — 10-12 × " \
+               "160m / 200m, the primary shape for race-pace work; (b) THRESHOLD longer " \
+               "repeats — 4-5 × 500m, occasionally used for tempo and distance accumulation; " \
+               "(c) MIXED — 6-8 × 400m. MAXIMUM individual run distance is 500m. " \
+               "**Roughly 1 in 3 sessions should skip running entirely** and build the engine " \
+               "on Air Bike + SkiErg + Rower combinations instead — the athlete needs " \
+               "non-treadmill engine work too, and machine cardio reduces impact on heavy " \
+               "training weeks. " \
+               "**Vary where the run block sits in the session** — not always first. Sometimes " \
+               "lead with an EMOM, alt EMOM, or strength accessory, THEN do the runs. " \
+               "Sometimes put runs in the middle, sometimes at the end. Don't default to " \
+               "'warm-up → runs → everything else' every workout. " \
+               "Don't default to 10 × 200m every session — vary the round count, distance, " \
+               "position, and sometimes use machines only."
       }.freeze
 
       MOVEMENT_VOCABULARY = <<~VOCAB.freeze
@@ -38,18 +44,18 @@ module LLMContext
       EXAMPLES = [
         {
           name: "Quick One",
-          goal: "6 × 400m treadmill repeats then a single-exercise RAM Reverse Lunges EMOM to cook the legs.",
+          goal: "Open with a RAM Reverse Lunges EMOM to pre-fatigue the legs, then 6 × 400m treadmill repeats on tired legs.",
           duration_mins: 30,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 3,
-              exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 180, equipment: "treadmill" } ] },
-            { name: "Mile High", format: "rounds", rounds: 6, rest_secs: 60,
-              exercises: [
-                { name: "Run", distance_m: 400, notes: "hard pace", equipment: "treadmill" }
-              ] },
+              exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 180, equipment: "rowing_machine" } ] },
             { name: "Lunge March", format: "emom", duration_mins: 10, rest_secs: 0,
               exercises: [
                 { name: "RAM Reverse Lunges", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "bodyweight" }
+              ] },
+            { name: "Mile High", format: "rounds", rounds: 6, rest_secs: 60,
+              exercises: [
+                { name: "Run", distance_m: 400, notes: "hard pace — legs are already cooked from the EMOM", equipment: "treadmill" }
               ] },
             { name: "Cool-Down", format: "straight", duration_mins: 2,
               exercises: [ { name: "Dynamic stretches", notes: "5 deep breaths" } ] }
@@ -57,18 +63,18 @@ module LLMContext
         },
         {
           name: "Half Mile Repeats",
-          goal: "Four longer 500m threshold repeats with active rest, a single-exercise Med Ball Sit-up Throw EMOM, then a heavy deadlift accessory.",
+          goal: "Open with a Med Ball Sit-up Throw EMOM, then four 500m threshold runs on tired core, then heavy deadlifts to close.",
           duration_mins: 45,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
-              exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "treadmill" } ] },
-            { name: "Threshold", format: "rounds", rounds: 4, rest_secs: 120,
-              exercises: [
-                { name: "Run", distance_m: 500, notes: "threshold pace — sustained hard but not all-out, 2 min easy jog between rounds", equipment: "treadmill" }
-              ] },
+              exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
             { name: "Throw Down", format: "emom", duration_mins: 10, rest_secs: 0,
               exercises: [
                 { name: "Med Ball Sit-up Throw", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "wall_ball" }
+              ] },
+            { name: "Threshold", format: "rounds", rounds: 4, rest_secs: 120,
+              exercises: [
+                { name: "Run", distance_m: 500, notes: "threshold pace — sustained hard but not all-out, 2 min easy jog between rounds", equipment: "treadmill" }
               ] },
             { name: "Iron Lift", format: "rounds", intensity_style: "high", rounds: 4, rest_secs: 120,
               exercises: [
