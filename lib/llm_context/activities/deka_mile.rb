@@ -17,15 +17,20 @@ module LLMContext
         cool_down:         :full_body_stretch,
         finisher:          :optional,
         core:              :optional,
-        notes: "MANDATORY: every session includes at least 2 treadmill intervals. The Deka " \
-               "Mile race is 10 × 160m runs alternating with 10 functional zones — sessions " \
-               "reflect this with HIGH-ROUND-COUNT short run repeats (10-12 × 160m / 200m, " \
-               "or 6-8 × 400m). MAXIMUM individual run distance is 400m — never longer. " \
-               "Engine-building blocks favour short fast repeats over long efforts."
+        notes: "The Deka Mile race is 10 × 160m runs alternating with 10 functional zones. " \
+               "MOST sessions include treadmill running (the race shape) but a session can " \
+               "skip running entirely once in a while and build the engine on Air Bike + " \
+               "SkiErg + Rower instead — variety matters. Run shapes (rotate across sessions): " \
+               "(a) RACE-PACE short repeats — 10-12 × 160m / 200m, the primary shape for " \
+               "race-pace work; (b) THRESHOLD longer repeats — 4-5 × 500m, occasionally used " \
+               "for tempo and distance accumulation; (c) MIXED — 6-8 × 400m. MAXIMUM " \
+               "individual run distance is 500m. Don't default to 10 × 200m every session — " \
+               "vary the round count and distance, and sometimes use machines only."
       }.freeze
 
       MOVEMENT_VOCABULARY = <<~VOCAB.freeze
-        Run blocks:        Treadmill 160m / 200m / 400m repeats (10-12 rounds typical), short sprint intervals — never longer than 400m per repeat
+        Run blocks:        Treadmill 160m / 200m race-pace repeats (10-12 rounds), 400m threshold (6-8 rounds), 500m longer threshold (4-5 rounds) — never longer than 500m per repeat
+        Machine engine:    Air Bike + SkiErg + Rower combinations (no run) — occasional alternative to treadmill work
         Stations:          RAM Reverse Lunges, Row, Box Jump, SkiErg, Farmer's Carry, Air Bike,
                            Dead Ball Yoke Over, Sled Push/Pull, RAM Weighted Burpees
       VOCAB
@@ -51,15 +56,15 @@ module LLMContext
           ]
         },
         {
-          name: "Death by Tens",
-          goal: "Ten 200m race-pace treadmill repeats, a single-exercise Med Ball Sit-up Throw EMOM, then a heavy deadlift accessory.",
+          name: "Half Mile Repeats",
+          goal: "Four longer 500m threshold repeats with active rest, a single-exercise Med Ball Sit-up Throw EMOM, then a heavy deadlift accessory.",
           duration_mins: 45,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "treadmill" } ] },
-            { name: "Race Pace", format: "rounds", rounds: 10, rest_secs: 60,
+            { name: "Threshold", format: "rounds", rounds: 4, rest_secs: 120,
               exercises: [
-                { name: "Run", distance_m: 200, notes: "race pace", equipment: "treadmill" }
+                { name: "Run", distance_m: 500, notes: "threshold pace — sustained hard but not all-out, 2 min easy jog between rounds", equipment: "treadmill" }
               ] },
             { name: "Throw Down", format: "emom", duration_mins: 10, rest_secs: 0,
               exercises: [
@@ -132,19 +137,23 @@ module LLMContext
           ]
         },
         {
-          name: "Carry Day",
-          goal: "30/30 treadmill engine, a heavy carry-and-sled triplet, a single-exercise RAM Reverse Lunges grind, and a hundred Box Jumps to finish.",
+          name: "Machine Engine",
+          goal: "No-run session — Air Bike sprint engine, SkiErg sprint engine, a heavy carry-and-sled triplet, a single-exercise RAM Reverse Lunges grind, and a hundred Box Jumps to finish. Variety from the treadmill default.",
           duration_mins: 60,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "rowing_machine" } ] },
-            { name: "Engine Build", format: "rounds", rounds: 10, rest_secs: 30,
+            { name: "Bike Engine", format: "rounds", rounds: 10, rest_secs: 30,
               exercises: [
-                { name: "Run", duration_s: 30, notes: "hard pace", equipment: "treadmill" }
+                { name: "Air Bike", duration_s: 30, notes: "hard pace", equipment: "assault_bike" }
+              ] },
+            { name: "Ski Engine", format: "rounds", rounds: 10, rest_secs: 30,
+              exercises: [
+                { name: "SkiErg", duration_s: 30, notes: "hard pace", equipment: "ski_erg" }
               ] },
             { name: "Three Carries", format: "rounds", rounds: 4, rest_secs: 60,
               exercises: [
-                { name: "Farmer's Carry", distance_m: 60, equipment: "kettlebells" },
+                { name: "Farmer's Carry", distance_m: 60, notes: "race weight — competition load", equipment: "kettlebells" },
                 { name: "Sled Push", distance_m: 40, notes: "race weight — full competition sled", equipment: "sled" },
                 { name: "Sled Pull", distance_m: 20, notes: "race weight — full competition sled", equipment: "sled" }
               ] },
