@@ -18,20 +18,29 @@ module LLMContext
         finisher:          :optional,
         core:              :optional,
         notes: "The Deka Mile race is 10 × 160m runs alternating with 10 functional zones. " \
-               "Run shapes (rotate across sessions): (a) RACE-PACE short repeats — 10-12 × " \
-               "160m / 200m, the primary shape for race-pace work; (b) THRESHOLD longer " \
-               "repeats — 4-5 × 500m, occasionally used for tempo and distance accumulation; " \
-               "(c) MIXED — 6-8 × 400m. MAXIMUM individual run distance is 500m. " \
+               "**COMPROMISED RUNNING IS THE HEADLINE SHAPE** — even short race-pace runs " \
+               "(160m / 200m / 400m) should usually be paired with 1-2 functional exercises " \
+               "AFTER each run, making the round compromised (e.g. `10 rounds: 200m Run + " \
+               "10 Med Ball Sit-up Throws + 10 RAM Reverse Lunges`). Bare run repeats with " \
+               "nothing after are the exception, not the default — reserve them for ONE " \
+               "session out of 4-5 (the pure race-pace test). " \
+               "Run shapes: (a) RACE-PACE compromised — 8-12 rounds × 160m/200m run + 2 " \
+               "short functional exercises (the primary shape); (b) THRESHOLD compromised — " \
+               "3-4 rounds × 500m run + 2-3 functional exercises (occasional, for distance); " \
+               "(c) MIXED compromised — 5-6 rounds × 400m run + 2-3 exercises. MAXIMUM " \
+               "individual run distance is 500m. " \
+               "**MACHINE CARDIO IS ALSO COMPROMISED** — Air Bike, SkiErg, and Row blocks " \
+               "should pair the machine with 1-2 functional exercises per round, NOT stand " \
+               "alone. **Twin Machines** (Air Bike + SkiErg paired in one round) is a great " \
+               "occasional shape, but only as ONE cardio block in the session — never " \
+               "alongside another big standalone cardio block. " \
                "**Roughly 1 in 3 sessions should skip running entirely** and build the engine " \
-               "on Air Bike + SkiErg + Rower combinations instead — the athlete needs " \
-               "non-treadmill engine work too, and machine cardio reduces impact on heavy " \
-               "training weeks. " \
+               "on machine cardio + functional exercises (compromised cardio). " \
                "**Vary where the run block sits in the session** — not always first. Sometimes " \
-               "lead with an EMOM, alt EMOM, or strength accessory, THEN do the runs. " \
-               "Sometimes put runs in the middle, sometimes at the end. Don't default to " \
-               "'warm-up → runs → everything else' every workout. " \
-               "Don't default to 10 × 200m every session — vary the round count, distance, " \
-               "position, and sometimes use machines only."
+               "lead with an EMOM, alt EMOM, or strength accessory, THEN do the compromised " \
+               "runs. " \
+               "Don't default to 10 × 200m every session — vary round count, distance, " \
+               "exercise pairings, position, and sometimes machines only."
       }.freeze
 
       MOVEMENT_VOCABULARY = <<~VOCAB.freeze
@@ -62,8 +71,8 @@ module LLMContext
           ]
         },
         {
-          name: "Half Mile Repeats",
-          goal: "Open with a Med Ball Sit-up Throw EMOM, then four 500m threshold runs on tired core, then heavy deadlifts to close.",
+          name: "Half Mile Compromised",
+          goal: "Open with a Med Ball Sit-up Throw EMOM, then three compromised 500m rounds paired with sled and lunges, then heavy deadlifts to close. Occasional longer-run shape.",
           duration_mins: 45,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
@@ -72,9 +81,11 @@ module LLMContext
               exercises: [
                 { name: "Med Ball Sit-up Throw", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "wall_ball" }
               ] },
-            { name: "Threshold", format: "rounds", rounds: 4, rest_secs: 120,
+            { name: "Long Compromised", format: "rounds", rounds: 3, rest_secs: 90,
               exercises: [
-                { name: "Run", distance_m: 500, notes: "threshold pace — sustained hard but not all-out, 2 min easy jog between rounds", equipment: "treadmill" }
+                { name: "Compromised Run", distance_m: 500, notes: "threshold pace — sustained hard but not all-out", equipment: "treadmill" },
+                { name: "Sled Push", distance_m: 20, notes: "race weight — full competition sled", equipment: "sled" },
+                { name: "RAM Reverse Lunges", reps: 20 }
               ] },
             { name: "Iron Lift", format: "rounds", intensity_style: "high", rounds: 4, rest_secs: 120,
               exercises: [
@@ -144,18 +155,16 @@ module LLMContext
         },
         {
           name: "Machine Engine",
-          goal: "No-run session — Air Bike sprint engine, SkiErg sprint engine, a heavy carry-and-sled triplet, a single-exercise RAM Reverse Lunges grind, and a hundred Box Jumps to finish. Variety from the treadmill default.",
+          goal: "No-run session — compromised Twin Machines (Air Bike + SkiErg paired with a station), a heavy carry-and-sled triplet, a single-exercise RAM Reverse Lunges grind, and a hundred Box Jumps to finish. ONE cardio block, not two stacked.",
           duration_mins: 60,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "rowing_machine" } ] },
-            { name: "Bike Engine", format: "rounds", rounds: 10, rest_secs: 30,
+            { name: "Twin Engines", format: "rounds", rounds: 6, rest_secs: 60,
               exercises: [
-                { name: "Air Bike", duration_s: 30, notes: "hard pace", equipment: "assault_bike" }
-              ] },
-            { name: "Ski Engine", format: "rounds", rounds: 10, rest_secs: 30,
-              exercises: [
-                { name: "SkiErg", duration_s: 30, notes: "hard pace", equipment: "ski_erg" }
+                { name: "Air Bike", calories: 12, notes: "strong sustained effort", equipment: "assault_bike" },
+                { name: "SkiErg", calories: 12, notes: "strong sustained effort", equipment: "ski_erg" },
+                { name: "RAM Reverse Lunges", reps: 12 }
               ] },
             { name: "Three Carries", format: "rounds", rounds: 4, rest_secs: 60,
               exercises: [
@@ -267,7 +276,7 @@ module LLMContext
         },
         {
           name: "Sprint Day",
-          goal: "Heavy deadlift triples, all-out 200m sprint repeats, heavy sled work, then a tabata finisher. Full recovery between every set.",
+          goal: "Heavy deadlift triples, compromised 200m sprint rounds with Deka stations, heavy sled work, then a tabata finisher. Full recovery between every set.",
           duration_mins: 45,
           intensity_style: "high",
           sections: [
@@ -277,9 +286,11 @@ module LLMContext
               exercises: [
                 { name: "Deadlift", reps: 3, notes: "near-max — heavier than race weight, last rep should be a fight", equipment: "barbell" }
               ] },
-            { name: "200m Repeats", format: "rounds", rounds: 8, rest_secs: 90,
+            { name: "Compromised 200s", format: "rounds", rounds: 8, rest_secs: 90,
               exercises: [
-                { name: "Run", distance_m: 200, notes: "all-out — every rep is maximum effort", equipment: "treadmill" }
+                { name: "Compromised Run", distance_m: 200, notes: "all-out — every rep is maximum effort", equipment: "treadmill" },
+                { name: "Box Jump", reps: 10, equipment: "bodyweight" },
+                { name: "Farmer's Carry", distance_m: 20, notes: "race weight — competition load", equipment: "kettlebells" }
               ] },
             { name: "Heavy Sled", format: "rounds", intensity_style: "high", rounds: 4, rest_secs: 120,
               exercises: [
@@ -296,7 +307,7 @@ module LLMContext
         },
         {
           name: "Race Pace Pyramid",
-          goal: "Heavy push press, max-effort 160m race-distance sprints, ski sprints, then a tabata burner. Short, sharp, full-recovery work.",
+          goal: "Heavy push press, the pure race-distance test (10 × 160m, no stations — the one bare-sprint session), then a tabata burner. Short, sharp, full-recovery.",
           duration_mins: 45,
           intensity_style: "high",
           sections: [
@@ -308,11 +319,7 @@ module LLMContext
               ] },
             { name: "160m Sprints", format: "rounds", rounds: 10, rest_secs: 90,
               exercises: [
-                { name: "Run", distance_m: 160, notes: "max-effort at race distance — every rep is maximum, full recovery between", equipment: "treadmill" }
-              ] },
-            { name: "Ski Sprints", format: "rounds", rounds: 6, rest_secs: 90,
-              exercises: [
-                { name: "SkiErg", duration_s: 30, notes: "all-out — every 30s is maximum, full recovery between", equipment: "ski_erg" }
+                { name: "Run", distance_m: 160, notes: "max-effort at race distance — pure sprint test, no compromise, every rep is maximum", equipment: "treadmill" }
               ] },
             { name: "Tabata Burner", format: "tabata",
               exercises: [
