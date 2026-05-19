@@ -366,6 +366,35 @@ module LLMContext
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
           ]
+        },
+        {
+          name: "1K Bookends",
+          goal: "Buy in with a 1km Row, race the main compromised running, then cash out on a 1km SkiErg. Matched-cardio bookends framing the work.",
+          duration_mins: 60,
+          sections: [
+            { name: "Warm-Up", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
+            { name: "Buy In", format: "for_time",
+              exercises: [
+                { name: "Row", distance_m: 1000, notes: "race pace — set the tone, don't sandbag", equipment: "rowing_machine" }
+              ] },
+            { name: "Compromised Stations", format: "rounds", rounds: 4, rest_secs: 60,
+              exercises: [
+                { name: "Compromised Run", distance_m: 500, equipment: "treadmill" },
+                { name: "Wall Balls", reps: 20, equipment: "wall_ball" },
+                { name: "Farmer's Carry", distance_m: 30, notes: "race weight — Hyrox competition load", equipment: "kettlebells" }
+              ] },
+            { name: "Iron Lift", format: "rounds", intensity_style: "high", rounds: 4, rest_secs: 120,
+              exercises: [
+                { name: "Deadlift", reps: 5, notes: "heavier than race weight — strength-training load, last rep should be a fight", equipment: "barbell" }
+              ] },
+            { name: "Cash Out", format: "for_time",
+              exercises: [
+                { name: "SkiErg", distance_m: 1000, notes: "everything left in the tank — race the clock home", equipment: "ski_erg" }
+              ] },
+            { name: "Cool-Down", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
+          ]
         }
       ].freeze
     end

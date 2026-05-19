@@ -188,7 +188,7 @@ class WorkoutLLMGenerator::ContractPromptBuilderTest < ActiveSupport::TestCase
     prompt = build(activity_slug: "hyrox")
     block = prompt[/\<examples\>(.*?)\<\/examples\>/m, 1]
     refute_nil block
-    assert_equal 10, block.scan(/"goal"\s*:/).length
+    assert_equal 11, block.scan(/"goal"\s*:/).length
   end
 
   test "task tag uses user_activity_name when provided (free-form typed activity)" do
