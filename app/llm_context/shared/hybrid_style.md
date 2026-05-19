@@ -84,6 +84,8 @@ A pair of single-effort sections that frame the main work of the session — a C
 
 **Schema**: each bookend is its own section, `format: "for_time"` (timed effort). **The Buy In section MUST be named exactly "Buy In"** and **the Cash Out section MUST be named exactly "Cash Out"** so the pattern renders correctly. Buy In comes immediately after the warm-up; Cash Out comes immediately before the cool-down.
 
+**HARD RULE — bookends come in pairs.** If a session includes a Buy In section, it MUST also include a Cash Out section, and vice versa. Never emit one without the other. A workout with just a Buy In and no Cash Out (or just a Cash Out and no Buy In) is broken — the bookend is the whole point.
+
 **Three canonical pairings** — rotate across sessions:
 - **Matched cardio**: `Buy In: 1000m Row for time` + `Cash Out: 1000m SkiErg for time`. Different machines bookending the session.
 - **Same movement bookend**: `Buy In: 50 Wall Balls for time` + `Cash Out: 50 Wall Balls for time`. Same movement, see how much slower the cash out feels.
