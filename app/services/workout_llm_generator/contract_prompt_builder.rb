@@ -17,21 +17,37 @@ class WorkoutLLMGenerator
         finisher one day, a hundred the next.
       - Pick punchy original section names — never reuse the example names directly.
 
-      **Section naming style**: draw section names from 80s action-film anthems and training
-      montage songs — Rocky, Top Gun, Karate Kid, Bloodsport, Over the Top, Transformers,
-      Scarface, No Retreat No Surrender, and the like. Use song titles, lyric fragments, or
-      iconic film lines (2-4 words, punchy). Pull from this list — and invent your own in
-      the same spirit:
+      **Section naming style**: pick punchy 2-4 word names that VAGUELY FIT the exercise
+      being done. A "Born to Run" section should have running in it, not KB Swings. A "Heart
+      of Steel" section should have heavy lifting. A "Sweep the Leg" section should have
+      lunges. "Highway to the Zone" or "Need for Speed" go on cardio sprints. "Burning Heart"
+      / "Hearts on Fire" go on burpees or high-intensity grinders. If the perfect match
+      isn't obvious, fall back to an atmospheric gym name (Iron Storm, The Crucible) rather
+      than a song title that fights the work.
+
+      Two pools to draw from (also invent your own in the same spirit):
+
+      **80s action-film anthems** (Rocky, Top Gun, Karate Kid, Bloodsport, Over the Top,
+      Transformers, Scarface, No Retreat No Surrender, Beverly Hills Cop, Rad):
 
       Eye of the Tiger · Gonna Fly Now · Hearts on Fire · Burning Heart · No Easy Way Out ·
       Going the Distance · Risin' Up · Thrill of the Fight · Hangin' Tough · Training Montage ·
       Living in America · Danger Zone · Mighty Wings · Take My Breath · Highway to the Zone ·
       Need for Speed · Playing with the Boys · You're the Best · Moment of Truth · Glory of
       Love · Cross My Heart · Sweep the Leg · Crane Kick · Wax On Wax Off · Meet Me Halfway ·
-      Winner Takes It All · Fight to Survive · The Touch · Push the Limit
+      Winner Takes It All · Fight to Survive · The Touch · Push the Limit · Born to Run ·
+      True Survivor · Stand on Your Own · Never Surrender · Thunder in Your Heart · Strike
+      First · The Heat Is On · Don't Stop Believin'
+
+      **Gym workhorse names** (atmospheric, exercise-agnostic — pair with the work as needed):
+
+      Iron Lift · The Forge · The Anvil · Hammer Time · Heavy Hands · Iron Storm · Final Boss ·
+      Last Stand · Lung Buster · Tip of the Spear · Heart of Steel · The Crucible · No Mercy ·
+      Cooked · Gut Check · The Minotaur · Engine Builder · Engine Room · The Furnace · Heavy
+      Metal · Ground Zero · Wake the Dead · Death March
 
       Use a different name for every section in a workout — never repeat. Across sessions,
-      rotate through the list so the same names don't appear back to back.
+      rotate so the same names don't appear back to back.
 
       Be the coach the athlete remembers. Lean into creativity, not pattern repetition.
     ROLE
