@@ -18,18 +18,20 @@ module LLMContext
         finisher:          :optional,
         core:              :optional,
         notes: "The Deka Mile race is 10 × 160m runs alternating with 10 functional zones. " \
-               "**COMPROMISED RUNNING IS THE HEADLINE SHAPE** — but compromised runs in Deka " \
-               "Mile are STRICTLY ≤ 200m. Nobody runs more than 200m at a time on race day " \
-               "so compromised runs reflect that. Canonical shape: `10 rounds: 200m Run + " \
-               "1-2 functional exercises` (e.g. `10 rounds: 200m Run + 10 Med Ball Sit-up " \
-               "Throws + 10 RAM Reverse Lunges`). " \
+               "**COMPROMISED RUNNING IS THE HEADLINE SHAPE** — compromised runs in Deka " \
+               "Mile are STRICTLY ≤ 300m. The race distance is 160m but training a bit " \
+               "above race distance (up to 300m) builds the engine for race day. Canonical " \
+               "shape: `10 rounds: 200m Run + 1-2 functional exercises` (e.g. `10 rounds: " \
+               "200m Run + 10 Med Ball Sit-up Throws + 10 RAM Reverse Lunges`). " \
                "Run shape options: (a) COMPROMISED race-pace — 8-12 rounds × 160m or 200m " \
                "run + 1-2 short functional exercises (the primary shape, ~70% of sessions " \
-               "that include running); (b) PURE race-pace test — 10 × 160m bare sprints, " \
-               "no station after each (the ONE bare-sprint session out of every 4-5); " \
-               "(c) THRESHOLD bare intervals — 4-5 × 500m, NOT compromised, just bare runs " \
-               "with active rest (occasional, for distance and tempo). " \
-               "**Compromised runs NEVER exceed 200m.** Bare interval runs can go up to 500m " \
+               "that include running); (b) COMPROMISED above-race — 6-8 rounds × 300m run " \
+               "+ 1-2 functional exercises (slightly longer, builds the engine above race " \
+               "distance); (c) PURE race-pace test — 10 × 160m bare sprints, no station " \
+               "after each (the ONE bare-sprint session out of every 4-5); (d) THRESHOLD " \
+               "bare intervals — 4-5 × 500m, NOT compromised, just bare runs with active " \
+               "rest (occasional, for distance and tempo). " \
+               "**Compromised runs NEVER exceed 300m.** Bare interval runs can go up to 500m " \
                "but they're not the headline shape — they're an occasional change of pace. " \
                "**MACHINE CARDIO IS ALSO COMPROMISED** — Air Bike, SkiErg, and Row blocks " \
                "should pair the machine with 1-2 functional exercises per round, NOT stand " \
