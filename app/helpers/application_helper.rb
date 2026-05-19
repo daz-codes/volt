@@ -16,15 +16,14 @@ module ApplicationHelper
       test[:match_terms].all? { |term| downcased.include?(term.downcase) }
     end
   end
-  # Renders rest_secs as "X min" when a clean minute multiple, else "Xs".
+  # Renders rest_secs. Under 60s: "Xs" (e.g. "45s"). Clean minutes: "X min".
+  # Otherwise mixed: "Xmin Ys" (e.g. 150s -> "2min 30s").
   def format_rest_secs(secs)
     s = secs.to_i
     return nil if s <= 0
-    if s >= 60 && (s % 60).zero?
-      "#{s / 60} min"
-    else
-      "#{s}s"
-    end
+    return "#{s}s" if s < 60
+    m, r = s.divmod(60)
+    r.zero? ? "#{m} min" : "#{m}min #{r}s"
   end
 
   # Total distance in metres for a single workout section.

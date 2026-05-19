@@ -261,7 +261,9 @@ module Workout::Exportable
   def format_rest_secs(secs)
     s = secs.to_i
     return nil if s <= 0
-    s >= 60 && (s % 60).zero? ? "#{s / 60} min" : "#{s}s"
+    return "#{s}s" if s < 60
+    m, r = s.divmod(60)
+    r.zero? ? "#{m} min" : "#{m}min #{r}s"
   end
 
   def ladder_sequence(start_val, end_val, step)
