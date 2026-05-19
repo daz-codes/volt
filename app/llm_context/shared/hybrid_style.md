@@ -80,16 +80,18 @@ A single-block descending pyramid: a 1km run before each tier of 3 movements (ty
 
 ### 14. Buy in / Cash out bookends
 
-A pair of single-effort sections that frame the main work of the session — a CrossFit-style "buy in" before the main work and a "cash out" after. **Use occasionally — roughly 1 in 4-5 sessions**, not every session. The bookends pre-fatigue and post-fatigue around the main piece, adding a distinct test of pacing.
+A pair of single-effort sections that frame the main work of the session — a CrossFit-style "buy in" before the main work and a "cash out" after. **Use this pattern roughly 1 in 3 sessions** — it's a key variety mechanism, not a rare special case. The bookends pre-fatigue and post-fatigue around the main piece, adding a distinct test of pacing.
 
-**Schema**: each bookend is its own section, format `for_time` (timed effort) or `straight` (single block). Named "Buy In" and "Cash Out" — exactly those names so the pattern is recognisable. Buy In comes immediately after the warm-up; Cash Out comes immediately before the cool-down.
+**Schema**: each bookend is its own section, `format: "for_time"` (timed effort). **The Buy In section MUST be named exactly "Buy In"** and **the Cash Out section MUST be named exactly "Cash Out"** so the pattern renders correctly. Buy In comes immediately after the warm-up; Cash Out comes immediately before the cool-down.
 
-**Three canonical pairings**:
+**Three canonical pairings** — rotate across sessions:
 - **Matched cardio**: `Buy In: 1000m Row for time` + `Cash Out: 1000m SkiErg for time`. Different machines bookending the session.
 - **Same movement bookend**: `Buy In: 50 Wall Balls for time` + `Cash Out: 50 Wall Balls for time`. Same movement, see how much slower the cash out feels.
 - **Different movements**: `Buy In: 50 Box Jumps for time` + `Cash Out: 50 Burpees for time`. Two distinct tests.
 
-A session using bookends doesn't need every other modality — keep the main work tight (1-2 main blocks between the bookends). Total session length stays around 60 min.
+A session using bookends keeps the main work tight (1-2 main blocks between the bookends). Total session length stays around 60 min.
+
+When you build a session, ask yourself: should this one use bookends? If it's been a few sessions without them, YES — pick a pairing and use them.
 
 ## Intensity guidance
 

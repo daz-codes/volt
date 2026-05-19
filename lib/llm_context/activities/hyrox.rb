@@ -395,6 +395,60 @@ module LLMContext
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
           ]
+        },
+        {
+          name: "Wall Ball Sandwich",
+          goal: "Buy in with 50 Wall Balls, race a 30/30 engine and an alternating EMOM, then cash out with another 50 Wall Balls. Same-movement bookends — feel the difference.",
+          duration_mins: 60,
+          sections: [
+            { name: "Warm-Up", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "rowing_machine" } ] },
+            { name: "Buy In", format: "for_time",
+              exercises: [
+                { name: "Wall Balls", reps: 50, notes: "unbroken if possible — clean reps, full squat depth", equipment: "wall_ball" }
+              ] },
+            { name: "Ski Engine", format: "rounds", rounds: 12, rest_secs: 30,
+              exercises: [
+                { name: "SkiErg", duration_s: 30, notes: "hard pace", equipment: "ski_erg" }
+              ] },
+            { name: "Final Boss", format: "emom", duration_mins: 16, rest_secs: 0, alternating: true,
+              exercises: [
+                { name: "KB Swings", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "kettlebells" },
+                { name: "Box Step-overs", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "bodyweight" }
+              ] },
+            { name: "Cash Out", format: "for_time",
+              exercises: [
+                { name: "Wall Balls", reps: 50, notes: "same movement, very different feel — push through the burn", equipment: "wall_ball" }
+              ] },
+            { name: "Cool-Down", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
+          ]
+        },
+        {
+          name: "Jump & Burn",
+          goal: "Buy in with 50 Box Jumps, work the main compromised circuit, then cash out with 50 Burpees. Different-movement bookends — two distinct tests.",
+          duration_mins: 60,
+          sections: [
+            { name: "Warm-Up", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "treadmill" } ] },
+            { name: "Buy In", format: "for_time",
+              exercises: [
+                { name: "Box Jumps", reps: 50, notes: "controlled landings — quality reps, no rebounding past form", equipment: "bodyweight" }
+              ] },
+            { name: "Last Mile", format: "rounds", rounds: 4, rest_secs: 90,
+              exercises: [
+                { name: "Compromised Run", distance_m: 800, equipment: "treadmill" },
+                { name: "Wall Balls", reps: 30, equipment: "wall_ball" },
+                { name: "Burpee Broad Jumps", reps: 20, equipment: "bodyweight" },
+                { name: "Farmer's Carry", distance_m: 40, notes: "race weight — Hyrox competition load", equipment: "kettlebells" }
+              ] },
+            { name: "Cash Out", format: "for_time",
+              exercises: [
+                { name: "Burpees", reps: 50, notes: "chest to floor each rep — race the clock, breath through the discomfort", equipment: "bodyweight" }
+              ] },
+            { name: "Cool-Down", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
+          ]
         }
       ].freeze
     end
