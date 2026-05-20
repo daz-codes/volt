@@ -59,7 +59,7 @@ module LLMContext
               ] },
             { name: "Iron Lift", format: "rounds", intensity_style: "high", rounds: 4, rest_secs: 120,
               exercises: [
-                { name: "Deadlift", reps: 5, notes: "heavier than race weight — strength-training load, last rep should be a fight", equipment: "barbell" }
+                { name: "Deadlift", reps: 5, notes: "heavy strength load — last rep should be a fight", equipment: "barbell" }
               ] },
             { name: "Walking Death", format: "emom", duration_mins: 16, rest_secs: 0,
               exercises: [
@@ -138,7 +138,7 @@ module LLMContext
               ] },
             { name: "Iron Lift", format: "rounds", intensity_style: "high", rounds: 4, rest_secs: 120,
               exercises: [
-                { name: "Deadlift", reps: 5, notes: "heavier than race weight — proper strength load, well above race-day fatigue weight", equipment: "barbell" }
+                { name: "Deadlift", reps: 5, notes: "heavy strength load — proper strength training, not a race-day-style effort", equipment: "barbell" }
               ] },
             { name: "Swing Time", format: "hundred",
               exercises: [
@@ -320,7 +320,7 @@ module LLMContext
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "treadmill" } ] },
             { name: "Heavy Pull", format: "rounds", intensity_style: "high", rounds: 5, rest_secs: 180,
               exercises: [
-                { name: "Deadlift", reps: 3, notes: "near-max — heavier than race weight, last rep should be a fight", equipment: "barbell" }
+                { name: "Deadlift", reps: 3, notes: "near-max strength load — last rep should be a fight", equipment: "barbell" }
               ] },
             { name: "Sprint Repeats", format: "rounds", rounds: 8, rest_secs: 90,
               exercises: [
@@ -349,7 +349,7 @@ module LLMContext
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
             { name: "Heavy Press", format: "rounds", intensity_style: "high", rounds: 5, rest_secs: 180,
               exercises: [
-                { name: "Push Press", reps: 3, notes: "near-max — heavier than race weight, full recovery between sets", equipment: "barbell" }
+                { name: "Push Press", reps: 3, notes: "near-max strength load — full recovery between sets", equipment: "barbell" }
               ] },
             { name: "Ski Sprints", format: "rounds", rounds: 6, rest_secs: 90,
               exercises: [
@@ -386,7 +386,7 @@ module LLMContext
               ] },
             { name: "Iron Lift", format: "rounds", intensity_style: "high", rounds: 4, rest_secs: 120,
               exercises: [
-                { name: "Deadlift", reps: 5, notes: "heavier than race weight — strength-training load, last rep should be a fight", equipment: "barbell" }
+                { name: "Deadlift", reps: 5, notes: "heavy strength load — last rep should be a fight", equipment: "barbell" }
               ] },
             { name: "Cash Out", format: "for_time",
               exercises: [

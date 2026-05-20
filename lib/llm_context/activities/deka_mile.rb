@@ -91,7 +91,7 @@ module LLMContext
               ] },
             { name: "Iron Lift", format: "rounds", intensity_style: "high", rounds: 4, rest_secs: 120,
               exercises: [
-                { name: "Deadlift", reps: 5, notes: "heavier than race weight — strength-training load, last rep should be a fight", equipment: "barbell" }
+                { name: "Deadlift", reps: 5, notes: "heavy strength load — last rep should be a fight", equipment: "barbell" }
               ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
@@ -286,7 +286,7 @@ module LLMContext
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "treadmill" } ] },
             { name: "Heavy Pull", format: "rounds", intensity_style: "high", rounds: 5, rest_secs: 180,
               exercises: [
-                { name: "Deadlift", reps: 3, notes: "near-max — heavier than race weight, last rep should be a fight", equipment: "barbell" }
+                { name: "Deadlift", reps: 3, notes: "near-max strength load — last rep should be a fight", equipment: "barbell" }
               ] },
             { name: "Compromised 200s", format: "rounds", rounds: 8, rest_secs: 90,
               exercises: [
@@ -317,7 +317,7 @@ module LLMContext
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
             { name: "Heavy Press", format: "rounds", intensity_style: "high", rounds: 5, rest_secs: 180,
               exercises: [
-                { name: "Push Press", reps: 3, notes: "near-max — heavier than race weight, full recovery between sets", equipment: "barbell" }
+                { name: "Push Press", reps: 3, notes: "near-max strength load — full recovery between sets", equipment: "barbell" }
               ] },
             { name: "160m Sprints", format: "rounds", rounds: 10, rest_secs: 90,
               exercises: [
