@@ -182,11 +182,16 @@ Most race-family sessions land here. Mix EMOMs, 30/30 cardio, compromised runnin
 
 ## Reps cueing
 
-The cue `~50% of your 1-min max (leaves ~20s rest)` is for **single-exercise EMOMs AND alternating EMOMs** (each exercise gets its own minute). In those cases, leave `reps` blank and set the cue in `notes`.
+The cue `~50% of your 1-min max (leaves ~20s rest)` is for **single-exercise EMOMs AND alternating EMOMs** (each exercise gets its own minute). In those cases, the athlete picks the volume — so on those exercises:
 
-EVERYTHERE ELSE — rounds, for_time, hundred, strength, abs — use plain integer reps.
+- Leave `reps` blank.
+- Leave `distance_m` blank — even for Sled Push, Farmer's Carry, Bear Crawl, Atlas Carry. The athlete picks the distance just like they pick the reps.
+- Leave `calories` blank for cardio machines.
+- Set the cue in `notes` only.
 
-Distance-based movements (Farmer's Carry, Sled, Bear Crawl) always use `distance_m`.
+**Never combine a fixed metric with the cue** on a single-ex / alternating EMOM exercise. `Sled Push, distance_m: 10, notes: "~50% of your 1-min max"` is contradictory — the cue says "you decide" but the 10m prescribes it. Pick one: either the cue (blank metric) OR a fixed metric (no cue).
+
+EVERYWHERE ELSE — rounds, for_time, hundred, strength, abs, and multi-exercise EMOMs (2-ex "both each minute" / 3+-ex E2MOM) — use plain numeric metrics (integer reps, distance_m, calories) and DROP the cue. Distance-based movements there always carry `distance_m`.
 
 ## What to avoid
 
