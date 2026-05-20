@@ -32,6 +32,17 @@ module LLMContext
                            Farmer's Carry, Air Bike 25 cal, Dead Ball Yoke Over, Sled Push/Pull, RAM Weighted Burpees
       VOCAB
 
+      # Canonical race-station exercises. Used by the validator to scope
+      # race-relative wording ("race weight", "competition load") to actual
+      # race movements — strength accessories like Deadlift get absolute
+      # phrasing instead. Loose substring match, case-insensitive.
+      RACE_STATIONS = [
+        "Treadmill", "Run",
+        "RAM Reverse Lunges", "Row", "Box Jump", "Med Ball Sit-up Throw",
+        "SkiErg", "Farmer's Carry", "Air Bike", "Dead Ball Yoke Over",
+        "Sled Push", "Sled Pull", "RAM Weighted Burpees"
+      ].freeze
+
       EXAMPLES = [
         {
           name: "Race Taste",

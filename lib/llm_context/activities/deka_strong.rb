@@ -34,6 +34,16 @@ module LLMContext
         Engine:            Ski Erg 500m repeats, Rower 500m repeats, Assault Bike 30s/30s
       VOCAB
 
+      # Canonical race-station exercises. Used by the validator to scope
+      # race-relative wording ("race weight", "competition load") to actual
+      # race movements — strength accessories like Deadlift get absolute
+      # phrasing instead. Loose substring match, case-insensitive.
+      RACE_STATIONS = [
+        "RAM Reverse Lunges", "Row", "Box Jump", "Med Ball Sit-up Throw",
+        "SkiErg", "Farmer's Carry", "Air Bike", "Dead Ball Yoke Over",
+        "Sled Push", "Sled Pull", "RAM Weighted Burpees"
+      ].freeze
+
       EXAMPLES = [
         {
           name: "Station Capacity",

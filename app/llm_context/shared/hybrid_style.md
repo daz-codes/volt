@@ -170,7 +170,9 @@ Warm-up can also mention mobility prep in its notes — rotate the focus the sam
 
 **Movements**: heavy compound at 3-5 reps with 180s rest, sprint repeats (15-45s work, 90s+ rest), heavy sled (max load), all-out tabata. Sprint repeats can be 200m runs, 30s machine sprints, 15m heavy sled sprints — full recovery between.
 
-**Weight prescription (high)**: HEAVIER than race/competition weight. Heavy compound accessories (deadlift, bench, push press) use proper strength-training loads — 3-5 reps at near-max, well above race-day fatigue loads. Sled push, heavy carries, and weighted-station work go ABOVE competition weight to train over-tolerance — if Hyrox race sled is 152kg/men, high-intensity sled training is 180kg+. The athlete should feel race weights are easy on race day because they've handled heavier. Notes should explicitly say "heavier than race weight" or "above competition load".
+**Weight prescription (high)**: HEAVIER than race/competition weight. Heavy compound accessories (deadlift, bench, push press) use proper strength-training loads — 3-5 reps at near-max, well above race-day fatigue loads. Sled push, heavy carries, and weighted-station work go ABOVE competition weight to train over-tolerance — if Hyrox race sled is 152kg/men, high-intensity sled training is 180kg+. The athlete should feel race weights are easy on race day because they've handled heavier.
+
+**Race-relative wording only on race-station exercises.** Phrases like "race weight", "heavier than race weight", "above competition load", "competition sled" ONLY belong on notes for exercises that are actual race stations for this activity (see the contract's "Stations:" line in the movement vocabulary). For strength **accessories** like Deadlift, Bench Press, Push Press, Bent-Over Row — which are NOT race exercises — use absolute strength-training language instead: "near-max strength load", "heavy 3-rep load", "top-end strength — full reset between reps", "last rep should be a fight". Never write "heavier than race weight" on an exercise that isn't in the race.
 
 **Avoid for high intensity**: continuous easy cardio, technique-focused light work, slow tempo training, 30/30 (that's threshold, not high), low-rep high-volume rounds.
 
@@ -178,7 +180,7 @@ Warm-up can also mention mobility prep in its notes — rotate the focus the sam
 
 Most race-family sessions land here. Mix EMOMs, 30/30 cardio, compromised running, strength accessory, hundreds, tabatas, continuous circuits — the full menu. 60 min, 4-6 main blocks.
 
-**Weight prescription (medium)**: RACE / COMPETITION weights — exactly what the athlete would use on race day. For Hyrox men: 9kg wall ball, 24kg-per-hand farmer's carry, full race sled. For Deka: the prescribed zone weights. Medium intensity sessions REHEARSE race-day load — that's what makes them race-prep. Notes can call this out: "race weight", "competition load", or "the load you'll lift on race day".
+**Weight prescription (medium)**: RACE / COMPETITION weights — exactly what the athlete would use on race day. For Hyrox men: 9kg wall ball, 24kg-per-hand farmer's carry, full race sled. For Deka: the prescribed zone weights. Medium intensity sessions REHEARSE race-day load — that's what makes them race-prep. Notes can call this out: "race weight", "competition load", or "the load you'll lift on race day" — **but ONLY on actual race-station exercises** (see the contract's "Stations:" line). For strength **accessories** that aren't race movements (Deadlift, Bench Press, Push Press, Bent-Over Row), use absolute language like "working weight" or "heavy strength load" — never "race weight", because there isn't one.
 
 ## Reps cueing
 

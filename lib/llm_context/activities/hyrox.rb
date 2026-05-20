@@ -32,8 +32,19 @@ module LLMContext
 
       MOVEMENT_VOCABULARY = <<~VOCAB.freeze
         Running:           Treadmill 500m, 1km, 400m repeats
-        Stations:          SkiErg, Sled Push, Sled Pull, Rowing Machine, Farmer's Carry, Wall Ball, Sandbag Lunges
+        Stations:          SkiErg, Sled Push, Sled Pull, Burpee Broad Jumps, Rowing Machine, Farmer's Carry, Wall Ball, Sandbag Lunges
       VOCAB
+
+      # Canonical race-station exercises (Hyrox 8 stations + running). Used
+      # by the validator to scope race-relative wording ("race weight",
+      # "Hyrox competition") to actual race movements — strength accessories
+      # like Deadlift get absolute phrasing instead. Loose substring match,
+      # case-insensitive.
+      RACE_STATIONS = [
+        "Treadmill", "Run",
+        "SkiErg", "Sled Push", "Sled Pull", "Burpee Broad Jump",
+        "Rowing Machine", "Row", "Farmer's Carry", "Wall Ball", "Sandbag Lunge"
+      ].freeze
 
       EXAMPLES = [
         {

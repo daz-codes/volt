@@ -40,6 +40,18 @@ module LLMContext
         Bodyweight:        Surrender Lunges (weighted), Weighted Sit-ups, Jump Rope Single Unders
       VOCAB
 
+      # Canonical race-station exercises. Used by the validator to scope
+      # race-relative wording ("race weight", "competition load") to actual
+      # race movements — accessories get absolute phrasing instead.
+      # Loose substring match, case-insensitive.
+      RACE_STATIONS = [
+        "Thruster", "Bar-Facing Burpee", "Burpee Over Bar",
+        "Single Arm DB Ground to Overhead", "DB Ground to Overhead",
+        "DB Shoulder to Overhead", "Shoulder to Overhead Press",
+        "Bear Crawl", "Farmer's Carry", "Atlas Shoulder to Carry",
+        "Surrender Lunges", "Weighted Sit-ups", "Jump Rope", "Single Under"
+      ].freeze
+
       EXAMPLES = [
         {
           name: "Atlas Awakens",

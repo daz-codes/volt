@@ -35,6 +35,19 @@ module LLMContext
                            Weighted Burpees
       VOCAB
 
+      # Canonical race-station exercises (broad hybrid-race pool). Used by
+      # the validator to scope race-relative wording ("race weight",
+      # "competition load") to actual race movements — strength accessories
+      # like Deadlift get absolute phrasing instead. Loose substring match,
+      # case-insensitive.
+      RACE_STATIONS = [
+        "Treadmill", "Run",
+        "Sled Push", "Sled Pull", "SkiErg", "Rowing Machine", "Row", "Air Bike",
+        "Farmer's Carry", "Wall Ball", "Sandbag Lunge",
+        "RAM Reverse Lunges", "Box Jump", "Med Ball Sit-up Throw",
+        "Dead Ball Yoke Over", "Burpee Broad Jump", "Weighted Burpee"
+      ].freeze
+
       EXAMPLES = [
         {
           name: "Sprint & Stations",

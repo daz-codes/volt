@@ -67,6 +67,7 @@ class WorkoutValidator
     fix_notes_as_programming(sections)
     fix_bear_complex_notes(sections)
     fix_strength_weight_cues(sections)
+    fix_race_weight_on_non_stations(sections)
     fix_jump_rope_calories(sections)
     fix_for_time_rounds(sections)
     fix_alternating_reps(sections)
@@ -620,6 +621,56 @@ class WorkoutValidator
         ex["notes"] = STRENGTH_WEIGHT_CUE
       end
     end
+  end
+
+  # Race-relative phrasing ("race weight", "competition load") only makes
+  # sense on actual race-station exercises. The LLM frequently puts it on
+  # strength accessories like Deadlift, which aren't in any race — so we
+  # replace those phrases with absolute language.
+  RACE_WEIGHT_DETECT = /\brace weight\b|\bcompetition (?:sled|load|weight)\b/i.freeze
+  RACE_WEIGHT_REPLACEMENTS = [
+    [/\bheavier than race weight\b/i,    "heavy strength load"],
+    [/\bwell below race weight\b/i,      "light load"],
+    [/\bbelow race weight\b/i,           "submaximal load"],
+    [/\babove race weight\b/i,           "near-max load"],
+    [/\bat race weight\b/i,              "working load"],
+    [/\babove competition load\b/i,      "near-max load"],
+    [/\bfull competition sled\b/i,       "heavy sled"],
+    [/\bHyrox competition sled\b/i,      "heavy sled"],
+    [/\bHyrox competition load\b/i,      "near-max load"],
+    [/\bcompetition sled\b/i,            "heavy sled"],
+    [/\bcompetition weight\b/i,          "working weight"],
+    [/\bcompetition load\b/i,            "working weight"],
+    [/\brace weight\b/i,                 "working weight"]
+  ].freeze
+
+  def fix_race_weight_on_non_stations(sections)
+    activity = LLMContext::Activities.for(@main_tag_slug)
+    return unless activity
+    return unless activity.const_defined?(:RACE_STATIONS)
+
+    station_pattern = build_race_station_pattern(activity::RACE_STATIONS)
+
+    sections.each do |section|
+      Array(section["exercises"]).each do |ex|
+        note = ex["notes"].to_s
+        next if note.empty?
+        next unless note.match?(RACE_WEIGHT_DETECT)
+        next if ex["name"].to_s.match?(station_pattern)
+
+        new_note = note.dup
+        RACE_WEIGHT_REPLACEMENTS.each { |pattern, replacement| new_note.gsub!(pattern, replacement) }
+        next if new_note == note
+
+        ex["notes"] = new_note
+        @fixes << "'#{ex["name"]}' in '#{section["name"]}': replaced race-relative wording (not a race station)"
+      end
+    end
+  end
+
+  def build_race_station_pattern(stations)
+    parts = Array(stations).map { |s| Regexp.escape(s.to_s) }
+    Regexp.new("\\b(?:#{parts.join('|')})", Regexp::IGNORECASE)
   end
 
   BEAR_PATTERN = /\bbears?\b/i.freeze

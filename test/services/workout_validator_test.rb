@@ -637,6 +637,63 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
     assert_equal "all-out", section["exercises"].first["notes"]
   end
 
+  # -- fix_race_weight_on_non_stations --
+
+  test "fix_race_weight_on_non_stations rewrites race-relative wording on a Deadlift (not a Hyrox station)" do
+    data = build_workout_with_sections([
+      { "name" => "Heavy Anchor", "category" => "main", "format" => "rounds", "rounds" => 5, "rest_secs" => 180,
+        "exercises" => [
+          { "name" => "Deadlift", "reps" => 5,
+            "notes" => "heavier than race weight — near-max load, last rep should be a grin" }
+        ] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 60, main_tag_slug: "hyrox").validate_and_fix
+    ex = result.dig("structure", "sections").first["exercises"].first
+    refute_match(/race weight/i, ex["notes"])
+    assert_match(/heavy strength load/i, ex["notes"])
+  end
+
+  test "fix_race_weight_on_non_stations leaves race-weight wording on actual race stations (Sled Push in Hyrox)" do
+    data = build_workout_with_sections([
+      { "name" => "Sled Block", "category" => "main", "format" => "rounds", "rounds" => 4, "rest_secs" => 90,
+        "exercises" => [
+          { "name" => "Sled Push", "distance_m" => 40,
+            "notes" => "race weight — full Hyrox competition sled", "equipment" => "sled" }
+        ] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 60, main_tag_slug: "hyrox").validate_and_fix
+    ex = result.dig("structure", "sections").first["exercises"].first
+    assert_equal "race weight — full Hyrox competition sled", ex["notes"]
+  end
+
+  test "fix_race_weight_on_non_stations is a no-op for activities without RACE_STATIONS (transformer)" do
+    data = build_workout_with_sections([
+      { "name" => "Heavy Pull", "category" => "main", "format" => "rounds", "rounds" => 5, "rest_secs" => 180,
+        "exercises" => [
+          { "name" => "Deadlift", "reps" => 3,
+            "notes" => "heavier than race weight — last rep should be a fight" }
+        ] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 60, main_tag_slug: "transformer").validate_and_fix
+    ex = result.dig("structure", "sections").first["exercises"].first
+    assert_match(/race weight/i, ex["notes"], "transformer has no RACE_STATIONS so the phrase is left alone")
+  end
+
+  test "fix_race_weight_on_non_stations rewrites Bench Press wording in a Deka session" do
+    data = build_workout_with_sections([
+      { "name" => "Iron Press", "category" => "main", "format" => "rounds", "rounds" => 4, "rest_secs" => 120,
+        "exercises" => [
+          { "name" => "Bench Press", "reps" => 5,
+            "notes" => "above competition load — well above race-day fatigue weight" }
+        ] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 60, main_tag_slug: "deka").validate_and_fix
+    ex = result.dig("structure", "sections").first["exercises"].first
+    refute_match(/competition load/i, ex["notes"])
+    refute_match(/race weight/i, ex["notes"])
+    assert_match(/near-max load/i, ex["notes"])
+  end
+
   private
 
   def build_workout_with_sections(sections)
