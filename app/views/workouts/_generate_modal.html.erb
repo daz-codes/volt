@@ -33,37 +33,22 @@
       { name: "Hybrid Race",       desc: "Runs + functional stations" },
       { name: "Strong Stations",   desc: "10 strongman-style stations" }
     ] %>
+    <% core_names = volt_types.map { |vt| vt[:name] }
+       recent_activities = Current.user.workouts
+                                      .where(status: "active")
+                                      .where.not(activity_id: nil)
+                                      .joins(:activity)
+                                      .where.not(activities: { name: core_names })
+                                      .order(created_at: :desc)
+                                      .limit(20)
+                                      .pluck("activities.name")
+                                      .uniq
+                                      .first(5) %>
     <div class="mb-6">
       <p class="text-sm font-semibold text-gray-300 uppercase tracking-wide mb-3">Workout Type</p>
-      <span class="text-gray-600 text-xs block mb-2">Volt Standard Workouts:</span>
-      <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
-        <% volt_types.each do |vt| %>
-          <label class="cursor-pointer">
-            <%= radio_button_tag "activity", vt[:name], false,
-                id: "activity_#{vt[:name].parameterize}",
-                class: "peer sr-only",
-                data: { generate_form_target: "pill", action: "change->generate-form#pillSelected" } %>
-            <div class="px-3 py-2 rounded-xl border border-zinc-600 peer-checked:border-lime-400 peer-checked:bg-lime-400/10 transition-all h-full">
-              <div class="text-sm font-semibold text-gray-300 peer-checked:text-lime-400 leading-tight"><%= vt[:name] %></div>
-              <div class="text-[11px] text-gray-500 mt-1 leading-snug"><%= vt[:desc] %></div>
-            </div>
-          </label>
-        <% end %>
-      </div>
 
-      <% core_names = volt_types.map { |vt| vt[:name] }
-         recent_activities = Current.user.workouts
-                                        .where(status: "active")
-                                        .where.not(activity_id: nil)
-                                        .joins(:activity)
-                                        .where.not(activities: { name: core_names })
-                                        .order(created_at: :desc)
-                                        .limit(20)
-                                        .pluck("activities.name")
-                                        .uniq
-                                        .first(5) %>
       <% if recent_activities.any? %>
-        <span class="text-gray-600 text-xs block mt-3 mb-2">Recent:</span>
+        <span class="text-gray-600 text-xs block mb-2">Recent:</span>
         <div class="flex flex-wrap gap-2">
           <% recent_activities.each do |name| %>
             <label class="cursor-pointer">
@@ -78,6 +63,29 @@
           <% end %>
         </div>
       <% end %>
+
+      <details class="mt-3 group" <%= "open" unless recent_activities.any? %>>
+        <summary class="flex items-center justify-between cursor-pointer list-none select-none">
+          <span class="text-gray-600 text-xs">Volt Standard Workouts</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-gray-500 group-open:rotate-180 transition-transform">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </summary>
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-2">
+          <% volt_types.each do |vt| %>
+            <label class="cursor-pointer">
+              <%= radio_button_tag "activity", vt[:name], false,
+                  id: "activity_#{vt[:name].parameterize}",
+                  class: "peer sr-only",
+                  data: { generate_form_target: "pill", action: "change->generate-form#pillSelected" } %>
+              <div class="px-3 py-2 rounded-xl border border-zinc-600 peer-checked:border-lime-400 peer-checked:bg-lime-400/10 transition-all h-full">
+                <div class="text-sm font-semibold text-gray-300 peer-checked:text-lime-400 leading-tight"><%= vt[:name] %></div>
+                <div class="text-[11px] text-gray-500 mt-1 leading-snug"><%= vt[:desc] %></div>
+              </div>
+            </label>
+          <% end %>
+        </div>
+      </details>
 
       <div class="mt-3">
         <%= text_field_tag :custom_activity, nil,
