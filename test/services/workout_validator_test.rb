@@ -3,6 +3,51 @@ require "test_helper"
 class WorkoutValidatorTest < ActiveSupport::TestCase
   # -- Long cardio in rounds → straight (the production bug) --
 
+  test "fix_deka_mile_compromised_run_cap clamps 500m compromised runs to 300m for Deka Mile" do
+    data = build_workout_with_sections([
+      { "name" => "Warm-Up", "format" => "straight", "duration_mins" => 5, "category" => "warm_up",
+        "exercises" => [{ "name" => "Easy ski", "duration_s" => 300 }] },
+      { "name" => "Race Repeats", "format" => "rounds", "rounds" => 5, "rest_secs" => 60,
+        "exercises" => [
+          { "name" => "Compromised Run", "distance_m" => 500, "equipment" => "treadmill" },
+          { "name" => "Med Ball Sit-up Throw", "reps" => 15, "equipment" => "wall_ball" }
+        ] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 60, main_tag_slug: "deka-mile").validate_and_fix
+    run = result.dig("structure", "sections")[1]["exercises"][0]
+    assert_equal 300, run["distance_m"], "compromised run should clamp to 300m for Deka Mile"
+  end
+
+  test "fix_deka_mile_compromised_run_cap leaves 200m compromised runs alone" do
+    data = build_workout_with_sections([
+      { "name" => "Warm-Up", "format" => "straight", "duration_mins" => 5, "category" => "warm_up",
+        "exercises" => [{ "name" => "Easy ski", "duration_s" => 300 }] },
+      { "name" => "Race Repeats", "format" => "rounds", "rounds" => 10, "rest_secs" => 60,
+        "exercises" => [
+          { "name" => "Compromised Run", "distance_m" => 200, "equipment" => "treadmill" },
+          { "name" => "Box Jump", "reps" => 10, "equipment" => "bodyweight" }
+        ] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 60, main_tag_slug: "deka-mile").validate_and_fix
+    run = result.dig("structure", "sections")[1]["exercises"][0]
+    assert_equal 200, run["distance_m"]
+  end
+
+  test "fix_deka_mile_compromised_run_cap is scoped to deka-mile only" do
+    # Other activities (e.g. Hyrox) can have compromised runs longer than 300m
+    data = build_workout_with_sections([
+      { "name" => "Warm-Up", "format" => "straight", "duration_mins" => 5, "category" => "warm_up",
+        "exercises" => [{ "name" => "Easy ski", "duration_s" => 300 }] },
+      { "name" => "Last Mile", "format" => "rounds", "rounds" => 4, "rest_secs" => 90,
+        "exercises" => [
+          { "name" => "Compromised Run", "distance_m" => 800, "equipment" => "treadmill" }
+        ] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 60, main_tag_slug: "hyrox").validate_and_fix
+    run = result.dig("structure", "sections")[1]["exercises"][0]
+    assert_equal 800, run["distance_m"], "Hyrox compromised runs are NOT capped at 300m"
+  end
+
   test "fix_long_cardio_rounds_to_straight converts 3 rounds × 24 min run to one straight 24 min block" do
     data = build_workout_with_sections([
       { "name" => "Warm-Up", "format" => "straight", "duration_mins" => 5,

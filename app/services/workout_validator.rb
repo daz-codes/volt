@@ -101,6 +101,7 @@ class WorkoutValidator
       fix_turbine_block_durations(sections)
     end
     fix_hyrox_banned_machines(sections) if @main_tag_slug == "hyrox"
+    fix_deka_mile_compromised_run_cap(sections) if @main_tag_slug == "deka-mile"
     fix_kettlebell_non_kb_exercises(sections) if @main_tag_slug == "kettlebell"
     dedup_warmup_sections(sections)
     dedup_cooldown_sections(sections)
@@ -493,6 +494,22 @@ class WorkoutValidator
   # the duration by the round count blows the session budget (e.g.
   # `3 rounds × Run 24min` = 72 min of cardio in a 60-min session).
   # Convert to `format: straight` with a single round.
+  # Deka Mile rule: compromised runs are STRICTLY ≤ 300m (the race format is
+  # 10 × 160m, training up to 300m builds the engine, longer than that drifts
+  # away from race specificity). Any exercise named "Compromised Run" with a
+  # distance_m above 300 gets clamped to 300m.
+  def fix_deka_mile_compromised_run_cap(sections)
+    sections.each do |section|
+      Array(section["exercises"]).each do |ex|
+        next unless ex["name"].to_s.match?(/\Acompromised run\z/i)
+        dist = ex["distance_m"].to_i
+        next if dist <= 300 || dist.zero?
+        ex["distance_m"] = 300
+        @fixes << "Deka Mile '#{section["name"]}' #{ex["name"]}: #{dist}m → 300m (compromised run cap)"
+      end
+    end
+  end
+
   def fix_long_cardio_rounds_to_straight(sections)
     sections.each do |section|
       next unless section["format"] == "rounds"
