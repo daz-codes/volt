@@ -637,6 +637,64 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
     assert_equal "all-out", section["exercises"].first["notes"]
   end
 
+  # -- fix_emom_alternating_inference --
+
+  test "fix_emom_alternating_inference promotes a 2-ex EMOM with the 1-min max cue to alternating" do
+    data = build_workout_with_sections([
+      { "name" => "Station Sweep", "category" => "main", "format" => "emom", "duration_mins" => 12, "rest_secs" => 0,
+        "exercises" => [
+          { "name" => "SkiErg", "notes" => "~50% of your 1-min max (leaves ~20s rest)", "equipment" => "ski_erg" },
+          { "name" => "Sled Push", "notes" => "~50% of your 1-min max (leaves ~20s rest) — race weight", "equipment" => "sled" }
+        ] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 60, main_tag_slug: "hyrox").validate_and_fix
+    section = result.dig("structure", "sections").first
+    assert_equal true, section["alternating"]
+  end
+
+  test "fix_emom_alternating_inference strips fixed metrics that conflict with the cue" do
+    data = build_workout_with_sections([
+      { "name" => "Conflict EMOM", "category" => "main", "format" => "emom", "duration_mins" => 16, "rest_secs" => 0,
+        "exercises" => [
+          { "name" => "Sled Push", "distance_m" => 10, "notes" => "~50% of your 1-min max (leaves ~20s rest)", "equipment" => "sled" },
+          { "name" => "Wall Balls", "reps" => 12, "notes" => "~50% of your 1-min max (leaves ~20s rest)", "equipment" => "wall_ball" }
+        ] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 60, main_tag_slug: "hyrox").validate_and_fix
+    section = result.dig("structure", "sections").first
+    assert_equal true, section["alternating"]
+    section["exercises"].each do |ex|
+      refute ex.key?("distance_m"), "#{ex["name"]} should have no distance_m once cue is in play"
+      refute ex.key?("reps"),       "#{ex["name"]} should have no reps once cue is in play"
+    end
+  end
+
+  test "fix_emom_alternating_inference leaves a 2-ex EMOM with fixed reps and no cue alone (legit 'both each minute')" do
+    data = build_workout_with_sections([
+      { "name" => "Triple Trouble", "category" => "main", "format" => "emom", "duration_mins" => 16, "rest_secs" => 0,
+        "exercises" => [
+          { "name" => "Burpees",   "reps" => 5, "equipment" => "bodyweight" },
+          { "name" => "KB Swings", "reps" => 5, "equipment" => "kettlebells" }
+        ] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 60, main_tag_slug: "hyrox").validate_and_fix
+    section = result.dig("structure", "sections").first
+    refute section["alternating"], "no cue means this is a real 'both each minute' EMOM — don't promote"
+    assert_equal [ 5, 5 ], section["exercises"].map { |ex| ex["reps"] }
+  end
+
+  test "fix_emom_alternating_inference leaves a single-exercise EMOM with the cue alone" do
+    data = build_workout_with_sections([
+      { "name" => "Wall Window", "category" => "main", "format" => "emom", "duration_mins" => 12, "rest_secs" => 0,
+        "exercises" => [
+          { "name" => "Wall Balls", "notes" => "~50% of your 1-min max (leaves ~20s rest)", "equipment" => "wall_ball" }
+        ] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 60, main_tag_slug: "hyrox").validate_and_fix
+    section = result.dig("structure", "sections").first
+    refute section["alternating"], "single-ex EMOMs render as the headline shape — alternating doesn't apply"
+  end
+
   # -- fix_race_weight_on_non_stations --
 
   test "fix_race_weight_on_non_stations rewrites race-relative wording on a Deadlift (not a Hyrox station)" do

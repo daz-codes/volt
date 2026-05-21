@@ -48,6 +48,7 @@ class WorkoutValidator
       case section["format"]
       when "emom"
         fix_emom_structure(section, idx)
+        fix_emom_alternating_inference(section, idx)
         fix_emom_reps(section, idx)
       when "continuous_circuit"
         fix_continuous_circuit_structure(section, idx)
@@ -253,6 +254,36 @@ class WorkoutValidator
       next if clean == reps
       ex["reps"] = clean
       @fixes << "EMOM circuit '#{section["name"]}': #{ex["name"]} reps #{reps} → #{clean} (must be 5 or 10)"
+    end
+  end
+
+  # The `~50% of your 1-min max` cue means "the athlete picks the volume" —
+  # only meaningful when each exercise gets its OWN minute (single-exercise
+  # EMOM, or alternating 2-ex EMOM where M1=A, M2=B, M3=A, …). A 2-exercise
+  # EMOM without `alternating: true` renders as "both each minute" (each
+  # exercise gets ~30s, the cue's 1-min framing doesn't apply). When we see
+  # the cue on a 2-ex non-alternating EMOM, promote it to alternating and
+  # strip any fixed metrics the LLM may have stacked alongside the cue —
+  # the cue and explicit metrics are mutually exclusive.
+  EMOM_CUE_PATTERN     = /~\s*50\s*%[^\n]*?1.?min/i.freeze
+  EMOM_CUE_METRIC_KEYS = %w[reps distance_m calories duration_s].freeze
+
+  def fix_emom_alternating_inference(section, idx)
+    return unless section["format"] == "emom"
+    return if section["alternating"]
+
+    exercises = Array(section["exercises"])
+    return unless exercises.size == 2
+    return unless exercises.any? { |ex| ex["notes"].to_s.match?(EMOM_CUE_PATTERN) }
+
+    section["alternating"] = true
+    @fixes << "EMOM '#{section["name"]}': set alternating: true (the '~50% of 1-min max' cue implies each exercise gets its own minute)"
+
+    exercises.each do |ex|
+      next unless ex["notes"].to_s.match?(EMOM_CUE_PATTERN)
+      stripped = EMOM_CUE_METRIC_KEYS.select { |k| ex.delete(k) }
+      next if stripped.empty?
+      @fixes << "EMOM '#{section["name"]}': stripped #{stripped.join(', ')} from '#{ex["name"]}' (incompatible with the 1-min max cue)"
     end
   end
 
