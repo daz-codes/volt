@@ -197,6 +197,5 @@ EVERYWHERE ELSE — rounds, for_time, hundred, strength, abs, and multi-exercise
 
 ## What to avoid
 
-- Defaulting to long for_time chippers. The compromised-run ladder (modality 5) is a chipper-shaped exception; standard full-race chippers are rare (~1 in 8-10).
 - 2-exercise EMOMs that pack both into one minute when neither fits. If you want two movements alongside cardio, use `alternating: true`, split into two separate single-exercise EMOMs, or use a 3+ exercise E2MOM.
 - Sessions that only do one type of work. Hybrid means hybrid — most sessions mix EMOM + cardio + strength + finisher.

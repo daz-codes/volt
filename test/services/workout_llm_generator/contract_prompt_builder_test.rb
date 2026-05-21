@@ -184,11 +184,36 @@ class WorkoutLLMGenerator::ContractPromptBuilderTest < ActiveSupport::TestCase
     assert_match(/"Iron & Fire"/, high_block)
   end
 
-  test "shows all examples when intensity_style is unset" do
+  test "randomly samples EXAMPLE_SAMPLE_SIZE examples when the pool exceeds it" do
+    # Hyrox has 13 examples — without sampling the LLM would see all of them
+    # and pattern-match the top-of-list each generation. Sampling rotates the
+    # slice each call so variety emerges naturally across sessions.
     prompt = build(activity_slug: "hyrox")
     block = prompt[/\<examples\>(.*?)\<\/examples\>/m, 1]
     refute_nil block
-    assert_equal 13, block.scan(/"goal"\s*:/).length
+    assert_equal WorkoutLLMGenerator::ContractPromptBuilder::EXAMPLE_SAMPLE_SIZE,
+                 block.scan(/"goal"\s*:/).length
+  end
+
+  test "returns the whole pool when it is at or below EXAMPLE_SAMPLE_SIZE" do
+    # kettlebell has 3 examples; with a sample size of 3 there is nothing to
+    # drop, so every generation gets the full set.
+    prompt = build(activity_slug: "kettlebell")
+    block = prompt[/\<examples\>(.*?)\<\/examples\>/m, 1]
+    refute_nil block
+    assert_equal 3, block.scan(/"goal"\s*:/).length
+  end
+
+  test "sampling rotates which examples appear across generations" do
+    # Burn 6 generations and collect the names of the examples shown. With
+    # 13 Hyrox examples and a sample size of 3, the same trio coming up six
+    # times in a row is vanishingly unlikely — so two distinct trios across
+    # the six calls is a low-flake assertion that sampling is actually random.
+    seen_trios = 6.times.map do
+      block = build(activity_slug: "hyrox")[/\<examples\>(.*?)\<\/examples\>/m, 1]
+      block.scan(/"name"\s*:\s*"([^"]+)"/).flatten.first(3).sort
+    end
+    assert seen_trios.uniq.length >= 2, "sampling should produce at least two different trios across 6 calls; got #{seen_trios.uniq.length}"
   end
 
   test "task tag uses user_activity_name when provided (free-form typed activity)" do

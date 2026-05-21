@@ -214,13 +214,28 @@ class WorkoutLLMGenerator
       EX
     end
 
-    # When the user has requested a specific intensity_style, narrow the
-    # examples shown to the LLM to those matching that intensity. STRICT
-    # filtering: when intensity is set, show ONLY matched examples (drop
-    # the unflagged "flexible" examples too). This prevents the unflagged
-    # medium-flavoured examples from biasing low/high sessions back toward
-    # medium patterns. Falls back to all examples if no matches exist.
+    # Number of example workouts shown to the LLM per generation. The full
+    # example pool can be large (Hyrox has 13+), but the LLM tends to pattern-
+    # match whatever it sees rather than balance modalities across sessions
+    # (it has no memory of prior generations, so "use modality X 1/5 of the
+    # time" is meaningless single-shot). Sampling a random slice each call
+    # rotates the examples the LLM sees, so output naturally varies across
+    # sessions instead of fixating on the top-of-list examples.
+    EXAMPLE_SAMPLE_SIZE = 3
+
+    # Pick the example pool: intensity-filter first (strict — drop unflagged
+    # "flexible" examples when intensity is set, to avoid biasing low/high
+    # sessions back toward medium patterns; fall back to all examples if
+    # nothing matches), then randomly sample up to EXAMPLE_SAMPLE_SIZE from
+    # the result. Pools at or below the sample size are returned as-is.
     def filtered_examples
+      pool = intensity_filtered_pool
+      return pool if pool.size <= EXAMPLE_SAMPLE_SIZE
+
+      pool.sample(EXAMPLE_SAMPLE_SIZE)
+    end
+
+    def intensity_filtered_pool
       return @activity::EXAMPLES unless @intensity_style.present?
 
       matched = @activity::EXAMPLES.select do |ex|
