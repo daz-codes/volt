@@ -333,6 +333,171 @@ module LLMContext
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
           ]
+        },
+        {
+          name: "Atlas Murph",
+          goal: "Strongman Murph — jump rope bookends around a chipper of 100 weighted sit-ups, 200 bar-facing burpees, and 300 surrender lunges. Pure stations, brutal volume.",
+          duration_mins: 60,
+          sections: [
+            { name: "Warm-Up", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "rowing_machine" } ] },
+            { name: "Buy In", format: "for_time",
+              exercises: [
+                { name: "Jump Rope Single Unders", reps: 200, notes: "race pace — set the tone for the work ahead", equipment: "jump_rope" }
+              ] },
+            { name: "Heart of Steel", format: "for_time",
+              exercises: [
+                { name: "Weighted Sit-ups", reps: 100, equipment: "dumbbells" },
+                { name: "Bar-Facing Burpees Over Bar", reps: 200, equipment: "barbell" },
+                { name: "Surrender Lunges", reps: 300, equipment: "dumbbells" }
+              ] },
+            { name: "Cash Out", format: "for_time",
+              exercises: [
+                { name: "Jump Rope Single Unders", reps: 200, notes: "everything left in the tank — race the clock home", equipment: "jump_rope" }
+              ] },
+            { name: "Cool-Down", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
+          ]
+        },
+        {
+          name: "Triple Engine",
+          goal: "Jump rope buy-in, five rotating jump-rope-and-carry rounds with bar-facing burpees between movements, a descending sled ladder, then a jump rope cash-out. Strongman station capacity.",
+          duration_mins: 60,
+          sections: [
+            { name: "Warm-Up", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "rowing_machine" } ] },
+            { name: "Buy In", format: "for_time",
+              exercises: [
+                { name: "Jump Rope Single Unders", reps: 200, notes: "race pace — set the tone, don't sandbag", equipment: "jump_rope" }
+              ] },
+            { name: "Engine Block", format: "rounds", rounds: 5, rest_secs: 60,
+              exercises: [
+                { name: "Jump Rope Single Unders", duration_s: 60, equipment: "jump_rope" },
+                { name: "Bar-Facing Burpees Over Bar", reps: 5, equipment: "barbell" },
+                { name: "Farmer's Carry", distance_m: 30, notes: "race weight — Deka Atlas competition load", equipment: "dumbbells" },
+                { name: "Bar-Facing Burpees Over Bar", reps: 5, equipment: "barbell" },
+                { name: "Atlas Shoulder to Carry", distance_m: 30, notes: "race weight — competition load", equipment: "sled" },
+                { name: "Bar-Facing Burpees Over Bar", reps: 5, equipment: "barbell" }
+              ] },
+            { name: "Sled Stairs", format: "ladder",
+              varies: "distance_m", start: 50, end: 10, step: 10, rest_between_rungs: 30,
+              exercises: [
+                { name: "Sled Push", notes: "race weight — full Deka Atlas competition sled", equipment: "sled" },
+                { name: "Sled Pull", notes: "race weight — full Deka Atlas competition sled", equipment: "sled" }
+              ] },
+            { name: "Cash Out", format: "for_time",
+              exercises: [
+                { name: "Jump Rope Single Unders", reps: 200, notes: "everything left in the tank — race the clock home", equipment: "jump_rope" }
+              ] },
+            { name: "Cool-Down", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
+          ]
+        },
+        {
+          name: "Sit-up Mountain",
+          goal: "Five rotating jump-rope-and-carry rounds with bar-facing burpees between movements, then a weighted sit-up mountain — 250 reps up and down.",
+          duration_mins: 45,
+          sections: [
+            { name: "Warm-Up", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "rowing_machine" } ] },
+            { name: "Engine Block", format: "rounds", rounds: 5, rest_secs: 60,
+              exercises: [
+                { name: "Jump Rope Single Unders", duration_s: 60, equipment: "jump_rope" },
+                { name: "Bar-Facing Burpees Over Bar", reps: 5, equipment: "barbell" },
+                { name: "Farmer's Carry", distance_m: 30, notes: "race weight — Deka Atlas competition load", equipment: "dumbbells" },
+                { name: "Bar-Facing Burpees Over Bar", reps: 5, equipment: "barbell" },
+                { name: "Atlas Shoulder to Carry", distance_m: 30, notes: "race weight — competition load", equipment: "sled" },
+                { name: "Bar-Facing Burpees Over Bar", reps: 5, equipment: "barbell" }
+              ] },
+            { name: "Mountain Climb", format: "mountain",
+              varies: "reps", start: 10, peak: 50, end: 10, step: 10, rest_between_rungs: 10,
+              exercises: [ { name: "Weighted Sit-ups", equipment: "dumbbells" } ] },
+            { name: "Cool-Down", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
+          ]
+        },
+        {
+          name: "Carry Heavy",
+          goal: "Three rounds of carry-sled-carry-sled, a 12-min weighted sit-up EMOM, a 30/30 jump rope engine, then 100 surrender lunges to close. Strongman density.",
+          duration_mins: 60,
+          sections: [
+            { name: "Warm-Up", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "rowing_machine" } ] },
+            { name: "Long Loops", format: "rounds", rounds: 3, rest_secs: 60,
+              exercises: [
+                { name: "Farmer's Carry", distance_m: 100, notes: "race weight — Deka Atlas competition load", equipment: "dumbbells" },
+                { name: "Sled Push", distance_m: 25, notes: "race weight — full Deka Atlas competition sled", equipment: "sled" },
+                { name: "Atlas Shoulder to Carry", distance_m: 100, notes: "race weight — competition load", equipment: "sled" },
+                { name: "Sled Pull", distance_m: 25, notes: "race weight — full Deka Atlas competition sled", equipment: "sled" }
+              ] },
+            { name: "Sit-up Window", format: "emom", duration_mins: 12, rest_secs: 0,
+              exercises: [
+                { name: "Weighted Sit-ups", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "dumbbells" }
+              ] },
+            { name: "Rope Engine", format: "rounds", rounds: 10, rest_secs: 30,
+              exercises: [
+                { name: "Jump Rope Single Unders", duration_s: 30, notes: "hard pace", equipment: "jump_rope" }
+              ] },
+            { name: "The Long Walk", format: "hundred",
+              exercises: [
+                { name: "Surrender Lunges", reps: 100, equipment: "dumbbells" }
+              ] },
+            { name: "Cool-Down", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
+          ]
+        },
+        {
+          name: "Engine Builder",
+          goal: "A long zone 2 chipper — two rounds of long row / long ski / weighted sit-ups / bike / row / surrender lunges. Conversational pace throughout, machine cardio (allowed at low intensity).",
+          duration_mins: 90,
+          intensity_style: "low",
+          sections: [
+            { name: "Warm-Up", format: "straight", duration_mins: 5,
+              exercises: [
+                { name: "Easy cardio + Deka mobility prep", duration_s: 300, notes: "90/90 hip switches, ankle circles, thoracic open books, world's greatest stretch", equipment: "rowing_machine" }
+              ] },
+            { name: "Two Loops", format: "rounds", rounds: 2, rest_secs: 300,
+              exercises: [
+                { name: "Row", distance_m: 2000, notes: "conversational pace — nose-breathing where possible, building aerobic engine", equipment: "rowing_machine" },
+                { name: "SkiErg", distance_m: 1000, notes: "easy aerobic pace — sustain the same effort the whole way", equipment: "ski_erg" },
+                { name: "Weighted Sit-ups", reps: 50, notes: "light load — well below race weight, controlled tempo, full range", equipment: "dumbbells" },
+                { name: "Air Bike", calories: 50, notes: "conversational pace — breath stays calm", equipment: "assault_bike" },
+                { name: "Row", distance_m: 1000, notes: "easy aerobic pace", equipment: "rowing_machine" },
+                { name: "Surrender Lunges", reps: 50, notes: "deliberate steps, focus on knee tracking", equipment: "dumbbells" }
+              ] },
+            { name: "Cool-Down", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
+          ]
+        },
+        {
+          name: "Living in America",
+          goal: "A descending jump rope ladder, a 20-min AMRAP on jump rope / weighted sit-ups / bar-facing burpees / surrender lunges, accessory strength on bench and split squats, then a bar-facing burpee tabata.",
+          duration_mins: 60,
+          sections: [
+            { name: "Warm-Up", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "rowing_machine" } ] },
+            { name: "Rope Stairs", format: "ladder",
+              varies: "reps", start: 200, end: 50, step: 50, rest_between_rungs: 30,
+              exercises: [ { name: "Jump Rope Single Unders", notes: "hard pace", equipment: "jump_rope" } ] },
+            { name: "Engine Hunt", format: "amrap", duration_mins: 20, rest_secs: 0,
+              exercises: [
+                { name: "Jump Rope Single Unders", reps: 100, equipment: "jump_rope" },
+                { name: "Weighted Sit-ups", reps: 20, equipment: "dumbbells" },
+                { name: "Bar-Facing Burpees Over Bar", reps: 10, equipment: "barbell" },
+                { name: "Surrender Lunges", reps: 20, equipment: "dumbbells" }
+              ] },
+            { name: "Strength Block", format: "rounds", intensity_style: "high", rounds: 5, rest_secs: 60,
+              exercises: [
+                { name: "DB Bench Press", reps: 8, notes: "working weight — last 2 reps should be a fight", equipment: "dumbbells" },
+                { name: "Split Squat", reps: 8, notes: "8 per leg — controlled tempo, knee tracks toe", equipment: "dumbbells" }
+              ] },
+            { name: "Tabata Burner", format: "tabata",
+              exercises: [
+                { name: "Bar-Facing Burpees Over Bar", equipment: "barbell" }
+              ] },
+            { name: "Cool-Down", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
+          ]
         }
       ].freeze
     end

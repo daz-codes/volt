@@ -330,6 +330,171 @@ module LLMContext
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
           ]
+        },
+        {
+          name: "Strong Murph",
+          goal: "Deka Strong-flavoured Murph — matched-cardio bookends around a chipper of 100 med ball sit-up throws, 200 RAM weighted burpees, and 300 RAM reverse lunges. No running, all stations.",
+          duration_mins: 60,
+          sections: [
+            { name: "Warm-Up", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
+            { name: "Buy In", format: "for_time",
+              exercises: [
+                { name: "Row", distance_m: 1000, notes: "race pace — set the tone for the work ahead", equipment: "rowing_machine" }
+              ] },
+            { name: "Heart of Steel", format: "for_time",
+              exercises: [
+                { name: "Med Ball Sit-up Throw", reps: 100, equipment: "wall_ball" },
+                { name: "RAM Weighted Burpees", reps: 200, equipment: "wall_ball" },
+                { name: "RAM Reverse Lunges", reps: 300, equipment: "wall_ball" }
+              ] },
+            { name: "Cash Out", format: "for_time",
+              exercises: [
+                { name: "SkiErg", distance_m: 1000, notes: "everything left in the tank — race the clock home", equipment: "ski_erg" }
+              ] },
+            { name: "Cool-Down", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
+          ]
+        },
+        {
+          name: "Triple Engine",
+          goal: "Row buy-in, five rotating triple-machine rounds with burpees between machines, a descending sled ladder, then a SkiErg cash-out. Three engines, two bookends — no running.",
+          duration_mins: 60,
+          sections: [
+            { name: "Warm-Up", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
+            { name: "Buy In", format: "for_time",
+              exercises: [
+                { name: "Row", distance_m: 1000, notes: "race pace — set the tone, don't sandbag", equipment: "rowing_machine" }
+              ] },
+            { name: "Engine Block", format: "rounds", rounds: 5, rest_secs: 60,
+              exercises: [
+                { name: "SkiErg", distance_m: 100, equipment: "ski_erg" },
+                { name: "Burpees", reps: 10, equipment: "bodyweight" },
+                { name: "Row", distance_m: 200, equipment: "rowing_machine" },
+                { name: "Burpees", reps: 10, equipment: "bodyweight" },
+                { name: "Air Bike", calories: 15, equipment: "assault_bike" },
+                { name: "Burpees", reps: 10, equipment: "bodyweight" }
+              ] },
+            { name: "Sled Stairs", format: "ladder",
+              varies: "distance_m", start: 50, end: 10, step: 10, rest_between_rungs: 30,
+              exercises: [
+                { name: "Sled Push", notes: "race weight — full Deka competition sled", equipment: "sled" },
+                { name: "Sled Pull", notes: "race weight — full Deka competition sled", equipment: "sled" }
+              ] },
+            { name: "Cash Out", format: "for_time",
+              exercises: [
+                { name: "SkiErg", distance_m: 1000, notes: "everything left in the tank — race the clock home", equipment: "ski_erg" }
+              ] },
+            { name: "Cool-Down", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
+          ]
+        },
+        {
+          name: "Med Ball Mountain",
+          goal: "Five rotating triple-machine rounds with burpees between machines, then a med ball sit-up throw mountain — 250 reps up and down. Compromised cardio into a single grinder.",
+          duration_mins: 45,
+          sections: [
+            { name: "Warm-Up", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
+            { name: "Engine Block", format: "rounds", rounds: 5, rest_secs: 60,
+              exercises: [
+                { name: "SkiErg", distance_m: 100, equipment: "ski_erg" },
+                { name: "Burpees", reps: 10, equipment: "bodyweight" },
+                { name: "Row", distance_m: 200, equipment: "rowing_machine" },
+                { name: "Burpees", reps: 10, equipment: "bodyweight" },
+                { name: "Air Bike", calories: 15, equipment: "assault_bike" },
+                { name: "Burpees", reps: 10, equipment: "bodyweight" }
+              ] },
+            { name: "Mountain Climb", format: "mountain",
+              varies: "reps", start: 10, peak: 50, end: 10, step: 10, rest_between_rungs: 10,
+              exercises: [ { name: "Med Ball Sit-up Throw", equipment: "wall_ball" } ] },
+            { name: "Cool-Down", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
+          ]
+        },
+        {
+          name: "Machine Heavy",
+          goal: "Three rounds of row-sled-row-sled, a 12-min med ball sit-up throw EMOM, a 30/30 SkiErg engine, then 100 RAM reverse lunges to close. No running, all machines and stations.",
+          duration_mins: 60,
+          sections: [
+            { name: "Warm-Up", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
+            { name: "Long Loops", format: "rounds", rounds: 3, rest_secs: 60,
+              exercises: [
+                { name: "Row", distance_m: 500, equipment: "rowing_machine" },
+                { name: "Sled Push", distance_m: 25, notes: "race weight — full Deka competition sled", equipment: "sled" },
+                { name: "Row", distance_m: 500, equipment: "rowing_machine" },
+                { name: "Sled Pull", distance_m: 25, notes: "race weight — full Deka competition sled", equipment: "sled" }
+              ] },
+            { name: "Med Ball Window", format: "emom", duration_mins: 12, rest_secs: 0,
+              exercises: [
+                { name: "Med Ball Sit-up Throw", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "wall_ball" }
+              ] },
+            { name: "Ski Engine", format: "rounds", rounds: 10, rest_secs: 30,
+              exercises: [
+                { name: "SkiErg", duration_s: 30, notes: "hard pace", equipment: "ski_erg" }
+              ] },
+            { name: "The Long Walk", format: "hundred",
+              exercises: [
+                { name: "RAM Reverse Lunges", reps: 100, equipment: "wall_ball" }
+              ] },
+            { name: "Cool-Down", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
+          ]
+        },
+        {
+          name: "Engine Builder",
+          goal: "A long zone 2 chipper — two rounds of long row / long ski / med ball sit-up throws / bike / row / RAM reverse lunges. Conversational pace throughout, all machine cardio.",
+          duration_mins: 90,
+          intensity_style: "low",
+          sections: [
+            { name: "Warm-Up", format: "straight", duration_mins: 5,
+              exercises: [
+                { name: "Easy cardio + Deka mobility prep", duration_s: 300, notes: "90/90 hip switches, ankle circles, thoracic open books, world's greatest stretch", equipment: "ski_erg" }
+              ] },
+            { name: "Two Loops", format: "rounds", rounds: 2, rest_secs: 300,
+              exercises: [
+                { name: "Row", distance_m: 2000, notes: "conversational pace — nose-breathing where possible, building aerobic engine", equipment: "rowing_machine" },
+                { name: "SkiErg", distance_m: 1000, notes: "easy aerobic pace — sustain the same effort the whole way", equipment: "ski_erg" },
+                { name: "Med Ball Sit-up Throw", reps: 50, notes: "light ball — well below race weight, controlled tempo, full range", equipment: "wall_ball" },
+                { name: "Air Bike", calories: 50, notes: "conversational pace — breath stays calm", equipment: "assault_bike" },
+                { name: "Row", distance_m: 1000, notes: "easy aerobic pace", equipment: "rowing_machine" },
+                { name: "RAM Reverse Lunges", reps: 50, notes: "deliberate steps, focus on knee tracking", equipment: "wall_ball" }
+              ] },
+            { name: "Cool-Down", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
+          ]
+        },
+        {
+          name: "Living in America",
+          goal: "A descending row ladder, a 20-min AMRAP on ski / med ball sit-up throws / row / RAM reverse lunges, accessory strength on bench and split squats, then a RAM weighted burpee tabata to close.",
+          duration_mins: 60,
+          sections: [
+            { name: "Warm-Up", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
+            { name: "Row Stairs", format: "ladder",
+              varies: "distance_m", start: 1000, end: 200, step: 200, rest_between_rungs: 30,
+              exercises: [ { name: "Row", notes: "hard pace", equipment: "rowing_machine" } ] },
+            { name: "Engine Hunt", format: "amrap", duration_mins: 20, rest_secs: 0,
+              exercises: [
+                { name: "SkiErg", distance_m: 400, equipment: "ski_erg" },
+                { name: "Med Ball Sit-up Throw", reps: 20, equipment: "wall_ball" },
+                { name: "Row", distance_m: 400, equipment: "rowing_machine" },
+                { name: "RAM Reverse Lunges", reps: 20, equipment: "wall_ball" }
+              ] },
+            { name: "Strength Block", format: "rounds", intensity_style: "high", rounds: 5, rest_secs: 60,
+              exercises: [
+                { name: "DB Bench Press", reps: 8, notes: "working weight — last 2 reps should be a fight", equipment: "dumbbells" },
+                { name: "Split Squat", reps: 8, notes: "8 per leg — controlled tempo, knee tracks toe", equipment: "dumbbells" }
+              ] },
+            { name: "Tabata Burner", format: "tabata",
+              exercises: [
+                { name: "RAM Weighted Burpees", equipment: "wall_ball" }
+              ] },
+            { name: "Cool-Down", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
+          ]
         }
       ].freeze
     end
