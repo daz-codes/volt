@@ -31,12 +31,21 @@ class WorkoutValidator
 
   attr_reader :fixes, :warnings
 
-  def initialize(workout_data, duration_mins:, main_tag_slug: nil)
-    @data          = workout_data
-    @duration_mins = duration_mins.to_i
-    @main_tag_slug = main_tag_slug.to_s
-    @fixes         = []
-    @warnings      = []
+  # Ordered preference for swapping running exercises when user has no treadmill.
+  # First slug the user actually has wins.
+  RUN_REPLACEMENTS = [
+    { slug: "rowing_machine", name: "Row" },
+    { slug: "ski_erg",        name: "SkiErg" },
+    { slug: "assault_bike",   name: "Air Bike" }
+  ].freeze
+
+  def initialize(workout_data, duration_mins:, main_tag_slug: nil, available_equipment: nil)
+    @data                = workout_data
+    @duration_mins       = duration_mins.to_i
+    @main_tag_slug       = main_tag_slug.to_s
+    @available_equipment = available_equipment.nil? ? nil : Array(available_equipment).map(&:to_s)
+    @fixes               = []
+    @warnings            = []
   end
 
   def validate_and_fix
@@ -74,6 +83,7 @@ class WorkoutValidator
     fix_alternating_reps(sections)
     fix_clean_rep_counts(sections)
     fix_clean_distances(sections)
+    fix_swap_run_for_no_treadmill(sections) if user_has_no_treadmill?
     fix_treadmill_calories(sections)
     fix_rest_secs(sections)
     fix_rest_ratio(sections)
@@ -507,6 +517,32 @@ class WorkoutValidator
         ex["distance_m"] = distance
         ex.delete("calories")
         @fixes << "'#{section["name"]}': treadmill #{cals} cal → #{distance}m (treadmills use distance, not calories)"
+      end
+    end
+  end
+
+  # When the user's available equipment excludes treadmill, swap any running /
+  # treadmill exercise the LLM emitted for the user's preferred cardio machine
+  # (Row > SkiErg > Air Bike, by availability). Activity-agnostic — applies
+  # equally to Deka Mile (running headline) and any other activity that allows
+  # running. Distance/duration metrics are left intact; downstream validators
+  # handle metric normalization per machine.
+  def user_has_no_treadmill?
+    @available_equipment.is_a?(Array) && @available_equipment.any? && !@available_equipment.include?("treadmill")
+  end
+
+  def fix_swap_run_for_no_treadmill(sections)
+    replacement = RUN_REPLACEMENTS.find { |r| @available_equipment.include?(r[:slug]) }
+    return unless replacement
+
+    sections.each do |section|
+      Array(section["exercises"]).each do |ex|
+        name = ex["name"].to_s
+        next unless name.match?(CARDIO_RUN_PATTERN) || name.match?(TREADMILL_PATTERN_STRICT)
+
+        ex["name"]      = replacement[:name]
+        ex["equipment"] = replacement[:slug]
+        @fixes << "'#{section["name"]}': swapped '#{name}' for '#{replacement[:name]}' (user has no treadmill)"
       end
     end
   end

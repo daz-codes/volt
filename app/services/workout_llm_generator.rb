@@ -569,11 +569,24 @@ class WorkoutLLMGenerator
   # Deduplicates — if multiple tags map to the same file, it's only included once.
 
   def validate_and_fix(workout_data)
-    validator = WorkoutValidator.new(workout_data, duration_mins: @duration_mins, main_tag_slug: @activity_slug || "")
+    validator = WorkoutValidator.new(
+      workout_data,
+      duration_mins:       @duration_mins,
+      main_tag_slug:       @activity_slug || "",
+      available_equipment: validator_available_equipment
+    )
     result    = validator.validate_and_fix
     validator.fixes.each    { |msg| Rails.logger.info("[WorkoutValidator] Fixed: #{msg}") }
     validator.warnings.each { |msg| Rails.logger.warn("[WorkoutValidator] Warn:  #{msg}") }
     result
+  end
+
+  # Resolves the user's effective equipment list for validator-side swaps.
+  # `session_note_banned_equipment` ("no run") implicitly removes treadmill
+  # even if the user's profile says they have one.
+  def validator_available_equipment
+    return nil if @equipment.blank?
+    @equipment - session_note_banned_equipment
   end
 
   def build_contract_prompt

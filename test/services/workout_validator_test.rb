@@ -48,6 +48,123 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
     assert_equal 800, run["distance_m"], "Hyrox compromised runs are NOT capped at 300m"
   end
 
+  # -- User has no treadmill: swap running exercises for cardio machine --
+
+  test "fix_swap_run_no_treadmill swaps Compromised Run for Row when user has no treadmill but has rowing_machine" do
+    data = build_workout_with_sections([
+      { "name" => "Race Repeats", "format" => "rounds", "rounds" => 5, "rest_secs" => 60,
+        "exercises" => [
+          { "name" => "Compromised Run", "distance_m" => 200, "equipment" => "treadmill" },
+          { "name" => "Box Jump", "reps" => 10 }
+        ] }
+    ])
+    result = WorkoutValidator.new(
+      data, duration_mins: 60, main_tag_slug: "deka-mile",
+      available_equipment: %w[rowing_machine ski_erg wall_ball]
+    ).validate_and_fix
+    ex = result.dig("structure", "sections")[0]["exercises"][0]
+    assert_equal "Row", ex["name"]
+    assert_equal "rowing_machine", ex["equipment"]
+    assert_equal 200, ex["distance_m"], "distance is preserved"
+  end
+
+  test "fix_swap_run_no_treadmill falls back to SkiErg when no rowing_machine available" do
+    data = build_workout_with_sections([
+      { "name" => "Intervals", "format" => "rounds", "rounds" => 4, "rest_secs" => 60,
+        "exercises" => [{ "name" => "Compromised Run", "distance_m" => 300, "equipment" => "treadmill" }] }
+    ])
+    result = WorkoutValidator.new(
+      data, duration_mins: 45, main_tag_slug: "deka-mile",
+      available_equipment: %w[ski_erg assault_bike wall_ball]
+    ).validate_and_fix
+    ex = result.dig("structure", "sections")[0]["exercises"][0]
+    assert_equal "SkiErg", ex["name"]
+    assert_equal "ski_erg", ex["equipment"]
+  end
+
+  test "fix_swap_run_no_treadmill falls back to Air Bike when only assault_bike available" do
+    data = build_workout_with_sections([
+      { "name" => "Intervals", "format" => "rounds", "rounds" => 4, "rest_secs" => 60,
+        "exercises" => [{ "name" => "Sprint", "distance_m" => 100, "equipment" => "treadmill" }] }
+    ])
+    result = WorkoutValidator.new(
+      data, duration_mins: 30, main_tag_slug: "deka-mile",
+      available_equipment: %w[assault_bike wall_ball]
+    ).validate_and_fix
+    ex = result.dig("structure", "sections")[0]["exercises"][0]
+    assert_equal "Air Bike", ex["name"]
+    assert_equal "assault_bike", ex["equipment"]
+  end
+
+  test "fix_swap_run_no_treadmill also swaps Treadmill-named exercises" do
+    data = build_workout_with_sections([
+      { "name" => "Engine", "format" => "rounds", "rounds" => 3, "rest_secs" => 60,
+        "exercises" => [{ "name" => "Treadmill Incline Intervals", "duration_s" => 480 }] }
+    ])
+    result = WorkoutValidator.new(
+      data, duration_mins: 45, main_tag_slug: "deka-mile",
+      available_equipment: %w[rowing_machine]
+    ).validate_and_fix
+    ex = result.dig("structure", "sections")[0]["exercises"][0]
+    assert_equal "Row", ex["name"]
+    assert_equal "rowing_machine", ex["equipment"]
+  end
+
+  test "fix_swap_run_no_treadmill leaves Compromised Run alone when user has treadmill" do
+    data = build_workout_with_sections([
+      { "name" => "Race Repeats", "format" => "rounds", "rounds" => 5, "rest_secs" => 60,
+        "exercises" => [{ "name" => "Compromised Run", "distance_m" => 200, "equipment" => "treadmill" }] }
+    ])
+    result = WorkoutValidator.new(
+      data, duration_mins: 60, main_tag_slug: "deka-mile",
+      available_equipment: %w[treadmill rowing_machine]
+    ).validate_and_fix
+    ex = result.dig("structure", "sections")[0]["exercises"][0]
+    assert_equal "Compromised Run", ex["name"]
+  end
+
+  test "fix_swap_run_no_treadmill is inert when available_equipment is nil (no constraint)" do
+    data = build_workout_with_sections([
+      { "name" => "Race Repeats", "format" => "rounds", "rounds" => 5, "rest_secs" => 60,
+        "exercises" => [{ "name" => "Compromised Run", "distance_m" => 200, "equipment" => "treadmill" }] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 60, main_tag_slug: "deka-mile").validate_and_fix
+    ex = result.dig("structure", "sections")[0]["exercises"][0]
+    assert_equal "Compromised Run", ex["name"]
+  end
+
+  test "fix_swap_run_no_treadmill leaves run exercises alone when no cardio machine available" do
+    # User has no treadmill AND no row/ski/bike — nothing to swap to. Leave it; user must reconfigure.
+    data = build_workout_with_sections([
+      { "name" => "Race Repeats", "format" => "rounds", "rounds" => 5, "rest_secs" => 60,
+        "exercises" => [{ "name" => "Compromised Run", "distance_m" => 200, "equipment" => "treadmill" }] }
+    ])
+    result = WorkoutValidator.new(
+      data, duration_mins: 60, main_tag_slug: "deka-mile",
+      available_equipment: %w[wall_ball kettlebells]
+    ).validate_and_fix
+    ex = result.dig("structure", "sections")[0]["exercises"][0]
+    assert_equal "Compromised Run", ex["name"]
+  end
+
+  test "fix_swap_run_no_treadmill does not swap non-running exercises that contain 'run' as substring" do
+    # 'Burpee Box Jump-overs' should not match. Sanity check the regex word-boundary scoping.
+    data = build_workout_with_sections([
+      { "name" => "Strength", "format" => "rounds", "rounds" => 3, "rest_secs" => 60,
+        "exercises" => [
+          { "name" => "RAM Reverse Lunges", "reps" => 10 },
+          { "name" => "Box Jump", "reps" => 10 }
+        ] }
+    ])
+    result = WorkoutValidator.new(
+      data, duration_mins: 45, main_tag_slug: "deka-mile",
+      available_equipment: %w[rowing_machine]
+    ).validate_and_fix
+    exs = result.dig("structure", "sections")[0]["exercises"]
+    assert_equal "RAM Reverse Lunges", exs[0]["name"]
+    assert_equal "Box Jump", exs[1]["name"]
+  end
+
   test "fix_long_cardio_rounds_to_straight converts 3 rounds × 24 min run to one straight 24 min block" do
     data = build_workout_with_sections([
       { "name" => "Warm-Up", "format" => "straight", "duration_mins" => 5,

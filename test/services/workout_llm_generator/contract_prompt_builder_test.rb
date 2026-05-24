@@ -123,6 +123,38 @@ class WorkoutLLMGenerator::ContractPromptBuilderTest < ActiveSupport::TestCase
     assert_match(/assault bike/i, contract_block)
   end
 
+  test "RUNNING SUBSTITUTION line appears for running-allowed activity when treadmill is banned" do
+    # Deka Mile allows treadmill; if the user bans it, the prompt must tell the LLM
+    # to substitute Compromised Run with the user's preferred cardio machine.
+    prompt = build(activity_slug: "deka-mile", banned_override: %w[treadmill assault_bike ski_erg])
+    sub_line = prompt[/RUNNING SUBSTITUTION:[^\n]+/]
+    refute_nil sub_line, "expected RUNNING SUBSTITUTION line in prompt"
+    assert_match(/Row/, sub_line)
+    refute_match(/SkiErg/, sub_line)
+    refute_match(/Air Bike/, sub_line)
+  end
+
+  test "RUNNING SUBSTITUTION line is omitted when treadmill is not banned" do
+    contract_block = build(activity_slug: "deka-mile")[/\<contract\>(.*?)\<\/contract\>/m, 1]
+    refute_nil contract_block
+    refute_match(/RUNNING SUBSTITUTION:/, contract_block)
+  end
+
+  test "RUNNING SUBSTITUTION line is omitted when activity disallows treadmill anyway" do
+    # Deka Strong bans treadmill at the contract level — running isn't a real choice for the LLM
+    # to make, so the substitution hint would be noise.
+    contract_block = build(activity_slug: "deka-strong", banned_override: %w[treadmill])[/\<contract\>(.*?)\<\/contract\>/m, 1]
+    refute_nil contract_block
+    refute_match(/RUNNING SUBSTITUTION:/, contract_block)
+  end
+
+  test "RUNNING SUBSTITUTION line is omitted when no cardio replacement is available to the user" do
+    contract_block = build(activity_slug: "deka-mile",
+      banned_override: %w[treadmill rowing_machine ski_erg assault_bike])[/\<contract\>(.*?)\<\/contract\>/m, 1]
+    refute_nil contract_block
+    refute_match(/RUNNING SUBSTITUTION:/, contract_block)
+  end
+
   test "omits ALLOWED EQUIPMENT line when activity allows none (e.g. ohm)" do
     contract_block = build(activity_slug: "ohm")[/\<contract\>(.*?)\<\/contract\>/m, 1]
     refute_nil contract_block

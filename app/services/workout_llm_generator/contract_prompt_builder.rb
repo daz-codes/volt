@@ -123,6 +123,9 @@ class WorkoutLLMGenerator
       lines << "PURITY: #{contract[:purity]}"
       lines << "ALLOWED EQUIPMENT: #{allowed.join(', ')}" if allowed.any?
       lines << "BANNED EQUIPMENT: #{banned.join(', ')}" if banned.any?
+      if (sub_line = run_substitution_line(allowed, banned))
+        lines << sub_line
+      end
       if banned_exercise_terms.any?
         lines << "BANNED EXERCISE NAMES (do not use in any section): #{banned_exercise_terms.join(', ')}"
       end
@@ -145,6 +148,28 @@ class WorkoutLLMGenerator
         lines << contract[:notes]
       end
       lines.join("\n")
+    end
+
+    # When the user has no treadmill but the activity allows running, tell the
+    # LLM explicitly which cardio machine to substitute. Without this the LLM
+    # often still emits Compromised Run for running-headline activities like
+    # Deka Mile because the "no treadmill" hint feels detachable from the
+    # named exercise. Mirrors validator's fix_swap_run_for_no_treadmill.
+    CARDIO_SUBSTITUTION_NAMES = {
+      "rowing_machine" => "Row",
+      "ski_erg"        => "SkiErg",
+      "assault_bike"   => "Air Bike"
+    }.freeze
+
+    def run_substitution_line(allowed, banned)
+      return nil unless banned.include?("treadmill") && allowed.include?("treadmill")
+      available_cardio = %w[rowing_machine ski_erg assault_bike] & allowed - banned
+      return nil if available_cardio.empty?
+      names = available_cardio.map { |slug| CARDIO_SUBSTITUTION_NAMES.fetch(slug) }
+      pref = names.first
+      "RUNNING SUBSTITUTION: User has no treadmill. Replace every running exercise " \
+        "(Compromised Run, Run, Sprint, Treadmill ...) with #{pref} " \
+        "(or one of: #{names.join(', ')}). Keep distance/duration unchanged."
     end
 
     # Extracts readable terms from the contract's banned_exercise_patterns regexes
