@@ -1079,6 +1079,14 @@ class WorkoutValidator
   def fix_treadmill_ladder(sections)
     sections.each do |section|
       next unless %w[ladder mountain].include?(section["format"])
+      # Parallel-rung ladders: if a treadmill exercise already carries its own
+      # distance_m override, the ladder is intentionally a mixed-metric shape.
+      # Leave the whole section alone — the rewrite below would destroy it.
+      if Array(section["exercises"]).any? { |ex|
+        ex["name"].to_s.match?(TREADMILL_PATTERN) && ex["varies"].to_s == "distance_m"
+      }
+        next
+      end
       # If the ladder is already a clean distance ladder, leave it alone.
       next if section["varies"].to_s == "distance_m"
 

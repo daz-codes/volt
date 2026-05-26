@@ -984,7 +984,6 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
   end
 
   test "fix_deka_mile_compromised_run_cap clamps per-exercise override rungs over 300m" do
-    skip "Enable after Task 6 - fix_treadmill_ladder currently mangles 'Run' inside non-distance ladders"
     # Section is reps-based but Compromised Run override is distance_m 500->100.
     data = build_workout_with_sections([
       { "name" => "Warm-Up", "format" => "straight", "duration_mins" => 5, "category" => "warm_up",
@@ -1000,6 +999,27 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
     result = WorkoutValidator.new(data, duration_mins: 60, main_tag_slug: "deka-mile").validate_and_fix
     run    = result.dig("structure", "sections")[1]["exercises"].find { |e| e["name"] == "Compromised Run" }
     assert run["start"].to_i <= 300, "override start should be clamped to 300 or below"
+  end
+
+  # -- fix_treadmill_ladder respects per-exercise overrides --
+
+  test "fix_treadmill_ladder leaves a parallel-rung ladder with a Run override alone" do
+    data = build_workout_with_sections([
+      { "name" => "Parallel Descender", "category" => "main", "format" => "ladder",
+        "varies" => "reps", "start" => 50, "end" => 10, "step" => 10,
+        "exercises" => [
+          { "name" => "Box Jump" },
+          { "name" => "Run", "equipment" => "treadmill",
+            "varies" => "distance_m", "start" => 500, "end" => 100, "step" => 100 }
+        ] }
+    ])
+    result  = WorkoutValidator.new(data, duration_mins: 60, main_tag_slug: "").validate_and_fix
+    section = result.dig("structure", "sections").first
+    assert_equal "reps", section["varies"], "section varies must not flip to distance_m"
+    run = section["exercises"].find { |e| e["name"] == "Run" }
+    assert_equal "distance_m", run["varies"]
+    assert_equal 500, run["start"]
+    assert_equal 2, section["exercises"].size, "Box Jump must not be deleted"
   end
 
   private
