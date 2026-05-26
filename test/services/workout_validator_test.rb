@@ -869,6 +869,59 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
     assert_match(/near-max load/i, ex["notes"])
   end
 
+  # -- fix_ladder_rung_count_parity --
+
+  test "fix_ladder_rung_count_parity leaves matching rung counts alone" do
+    data = build_workout_with_sections([
+      { "name" => "Parallel Descender", "category" => "main", "format" => "ladder",
+        "varies" => "reps", "start" => 50, "end" => 10, "step" => 10,
+        "exercises" => [
+          { "name" => "Box Jump" },
+          { "name" => "Row", "varies" => "calories", "start" => 50, "end" => 10, "step" => 10 }
+        ] }
+    ])
+    result  = WorkoutValidator.new(data, duration_mins: 30, main_tag_slug: "").validate_and_fix
+    section = result.dig("structure", "sections").first
+    row     = section["exercises"].find { |e| e["name"] == "Row" }
+    assert_equal "calories", row["varies"]
+    assert_equal 50, row["start"]
+  end
+
+  test "fix_ladder_rung_count_parity strips all overrides on mismatch" do
+    # Box Jump: 50→10 step 10 = 5 rungs. Row: 80→10 step 10 = 8 rungs. Mismatch.
+    data = build_workout_with_sections([
+      { "name" => "Parallel Descender", "category" => "main", "format" => "ladder",
+        "varies" => "reps", "start" => 50, "end" => 10, "step" => 10,
+        "exercises" => [
+          { "name" => "Box Jump" },
+          { "name" => "Row", "varies" => "calories", "start" => 80, "end" => 10, "step" => 10 }
+        ] }
+    ])
+    validator = WorkoutValidator.new(data, duration_mins: 30, main_tag_slug: "")
+    result    = validator.validate_and_fix
+    row       = result.dig("structure", "sections").first["exercises"].find { |e| e["name"] == "Row" }
+    refute row.key?("varies"),    "override varies should be stripped on mismatch"
+    refute row.key?("start"),     "override start should be stripped on mismatch"
+    refute row.key?("end"),       "override end should be stripped on mismatch"
+    refute row.key?("step"),      "override step should be stripped on mismatch"
+    assert validator.warnings.any? { |w| w.match?(/rung count/i) }, "expected a parity warning"
+  end
+
+  test "fix_ladder_rung_count_parity also strips mountain peak override" do
+    # Two mountain exercises with mismatched peaks → mismatched rung counts.
+    data = build_workout_with_sections([
+      { "name" => "Twin Peaks", "category" => "main", "format" => "mountain",
+        "varies" => "reps", "start" => 5, "peak" => 15, "end" => 5, "step" => 5,
+        "exercises" => [
+          { "name" => "Wall Ball" },
+          { "name" => "KB Swing", "varies" => "reps", "start" => 5, "peak" => 25, "end" => 5, "step" => 5 }
+        ] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 30, main_tag_slug: "").validate_and_fix
+    kb = result.dig("structure", "sections").first["exercises"].find { |e| e["name"] == "KB Swing" }
+    refute kb.key?("peak"), "override peak should be stripped on mismatch"
+  end
+
   private
 
   def build_workout_with_sections(sections)

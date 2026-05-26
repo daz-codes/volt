@@ -65,6 +65,7 @@ class WorkoutValidator
         fix_tabata_duration(section, idx)
         fix_tabata_exercise_count(section, idx)
       when "ladder", "mountain"
+        fix_ladder_rung_count_parity(section, idx)
         fix_ladder_step(section, idx)
         fix_mountain_end(section) if section["format"] == "mountain"
       when "hundred"
@@ -331,6 +332,24 @@ class WorkoutValidator
     old = section["duration_mins"]
     section["duration_mins"] = 4
     @fixes << "Tabata '#{section["name"]}': corrected duration #{old} → 4 mins"
+  end
+
+  # Per-exercise rung-count parity: when overrides are present, every exercise
+  # in a ladder/mountain must produce the same number of rungs as the section
+  # default. Mismatched overrides are stripped (the section falls back to its
+  # defaults) — the alternative ("drop the offending exercise") loses real
+  # programming intent and was explicitly ruled out in the design.
+  def fix_ladder_rung_count_parity(section, idx)
+    return unless Workout::LadderSequence.has_per_exercise_overrides?(section)
+
+    exercises   = Array(section["exercises"])
+    rung_counts = exercises.map { |ex| Workout::LadderSequence.values_for(section, ex).size }
+    return if rung_counts.uniq.size == 1
+
+    exercises.each do |ex|
+      %w[varies start end step peak].each { |k| ex.delete(k) }
+    end
+    @warnings << "Ladder '#{section["name"]}': per-exercise rung counts mismatched (#{rung_counts.join(",")}) — stripped overrides, falling back to section defaults"
   end
 
   # Ladder/mountain: step size must be within the valid range for the varying metric.
