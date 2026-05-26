@@ -625,6 +625,33 @@ module LLMContext
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
           ]
+        },
+        {
+          name: "Wall Ball Tower",
+          goal: "Wall Balls and Row descending in parallel — both exercises descend on the same rung count but on different scales (25→5 reps of wall balls paired with 25→5 calories of row), then heavy sled work and a tabata finisher.",
+          duration_mins: 45,
+          sections: [
+            { name: "Warm-Up", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "rowing_machine" } ] },
+            { name: "Wall Ball Tower", format: "ladder",
+              varies: "reps", start: 25, end: 5, step: 5, rest_between_rungs: 45,
+              exercises: [
+                { name: "Wall Balls", equipment: "wall_ball" },
+                { name: "Row", equipment: "rowing_machine",
+                  varies: "calories", start: 25, end: 5, step: 5 }
+              ] },
+            { name: "Heavy Sled", format: "rounds", intensity_style: "high", rounds: 4, rest_secs: 120,
+              exercises: [
+                { name: "Sled Push", distance_m: 20, notes: "heavier than race weight — above competition load", equipment: "sled" }
+              ] },
+            { name: "Tabata Burner", format: "tabata",
+              exercises: [
+                { name: "Burpee Broad Jumps", equipment: "bodyweight" },
+                { name: "Sandbag Lunges", equipment: "bodyweight" }
+              ] },
+            { name: "Cool-Down", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
+          ]
         }
       ].freeze
     end

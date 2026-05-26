@@ -507,6 +507,35 @@ module LLMContext
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
           ]
+        },
+        {
+          name: "Parallel Descender",
+          goal: "Compromised Run + Box Jump descending in parallel — both exercises descend on the same rung count but on different scales (300→100m of run paired with 25→5 reps of box jump), then heavy carries and a tabata finisher.",
+          duration_mins: 45,
+          sections: [
+            { name: "Warm-Up", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "treadmill" } ] },
+            { name: "Compromised Descender", format: "ladder",
+              varies: "distance_m", start: 300, end: 100, step: 50, rest_between_rungs: 45,
+              exercises: [
+                { name: "Compromised Run", equipment: "treadmill", notes: "race pace — Deka Mile distance" },
+                { name: "Box Jump", equipment: "bodyweight",
+                  varies: "reps", start: 25, end: 5, step: 5,
+                  notes: "rebound off the box, soft landings" }
+              ] },
+            { name: "Heavy Carries", format: "rounds", rounds: 4, rest_secs: 60,
+              exercises: [
+                { name: "Farmer's Carry", distance_m: 40, notes: "race weight — competition load", equipment: "kettlebells" },
+                { name: "Sled Push", distance_m: 20, notes: "race weight — full competition sled", equipment: "sled" }
+              ] },
+            { name: "Tabata Burner", format: "tabata",
+              exercises: [
+                { name: "RAM Weighted Burpees", equipment: "bodyweight" },
+                { name: "Sit-ups", equipment: "bodyweight" }
+              ] },
+            { name: "Cool-Down", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
+          ]
         }
       ].freeze
     end
