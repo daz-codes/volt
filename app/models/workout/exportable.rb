@@ -211,16 +211,27 @@ module Workout::Exportable
       desc = cycles && cycles > 1 ? "1 min each exercise, #{cycles} rounds" : "1 min each exercise"
       [ "Continuous Circuit", desc ]
     when "emom"
+      period      = section["period_mins"].to_i.nonzero? || 1
       alternating = section["alternating"]
-      if alternating && ex_count == 2
-        [ "EMOM #{dur}min", "Alternating each minute" ]
-      elsif ex_count >= 3 && dur
-        e2m_rounds = dur / 2
-        desc = e2m_rounds > 1 ? "All #{ex_count} exercises every 2 min \u00B7 #{e2m_rounds} rounds" : nil
-        [ "E2MOM #{dur}min", desc ]
-      else
-        [ "EMOM #{dur}min", rest ? "#{format_rest_secs(rest)} rest each minute" : nil ]
-      end
+      label_base  = period == 1 ? "EMOM" : "E#{period}MOM"
+      label       = dur ? "#{label_base} #{dur}min" : label_base
+
+      desc =
+        if ex_count == 2 && alternating && period == 1
+          "Alternating each minute"
+        elsif ex_count >= 2 && alternating
+          cycle = ex_count * period
+          per_label = period == 1 ? "one exercise per minute" : "one exercise per #{period} minutes"
+          "#{cycle}-min rotation \u00B7 #{per_label}"
+        elsif ex_count == 2
+          period == 1 ? "Both exercises each minute" : "Both exercises every #{period} minutes"
+        elsif ex_count > 2
+          period == 1 ? "All #{ex_count} exercises each minute" : "All #{ex_count} exercises every #{period} minutes"
+        elsif rest
+          period == 1 ? "#{format_rest_secs(rest)} rest each minute" : "#{format_rest_secs(rest)} rest every #{period} minutes"
+        end
+
+      [ label, desc ]
     when "amrap"
       [ "AMRAP #{dur}min", "As many rounds as possible" ]
     when "rounds"

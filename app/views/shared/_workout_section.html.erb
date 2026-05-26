@@ -82,24 +82,28 @@
    when "amrap"
      ["AMRAP", section["duration_mins"] ? "#{section["duration_mins"]} min" : nil]
    when "emom"
-     detail_parts = []
-     detail_parts << "#{section["duration_mins"]} min" if section["duration_mins"]
-     n = Array(section["exercises"]).size
-     dur = section["duration_mins"].to_i
+     n           = Array(section["exercises"]).size
+     dur         = section["duration_mins"].to_i
+     period      = section["period_mins"].to_i.nonzero? || 1
      alternating = section["alternating"]
-     if alternating && n == 2
+     label       = period == 1 ? "EMOM" : "E#{period}MOM"
+
+     detail_parts = []
+     detail_parts << "#{dur} min" if dur > 0
+
+     if n == 2 && alternating && period == 1
        detail_parts << "alternating each minute"
-       ["EMOM", detail_parts.join(" · ").presence]
-     elsif n >= 3
-       rounds = dur > 0 ? dur / 2 : nil
-       detail_parts << "all #{n} exercises every 2 minutes"
-       detail_parts << "#{rounds} rounds" if rounds && rounds > 1
-       ["E2MOM", detail_parts.join(" · ").presence]
-     else
-       detail_parts << "both exercises each minute" if n == 2
-       detail_parts << "all #{n} exercises each minute" if n > 2
-       ["EMOM", detail_parts.join(" · ").presence]
+     elsif n >= 2 && alternating
+       cycle = n * period
+       per_label = period == 1 ? "one exercise per minute" : "one exercise per #{period} minutes"
+       detail_parts << "#{cycle}-min rotation, #{per_label}"
+     elsif n == 2
+       detail_parts << (period == 1 ? "both exercises each minute" : "both exercises every #{period} minutes")
+     elsif n > 2
+       detail_parts << (period == 1 ? "all #{n} exercises each minute" : "all #{n} exercises every #{period} minutes")
      end
+
+     [label, detail_parts.join(" · ").presence]
    when "continuous_circuit"
      detail_parts = []
      detail_parts << "#{section["duration_mins"]} min" if section["duration_mins"]
