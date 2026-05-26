@@ -190,9 +190,17 @@ class WorkoutValidator
   # Continuous circuits (one exercise per minute) are their own format and don't
   # hit this method. Also enforces a per-exercise calorie cap for cardio machines.
   def fix_emom_reps(section, idx)
-    cap       = EMOM_REP_CAP
-    exercises = Array(section["exercises"])
-    changed   = []
+    period      = section["period_mins"].to_i.nonzero? || 1
+    alternating = section["alternating"]
+    exercises   = Array(section["exercises"])
+    changed     = []
+
+    # When exercises rotate one-per-period, each one owns its full period —
+    # don't aggregate-cap across the list. Cardio cal cap still applies
+    # per-exercise (scaled by period).
+    return if alternating && exercises.size >= 2 && fix_emom_cardio_cal_only(section, exercises, period, changed)
+
+    cap = EMOM_REP_CAP * period
 
     # Zero pass: convert distance_m to calories on cardio machines in circuit EMOMs.
     # Distance targets (250m ski, 500m row) are impossible within a shared minute.
@@ -212,13 +220,14 @@ class WorkoutValidator
       end
     end
 
-    # First pass: clamp cardio machine calories independently
+    # First pass: clamp cardio machine calories independently (cap scales by period)
+    cardio_cap = EMOM_CARDIO_CAL_CAP * period
     exercises.each do |ex|
-      next unless ex["calories"].to_i > EMOM_CARDIO_CAL_CAP
+      next unless ex["calories"].to_i > cardio_cap
       next unless ex["name"].to_s.match?(CARDIO_MACHINE_PATTERN)
       old = ex["calories"]
-      ex["calories"] = EMOM_CARDIO_CAL_CAP
-      changed << "#{ex["name"]} cal #{old} → #{EMOM_CARDIO_CAL_CAP}"
+      ex["calories"] = cardio_cap
+      changed << "#{ex["name"]} cal #{old} → #{cardio_cap}"
     end
 
     # Second pass: scale total if still over cap
@@ -242,20 +251,42 @@ class WorkoutValidator
     @fixes << "EMOM '#{section["name"]}': #{changed.join("; ")}" if changed.any?
   end
 
-  # EMOM circuit: max 3 exercises per minute.
-  def fix_emom_structure(section, idx)
-    exercises = Array(section["exercises"])
+  # Per-exercise cardio cap pass for rotating EMOMs (where each exercise owns
+  # its full period). Returns true when called, so the surrounding aggregate
+  # rep-scaling pass is skipped.
+  def fix_emom_cardio_cal_only(section, exercises, period, changed)
+    cardio_cap = EMOM_CARDIO_CAL_CAP * period
+    exercises.each do |ex|
+      next unless ex["calories"].to_i > cardio_cap
+      next unless ex["name"].to_s.match?(CARDIO_MACHINE_PATTERN)
+      old = ex["calories"]
+      ex["calories"] = cardio_cap
+      changed << "#{ex["name"]} cal #{old} → #{cardio_cap}"
+    end
+    @fixes << "EMOM '#{section["name"]}': #{changed.join("; ")}" if changed.any?
+    true
+  end
 
-    # circuit — cap exercises per minute. Standard EMOMs share one minute, so two
-    # exercises is the practical max (FM allows three legacy 3-ex emoms before they
-    # were promoted to continuous_circuit).
-    is_fm = @main_tag_slug == "functional-muscle"
-    max_exercises = is_fm ? 3 : 2
-    if exercises.size > max_exercises
-      section["exercises"] = exercises.first(max_exercises)
-      section.delete("notes") # LLM notes reference the old exercise count
-      @fixes << "EMOM circuit '#{section["name"]}': trimmed to #{max_exercises} exercises (was #{exercises.size})"
-      exercises = section["exercises"]
+  # EMOM structure cap. Standard circuit EMOMs (period_mins:1, alternating
+  # false-or-nil) share one minute, so two exercises is the practical max
+  # (FM allows three legacy 3-ex emoms before they were promoted to
+  # continuous_circuit). With period_mins > 1 or alternating: true the
+  # cap does not apply — the LLM is intentionally describing E2MOMs, rotating
+  # blocks, or strength stations.
+  def fix_emom_structure(section, idx)
+    exercises  = Array(section["exercises"])
+    period     = section["period_mins"].to_i.nonzero? || 1
+    alternates = section["alternating"]
+
+    unless period > 1 || alternates
+      is_fm = @main_tag_slug == "functional-muscle"
+      max_exercises = is_fm ? 3 : 2
+      if exercises.size > max_exercises
+        section["exercises"] = exercises.first(max_exercises)
+        section.delete("notes") # LLM notes reference the old exercise count
+        @fixes << "EMOM circuit '#{section["name"]}': trimmed to #{max_exercises} exercises (was #{exercises.size})"
+        exercises = section["exercises"]
+      end
     end
 
     exercises.each do |ex|
