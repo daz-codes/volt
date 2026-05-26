@@ -147,7 +147,13 @@ module Workout::Exportable
           metric = parts.join(" \u00B7 ")
 
           if is_ladder
-            ex_name
+            if Workout::LadderSequence.has_per_exercise_overrides?(section) && %w[ladder mountain].include?(fmt)
+              vals = Workout::LadderSequence.values_for(section, ex)
+              unit = Workout::LadderSequence.unit_label_for(section, ex)
+              "#{vals.join(" · ")} #{unit} #{ex_name}".strip
+            else
+              ex_name
+            end
           elsif metric.present?
             "#{metric} #{ex_name}"
           else
@@ -241,12 +247,16 @@ module Workout::Exportable
     when "for_time"
       desc = rounds && rounds > 1 ? "#{rounds} rounds \u00B7 race the clock" : "Race the clock"
       [ "For Time", desc ]
-    when "ladder"
-      seq = ladder_sequence(section["start"], section["end"], section["step"])
-      [ "Ladder", "#{seq} reps of each exercise" ]
-    when "mountain"
-      seq = mountain_sequence(section["start"], section["peak"], section["end"], section["step"])
-      [ "Mountain", "#{seq} reps of each exercise" ]
+    when "ladder", "mountain"
+      if Workout::LadderSequence.has_per_exercise_overrides?(section)
+        [ fmt == "mountain" ? "Mixed Mountain" : "Mixed Ladder", nil ]
+      elsif fmt == "ladder"
+        seq = ladder_sequence(section["start"], section["end"], section["step"])
+        [ "Ladder", "#{seq} reps of each exercise" ]
+      else
+        seq = mountain_sequence(section["start"], section["peak"], section["end"], section["step"])
+        [ "Mountain", "#{seq} reps of each exercise" ]
+      end
     when "switchback"
       [ "Up & Down Ladder", "Alternate between each exercise" ]
     when "hundred"

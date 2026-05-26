@@ -277,4 +277,36 @@ class Workout::ExportableTest < ActiveSupport::TestCase
     @workout.structure = "invalid"
     assert_equal [], @workout.export_sections
   end
+
+  test "export_sections shows shared sequence in description for section-default ladder" do
+    @workout.structure = {
+      "sections" => [
+        { "name" => "Reps Ladder", "category" => "main", "format" => "ladder",
+          "varies" => "reps", "start" => 10, "end" => 1, "step" => 1,
+          "exercises" => [{ "name" => "Burpee" }] }
+      ]
+    }
+    section = @workout.export_sections.first
+    assert_equal "Ladder", section[:label]
+    assert_match(/reps of each exercise/, section[:description].to_s)
+  end
+
+  test "export_sections shows per-exercise sequences when overrides are present" do
+    @workout.structure = {
+      "sections" => [
+        { "name" => "Parallel Descender", "category" => "main", "format" => "ladder",
+          "varies" => "reps", "start" => 50, "end" => 10, "step" => 10,
+          "exercises" => [
+            { "name" => "Box Jump" },
+            { "name" => "Row", "varies" => "calories", "start" => 50, "end" => 10, "step" => 10 }
+          ] }
+      ]
+    }
+    section = @workout.export_sections.first
+    assert_equal "Mixed Ladder", section[:label]
+    assert section[:description].to_s.empty? || !section[:description].to_s.match?(/50.*40.*30/),
+           "no shared sequence in header"
+    assert section[:exercises].any? { |line| line.match?(/50.*40.*30.*20.*10.*reps/) }, "box jump row"
+    assert section[:exercises].any? { |line| line.match?(/50.*40.*30.*20.*10.*cal/) },  "row row"
+  end
 end
