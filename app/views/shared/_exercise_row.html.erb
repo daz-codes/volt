@@ -78,11 +78,22 @@
       <% end %>
     </div>
   <% elsif %w[ladder mountain].include?(section["format"].to_s) %>
-    <% all_metrics = Array(section["exercises"]).map { |e| e["metric"].presence || section["varies"].to_s }
+    <% has_overrides = ladder_has_per_exercise_overrides?(section)
+       all_metrics = Array(section["exercises"]).map { |e| e["metric"].presence || section["varies"].to_s }
        mixed = all_metrics.uniq.size > 1
        this_metric = exercise["metric"].presence || section["varies"].to_s
        unit_lbl = ladder_unit_lbl_map[this_metric] %>
-    <% if (mixed && unit_lbl) || exercise["notes"].present? %>
+    <% if has_overrides %>
+      <% vals = ladder_values_for(section, exercise)
+         lbl  = ladder_unit_label_for(section, exercise)
+         seq  = vals.size <= 10 ? vals.join(" · ") : "#{vals.first(3).join(" · ")} · … · #{vals.last}" %>
+      <div class="flex items-center gap-1.5 mt-1 flex-wrap">
+        <span class="text-xs font-bold text-sky-200"><%= seq %> <%= lbl %></span>
+        <% if exercise["notes"].present? %>
+          <span class="text-gray-400 text-xs italic"><%= exercise["notes"] %></span>
+        <% end %>
+      </div>
+    <% elsif (mixed && unit_lbl) || exercise["notes"].present? %>
       <div class="flex items-center gap-1.5 mt-1 flex-wrap">
         <% if mixed && unit_lbl %>
           <span class="text-xs font-bold text-sky-200"><%= unit_lbl %></span>

@@ -30,32 +30,37 @@
    switchback_down_str = nil
    switchback_up_str = nil
    if %w[ladder mountain].include?(sec_format)
-     step = [section["step"].to_f, 1.0].max
-     ladder_metric_unit = { "reps" => "reps", "calories" => "cal", "kg" => "kg", "distance_m" => "m" }
-     ladder_effective_metrics = Array(section["exercises"]).map { |e| e["metric"].presence || section["varies"].to_s }
-     ladder_metrics_mixed = ladder_effective_metrics.uniq.size > 1
-     varies_lbl = if ladder_metrics_mixed
-       ""
+     if ladder_has_per_exercise_overrides?(section)
+       # Per-exercise sequences render under each exercise — no shared header.
+       ladder_seq_str = nil
      else
-       ladder_metric_unit.fetch(section["varies"].to_s, section["varies"].to_s)
-     end
-     if sec_format == "ladder"
-       sv = section["start"].to_f; ev = section["end"].to_f
-       vals = []
-       if sv <= ev
-         v = sv; while v <= ev + 0.001; vals << v; v += step; end
+       step = [section["step"].to_f, 1.0].max
+       ladder_metric_unit = { "reps" => "reps", "calories" => "cal", "kg" => "kg", "distance_m" => "m" }
+       ladder_effective_metrics = Array(section["exercises"]).map { |e| e["metric"].presence || section["varies"].to_s }
+       ladder_metrics_mixed = ladder_effective_metrics.uniq.size > 1
+       varies_lbl = if ladder_metrics_mixed
+         ""
        else
-         v = sv; while v >= ev - 0.001; vals << v; v -= step; end
+         ladder_metric_unit.fetch(section["varies"].to_s, section["varies"].to_s)
        end
-     else
-       sv = section["start"].to_f; pk = section["peak"].to_f; ev = section["end"].to_f.nonzero? || sv
-       up = []; v = sv; while v <= pk + 0.001; up << v; v += step; end
-       dn = []; v = pk - step; while v >= ev - 0.001; dn << v; v -= step; end
-       vals = up + dn
+       if sec_format == "ladder"
+         sv = section["start"].to_f; ev = section["end"].to_f
+         vals = []
+         if sv <= ev
+           v = sv; while v <= ev + 0.001; vals << v; v += step; end
+         else
+           v = sv; while v >= ev - 0.001; vals << v; v -= step; end
+         end
+       else
+         sv = section["start"].to_f; pk = section["peak"].to_f; ev = section["end"].to_f.nonzero? || sv
+         up = []; v = sv; while v <= pk + 0.001; up << v; v += step; end
+         dn = []; v = pk - step; while v >= ev - 0.001; dn << v; v -= step; end
+         vals = up + dn
+       end
+       vals = vals.map { |v| v == v.to_i ? v.to_i : v }
+       seq = vals.size <= 10 ? vals.join(" · ") : "#{vals.first(3).join(" · ")} · … · #{vals.last}"
+       ladder_seq_str = "#{seq} #{varies_lbl}".strip
      end
-     vals = vals.map { |v| v == v.to_i ? v.to_i : v }
-     seq = vals.size <= 10 ? vals.join(" · ") : "#{vals.first(3).join(" · ")} · … · #{vals.last}"
-     ladder_seq_str = "#{seq} #{varies_lbl}".strip
    elsif sec_format == "switchback"
      sb_start = section["start"].to_i.nonzero? || 40
      sb_end   = section["end"].to_i.nonzero?   || 10
