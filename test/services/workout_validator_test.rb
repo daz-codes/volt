@@ -6,7 +6,7 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
   test "fix_deka_mile_compromised_run_cap clamps 500m compromised runs to 300m for Deka Mile" do
     data = build_workout_with_sections([
       { "name" => "Warm-Up", "format" => "straight", "duration_mins" => 5, "category" => "warm_up",
-        "exercises" => [{ "name" => "Easy ski", "duration_s" => 300 }] },
+        "exercises" => [ { "name" => "Easy ski", "duration_s" => 300 } ] },
       { "name" => "Race Repeats", "format" => "rounds", "rounds" => 5, "rest_secs" => 60,
         "exercises" => [
           { "name" => "Compromised Run", "distance_m" => 500, "equipment" => "treadmill" },
@@ -21,7 +21,7 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
   test "fix_deka_mile_compromised_run_cap leaves 200m compromised runs alone" do
     data = build_workout_with_sections([
       { "name" => "Warm-Up", "format" => "straight", "duration_mins" => 5, "category" => "warm_up",
-        "exercises" => [{ "name" => "Easy ski", "duration_s" => 300 }] },
+        "exercises" => [ { "name" => "Easy ski", "duration_s" => 300 } ] },
       { "name" => "Race Repeats", "format" => "rounds", "rounds" => 10, "rest_secs" => 60,
         "exercises" => [
           { "name" => "Compromised Run", "distance_m" => 200, "equipment" => "treadmill" },
@@ -37,7 +37,7 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
     # Other activities (e.g. Hyrox) can have compromised runs longer than 300m
     data = build_workout_with_sections([
       { "name" => "Warm-Up", "format" => "straight", "duration_mins" => 5, "category" => "warm_up",
-        "exercises" => [{ "name" => "Easy ski", "duration_s" => 300 }] },
+        "exercises" => [ { "name" => "Easy ski", "duration_s" => 300 } ] },
       { "name" => "Last Mile", "format" => "rounds", "rounds" => 4, "rest_secs" => 90,
         "exercises" => [
           { "name" => "Compromised Run", "distance_m" => 800, "equipment" => "treadmill" }
@@ -71,7 +71,7 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
   test "fix_swap_run_no_treadmill falls back to SkiErg when no rowing_machine available" do
     data = build_workout_with_sections([
       { "name" => "Intervals", "format" => "rounds", "rounds" => 4, "rest_secs" => 60,
-        "exercises" => [{ "name" => "Compromised Run", "distance_m" => 300, "equipment" => "treadmill" }] }
+        "exercises" => [ { "name" => "Compromised Run", "distance_m" => 300, "equipment" => "treadmill" } ] }
     ])
     result = WorkoutValidator.new(
       data, duration_mins: 45, main_tag_slug: "deka-mile",
@@ -85,7 +85,7 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
   test "fix_swap_run_no_treadmill falls back to Air Bike when only assault_bike available" do
     data = build_workout_with_sections([
       { "name" => "Intervals", "format" => "rounds", "rounds" => 4, "rest_secs" => 60,
-        "exercises" => [{ "name" => "Sprint", "distance_m" => 100, "equipment" => "treadmill" }] }
+        "exercises" => [ { "name" => "Sprint", "distance_m" => 100, "equipment" => "treadmill" } ] }
     ])
     result = WorkoutValidator.new(
       data, duration_mins: 30, main_tag_slug: "deka-mile",
@@ -99,7 +99,7 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
   test "fix_swap_run_no_treadmill also swaps Treadmill-named exercises" do
     data = build_workout_with_sections([
       { "name" => "Engine", "format" => "rounds", "rounds" => 3, "rest_secs" => 60,
-        "exercises" => [{ "name" => "Treadmill Incline Intervals", "duration_s" => 480 }] }
+        "exercises" => [ { "name" => "Treadmill Incline Intervals", "duration_s" => 480 } ] }
     ])
     result = WorkoutValidator.new(
       data, duration_mins: 45, main_tag_slug: "deka-mile",
@@ -113,7 +113,7 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
   test "fix_swap_run_no_treadmill leaves Compromised Run alone when user has treadmill" do
     data = build_workout_with_sections([
       { "name" => "Race Repeats", "format" => "rounds", "rounds" => 5, "rest_secs" => 60,
-        "exercises" => [{ "name" => "Compromised Run", "distance_m" => 200, "equipment" => "treadmill" }] }
+        "exercises" => [ { "name" => "Compromised Run", "distance_m" => 200, "equipment" => "treadmill" } ] }
     ])
     result = WorkoutValidator.new(
       data, duration_mins: 60, main_tag_slug: "deka-mile",
@@ -126,7 +126,7 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
   test "fix_swap_run_no_treadmill is inert when available_equipment is nil (no constraint)" do
     data = build_workout_with_sections([
       { "name" => "Race Repeats", "format" => "rounds", "rounds" => 5, "rest_secs" => 60,
-        "exercises" => [{ "name" => "Compromised Run", "distance_m" => 200, "equipment" => "treadmill" }] }
+        "exercises" => [ { "name" => "Compromised Run", "distance_m" => 200, "equipment" => "treadmill" } ] }
     ])
     result = WorkoutValidator.new(data, duration_mins: 60, main_tag_slug: "deka-mile").validate_and_fix
     ex = result.dig("structure", "sections")[0]["exercises"][0]
@@ -137,7 +137,7 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
     # User has no treadmill AND no row/ski/bike — nothing to swap to. Leave it; user must reconfigure.
     data = build_workout_with_sections([
       { "name" => "Race Repeats", "format" => "rounds", "rounds" => 5, "rest_secs" => 60,
-        "exercises" => [{ "name" => "Compromised Run", "distance_m" => 200, "equipment" => "treadmill" }] }
+        "exercises" => [ { "name" => "Compromised Run", "distance_m" => 200, "equipment" => "treadmill" } ] }
     ])
     result = WorkoutValidator.new(
       data, duration_mins: 60, main_tag_slug: "deka-mile",
@@ -168,9 +168,9 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
   test "fix_long_cardio_rounds_to_straight converts 3 rounds × 24 min run to one straight 24 min block" do
     data = build_workout_with_sections([
       { "name" => "Warm-Up", "format" => "straight", "duration_mins" => 5,
-        "exercises" => [{ "name" => "Easy ski", "duration_s" => 300 }] },
+        "exercises" => [ { "name" => "Easy ski", "duration_s" => 300 } ] },
       { "name" => "The Long Run", "format" => "rounds", "rounds" => 3, "rest_secs" => 60,
-        "exercises" => [{ "name" => "Run", "duration_s" => 1440, "equipment" => "treadmill" }] }
+        "exercises" => [ { "name" => "Run", "duration_s" => 1440, "equipment" => "treadmill" } ] }
     ])
     result = WorkoutValidator.new(data, duration_mins: 60, main_tag_slug: "").validate_and_fix
     long = result.dig("structure", "sections")[1]
@@ -183,9 +183,9 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
   test "fix_long_cardio_rounds_to_straight leaves short interval rounds alone" do
     data = build_workout_with_sections([
       { "name" => "Warm-Up", "format" => "straight", "duration_mins" => 5,
-        "exercises" => [{ "name" => "Easy ski", "duration_s" => 300 }] },
+        "exercises" => [ { "name" => "Easy ski", "duration_s" => 300 } ] },
       { "name" => "Row Intervals", "format" => "rounds", "rounds" => 4, "rest_secs" => 60,
-        "exercises" => [{ "name" => "Row", "duration_s" => 300, "equipment" => "rowing_machine" }] }
+        "exercises" => [ { "name" => "Row", "duration_s" => 300, "equipment" => "rowing_machine" } ] }
     ])
     result = WorkoutValidator.new(data, duration_mins: 60, main_tag_slug: "").validate_and_fix
     intervals = result.dig("structure", "sections")[1]
@@ -197,8 +197,8 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
 
   test "ensure_section_categories infers warm_up from name" do
     data = build_workout_with_sections([
-      { "name" => "Gas Pedal", "format" => "straight", "exercises" => [{ "name" => "Jog" }] },
-      { "name" => "Main Block", "format" => "rounds", "rounds" => 3, "exercises" => [{ "name" => "Squat", "reps" => 10 }] }
+      { "name" => "Gas Pedal", "format" => "straight", "exercises" => [ { "name" => "Jog" } ] },
+      { "name" => "Main Block", "format" => "rounds", "rounds" => 3, "exercises" => [ { "name" => "Squat", "reps" => 10 } ] }
     ])
     result = WorkoutValidator.new(data, duration_mins: 60, main_tag_slug: "").validate_and_fix
     sections = result.dig("structure", "sections")
@@ -208,8 +208,8 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
 
   test "ensure_section_categories infers warm_up from warm-up name" do
     data = build_workout_with_sections([
-      { "name" => "Warm-Up", "format" => "straight", "exercises" => [{ "name" => "Jog" }] },
-      { "name" => "Main Block", "format" => "rounds", "rounds" => 3, "exercises" => [{ "name" => "Squat", "reps" => 10 }] }
+      { "name" => "Warm-Up", "format" => "straight", "exercises" => [ { "name" => "Jog" } ] },
+      { "name" => "Main Block", "format" => "rounds", "rounds" => 3, "exercises" => [ { "name" => "Squat", "reps" => 10 } ] }
     ])
     result = WorkoutValidator.new(data, duration_mins: 60, main_tag_slug: "").validate_and_fix
     sections = result.dig("structure", "sections")
@@ -219,8 +219,8 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
 
   test "ensure_section_categories infers cool_down from name" do
     data = build_workout_with_sections([
-      { "name" => "Main Block", "format" => "rounds", "rounds" => 3, "exercises" => [{ "name" => "Squat", "reps" => 10 }] },
-      { "name" => "Decompress", "format" => "straight", "exercises" => [{ "name" => "Stretch" }] }
+      { "name" => "Main Block", "format" => "rounds", "rounds" => 3, "exercises" => [ { "name" => "Squat", "reps" => 10 } ] },
+      { "name" => "Decompress", "format" => "straight", "exercises" => [ { "name" => "Stretch" } ] }
     ])
     result = WorkoutValidator.new(data, duration_mins: 60, main_tag_slug: "").validate_and_fix
     sections = result.dig("structure", "sections")
@@ -230,9 +230,9 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
 
   test "ensure_section_categories infers finisher for last tabata before cool-down" do
     data = build_workout_with_sections([
-      { "name" => "Main Block", "format" => "rounds", "rounds" => 3, "exercises" => [{ "name" => "Squat", "reps" => 10 }] },
-      { "name" => "Final Push", "format" => "tabata", "duration_mins" => 4, "exercises" => [{ "name" => "Row" }] },
-      { "name" => "Cool-Down", "format" => "straight", "exercises" => [{ "name" => "Stretch" }] }
+      { "name" => "Main Block", "format" => "rounds", "rounds" => 3, "exercises" => [ { "name" => "Squat", "reps" => 10 } ] },
+      { "name" => "Final Push", "format" => "tabata", "duration_mins" => 4, "exercises" => [ { "name" => "Row" } ] },
+      { "name" => "Cool-Down", "format" => "straight", "exercises" => [ { "name" => "Stretch" } ] }
     ])
     result = WorkoutValidator.new(data, duration_mins: 60, main_tag_slug: "").validate_and_fix
     sections = result.dig("structure", "sections")
@@ -243,8 +243,8 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
 
   test "ensure_section_categories preserves valid existing category" do
     data = build_workout_with_sections([
-      { "name" => "Gas Pedal", "category" => "warm_up", "format" => "straight", "exercises" => [{ "name" => "Jog" }] },
-      { "name" => "Main Block", "category" => "main", "format" => "rounds", "rounds" => 3, "exercises" => [{ "name" => "Squat", "reps" => 10 }] }
+      { "name" => "Gas Pedal", "category" => "warm_up", "format" => "straight", "exercises" => [ { "name" => "Jog" } ] },
+      { "name" => "Main Block", "category" => "main", "format" => "rounds", "rounds" => 3, "exercises" => [ { "name" => "Squat", "reps" => 10 } ] }
     ])
     result = WorkoutValidator.new(data, duration_mins: 60, main_tag_slug: "").validate_and_fix
     sections = result.dig("structure", "sections")
@@ -254,7 +254,7 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
 
   test "ensure_section_categories replaces invalid category" do
     data = build_workout_with_sections([
-      { "name" => "Warm-Up", "category" => "bogus", "format" => "straight", "exercises" => [{ "name" => "Jog" }] }
+      { "name" => "Warm-Up", "category" => "bogus", "format" => "straight", "exercises" => [ { "name" => "Jog" } ] }
     ])
     result = WorkoutValidator.new(data, duration_mins: 60, main_tag_slug: "").validate_and_fix
     sections = result.dig("structure", "sections")
@@ -955,7 +955,7 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
   test "fix_deka_mile_compromised_run_cap clamps section-level ladder rungs over 300m" do
     data = build_workout_with_sections([
       { "name" => "Warm-Up", "format" => "straight", "duration_mins" => 5, "category" => "warm_up",
-        "exercises" => [{ "name" => "Easy ski", "duration_s" => 300 }] },
+        "exercises" => [ { "name" => "Easy ski", "duration_s" => 300 } ] },
       { "name" => "Run Stairs", "category" => "main", "format" => "ladder",
         "varies" => "distance_m", "start" => 500, "end" => 100, "step" => 100,
         "exercises" => [
@@ -971,7 +971,7 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
   test "fix_deka_mile_compromised_run_cap leaves a 300m ladder alone" do
     data = build_workout_with_sections([
       { "name" => "Warm-Up", "format" => "straight", "duration_mins" => 5, "category" => "warm_up",
-        "exercises" => [{ "name" => "Easy ski", "duration_s" => 300 }] },
+        "exercises" => [ { "name" => "Easy ski", "duration_s" => 300 } ] },
       { "name" => "Run Stairs", "category" => "main", "format" => "ladder",
         "varies" => "distance_m", "start" => 300, "end" => 100, "step" => 100,
         "exercises" => [
@@ -987,7 +987,7 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
     # Section is reps-based but Compromised Run override is distance_m 500->100.
     data = build_workout_with_sections([
       { "name" => "Warm-Up", "format" => "straight", "duration_mins" => 5, "category" => "warm_up",
-        "exercises" => [{ "name" => "Easy ski", "duration_s" => 300 }] },
+        "exercises" => [ { "name" => "Easy ski", "duration_s" => 300 } ] },
       { "name" => "Parallel Descender", "category" => "main", "format" => "ladder",
         "varies" => "reps", "start" => 50, "end" => 10, "step" => 10,
         "exercises" => [

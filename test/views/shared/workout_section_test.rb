@@ -22,7 +22,7 @@ class SharedWorkoutSectionTest < ActionView::TestCase
     section = {
       "name" => "Reps Ladder", "format" => "ladder",
       "varies" => "reps", "start" => 10, "end" => 1, "step" => 1,
-      "exercises" => [{ "name" => "Burpee" }, { "name" => "Sit-up" }]
+      "exercises" => [ { "name" => "Burpee" }, { "name" => "Sit-up" } ]
     }
     render partial: "shared/workout_section", locals: { section: section }
     assert_match(/10.*9.*8.*reps/, rendered, "header should carry the shared sequence")

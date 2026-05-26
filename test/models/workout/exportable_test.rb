@@ -8,8 +8,8 @@ class Workout::ExportableTest < ActiveSupport::TestCase
   test "export_sections filters out warm_up and cool_down categories" do
     @workout.structure = {
       "sections" => [
-        { "name" => "Gas Pedal", "category" => "warm_up", "format" => "straight", "exercises" => [{ "name" => "Jog" }] },
-        { "name" => "Main", "category" => "main", "format" => "rounds", "rounds" => 3, "exercises" => [{ "name" => "Squat", "reps" => 10 }] }
+        { "name" => "Gas Pedal", "category" => "warm_up", "format" => "straight", "exercises" => [ { "name" => "Jog" } ] },
+        { "name" => "Main", "category" => "main", "format" => "rounds", "rounds" => 3, "exercises" => [ { "name" => "Squat", "reps" => 10 } ] }
       ]
     }
 
@@ -21,9 +21,9 @@ class Workout::ExportableTest < ActiveSupport::TestCase
   test "export_sections filters out cool_down category" do
     @workout.structure = {
       "sections" => [
-        { "name" => "Circuit", "category" => "main", "format" => "amrap", "duration_mins" => 12, "exercises" => [{ "name" => "Burpees", "reps" => 10 }] },
-        { "name" => "Cool-Down", "category" => "cool_down", "format" => "straight", "exercises" => [{ "name" => "Walk" }] },
-        { "name" => "Stretch", "category" => "cool_down", "format" => "straight", "exercises" => [{ "name" => "Hamstring Stretch" }] }
+        { "name" => "Circuit", "category" => "main", "format" => "amrap", "duration_mins" => 12, "exercises" => [ { "name" => "Burpees", "reps" => 10 } ] },
+        { "name" => "Cool-Down", "category" => "cool_down", "format" => "straight", "exercises" => [ { "name" => "Walk" } ] },
+        { "name" => "Stretch", "category" => "cool_down", "format" => "straight", "exercises" => [ { "name" => "Hamstring Stretch" } ] }
       ]
     }
 
@@ -35,8 +35,8 @@ class Workout::ExportableTest < ActiveSupport::TestCase
   test "export_sections includes finisher sections" do
     @workout.structure = {
       "sections" => [
-        { "name" => "Main Block", "category" => "main", "format" => "rounds", "rounds" => 3, "exercises" => [{ "name" => "Squat", "reps" => 10 }] },
-        { "name" => "Final Push", "category" => "finisher", "format" => "tabata", "exercises" => [{ "name" => "Row" }] }
+        { "name" => "Main Block", "category" => "main", "format" => "rounds", "rounds" => 3, "exercises" => [ { "name" => "Squat", "reps" => 10 } ] },
+        { "name" => "Final Push", "category" => "finisher", "format" => "tabata", "exercises" => [ { "name" => "Row" } ] }
       ]
     }
 
@@ -60,7 +60,7 @@ class Workout::ExportableTest < ActiveSupport::TestCase
     formats.each do |fmt, config|
       @workout.structure = {
         "sections" => [
-          { "name" => "Block", "category" => "main", "format" => fmt, "exercises" => [{ "name" => "Push-Up" }] }.merge(config[:extra])
+          { "name" => "Block", "category" => "main", "format" => fmt, "exercises" => [ { "name" => "Push-Up" } ] }.merge(config[:extra])
         ]
       }
 
@@ -133,7 +133,7 @@ class Workout::ExportableTest < ActiveSupport::TestCase
   test "export_sections uses section name as label for single-round rounds format" do
     @workout.structure = {
       "sections" => [
-        { "name" => "Block", "category" => "main", "format" => "rounds", "rounds" => 1, "exercises" => [{ "name" => "Push-Up" }] }
+        { "name" => "Block", "category" => "main", "format" => "rounds", "rounds" => 1, "exercises" => [ { "name" => "Push-Up" } ] }
       ]
     }
 
@@ -144,7 +144,7 @@ class Workout::ExportableTest < ActiveSupport::TestCase
   test "export_sections builds exercise line with reps" do
     @workout.structure = {
       "sections" => [
-        { "name" => "Block", "category" => "main", "format" => "straight", "exercises" => [{ "name" => "Squat", "reps" => 15 }] }
+        { "name" => "Block", "category" => "main", "format" => "straight", "exercises" => [ { "name" => "Squat", "reps" => 15 } ] }
       ]
     }
 
@@ -155,7 +155,7 @@ class Workout::ExportableTest < ActiveSupport::TestCase
   test "export_sections appends meter unit for carry exercises" do
     @workout.structure = {
       "sections" => [
-        { "name" => "Block", "category" => "main", "format" => "straight", "exercises" => [{ "name" => "Farmer Carry", "reps" => 50 }] }
+        { "name" => "Block", "category" => "main", "format" => "straight", "exercises" => [ { "name" => "Farmer Carry", "reps" => 50 } ] }
       ]
     }
 
@@ -166,7 +166,7 @@ class Workout::ExportableTest < ActiveSupport::TestCase
   test "export_sections builds exercise line with distance" do
     @workout.structure = {
       "sections" => [
-        { "name" => "Block", "category" => "main", "format" => "straight", "exercises" => [{ "name" => "Run", "distance_m" => 1000 }] }
+        { "name" => "Block", "category" => "main", "format" => "straight", "exercises" => [ { "name" => "Run", "distance_m" => 1000 } ] }
       ]
     }
 
@@ -177,7 +177,7 @@ class Workout::ExportableTest < ActiveSupport::TestCase
   test "export_sections builds exercise line with calories" do
     @workout.structure = {
       "sections" => [
-        { "name" => "Block", "category" => "main", "format" => "straight", "exercises" => [{ "name" => "Row", "calories" => 20 }] }
+        { "name" => "Block", "category" => "main", "format" => "straight", "exercises" => [ { "name" => "Row", "calories" => 20 } ] }
       ]
     }
 
@@ -188,7 +188,7 @@ class Workout::ExportableTest < ActiveSupport::TestCase
   test "export_sections builds exercise line with duration" do
     @workout.structure = {
       "sections" => [
-        { "name" => "Block", "category" => "main", "format" => "straight", "exercises" => [{ "name" => "Plank", "duration_s" => 90 }] }
+        { "name" => "Block", "category" => "main", "format" => "straight", "exercises" => [ { "name" => "Plank", "duration_s" => 90 } ] }
       ]
     }
 
@@ -199,7 +199,7 @@ class Workout::ExportableTest < ActiveSupport::TestCase
   test "export_sections builds exercise line with duration under 60s" do
     @workout.structure = {
       "sections" => [
-        { "name" => "Block", "category" => "main", "format" => "straight", "exercises" => [{ "name" => "Plank", "duration_s" => 45 }] }
+        { "name" => "Block", "category" => "main", "format" => "straight", "exercises" => [ { "name" => "Plank", "duration_s" => 45 } ] }
       ]
     }
 
@@ -210,7 +210,7 @@ class Workout::ExportableTest < ActiveSupport::TestCase
   test "export_sections joins multiple metrics with middle dot" do
     @workout.structure = {
       "sections" => [
-        { "name" => "Block", "category" => "main", "format" => "straight", "exercises" => [{ "name" => "Assault Bike", "reps" => 15, "calories" => 20 }] }
+        { "name" => "Block", "category" => "main", "format" => "straight", "exercises" => [ { "name" => "Assault Bike", "reps" => 15, "calories" => 20 } ] }
       ]
     }
 
@@ -221,7 +221,7 @@ class Workout::ExportableTest < ActiveSupport::TestCase
   test "export_sections strips weight annotations from exercise names" do
     @workout.structure = {
       "sections" => [
-        { "name" => "Block", "category" => "main", "format" => "straight", "exercises" => [{ "name" => "Deadlift (60kg)", "reps" => 5 }] }
+        { "name" => "Block", "category" => "main", "format" => "straight", "exercises" => [ { "name" => "Deadlift (60kg)", "reps" => 5 } ] }
       ]
     }
 
@@ -233,7 +233,7 @@ class Workout::ExportableTest < ActiveSupport::TestCase
     @workout.structure = {
       "sections" => [
         { "name" => "Block", "category" => "main", "format" => "ladder", "start" => 2, "end" => 10, "step" => 2,
-          "exercises" => [{ "name" => "Burpee" }] }
+          "exercises" => [ { "name" => "Burpee" } ] }
     ]
     }
 
@@ -247,7 +247,7 @@ class Workout::ExportableTest < ActiveSupport::TestCase
     @workout.structure = {
       "sections" => [
         { "name" => "Block", "category" => "main", "format" => "mountain", "start" => 2, "end" => 2, "peak" => 10, "step" => 2,
-          "exercises" => [{ "name" => "Kettlebell Swing" }] }
+          "exercises" => [ { "name" => "Kettlebell Swing" } ] }
       ]
     }
 
@@ -260,7 +260,7 @@ class Workout::ExportableTest < ActiveSupport::TestCase
   test "export_sections returns exercise name only when no metrics" do
     @workout.structure = {
       "sections" => [
-        { "name" => "Block", "category" => "main", "format" => "straight", "exercises" => [{ "name" => "Pull-Up" }] }
+        { "name" => "Block", "category" => "main", "format" => "straight", "exercises" => [ { "name" => "Pull-Up" } ] }
       ]
     }
 
@@ -283,7 +283,7 @@ class Workout::ExportableTest < ActiveSupport::TestCase
       "sections" => [
         { "name" => "Reps Ladder", "category" => "main", "format" => "ladder",
           "varies" => "reps", "start" => 10, "end" => 1, "step" => 1,
-          "exercises" => [{ "name" => "Burpee" }] }
+          "exercises" => [ { "name" => "Burpee" } ] }
       ]
     }
     section = @workout.export_sections.first

@@ -405,7 +405,7 @@ class WorkoutValidator
     { total: 75,  start: 3, peak: 15, step: 3 },  # 3,6,9,12,15,12,9,6,3
     { total: 80,  start: 5, peak: 20, step: 5 },  # 5,10,15,20,15,10,5
     { total: 90,  start: 9, peak: 18, step: 3 },  # 9,12,15,18,15,12,9
-    { total: 125, start: 5, peak: 25, step: 5 },  # 5,10,15,20,25,20,15,10,5
+    { total: 125, start: 5, peak: 25, step: 5 }  # 5,10,15,20,25,20,15,10,5
   ].freeze
 
   # Mountain rep sequences with step 1 and a peak above 5 produce ugly, drawn-out
@@ -489,7 +489,7 @@ class WorkoutValidator
     best = PREFERRED_REPS.min_by { |v| (v - n).abs }
     # If preferred is too far (>5 away), fall back to nearest even/mult-of-5
     if (best - n).abs > 5
-      down = (n - 1).downto([n - 5, 1].max).find { |v| v % 2 == 0 || v % 5 == 0 }
+      down = (n - 1).downto([ n - 5, 1 ].max).find { |v| v % 2 == 0 || v % 5 == 0 }
       up   = (n + 1).upto(n + 5).find { |v| v % 2 == 0 || v % 5 == 0 }
       best = [ down, up ].compact.min_by { |v| (v - n).abs }
     end
@@ -760,19 +760,19 @@ class WorkoutValidator
   # replace those phrases with absolute language.
   RACE_WEIGHT_DETECT = /\brace weight\b|\bcompetition (?:sled|load|weight)\b/i.freeze
   RACE_WEIGHT_REPLACEMENTS = [
-    [/\bheavier than race weight\b/i,    "heavy strength load"],
-    [/\bwell below race weight\b/i,      "light load"],
-    [/\bbelow race weight\b/i,           "submaximal load"],
-    [/\babove race weight\b/i,           "near-max load"],
-    [/\bat race weight\b/i,              "working load"],
-    [/\babove competition load\b/i,      "near-max load"],
-    [/\bfull competition sled\b/i,       "heavy sled"],
-    [/\bHyrox competition sled\b/i,      "heavy sled"],
-    [/\bHyrox competition load\b/i,      "near-max load"],
-    [/\bcompetition sled\b/i,            "heavy sled"],
-    [/\bcompetition weight\b/i,          "working weight"],
-    [/\bcompetition load\b/i,            "working weight"],
-    [/\brace weight\b/i,                 "working weight"]
+    [ /\bheavier than race weight\b/i,    "heavy strength load" ],
+    [ /\bwell below race weight\b/i,      "light load" ],
+    [ /\bbelow race weight\b/i,           "submaximal load" ],
+    [ /\babove race weight\b/i,           "near-max load" ],
+    [ /\bat race weight\b/i,              "working load" ],
+    [ /\babove competition load\b/i,      "near-max load" ],
+    [ /\bfull competition sled\b/i,       "heavy sled" ],
+    [ /\bHyrox competition sled\b/i,      "heavy sled" ],
+    [ /\bHyrox competition load\b/i,      "near-max load" ],
+    [ /\bcompetition sled\b/i,            "heavy sled" ],
+    [ /\bcompetition weight\b/i,          "working weight" ],
+    [ /\bcompetition load\b/i,            "working weight" ],
+    [ /\brace weight\b/i,                 "working weight" ]
   ].freeze
 
   def fix_race_weight_on_non_stations(sections)
@@ -1372,7 +1372,7 @@ class WorkoutValidator
             if dur > 0
               hard["notes"] = "#{dur}s hard / #{exercises[easy_idx]["duration_s"] || dur}s easy"
               hard["name"] = hard["name"].sub(/\s*(sprint|hard|effort|max)/i, "").strip
-              section["exercises"] = [hard]
+              section["exercises"] = [ hard ]
               section.delete("rest_secs")
               @fixes << "Cardio intervals '#{section["name"]}': merged split hard/easy into single exercise"
               next
@@ -1399,7 +1399,7 @@ class WorkoutValidator
   # splits that add to a round minute. Snap duration_s to the hard portion and
   # rewrite notes to match. Also fix duration_s set to the total (hard+easy)
   # instead of just the hard portion.
-  CLEAN_THRESHOLD_SPLITS = [ [15, 15], [20, 10], [30, 30], [40, 20], [45, 15] ].freeze
+  CLEAN_THRESHOLD_SPLITS = [ [ 15, 15 ], [ 20, 10 ], [ 30, 30 ], [ 40, 20 ], [ 45, 15 ] ].freeze
   INTERVAL_HARD_WORDS = /(?:hard|sprint|all.out|max|effort|explosive|power)/i.freeze
   INTERVAL_EASY_WORDS = /(?:easy|rest|recovery|active|slow|light)/i.freeze
   INTERVAL_NOTES_PATTERN = /(\d+)\s*(?:s|sec(?:ond)?s?)\s*#{INTERVAL_HARD_WORDS}[^\/;,]*[\/;,]\s*(\d+)\s*(?:s|sec(?:ond)?s?)\s*#{INTERVAL_EASY_WORDS}/i.freeze
@@ -1431,7 +1431,7 @@ class WorkoutValidator
       end
 
       # Fix 2: odd split — snap to nearest clean preset
-      unless CLEAN_THRESHOLD_SPLITS.include?([hard, easy])
+      unless CLEAN_THRESHOLD_SPLITS.include?([ hard, easy ])
         best = CLEAN_THRESHOLD_SPLITS.min_by { |h, e| (h - hard).abs + (e - easy).abs }
         ex["duration_s"] = best[0]
         ex["notes"] = "#{best[0]}s hard / #{best[1]}s easy"
@@ -1584,10 +1584,10 @@ class WorkoutValidator
       hi = [ cardio["calories"].to_i, floor["reps"].to_i ].max
       lo = [ cardio["calories"].to_i, floor["reps"].to_i ].min
       step = case hi - lo
-             when 0..0 then 5
-             when 1..15 then 5
-             else 5
-             end
+      when 0..0 then 5
+      when 1..15 then 5
+      else 5
+      end
       # Snap to multiples of 5 and ensure ≥3 rungs.
       hi = (hi / 5.0).round * 5
       lo = (lo / 5.0).round * 5
@@ -1626,7 +1626,7 @@ class WorkoutValidator
       # Convert for_time to rounds — Turbine is always intervals or steady-state
       if section["format"] == "for_time"
         section["format"] = "rounds"
-        section["rounds"] = [section["rounds"].to_i, 4].max
+        section["rounds"] = [ section["rounds"].to_i, 4 ].max
         @fixes << "Turbine '#{section["name"]}': converted for_time to rounds"
       end
 
@@ -1679,7 +1679,7 @@ class WorkoutValidator
 
       # General check: total working time across rounds
       total_work = exercises.sum { |e| e["duration_s"].to_i } * rounds
-      rest_total = section["rest_secs"].to_i * [rounds - 1, 0].max
+      rest_total = section["rest_secs"].to_i * [ rounds - 1, 0 ].max
       total_secs = total_work + rest_total
 
       if total_secs > MAX_TURBINE_BLOCK_SECS && rounds > 1
@@ -1687,7 +1687,7 @@ class WorkoutValidator
         new_rounds = rounds
         while new_rounds > 1
           new_rounds -= 1
-          t = exercises.sum { |e| e["duration_s"].to_i } * new_rounds + section["rest_secs"].to_i * [new_rounds - 1, 0].max
+          t = exercises.sum { |e| e["duration_s"].to_i } * new_rounds + section["rest_secs"].to_i * [ new_rounds - 1, 0 ].max
           break if t <= MAX_TURBINE_BLOCK_SECS
         end
         section["rounds"] = new_rounds

@@ -222,7 +222,7 @@ class WorkoutLLMGenerator
     /output\s+(your|the)\s+(system|instructions?|prompt)/i,
     /what\s+(are|is)\s+your\s+(system|instructions?|prompt)/i,
     /<\/?system>/i,
-    /```\s*(system|prompt|instructions?)/i,
+    /```\s*(system|prompt|instructions?)/i
   ].freeze
 
   def sanitize_user_input(text)
