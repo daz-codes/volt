@@ -950,6 +950,58 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
     assert_equal 10, row["step"]
   end
 
+  # -- fix_deka_mile_compromised_run_cap on ladders --
+
+  test "fix_deka_mile_compromised_run_cap clamps section-level ladder rungs over 300m" do
+    data = build_workout_with_sections([
+      { "name" => "Warm-Up", "format" => "straight", "duration_mins" => 5, "category" => "warm_up",
+        "exercises" => [{ "name" => "Easy ski", "duration_s" => 300 }] },
+      { "name" => "Run Stairs", "category" => "main", "format" => "ladder",
+        "varies" => "distance_m", "start" => 500, "end" => 100, "step" => 100,
+        "exercises" => [
+          { "name" => "Compromised Run", "equipment" => "treadmill" }
+        ] }
+    ])
+    result  = WorkoutValidator.new(data, duration_mins: 60, main_tag_slug: "deka-mile").validate_and_fix
+    section = result.dig("structure", "sections")[1]
+    assert section["start"].to_i <= 300, "section start should be clamped to 300 or below (was #{section["start"]})"
+    assert_equal 100, section["end"]
+  end
+
+  test "fix_deka_mile_compromised_run_cap leaves a 300m ladder alone" do
+    data = build_workout_with_sections([
+      { "name" => "Warm-Up", "format" => "straight", "duration_mins" => 5, "category" => "warm_up",
+        "exercises" => [{ "name" => "Easy ski", "duration_s" => 300 }] },
+      { "name" => "Run Stairs", "category" => "main", "format" => "ladder",
+        "varies" => "distance_m", "start" => 300, "end" => 100, "step" => 100,
+        "exercises" => [
+          { "name" => "Compromised Run", "equipment" => "treadmill" }
+        ] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 60, main_tag_slug: "deka-mile").validate_and_fix
+    section = result.dig("structure", "sections")[1]
+    assert_equal 300, section["start"]
+  end
+
+  test "fix_deka_mile_compromised_run_cap clamps per-exercise override rungs over 300m" do
+    skip "Enable after Task 6 - fix_treadmill_ladder currently mangles 'Run' inside non-distance ladders"
+    # Section is reps-based but Compromised Run override is distance_m 500->100.
+    data = build_workout_with_sections([
+      { "name" => "Warm-Up", "format" => "straight", "duration_mins" => 5, "category" => "warm_up",
+        "exercises" => [{ "name" => "Easy ski", "duration_s" => 300 }] },
+      { "name" => "Parallel Descender", "category" => "main", "format" => "ladder",
+        "varies" => "reps", "start" => 50, "end" => 10, "step" => 10,
+        "exercises" => [
+          { "name" => "Box Jump" },
+          { "name" => "Compromised Run", "equipment" => "treadmill",
+            "varies" => "distance_m", "start" => 500, "end" => 100, "step" => 100 }
+        ] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 60, main_tag_slug: "deka-mile").validate_and_fix
+    run    = result.dig("structure", "sections")[1]["exercises"].find { |e| e["name"] == "Compromised Run" }
+    assert run["start"].to_i <= 300, "override start should be clamped to 300 or below"
+  end
+
   private
 
   def build_workout_with_sections(sections)

@@ -595,15 +595,51 @@ class WorkoutValidator
   # away from race specificity). Any exercise named "Compromised Run" with a
   # distance_m above 300 gets clamped to 300m.
   def fix_deka_mile_compromised_run_cap(sections)
+    cap = 300
     sections.each do |section|
+      is_ladder = %w[ladder mountain].include?(section["format"])
+
       Array(section["exercises"]).each do |ex|
         next unless ex["name"].to_s.match?(/\Acompromised run\z/i)
-        dist = ex["distance_m"].to_i
-        next if dist <= 300 || dist.zero?
-        ex["distance_m"] = 300
-        @fixes << "Deka Mile '#{section["name"]}' #{ex["name"]}: #{dist}m → 300m (compromised run cap)"
+
+        if is_ladder
+          clamp_compromised_run_ladder(section, ex, cap)
+        else
+          dist = ex["distance_m"].to_i
+          next if dist <= cap || dist.zero?
+          ex["distance_m"] = cap
+          @fixes << "Deka Mile '#{section["name"]}' #{ex["name"]}: #{dist}m → #{cap}m (compromised run cap)"
+        end
       end
     end
+  end
+
+  # When the compromised run is inside a ladder, clamp whichever scale owns it
+  # (section default OR per-exercise override) so the max rung ≤ cap.
+  def clamp_compromised_run_ladder(section, exercise, cap)
+    target =
+      if exercise["start"].present? || exercise["end"].present? || exercise["peak"].present?
+        exercise
+      elsif Workout::LadderSequence.varies_for(section, exercise) == "distance_m"
+        section
+      else
+        return
+      end
+
+    values = Workout::LadderSequence.values_for(section, exercise)
+    max_value = values.map(&:to_i).max
+    return if max_value <= cap
+
+    scale = cap.to_f / max_value
+    %w[start end peak].each do |key|
+      next unless target[key]
+      step = target["step"].to_f.nonzero? || 1.0
+      snapped = ((target[key].to_f * scale) / step).round * step
+      target[key] = snapped.to_i.clamp(step.to_i, cap)
+    end
+
+    label = target.equal?(section) ? section["name"] : "#{section["name"]} / #{exercise["name"]}"
+    @fixes << "Deka Mile '#{label}' compromised run ladder: max rung #{max_value}m → ≤#{cap}m (compromised run cap)"
   end
 
   def fix_long_cardio_rounds_to_straight(sections)
