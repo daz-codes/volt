@@ -922,6 +922,34 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
     refute kb.key?("peak"), "override peak should be stripped on mismatch"
   end
 
+  # -- fix_ladder_step on per-exercise overrides --
+
+  test "fix_ladder_step corrects an out-of-range step on a per-exercise override" do
+    data = build_workout_with_sections([
+      { "name" => "Calorie Descender", "category" => "main", "format" => "ladder",
+        "varies" => "reps", "start" => 25, "end" => 5, "step" => 5,
+        "exercises" => [
+          { "name" => "Row", "varies" => "calories", "start" => 25, "end" => 5, "step" => 2 }
+        ] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 30, main_tag_slug: "").validate_and_fix
+    row = result.dig("structure", "sections").first["exercises"].first
+    assert_equal 5, row["step"], "calories step 2 should be raised to minimum 5"
+  end
+
+  test "fix_ladder_step leaves valid per-exercise steps alone" do
+    data = build_workout_with_sections([
+      { "name" => "Calorie Descender", "category" => "main", "format" => "ladder",
+        "varies" => "reps", "start" => 50, "end" => 10, "step" => 10,
+        "exercises" => [
+          { "name" => "Row", "varies" => "calories", "start" => 50, "end" => 10, "step" => 10 }
+        ] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 30, main_tag_slug: "").validate_and_fix
+    row = result.dig("structure", "sections").first["exercises"].first
+    assert_equal 10, row["step"]
+  end
+
   private
 
   def build_workout_with_sections(sections)

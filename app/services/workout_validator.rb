@@ -365,8 +365,17 @@ class WorkoutValidator
   end
 
   def fix_ladder_step(section, idx)
-    varies = section["varies"]
-    step   = section["step"].to_f
+    fix_ladder_step_for(section, section["name"], section)
+    Array(section["exercises"]).each do |ex|
+      next unless ex["step"].present? && ex["varies"].present?
+      fix_ladder_step_for(section, "#{section["name"]} / #{ex["name"]}", ex)
+    end
+  end
+
+  # Snap `target`'s step into bounds for its varies (target is a section or exercise hash).
+  def fix_ladder_step_for(section, label, target)
+    varies = target["varies"]
+    step   = target["step"].to_f
     return unless varies && step > 0
 
     min = LADDER_STEP_MIN[varies]
@@ -381,8 +390,8 @@ class WorkoutValidator
       return  # already valid
     end
 
-    section["step"] = corrected
-    @fixes << "#{section["format"].capitalize} '#{section["name"]}': " \
+    target["step"] = corrected
+    @fixes << "#{section["format"].capitalize} '#{label}': " \
               "step #{step} invalid for #{varies} — corrected to #{corrected}"
   end
 
