@@ -167,9 +167,11 @@ class WorkoutValidator
   # EMOMs keep their original duration. The first exercise is preserved so the
   # cardio modality survives; subsequent exercises are dropped (an EMOM circuit
   # with multiple movements doesn't translate to a single steady block).
+  # `continuous_circuit` is intentionally NOT in the list — at low intensity a
+  # long rotating circuit at conversational pace is the canonical engine builder.
   def fix_low_intensity_format(section)
     fmt = section["format"]
-    return unless %w[emom tabata continuous_circuit].include?(fmt)
+    return unless %w[emom tabata].include?(fmt)
 
     dur =
       if fmt == "tabata"

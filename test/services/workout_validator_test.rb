@@ -1133,6 +1133,23 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
     assert_equal 4,          section["duration_mins"]
   end
 
+  test "fix_low_intensity_shapes leaves a low-intensity continuous_circuit alone" do
+    data = build_workout_with_sections([
+      { "name" => "Engine Loop", "category" => "main", "format" => "continuous_circuit",
+        "intensity_style" => "low", "duration_mins" => 20,
+        "exercises" => [
+          { "name" => "Row",           "duration_s" => 60, "notes" => "easy pace", "equipment" => "rowing_machine" },
+          { "name" => "Wall Balls",    "reps" => 20,       "notes" => "light",     "equipment" => "wall_ball" },
+          { "name" => "Walking Lunges", "reps" => 20,                                "equipment" => "bodyweight" },
+          { "name" => "SkiErg",        "duration_s" => 60, "notes" => "easy pace", "equipment" => "ski_erg" }
+        ] }
+    ])
+    result  = WorkoutValidator.new(data, duration_mins: 45, main_tag_slug: "").validate_and_fix
+    section = result.dig("structure", "sections").first
+    assert_equal "continuous_circuit", section["format"], "low + continuous_circuit is the engine builder, must survive"
+    assert_equal 4, section["exercises"].size,            "all exercises must survive"
+  end
+
   test "fix_low_intensity_shapes leaves a medium-intensity EMOM alone" do
     data = build_workout_with_sections([
       { "name" => "Working EMOM", "category" => "main", "format" => "emom",

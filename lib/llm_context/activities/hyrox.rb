@@ -21,23 +21,34 @@ module LLMContext
         finisher:          :optional,
         core:              :optional,
         intensity_guide: {
-          low:    "Zone-2 day — long continuous easy-pace cardio is the headline. Build the session " \
-                  "around a single 20+ min steady block (e.g. one 25-min Row at conversational pace), " \
-                  "OR stack 2-3 single-modality blocks (10 min Row + 10 min Run + 10 min SkiErg). " \
-                  "Cardio rounds are fine if they're long-interval (e.g. 4 rounds × 6 min Row at easy " \
-                  "pace, 30s rest). NO weights — no barbell, dumbbell, or kettlebell loaded work; the " \
-                  "only rep-based movements allowed are light Wall Balls for form, mobility flows, " \
-                  "or bodyweight technique drills. NO EMOMs, NO Tabatas, NO sprints. " \
-                  "duration_mins on every main/finisher section must be a multiple of 5. " \
+          low:    "Zone-2 day — rotate between FOUR structural shapes so the athlete doesn't see the " \
+                  "same session twice. " \
+                  "SHAPE 1 — one long continuous block (e.g. one 25-min Row at conversational pace). " \
+                  "SHAPE 2 — stacked single-modality blocks (10 min Row + 10 min Run + 10 min SkiErg, " \
+                  "no rest between machines). " \
+                  "SHAPE 3 — **long continuous circuit (engine builder, reach for this often)**: " \
+                  "`format: continuous_circuit` with 4-6 Hyrox movements rotating 1 min each " \
+                  "(Row / Wall Balls / Walking Lunges / SkiErg / Run / Burpee Broad Jumps light) for " \
+                  "20-40 min, no rest. Or a 20-min `format: amrap` at light load. Or a long " \
+                  "`format: for_time` chipper. This is the most under-used shape — use it explicitly. " \
+                  "SHAPE 4 — long-interval cardio rounds (e.g. 4 rounds × 6 min Row, 30s rest). " \
+                  "NO weights — no barbell, dumbbell, or kettlebell loaded work; the only rep-based " \
+                  "movements allowed are light Wall Balls for form, mobility flows, or bodyweight " \
+                  "technique drills. NO EMOMs, NO Tabatas, NO sprints. duration_mins on every " \
+                  "main/finisher section must be a multiple of 5. " \
                   "Effort cue: easy, conversational, nose-breathing pace.",
           medium: "Race-prep working pace — the bread-and-butter Hyrox session. Mix run intervals " \
-                  "with station blocks at ~RPE 7-8, 60s rest between rounds. EMOMs, AMRAPs, and " \
-                  "for-time chippers all fit naturally.",
+                  "with station blocks at ~RPE 7-8, 60s rest between rounds. **Reach for `format: emom` " \
+                  "and `format: continuous_circuit` often — they're the two best-fitting shapes for " \
+                  "hybrid race training.** AMRAPs and for-time chippers also fit naturally.",
           high:   "Race-day energy — strength block goes FIRST (heavy 3-5 rep lifts at near-max load, " \
-                  "120-180s rest), then everything else is max-pace with long recovery. Prefer EMOMs " \
-                  "(with the ~50% of 1-min max cue or rotating alternating:true) over " \
-                  "continuous_circuit. Use the 30s hard / 30s rest pattern for hard cardio. Run intervals " \
-                  "are all-out sprints (200-400m), never threshold pace. Pack LESS total work into the " \
+                  "120-180s rest). **Pick a different lift each session — Deadlift, Back Squat, Front " \
+                  "Squat, Bench Press, Push Press, Overhead Press, Clean & Jerk. Do NOT default to " \
+                  "Bench Press; rotate.** After the strength block, everything else is max-pace with " \
+                  "long recovery. **Strongly prefer `format: emom`** (with the ~50% of 1-min max cue " \
+                  "or rotating `alternating: true`) over `continuous_circuit` for metcons at high " \
+                  "intensity. Use the 30s hard / 30s rest pattern for hard cardio. Run intervals are " \
+                  "all-out sprints (200-400m), never threshold pace. Pack LESS total work into the " \
                   "session than you would at medium — typically one main block fewer — so transitions " \
                   "between sections are unhurried."
         },
