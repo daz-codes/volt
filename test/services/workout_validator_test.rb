@@ -1104,6 +1104,73 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
     assert_equal 15, section["exercises"][2]["reps"]
   end
 
+  # -- fix_orphan_bookend_sections --
+
+  test "fix_orphan_bookend_sections renames Buy In when no Cash Out exists" do
+    data = build_workout_with_sections([
+      { "name" => "Buy In", "category" => "main", "format" => "for_time",
+        "exercises" => [{ "name" => "Run", "duration_s" => 480, "equipment" => "treadmill" }] },
+      { "name" => "Engine Room", "category" => "main", "format" => "straight", "duration_mins" => 20,
+        "exercises" => [{ "name" => "Rowing Machine", "duration_s" => 1200, "equipment" => "rowing_machine" }] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 60, main_tag_slug: "hyrox").validate_and_fix
+    names = result.dig("structure", "sections").map { |s| s["name"] }
+    refute_includes names, "Buy In", "orphan Buy In must be renamed"
+    assert_includes names, "Engine Opener"
+  end
+
+  test "fix_orphan_bookend_sections renames Cash Out when no Buy In exists" do
+    data = build_workout_with_sections([
+      { "name" => "Engine Room", "category" => "main", "format" => "straight", "duration_mins" => 20,
+        "exercises" => [{ "name" => "Rowing Machine", "duration_s" => 1200, "equipment" => "rowing_machine" }] },
+      { "name" => "Cash Out", "category" => "main", "format" => "for_time",
+        "exercises" => [{ "name" => "Run", "distance_m" => 1000, "equipment" => "treadmill" }] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 60, main_tag_slug: "hyrox").validate_and_fix
+    names = result.dig("structure", "sections").map { |s| s["name"] }
+    refute_includes names, "Cash Out", "orphan Cash Out must be renamed"
+    assert_includes names, "Engine Closer"
+  end
+
+  test "fix_orphan_bookend_sections leaves matched bookends alone" do
+    data = build_workout_with_sections([
+      { "name" => "Buy In", "category" => "main", "format" => "for_time",
+        "exercises" => [{ "name" => "Row", "distance_m" => 1000, "equipment" => "rowing_machine" }] },
+      { "name" => "Engine Room", "category" => "main", "format" => "rounds", "rounds" => 4,
+        "exercises" => [{ "name" => "Wall Balls", "reps" => 20, "equipment" => "wall_ball" }] },
+      { "name" => "Cash Out", "category" => "main", "format" => "for_time",
+        "exercises" => [{ "name" => "SkiErg", "distance_m" => 1000, "equipment" => "ski_erg" }] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 60, main_tag_slug: "hyrox").validate_and_fix
+    names = result.dig("structure", "sections").map { |s| s["name"] }
+    assert_includes names, "Buy In"
+    assert_includes names, "Cash Out"
+  end
+
+  test "fix_low_intensity_duration_multiple snaps for_time cardio buy-in to multiple of 5" do
+    data = build_workout_with_sections([
+      { "name" => "Buy In", "category" => "main", "format" => "for_time", "intensity_style" => "low",
+        "duration_mins" => 8,
+        "exercises" => [{ "name" => "Run", "duration_s" => 480, "equipment" => "treadmill" }] }
+    ])
+    result  = WorkoutValidator.new(data, duration_mins: 60, main_tag_slug: "hyrox").validate_and_fix
+    section = result.dig("structure", "sections").first
+    assert_equal 10, section["duration_mins"], "8-min for_time cardio must snap to 10"
+  end
+
+  test "fix_low_intensity_duration_multiple snaps 22-min Rowing Machine block to 20" do
+    # Pattern bug: \brow\b didn't match \"Rowing Machine\" because the word
+    # boundary is at \"Row|ing\". Now matches via \\brow(ing)?\\b.
+    data = build_workout_with_sections([
+      { "name" => "Engine Room", "category" => "main", "format" => "straight", "intensity_style" => "low",
+        "duration_mins" => 22,
+        "exercises" => [{ "name" => "Rowing Machine", "duration_s" => 1320, "equipment" => "rowing_machine" }] }
+    ])
+    result  = WorkoutValidator.new(data, duration_mins: 60, main_tag_slug: "hyrox").validate_and_fix
+    section = result.dig("structure", "sections").first
+    assert_equal 20, section["duration_mins"]
+  end
+
   # -- fix_low_intensity_shapes --
 
   test "fix_low_intensity_shapes converts a low-intensity EMOM into a straight block" do

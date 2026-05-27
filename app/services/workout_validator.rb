@@ -141,6 +141,7 @@ class WorkoutValidator
     end
 
     fix_low_intensity_shapes(sections)
+    fix_orphan_bookend_sections(sections)
     fix_goal_durations(sections)
 
     @data
@@ -221,7 +222,7 @@ class WorkoutValidator
   # cardio rounds" shape). Mobility flows (rounds with multiple drills,
   # bodyweight prep) keep their natural durations; continuous_circuit is
   # structurally constrained elsewhere.
-  CARDIO_EXERCISE_PATTERN = /\b(row|ski|skierg|run|jog|treadmill|bike|assault|echo|erg)\b/i.freeze
+  CARDIO_EXERCISE_PATTERN = /\b(row(ing)?|ski(erg)?|run(ning)?|jog(ging)?|treadmill|bike|assault|echo|erg)\b/i.freeze
 
   def fix_low_intensity_duration_multiple(section)
     return unless low_intensity_cardio_block?(section)
@@ -233,14 +234,39 @@ class WorkoutValidator
     @fixes << "Low-intensity '#{section["name"]}': duration_mins #{dur} → #{snapped} (cardio blocks must be a multiple of 5)"
   end
 
+  # Bookends ("Buy In" + "Cash Out") must come as a pair — the prompt says so,
+  # but the LLM occasionally writes one without the other. Detect orphans and
+  # rename them to a neutral label so the rendered workout doesn't promise a
+  # framing it doesn't deliver.
+  BUY_IN_PATTERN  = /\A\s*buy\W?in\b/i.freeze
+  CASH_OUT_PATTERN = /\A\s*cash\W?out\b/i.freeze
+
+  def fix_orphan_bookend_sections(sections)
+    has_buy_in   = sections.any? { |s| s["name"].to_s.match?(BUY_IN_PATTERN) }
+    has_cash_out = sections.any? { |s| s["name"].to_s.match?(CASH_OUT_PATTERN) }
+    return if has_buy_in == has_cash_out  # both present or both absent — OK
+
+    sections.each do |section|
+      name = section["name"].to_s
+      if name.match?(BUY_IN_PATTERN) && !has_cash_out
+        section["name"] = "Engine Opener"
+        @fixes << "Renamed orphan 'Buy In' → 'Engine Opener' (no matching Cash Out — bookends must be a pair)"
+      elsif name.match?(CASH_OUT_PATTERN) && !has_buy_in
+        section["name"] = "Engine Closer"
+        @fixes << "Renamed orphan 'Cash Out' → 'Engine Closer' (no matching Buy In — bookends must be a pair)"
+      end
+    end
+  end
+
   def low_intensity_cardio_block?(section)
     fmt = section["format"]
     exercises = Array(section["exercises"])
     return false if exercises.empty?
 
     case fmt
-    when "straight"
+    when "straight", "for_time"
       # Single-modality cardio block: the only or first exercise is cardio.
+      # for_time covers bookends (Buy In / Cash Out) which use that format.
       exercises.first["name"].to_s.match?(CARDIO_EXERCISE_PATTERN)
     when "rounds"
       # Long-interval cardio rounds: single exercise and it's cardio.

@@ -43,7 +43,15 @@
                                       .limit(20)
                                       .pluck("activities.name")
                                       .uniq
-                                      .first(5) %>
+                                      .first(5)
+       last_activity = Current.user.workouts
+                                   .where(status: "active")
+                                   .where.not(activity_id: nil)
+                                   .joins(:activity)
+                                   .order(created_at: :desc)
+                                   .limit(1)
+                                   .pick("activities.name")
+       custom_default = last_activity if last_activity.present? && !core_names.include?(last_activity) && !recent_activities.include?(last_activity) %>
     <div class="mb-6">
       <p class="text-sm font-semibold text-gray-300 uppercase tracking-wide mb-3">Workout Type</p>
 
@@ -52,7 +60,7 @@
         <div class="flex flex-wrap gap-2">
           <% recent_activities.each do |name| %>
             <label class="cursor-pointer">
-              <%= radio_button_tag "activity", name, false,
+              <%= radio_button_tag "activity", name, last_activity == name,
                   id: "activity_#{name.parameterize}",
                   class: "peer sr-only",
                   data: { generate_form_target: "pill", action: "change->generate-form#pillSelected" } %>
@@ -64,7 +72,7 @@
         </div>
       <% end %>
 
-      <details class="mt-3 group" <%= "open" unless recent_activities.any? %>>
+      <details class="mt-3 group" <%= "open" if !recent_activities.any? || core_names.include?(last_activity) %>>
         <summary class="flex items-center justify-between cursor-pointer list-none select-none">
           <span class="text-gray-600 text-xs">Volt Standard Workouts</span>
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-gray-500 group-open:rotate-180 transition-transform">
@@ -74,7 +82,7 @@
         <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-2">
           <% volt_types.each do |vt| %>
             <label class="cursor-pointer">
-              <%= radio_button_tag "activity", vt[:name], false,
+              <%= radio_button_tag "activity", vt[:name], last_activity == vt[:name],
                   id: "activity_#{vt[:name].parameterize}",
                   class: "peer sr-only",
                   data: { generate_form_target: "pill", action: "change->generate-form#pillSelected" } %>
@@ -88,10 +96,10 @@
       </details>
 
       <div class="mt-3">
-        <%= text_field_tag :custom_activity, nil,
+        <%= text_field_tag :custom_activity, custom_default,
             placeholder: "Or enter any other workout type, e.g. Heavy Lifting, Climbing, Zone 2, Hyrox",
             maxlength: 100,
-            class: "w-full bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-lime-400 transition-colors",
+            class: "w-full bg-zinc-800 rounded-xl px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-lime-400 transition-colors #{custom_default.present? ? "border border-lime-400 bg-lime-400/5" : "border border-zinc-700"}",
             data: { generate_form_target: "customInput", action: "input->generate-form#customTyped" } %>
       </div>
     </div>
