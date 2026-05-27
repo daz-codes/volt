@@ -123,6 +123,7 @@ class WorkoutValidator
     fix_warmup_format(sections)
     fix_amrap_minimum_exercises(sections)
     fix_timed_section_durations(sections)
+    fix_emom_alternating_duration(sections)
     dedup_identical_sections(sections)
     dedup_structurally_identical_sections(sections)
     cap_main_section_count(sections) unless @main_tag_slug == "functional-muscle"
@@ -830,6 +831,34 @@ class WorkoutValidator
       clean = CLEAN_TIMED_DURATIONS.min_by { |v| (v - dur).abs }
       section["duration_mins"] = clean
       @fixes << "'#{section["name"]}': #{section["format"].upcase} duration #{dur} min → #{clean} min (snapped to clean number)"
+    end
+  end
+
+  # Alternating EMOMs (one exercise per period rotating across the duration)
+  # need duration_mins to be a multiple of the exercise count so every exercise
+  # gets the same number of work bouts. A 15-min EMOM with 2 alternating
+  # exercises gives 8 of one and 7 of the other — unbalanced. Snap to the
+  # nearest multiple, tie goes UP (give the full rotation rather than truncate).
+  # Runs AFTER fix_timed_section_durations so the input is already a clean
+  # number (10/12/15/16/...); we override that snap when alternation requires it.
+  def fix_emom_alternating_duration(sections)
+    sections.each do |section|
+      next unless section["format"] == "emom"
+      next unless section["alternating"]
+      exercises = Array(section["exercises"])
+      n = exercises.size
+      next if n <= 1
+
+      dur = section["duration_mins"].to_i
+      next if dur <= 0 || (dur % n).zero?
+
+      floor_mult = (dur / n) * n
+      ceil_mult  = floor_mult + n
+      snapped = (ceil_mult - dur) <= (dur - floor_mult) ? ceil_mult : floor_mult
+      snapped = n if snapped <= 0
+
+      section["duration_mins"] = snapped
+      @fixes << "Alternating EMOM '#{section["name"]}': duration_mins #{dur} → #{snapped} (must be a multiple of #{n} exercises for an even rotation)"
     end
   end
 

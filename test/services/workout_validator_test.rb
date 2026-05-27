@@ -1202,6 +1202,65 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
     assert_equal 4, cooldown["duration_mins"], "cool-down duration must not be snapped"
   end
 
+  # -- fix_emom_alternating_duration --
+
+  test "fix_emom_alternating_duration snaps 15min 2-ex alternating to 16min" do
+    data = build_workout_with_sections([
+      { "name" => "Heavy Hands", "category" => "main", "format" => "emom",
+        "duration_mins" => 15, "alternating" => true,
+        "exercises" => [
+          { "name" => "Sled Push", "distance_m" => 20, "equipment" => "sled" },
+          { "name" => "Wall Balls", "reps" => 20,      "equipment" => "wall_ball" }
+        ] }
+    ])
+    result  = WorkoutValidator.new(data, duration_mins: 45, main_tag_slug: "hyrox").validate_and_fix
+    section = result.dig("structure", "sections").first
+    assert_equal 16, section["duration_mins"], "15 must snap UP to 16 (next multiple of 2)"
+  end
+
+  test "fix_emom_alternating_duration snaps 14min 3-ex alternating to 15min" do
+    data = build_workout_with_sections([
+      { "name" => "Race Day Energy", "category" => "main", "format" => "emom",
+        "duration_mins" => 14, "alternating" => true,
+        "exercises" => [
+          { "name" => "Burpees",        "reps" => 8,  "equipment" => "bodyweight" },
+          { "name" => "Reverse Lunges", "reps" => 12, "equipment" => "bodyweight" },
+          { "name" => "Sit Ups",        "reps" => 15, "equipment" => "bodyweight" }
+        ] }
+    ])
+    result  = WorkoutValidator.new(data, duration_mins: 45, main_tag_slug: "").validate_and_fix
+    section = result.dig("structure", "sections").first
+    assert_equal 15, section["duration_mins"], "14 must snap to nearest multiple of 3 (15, distance 1 vs 12 distance 2)"
+  end
+
+  test "fix_emom_alternating_duration leaves 16min 2-ex alternating alone" do
+    data = build_workout_with_sections([
+      { "name" => "Couplet", "category" => "main", "format" => "emom",
+        "duration_mins" => 16, "alternating" => true,
+        "exercises" => [
+          { "name" => "Push Press", "reps" => 5, "equipment" => "barbell" },
+          { "name" => "Box Jumps",  "reps" => 8, "equipment" => "bodyweight" }
+        ] }
+    ])
+    result  = WorkoutValidator.new(data, duration_mins: 45, main_tag_slug: "").validate_and_fix
+    section = result.dig("structure", "sections").first
+    assert_equal 16, section["duration_mins"]
+  end
+
+  test "fix_emom_alternating_duration ignores non-alternating EMOMs" do
+    data = build_workout_with_sections([
+      { "name" => "Both Each Minute", "category" => "main", "format" => "emom",
+        "duration_mins" => 15,
+        "exercises" => [
+          { "name" => "Wall Balls", "reps" => 5, "equipment" => "wall_ball" },
+          { "name" => "Burpees",    "reps" => 5, "equipment" => "bodyweight" }
+        ] }
+    ])
+    result  = WorkoutValidator.new(data, duration_mins: 45, main_tag_slug: "").validate_and_fix
+    section = result.dig("structure", "sections").first
+    assert_equal 15, section["duration_mins"], "non-alternating EMOMs are not constrained by exercise count"
+  end
+
   private
 
   def build_workout_with_sections(sections)
