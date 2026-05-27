@@ -8,8 +8,8 @@ module LLMContext
         purity: "Deka Mile race training — running-heavy Deka variant. Treadmill mileage " \
                 "is the backbone of every session.",
         hybrid_family: true,
-        allowed_equipment: %w[treadmill rowing_machine ski_erg assault_bike wall_ball sled kettlebells barbell dumbbells pull_up_bar],
-        banned_equipment:  %w[resistance_bands jump_rope],
+        allowed_equipment: %w[treadmill rowing_machine ski_erg assault_bike wall_ball sled kettlebells barbell dumbbells pull_up_bar resistance_bands],
+        banned_equipment:  %w[jump_rope],
         banned_exercise_patterns: [].freeze,
         allowed_formats:   %w[for_time rounds emom amrap tabata ladder hundred matrix mountain],
         primary_formats:   %w[for_time rounds emom],
@@ -17,6 +17,29 @@ module LLMContext
         cool_down:         :full_body_stretch,
         finisher:          :optional,
         core:              :optional,
+        intensity_guide: {
+          low:    "Zone-2 day for Deka Mile (compromised running is mostly a medium/high event). " \
+                  "Rotate between FOUR shapes: (1) one long 20+ min easy-pace Row, Ski, Bike, or " \
+                  "treadmill block, (2) stacked 10-min blocks (Run + Row + Ski at easy pace), (3) long " \
+                  "continuous circuit (format: continuous_circuit, 4-6 movements rotating 1 min each " \
+                  "for 20-40 min, no rest — REACH FOR IT OFTEN), (4) long-interval cardio rounds (4 × " \
+                  "6 min Row at easy pace, 30s rest). NO weights, NO EMOMs, NO Tabatas, NO sprints, " \
+                  "NO compromised running (compromised work is by definition not easy). Bookends at " \
+                  "easy pace fit (10-min Row buy-in → main → 10-min Ski cash-out). duration_mins on " \
+                  "every main/finisher section must be a multiple of 5. Effort cue: easy, " \
+                  "conversational, nose-breathing pace.",
+          medium: "Race-prep working pace — Deka Mile's bread-and-butter. **Compromised running is the " \
+                  "headline shape here** (8-12 rounds × 160-300m run + 1-2 functional exercises). Also " \
+                  "fits: 200m or 300m run intervals as straight sections, station blocks, EMOMs. " \
+                  "Reach for `format: emom` and `format: continuous_circuit` often. Bookends fit (Row " \
+                  "buy-in → run main → Ski cash-out). Strength is OPTIONAL — many medium sessions are " \
+                  "pure run + station metcon. When strength is included, placement can vary.",
+          high:   "Race-day energy — strength block (if included) goes FIRST after warm-up (heavy 3-5 " \
+                  "rep lifts, 120-180s rest); rotate the lift each session (no Bench default). After " \
+                  "that, max-pace work with long recovery: short compromised runs (160-200m, all-out, " \
+                  "with full recovery), strength station EMOMs, 30s hard / 30s rest cardio. Pack LESS " \
+                  "total work — one main block fewer than medium — so transitions are unhurried."
+        },
         notes: "The Deka Mile race is 10 × 160m runs alternating with 10 functional zones. " \
                "**COMPROMISED RUNNING IS THE HEADLINE SHAPE** — compromised runs in Deka " \
                "Mile are STRICTLY ≤ 300m. The race distance is 160m but training a bit " \

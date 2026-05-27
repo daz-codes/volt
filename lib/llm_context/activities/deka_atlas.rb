@@ -8,8 +8,8 @@ module LLMContext
         purity: "Deka Atlas race training — ten strongman-style weighted stations, no " \
                 "running. Barbell and dumbbell work feature alongside classic carries.",
         hybrid_family: true,
-        allowed_equipment: %w[barbell dumbbells kettlebells sled jump_rope rowing_machine ski_erg assault_bike],
-        banned_equipment:  %w[treadmill wall_ball pull_up_bar resistance_bands],
+        allowed_equipment: %w[barbell dumbbells kettlebells sled jump_rope rowing_machine ski_erg assault_bike resistance_bands],
+        banned_equipment:  %w[treadmill wall_ball pull_up_bar],
         banned_exercise_patterns: [
           /\btreadmill\b/i, /\brun(ning)?\b/i
         ].freeze,
@@ -19,6 +19,31 @@ module LLMContext
         cool_down:         :full_body_stretch,
         finisher:          :optional,
         core:              :optional,
+        intensity_guide: {
+          low:    "Zone-2 day for Deka Atlas (no running; loaded stations are by definition not easy). " \
+                  "Rotate between FOUR shapes: (1) one long 20+ min easy-pace Row, Ski, or Bike block, " \
+                  "(2) stacked 10-min blocks (10 Row + 10 Ski + 10 Bike at easy pace), (3) long " \
+                  "continuous circuit (format: continuous_circuit, 4-6 BODYWEIGHT/light movements " \
+                  "rotating 1 min each for 20-40 min, no rest — REACH FOR IT OFTEN), (4) long-interval " \
+                  "cardio rounds (4 × 6 min Row, 30s rest). NO weights, NO EMOMs, NO Tabatas, NO " \
+                  "sprints, NO loaded station work (the heavy strongman movements are NEVER zone-2). " \
+                  "Bookends at easy pace fit (10-min Row buy-in → main → 10-min Ski cash-out). " \
+                  "duration_mins on every main/finisher section must be a multiple of 5. Effort cue: " \
+                  "easy, conversational, nose-breathing pace.",
+          medium: "Working pace — strongman stations + jump rope conditioning. Reach for `format: emom` " \
+                  "and `format: continuous_circuit` often. Bookends fit (DB or barbell movement as buy-" \
+                  "in/cash-out works too — '50 Barbell Thrusters' bookends). Strength is more central " \
+                  "to Deka Atlas than to other Deka variants (everything is loaded), but it's still " \
+                  "not mandatory in every session — pure metcon sessions are fine. When strength is " \
+                  "included, placement can vary.",
+          high:   "Race-day energy — strength block goes FIRST after warm-up (heavy 3-5 rep Barbell " \
+                  "Thrusters, Deadlift, DB Push Press, or other compound lifts; 120-180s rest). " \
+                  "Rotate the lift each session — do NOT default to Bench. After the strength block, " \
+                  "max-pace station work with long recovery. Prefer EMOMs over continuous_circuit. " \
+                  "Jump Rope is the canonical cardio modality (Single or Double Unders) — sprint " \
+                  "intervals on the machines are not for Atlas at high intensity. Pack LESS total " \
+                  "work — one main block fewer than medium — so transitions are unhurried."
+        },
         notes: "Stations: Barbell Thrusters, Bar-Facing Burpees Over Bar, Surrender " \
                "Lunges (weighted), Single Arm DB Ground to Overhead, Dumbbell Bear Crawl, " \
                "Weighted Sit-ups, Farmer's Carry, DB Shoulder to Overhead Press, Jump Rope " \

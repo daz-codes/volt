@@ -9,8 +9,8 @@ module LLMContext
                 "via the 10 weighted functional zones. Most sessions use 4-6 stations with " \
                 "supplementary movement work; full 10-zone sessions are valid but uncommon.",
         hybrid_family: true,
-        allowed_equipment: %w[rowing_machine ski_erg assault_bike wall_ball sled kettlebells barbell dumbbells pull_up_bar],
-        banned_equipment:  %w[treadmill resistance_bands jump_rope],
+        allowed_equipment: %w[rowing_machine ski_erg assault_bike wall_ball sled kettlebells barbell dumbbells pull_up_bar resistance_bands],
+        banned_equipment:  %w[treadmill jump_rope],
         banned_exercise_patterns: [
           /\btreadmill\b/i, /\brun(ning)?\b/i
         ].freeze,
@@ -20,6 +20,27 @@ module LLMContext
         cool_down:         :full_body_stretch,
         finisher:          :optional,
         core:              :optional,
+        intensity_guide: {
+          low:    "Zone-2 day for Deka Strong (no running). Rotate between FOUR shapes: (1) one long " \
+                  "20+ min single-modality cardio block on Row / Ski / Bike, (2) stacked 10-min blocks " \
+                  "(10 Row + 10 Ski + 10 Bike), (3) long continuous circuit (format: continuous_circuit, " \
+                  "4-6 movements rotating 1 min each for 20-40 min — REACH FOR IT OFTEN, the engine " \
+                  "builder), (4) long-interval cardio rounds (4 × 6 min Row, 30s rest). NO weights, NO " \
+                  "EMOMs, NO Tabatas, NO sprints. Bookends at easy pace fit (10-min Row buy-in → main " \
+                  "→ 10-min Ski cash-out). duration_mins on every main/finisher section must be a " \
+                  "multiple of 5. Effort cue: easy, conversational, nose-breathing pace.",
+          medium: "Working pace — strength + stations is the bread-and-butter Deka Strong session. " \
+                  "Mix 30s/30s machine work with zone-station blocks at ~RPE 7-8. Reach for `format: " \
+                  "emom` and `format: continuous_circuit` often. Strength is more common here than in " \
+                  "the runnable Deka variants (this IS the strength-leaning event), but it's still not " \
+                  "mandatory every session. When strength is included, placement can vary.",
+          high:   "Race-day energy — strength block goes FIRST after warm-up (heavy 3-5 rep lifts, " \
+                  "120-180s rest). Rotate the lift each session — Deadlift, Back Squat, Front Squat, " \
+                  "Bench Press, Push Press, Clean & Jerk variants. Do NOT default to Bench. After the " \
+                  "strength block, max-pace station work with long recovery. Prefer EMOMs over " \
+                  "continuous_circuit. Use the 30s hard / 30s rest pattern for hard cardio. Pack LESS " \
+                  "work — one main block fewer than medium."
+        },
         notes: "No running. Build anaerobic capacity on ski erg, assault bike, or rower " \
                "instead — 30s hard/30s easy or 400m repeats. Stations: RAM Reverse Lunges, " \
                "Row, Box Jump, Med Ball Sit-up Throw, SkiErg, Farmer's Carry, Air Bike, " \

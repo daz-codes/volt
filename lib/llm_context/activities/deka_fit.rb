@@ -8,8 +8,8 @@ module LLMContext
         purity: "Deka Fit race training — 10-zone event, 5 run zones alternating with " \
                 "5 functional zones. Running is half the race (10 × 500m).",
         hybrid_family: true,
-        allowed_equipment: %w[treadmill rowing_machine ski_erg assault_bike wall_ball sled kettlebells barbell dumbbells pull_up_bar],
-        banned_equipment:  %w[resistance_bands jump_rope],
+        allowed_equipment: %w[treadmill rowing_machine ski_erg assault_bike wall_ball sled kettlebells barbell dumbbells pull_up_bar resistance_bands],
+        banned_equipment:  %w[jump_rope],
         banned_exercise_patterns: [].freeze,
         allowed_formats:   %w[for_time rounds emom amrap tabata ladder hundred matrix mountain],
         primary_formats:   %w[for_time rounds emom],
@@ -17,6 +17,27 @@ module LLMContext
         cool_down:         :full_body_stretch,
         finisher:          :optional,
         core:              :optional,
+        intensity_guide: {
+          low:    "Zone-2 day for Deka Fit prep. Rotate between FOUR shapes: (1) one long 20+ min " \
+                  "single-modality block (Row / Ski / Bike / easy-pace treadmill), (2) stacked 10-min " \
+                  "blocks across the race machines (Row + Ski + Bike), (3) long continuous circuit " \
+                  "(format: continuous_circuit, 4-6 movements rotating 1 min each for 20-40 min, no " \
+                  "rest — engine builder, REACH FOR IT OFTEN), (4) long-interval cardio rounds (4 × 6 " \
+                  "min Row, 30s rest). NO weights, NO EMOMs, NO Tabatas, NO sprints. Bookends fit at " \
+                  "easy pace (10-min Row buy-in → main → 10-min Ski cash-out). duration_mins on every " \
+                  "main/finisher section must be a multiple of 5. Effort cue: easy, conversational, " \
+                  "nose-breathing pace.",
+          medium: "Race-prep working pace — most Deka Fit training lives here. Mix 500m treadmill runs " \
+                  "with zone-station blocks at ~RPE 7-8. Reach for `format: emom` and `format: " \
+                  "continuous_circuit` often. Bookends, AMRAPs, for-time chippers all fit. Strength is " \
+                  "OPTIONAL — many medium sessions are pure zone-station metcon. When strength is " \
+                  "included, placement can vary.",
+          high:   "Race-day energy — strength block goes FIRST after warm-up (heavy 3-5 rep lifts, " \
+                  "120-180s rest). Rotate the lift each session — do NOT default to Bench Press. " \
+                  "After that, max-pace work with long recovery. Prefer EMOMs over continuous_circuit. " \
+                  "Use the 30s hard / 30s rest pattern for hard cardio. Pack LESS total work — one main " \
+                  "block fewer than medium — so transitions are unhurried."
+        },
         notes: "MOST sessions include treadmill running intervals (200m–500m each) placed " \
                "between station blocks. **Compromised runs are STRICTLY ≤ 500m** — never " \
                "longer, because race-day Deka Fit run zones are 500m. Stations mirror the " \

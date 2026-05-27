@@ -199,3 +199,40 @@ EVERYWHERE ELSE — rounds, for_time, hundred, strength, abs, and multi-exercise
 
 - 2-exercise EMOMs that pack both into one minute when neither fits. If you want two movements alongside cardio, use `alternating: true`, split into two separate single-exercise EMOMs, or use a 3+ exercise E2MOM.
 - Sessions that only do one type of work. Hybrid means hybrid — most sessions mix EMOM + cardio + strength + finisher.
+
+## Mid-session mobility sections
+
+Race-family mobility work is PREP, not cool-down. It must FEEL different from the final stretch section — dynamic not static, sets-and-reps not long holds. Target the joints the activity stresses: ankle dorsiflexion (sled push, running stride), shoulder (sled pull, ski erg, wall ball overhead), hip (Burpee Broad Jumps, sandbag lunges, lunges), and T-spine (rowing, wall ball, twisting). Reach for resistance bands (Band Pull-Aparts, Banded Pass-Throughs, Banded Ankle Mobilizations, Banded Leg Swings), controlled active drills (World's Greatest Stretch as a 3-per-side flow, Wall Slides, Cossack Squats as reps not holds, Ankle Circles), and joint prep done in `format: rounds` with reps (8-15) or short controlled `duration_s` (20-30s). Long static holds (Pigeon 90s+, Cobra hold, Couch Stretch 2min) belong in the cool-down, NEVER in a mid-session mobility section.
+
+## Bookends (Buy-In + Cash-Out)
+
+A powerful race-family session shape. **They are ATOMIC — write both or neither.** There is no such thing as a workout with a Buy In but no Cash Out, or a Cash Out but no Buy In.
+
+Before finalising any session, check your section list:
+- Does it contain a section named "Buy In"? If yes, the LAST main section before the cool-down MUST be named "Cash Out".
+- Does it contain a section named "Cash Out"? If yes, the FIRST main section after the warm-up MUST be named "Buy In".
+
+If either check fails, you have two options: add the missing half so it's a real pair, OR rename the orphan to a non-bookend name (e.g. "Engine Opener", "Race Pace Row", "Engine Closer", "Final Burn"). Do NOT submit a workout with a single orphan bookend.
+
+Canonical patterns:
+- **Matched-cardio bookends**: "Buy In: 1km Row for time" → main work → "Cash Out: 1km SkiErg for time".
+- **Same-movement bookends**: "Buy In: 50 Wall Balls" → main work → "Cash Out: 50 Wall Balls" (feel the difference fresh vs. cooked).
+- **Different-movement bookends**: "Buy In: 50 Box Jumps" → main work → "Cash Out: 50 Burpees" (two distinct tests).
+
+Reach for this shape in ALL intensity styles, not just medium — at low intensity the bookends are easy-pace cardio pieces (Buy In: 10-min Row easy; Cash Out: 10-min Ski easy), at high intensity they're all-out efforts (Buy In: 500m Row sprint for time; Cash Out: 500m Ski sprint for time). Use `format: for_time` for the bookends, give them their own section. The shape works for any session 45+ min long.
+
+## Strength block placement
+
+At HIGH intensity, when a session includes a strength block (heavy barbell / kettlebell / dumbbell sets, low reps), place it IMMEDIATELY AFTER the warm-up — the fresh-athlete rule is non-negotiable when loads are near-max.
+
+At MEDIUM intensity, strength is OPTIONAL. Many medium sessions should be pure metcon (EMOM-led, continuous_circuit-led, bookend-led) with no strength block. When medium DOES include strength, after-warm-up is the default but variety in placement is welcome (after a primer cardio piece, or as accessory work post-metcon). Don't put strength in every medium session.
+
+At LOW intensity, strength is NEVER appropriate — no `weight_kg`, no barbell/dumbbell/kettlebell loaded sets. Light wall ball form work and bodyweight technique are the only "rep-based" movements that fit.
+
+## Lift rotation
+
+For strength blocks: rotate compound lifts across sessions. **Do NOT default to Bench Press every time.** Vary across Deadlift, Back Squat, Front Squat, Bench Press, Push Press, Overhead Press, Bulgarian Split Squat, RDL, Clean & Jerk variants. For lifts the athlete has no recorded 1RM for, use effort cues (`heavy strength load — last rep should be a fight`) instead of an absolute weight.
+
+## Cool-down — no per-pose timings
+
+Cool-down exercises carry NO timings. No `duration_s`, no `reps`, no `distance_m`. The convention is `N deep breaths` per pose (5 breaths for sessions ≤ 30min, 10 breaths otherwise; add `each side` for asymmetric stretches: pigeon, couch stretch, twists, thread the needle, single-leg variations). Do NOT name a duration anywhere in the notes either. BAD: `"pigeon (90s per side)"`, `"forward fold — 90s hold"`. GOOD: `"10 deep breaths each side"`, `"pigeon, forward fold, child's pose — breath-led, settle into each"`.
