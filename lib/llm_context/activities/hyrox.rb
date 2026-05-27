@@ -40,7 +40,10 @@ module LLMContext
           medium: "Race-prep working pace — the bread-and-butter Hyrox session. Mix run intervals " \
                   "with station blocks at ~RPE 7-8, 60s rest between rounds. **Reach for `format: emom` " \
                   "and `format: continuous_circuit` often — they're the two best-fitting shapes for " \
-                  "hybrid race training.** AMRAPs and for-time chippers also fit naturally.",
+                  "hybrid race training.** AMRAPs and for-time chippers also fit naturally. " \
+                  "**If the session includes a strength block (heavy compound lift), place it " \
+                  "immediately after the warm-up — same rule as high intensity. Strength always " \
+                  "comes first in Hyrox, never tacked on after the metcon.**",
           high:   "Race-day energy — strength block goes FIRST (heavy 3-5 rep lifts at near-max load, " \
                   "120-180s rest). **Pick a different lift each session — Deadlift, Back Squat, Front " \
                   "Squat, Bench Press, Push Press, Overhead Press, Clean & Jerk. Do NOT default to " \
@@ -72,7 +75,20 @@ module LLMContext
                "prep done in `format: rounds` with reps (8-15) or short controlled " \
                "duration_s (20-30s). Long static holds (Pigeon 90s+, Cobra hold, Couch " \
                "Stretch 2min) belong in the cool-down, NEVER in a mid-session mobility " \
-               "section."
+               "section. " \
+               "RUN DISTANCES IN SOLO ROUNDS: a `format: rounds` section that contains ONLY " \
+               "running (a single Run/Treadmill exercise, no other movement) must use 400m or " \
+               "longer as the per-round distance. 200m and 300m runs on their own are too " \
+               "short to anchor a rounds block — the session goes too quick and the stimulus " \
+               "is wrong. 200m and 300m are FINE in mixed company: alongside other movements " \
+               "inside a single round (e.g. compromised running: Run 300m + Burpees + Wall Balls), " \
+               "as a separate follow-on section after a longer-distance block (4×400m followed " \
+               "by 8×200m), or as the final rung of a descending distance ladder (500→400→300→ " \
+               "200→100m). Never solo-200m or solo-300m as the headline shape. " \
+               "STRENGTH BLOCK PLACEMENT: when a session includes a strength block (heavy " \
+               "barbell / kettlebell / dumbbell sets, format: rounds with low reps), place it " \
+               "IMMEDIATELY AFTER the warm-up — while the athlete is fresh. This applies to " \
+               "both medium AND high intensity Hyrox sessions, not just high."
       }.freeze
 
       MOVEMENT_VOCABULARY = <<~VOCAB.freeze
@@ -102,11 +118,15 @@ module LLMContext
       EXAMPLES = [
         {
           name: "Mixed Hybrid",
-          goal: "Race-pace stations, a 30/30 engine split, a heavy lift, and a single-exercise EMOM grind.",
+          goal: "Heavy deadlifts to open, race-pace stations, a 30/30 engine split, and a single-exercise EMOM grind.",
           duration_mins: 60,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
+            { name: "Iron Lift", format: "rounds", intensity_style: "high", rounds: 4, rest_secs: 120,
+              exercises: [
+                { name: "Deadlift", reps: 5, notes: "heavy strength load — last rep should be a fight", equipment: "barbell" }
+              ] },
             { name: "Compromised Stations", format: "rounds", rounds: 4, rest_secs: 60,
               exercises: [
                 { name: "Compromised Run", distance_m: 500, equipment: "treadmill" },
@@ -120,10 +140,6 @@ module LLMContext
             { name: "Row Sprint", format: "rounds", rounds: 5, rest_secs: 30,
               exercises: [
                 { name: "Row", duration_s: 30, notes: "hard pace", equipment: "rowing_machine" }
-              ] },
-            { name: "Iron Lift", format: "rounds", intensity_style: "high", rounds: 4, rest_secs: 120,
-              exercises: [
-                { name: "Deadlift", reps: 5, notes: "heavy strength load — last rep should be a fight", equipment: "barbell" }
               ] },
             { name: "Walking Death", format: "emom", duration_mins: 16, rest_secs: 0,
               exercises: [
@@ -173,11 +189,15 @@ module LLMContext
         },
         {
           name: "Ladder Day",
-          goal: "30/30 opener, alternating EMOM grind, a compromised run-up-and-down ladder, then strength and a hundred.",
+          goal: "Heavy deadlifts to open, then a 30/30 opener, alternating EMOM grind, a compromised run-up-and-down ladder, and a hundred to close.",
           duration_mins: 60,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "treadmill" } ] },
+            { name: "Iron Lift", format: "rounds", intensity_style: "high", rounds: 4, rest_secs: 120,
+              exercises: [
+                { name: "Deadlift", reps: 5, notes: "heavy strength load — proper strength training, not a race-day-style effort", equipment: "barbell" }
+              ] },
             { name: "Lung Buster", format: "rounds", rounds: 10, rest_secs: 30,
               exercises: [
                 { name: "SkiErg", duration_s: 30, notes: "hard pace", equipment: "ski_erg" }
@@ -200,10 +220,6 @@ module LLMContext
                 { name: "Run", distance_m: 200, equipment: "treadmill" },
                 { name: "Wall Balls", reps: 50, equipment: "wall_ball" }
               ] },
-            { name: "Iron Lift", format: "rounds", intensity_style: "high", rounds: 4, rest_secs: 120,
-              exercises: [
-                { name: "Deadlift", reps: 5, notes: "heavy strength load — proper strength training, not a race-day-style effort", equipment: "barbell" }
-              ] },
             { name: "Swing Time", format: "hundred",
               exercises: [
                 { name: "KB Swings", reps: 100, equipment: "kettlebells" }
@@ -214,11 +230,15 @@ module LLMContext
         },
         {
           name: "The Workshop",
-          goal: "Continuous circuit opener, a carry-and-sled triplet, heavy goblet squats, 1km repeats, then a tabata finisher.",
+          goal: "Heavy goblet squats to open, a continuous circuit, a carry-and-sled triplet, 1km repeats, then a tabata finisher.",
           duration_mins: 60,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
+            { name: "Iron Lift", format: "rounds", intensity_style: "high", rounds: 4, rest_secs: 120,
+              exercises: [
+                { name: "Goblet Squats", reps: 5, notes: "heavier than race weight — heaviest bell you can rep cleanly for 5", equipment: "kettlebells" }
+              ] },
             { name: "Rotation Room", format: "continuous_circuit", duration_mins: 12,
               exercises: [
                 { name: "SkiErg", equipment: "ski_erg" },
@@ -230,10 +250,6 @@ module LLMContext
                 { name: "Farmer's Carry", distance_m: 60, notes: "race weight — Hyrox competition load", equipment: "kettlebells" },
                 { name: "Sled Push", distance_m: 40, notes: "race weight — full Hyrox sled", equipment: "sled" },
                 { name: "Sled Pull", distance_m: 20, notes: "race weight — full Hyrox sled", equipment: "sled" }
-              ] },
-            { name: "Iron Lift", format: "rounds", intensity_style: "high", rounds: 4, rest_secs: 120,
-              exercises: [
-                { name: "Goblet Squats", reps: 5, notes: "heavier than race weight — heaviest bell you can rep cleanly for 5", equipment: "kettlebells" }
               ] },
             { name: "Race Pace", format: "rounds", rounds: 5, rest_secs: 90,
               exercises: [
@@ -386,9 +402,9 @@ module LLMContext
               exercises: [
                 { name: "Deadlift", reps: 3, notes: "near-max strength load — last rep should be a fight", equipment: "barbell" }
               ] },
-            { name: "Sprint Repeats", format: "rounds", rounds: 8, rest_secs: 90,
+            { name: "Sprint Repeats", format: "rounds", intensity_style: "high", rounds: 4, rest_secs: 120,
               exercises: [
-                { name: "Run", distance_m: 200, notes: "all-out — every rep is maximum effort", equipment: "treadmill" }
+                { name: "Run", distance_m: 400, notes: "all-out — every rep is maximum effort, full recovery between", equipment: "treadmill" }
               ] },
             { name: "Heavy Sled", format: "rounds", intensity_style: "high", rounds: 4, rest_secs: 120,
               exercises: [
@@ -433,11 +449,15 @@ module LLMContext
         },
         {
           name: "1K Bookends",
-          goal: "Buy in with a 1km Row, race the main compromised running, then cash out on a 1km SkiErg. Matched-cardio bookends framing the work.",
+          goal: "Heavy deadlifts to open, then 1km Row buy-in, compromised stations, and a 1km SkiErg cash-out. Matched-cardio bookends framing the work.",
           duration_mins: 60,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
+            { name: "Iron Lift", format: "rounds", intensity_style: "high", rounds: 4, rest_secs: 120,
+              exercises: [
+                { name: "Deadlift", reps: 5, notes: "heavy strength load — last rep should be a fight", equipment: "barbell" }
+              ] },
             { name: "Buy In", format: "for_time",
               exercises: [
                 { name: "Row", distance_m: 1000, notes: "race pace — set the tone, don't sandbag", equipment: "rowing_machine" }
@@ -447,10 +467,6 @@ module LLMContext
                 { name: "Compromised Run", distance_m: 500, equipment: "treadmill" },
                 { name: "Wall Balls", reps: 20, equipment: "wall_ball" },
                 { name: "Farmer's Carry", distance_m: 30, notes: "race weight — Hyrox competition load", equipment: "kettlebells" }
-              ] },
-            { name: "Iron Lift", format: "rounds", intensity_style: "high", rounds: 4, rest_secs: 120,
-              exercises: [
-                { name: "Deadlift", reps: 5, notes: "heavy strength load — last rep should be a fight", equipment: "barbell" }
               ] },
             { name: "Cash Out", format: "for_time",
               exercises: [
@@ -651,11 +667,16 @@ module LLMContext
         },
         {
           name: "Living in America",
-          goal: "A descending run ladder, a 20-min AMRAP on ski / wall balls / row / lunges, accessory strength on bench and split squats, then a burpee tabata to close.",
+          goal: "Accessory strength on bench and split squats to open, then a descending run ladder, a 20-min AMRAP on ski / wall balls / row / lunges, and a burpee tabata to close.",
           duration_mins: 60,
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
+            { name: "Strength Block", format: "rounds", intensity_style: "high", rounds: 5, rest_secs: 60,
+              exercises: [
+                { name: "DB Bench Press", reps: 8, notes: "working weight — last 2 reps should be a fight", equipment: "dumbbells" },
+                { name: "Split Squat", reps: 8, notes: "8 per leg — controlled tempo, knee tracks toe", equipment: "dumbbells" }
+              ] },
             { name: "Run Stairs", format: "ladder",
               varies: "distance_m", start: 1000, end: 200, step: 200, rest_between_rungs: 30,
               exercises: [ { name: "Run", notes: "hard pace", equipment: "treadmill" } ] },
@@ -665,11 +686,6 @@ module LLMContext
                 { name: "Wall Balls", reps: 20, equipment: "wall_ball" },
                 { name: "Row", distance_m: 400, equipment: "rowing_machine" },
                 { name: "Walking Lunges", reps: 20, equipment: "bodyweight" }
-              ] },
-            { name: "Strength Block", format: "rounds", intensity_style: "high", rounds: 5, rest_secs: 60,
-              exercises: [
-                { name: "DB Bench Press", reps: 8, notes: "working weight — last 2 reps should be a fight", equipment: "dumbbells" },
-                { name: "Split Squat", reps: 8, notes: "8 per leg — controlled tempo, knee tracks toe", equipment: "dumbbells" }
               ] },
             { name: "Tabata Burner", format: "tabata",
               exercises: [
