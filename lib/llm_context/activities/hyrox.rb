@@ -300,10 +300,10 @@ module LLMContext
             { name: "Technique Stations", format: "rounds", rounds: 3, rest_secs: 20,
               exercises: [
                 { name: "Wall Balls", reps: 20, notes: "light ball, full squat depth, controlled tempo", equipment: "wall_ball" },
-                { name: "KB Swings", reps: 20, notes: "light kettlebell, hip hinge mechanics, smooth and even", equipment: "kettlebells" },
-                { name: "Farmer's Carry", distance_m: 30, notes: "light load — well below race weight, tall posture, breath stays calm", equipment: "kettlebells" }
+                { name: "Air Squats", reps: 20, notes: "deliberate tempo, full depth, knees track over toes", equipment: "bodyweight" },
+                { name: "Walking Lunges", reps: 20, notes: "10 per leg, tall posture, controlled steps", equipment: "bodyweight" }
               ] },
-            { name: "Ankle Flow", format: "straight", duration_mins: 4,
+            { name: "Ankle Flow", format: "straight", duration_mins: 5,
               exercises: [
                 { name: "Ankle Circles", duration_s: 60, notes: "both ankles, full range in both directions" },
                 { name: "Calf Stretch", duration_s: 120, notes: "gastrocnemius and soleus — 60s per side" },
@@ -315,7 +315,7 @@ module LLMContext
         },
         {
           name: "Aerobic Build",
-          goal: "A long steady row, an easy circuit with mobility woven into each round, slow technique-focused goblet squats, then a quiet cool-down.",
+          goal: "A long steady row, an easy circuit with mobility woven into each round, a dedicated hip mobility flow, then a quiet cool-down.",
           duration_mins: 60,
           intensity_style: "low",
           sections: [
@@ -333,10 +333,11 @@ module LLMContext
                 { name: "Ankle Banded Mobilizations", duration_s: 60, notes: "ankle dorsiflexion prep — 30s per side, drive knee forward" },
                 { name: "Walking Lunges", reps: 20, notes: "deliberate steps, focus on knee tracking", equipment: "bodyweight" }
               ] },
-            { name: "Slow Goblet", format: "rounds", rounds: 4, rest_secs: 30,
+            { name: "Hip Mobility Flow", format: "straight", duration_mins: 10,
               exercises: [
-                { name: "Goblet Squat", reps: 12, notes: "light bell — well below race weight, 3-second eccentric, focus on form and depth", equipment: "kettlebells" },
-                { name: "Wall Slides", duration_s: 60, notes: "shoulder and T-spine mobility between sets — slow controlled overhead reach" }
+                { name: "90/90 Hip Switches", duration_s: 180, notes: "slow controlled rotation — internal/external hip range, breath stays calm" },
+                { name: "Couch Stretch",      duration_s: 240, notes: "120s per side — hip flexor and quad opener, keep ribs stacked over hips" },
+                { name: "Cossack Squats",     duration_s: 180, notes: "lateral squat shifting side to side, bodyweight, focus on depth and ankle range" }
               ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
