@@ -216,7 +216,12 @@ class WorkoutValidator
   end
 
   # Snap odd duration_mins to nearest 5 (rounding 1-2 down, 3-4 up).
+  # Skip continuous_circuit sections: their duration is structurally constrained
+  # to a multiple of the exercise count (fix_continuous_circuit_structure), and
+  # that constraint wins — multiple-of-5 here is aesthetic, multiple-of-N there
+  # is structural.
   def fix_low_intensity_duration_multiple(section)
+    return if section["format"] == "continuous_circuit"
     dur = section["duration_mins"].to_i
     return if dur <= 0 || (dur % 5).zero?
     snapped = ((dur / 5.0).round) * 5

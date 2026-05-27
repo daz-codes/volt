@@ -1133,6 +1133,24 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
     assert_equal 4,          section["duration_mins"]
   end
 
+  test "fix_low_intensity_duration_multiple defers to continuous_circuit constraint" do
+    # 30min / 4 exercises violates the continuous_circuit multiple-of-N rule.
+    # Snap to 32 (multiple of 4) NOT back to 30 (multiple of 5).
+    data = build_workout_with_sections([
+      { "name" => "The Grind", "category" => "main", "format" => "continuous_circuit",
+        "intensity_style" => "low", "duration_mins" => 30,
+        "exercises" => [
+          { "name" => "Run",        "equipment" => "treadmill" },
+          { "name" => "Row",        "equipment" => "rowing_machine" },
+          { "name" => "Wall Balls", "equipment" => "wall_ball" },
+          { "name" => "SkiErg",     "equipment" => "ski_erg" }
+        ] }
+    ])
+    result  = WorkoutValidator.new(data, duration_mins: 45, main_tag_slug: "hyrox").validate_and_fix
+    section = result.dig("structure", "sections").first
+    assert_equal 32, section["duration_mins"], "continuous_circuit multiple-of-N must win over multiple-of-5"
+  end
+
   test "fix_low_intensity_shapes leaves a low-intensity continuous_circuit alone" do
     data = build_workout_with_sections([
       { "name" => "Engine Loop", "category" => "main", "format" => "continuous_circuit",
