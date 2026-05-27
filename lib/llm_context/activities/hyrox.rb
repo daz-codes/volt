@@ -108,14 +108,17 @@ module LLMContext
                "When medium DOES include strength, after-warm-up is the default but variety in " \
                "placement is welcome (after a primer cardio piece, or as accessory work post-metcon). " \
                "Don't put strength in every medium session. " \
-               "BOOKENDS (BUY-IN + CASH-OUT): a powerful Hyrox session shape. **They come as " \
-               "a PAIR — never one without the other.** If you write a section named 'Buy In' " \
-               "at the start of the workout, you MUST write a matching section named 'Cash Out' " \
-               "as the last main section before the cool-down. Likewise, if you write a 'Cash " \
-               "Out' you MUST have opened with a 'Buy In'. A buy-in alone with no cash-out is " \
-               "BROKEN — the shape requires both ends. If you only want a single anchor cardio " \
-               "piece, use a normal section name (e.g. 'Engine Opener', 'Race Pace Row') — DO " \
-               "NOT call it 'Buy In' unless the matching 'Cash Out' is also in the session. " \
+               "BOOKENDS (BUY-IN + CASH-OUT): a powerful Hyrox session shape. **They are " \
+               "ATOMIC — write both or neither. There is no such thing as a workout with a " \
+               "Buy In but no Cash Out, or a Cash Out but no Buy In.** Before finalising any " \
+               "Hyrox workout, check your section list: (a) does it contain a section named " \
+               "'Buy In'? If yes, the LAST main section before the cool-down MUST be named " \
+               "'Cash Out'. (b) Does it contain a section named 'Cash Out'? If yes, the FIRST " \
+               "main section after the warm-up MUST be named 'Buy In'. If either check fails, " \
+               "you have two options: add the missing half so it's a real pair, OR rename the " \
+               "orphan to a non-bookend name (e.g. 'Engine Opener', 'Race Pace Row', 'Engine " \
+               "Closer', 'Final Burn'). Do NOT submit a workout with a single orphan bookend — " \
+               "the framing promises a pair the rest of the session doesn't deliver. " \
                "Canonical patterns: 'Buy In: 1km Row for time' → main work → 'Cash Out: 1km " \
                "SkiErg for time' (matched-cardio bookends); 'Buy In: 50 Wall Balls' → main work " \
                "→ 'Cash Out: 50 Wall Balls' (same-movement bookends — feel the difference fresh " \
