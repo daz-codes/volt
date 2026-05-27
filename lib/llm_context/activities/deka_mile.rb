@@ -536,6 +536,54 @@ module LLMContext
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
           ]
+        },
+        {
+          name: "Strike First",
+          goal: "A 90-min high-intensity grinder: heavy bench triples, a rotating 3-exercise EMOM, machine sprints, compromised running, then a tabata burner. Race-day energy from the first set.",
+          duration_mins: 90,
+          intensity_style: "high",
+          sections: [
+            { name: "Warm-Up", format: "straight", duration_mins: 5,
+              exercises: [
+                { name: "Easy cardio + Dynamic stretches", duration_s: 300,
+                  notes: "light jog or row to elevate heart rate; arm circles, leg swings, glute activation",
+                  equipment: "rowing_machine" }
+              ] },
+            { name: "Iron Anchor", format: "rounds", intensity_style: "high", rounds: 5, rest_secs: 180,
+              exercises: [
+                { name: "Bench Press", reps: 3,
+                  notes: "near-max strength load — last rep should be a fight, full reset between sets",
+                  equipment: "barbell" }
+              ] },
+            { name: "Race Day Energy", format: "emom", duration_mins: 15, rest_secs: 0, alternating: true,
+              exercises: [
+                { name: "Burpees",        notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "bodyweight" },
+                { name: "Reverse Lunges", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "bodyweight" },
+                { name: "Sit Ups",        notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "bodyweight" }
+              ] },
+            { name: "Machine Assault", format: "rounds", rounds: 6, rest_secs: 60,
+              exercises: [
+                { name: "SkiErg",       calories: 12, notes: "all-out sprint effort — max calories each round", equipment: "ski_erg" },
+                { name: "Assault Bike", calories: 12, notes: "hammer the resistance, full recovery between rounds", equipment: "assault_bike" }
+              ] },
+            { name: "Compromised Gauntlet", format: "rounds", rounds: 4, rest_secs: 60,
+              exercises: [
+                { name: "Compromised Run", distance_m: 300,
+                  notes: "hard effort — arriving already fatigued from machine work; above-race distance to build the engine",
+                  equipment: "treadmill" },
+                { name: "Box Jump Step-Overs", reps: 12, equipment: "bodyweight" }
+              ] },
+            { name: "Final Burn", format: "tabata", duration_mins: 4,
+              exercises: [
+                { name: "RAM Weighted Burpees", equipment: "bodyweight" },
+                { name: "Med Ball Slams",       equipment: "wall_ball" }
+              ] },
+            { name: "Cool-Down", format: "straight", duration_mins: 5,
+              exercises: [
+                { name: "Static stretches",
+                  notes: "10 deep breaths each side. Pigeon, forward fold, spinal twist, chest opener, thread the needle, child's pose — 45–60s each" }
+              ] }
+          ]
         }
       ].freeze
     end
