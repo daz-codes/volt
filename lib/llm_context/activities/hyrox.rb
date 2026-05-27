@@ -20,6 +20,27 @@ module LLMContext
         cool_down:         :full_body_stretch,
         finisher:          :optional,
         core:              :optional,
+        intensity_guide: {
+          low:    "Zone-2 day — long continuous easy-pace cardio is the headline. Build the session " \
+                  "around a single 20+ min steady block (e.g. one 25-min Row at conversational pace), " \
+                  "OR stack 2-3 single-modality blocks (10 min Row + 10 min Run + 10 min SkiErg). " \
+                  "Cardio rounds are fine if they're long-interval (e.g. 4 rounds × 6 min Row at easy " \
+                  "pace, 30s rest). NO weights — no barbell, dumbbell, or kettlebell loaded work; the " \
+                  "only rep-based movements allowed are light Wall Balls for form, mobility flows, " \
+                  "or bodyweight technique drills. NO EMOMs, NO Tabatas, NO sprints. " \
+                  "duration_mins on every main/finisher section must be a multiple of 5. " \
+                  "Effort cue: easy, conversational, nose-breathing pace.",
+          medium: "Race-prep working pace — the bread-and-butter Hyrox session. Mix run intervals " \
+                  "with station blocks at ~RPE 7-8, 60s rest between rounds. EMOMs, AMRAPs, and " \
+                  "for-time chippers all fit naturally.",
+          high:   "Race-day energy — strength block goes FIRST (heavy 3-5 rep lifts at near-max load, " \
+                  "120-180s rest), then everything else is max-pace with long recovery. Prefer EMOMs " \
+                  "(with the ~50% of 1-min max cue or rotating alternating:true) over " \
+                  "continuous_circuit. Use the 30s hard / 30s rest pattern for hard cardio. Run intervals " \
+                  "are all-out sprints (200-400m), never threshold pace. Pack LESS total work into the " \
+                  "session than you would at medium — typically one main block fewer — so transitions " \
+                  "between sections are unhurried."
+        },
         notes: "MANDATORY: every session must include at least 2 treadmill running " \
                "intervals (500m–1km each) placed between station blocks. Stations " \
                "mirror the race: SkiErg, Sled Push/Pull, Burpee Broad Jumps, Rowing, " \
