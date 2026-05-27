@@ -113,17 +113,25 @@ class WorkoutLLMGenerator
       (Array(contract[:banned_equipment]) + @banned_override).uniq
     end
 
+    # Equipment the athlete may actually use in this session: what the activity
+    # allows, minus anything banned (by the activity OR the athlete's profile).
+    # MUST be the SET DIFFERENCE — without this, the ALLOWED and BANNED prompt
+    # lines contradict each other and the LLM ignores the ban.
+    def effective_allowed_equipment
+      Array(contract[:allowed_equipment]) - banned_equipment
+    end
+
     def contract_block
       vocab = defined?(@activity::MOVEMENT_VOCABULARY) ? @activity::MOVEMENT_VOCABULARY : nil
-      allowed = Array(contract[:allowed_equipment])
+      allowed = effective_allowed_equipment
       banned  = banned_equipment
       lines = []
       lines << "Activity: #{@activity::NAME} (#{@activity::SLUG})"
       lines << ""
       lines << "PURITY: #{contract[:purity]}"
-      lines << "ALLOWED EQUIPMENT: #{allowed.join(', ')}" if allowed.any?
-      lines << "BANNED EQUIPMENT: #{banned.join(', ')}" if banned.any?
-      if (sub_line = run_substitution_line(allowed, banned))
+      lines << "ALLOWED EQUIPMENT (the ONLY equipment the athlete has access to — use NOTHING else): #{allowed.join(', ')}" if allowed.any?
+      lines << "BANNED EQUIPMENT (never reference any of these — neither in `equipment` fields nor implied by exercise names): #{banned.join(', ')}" if banned.any?
+      if (sub_line = run_substitution_line(Array(contract[:allowed_equipment]), banned))
         lines << sub_line
       end
       if banned_exercise_terms.any?
@@ -161,9 +169,12 @@ class WorkoutLLMGenerator
       "assault_bike"   => "Air Bike"
     }.freeze
 
-    def run_substitution_line(allowed, banned)
-      return nil unless banned.include?("treadmill") && allowed.include?("treadmill")
-      available_cardio = %w[rowing_machine ski_erg assault_bike] & allowed - banned
+    # `contract_allowed` is the activity's full allowed list (NOT the effective
+    # allowed list, which has bans already stripped). We need to know the
+    # activity COULD have running before substituting it away.
+    def run_substitution_line(contract_allowed, banned)
+      return nil unless banned.include?("treadmill") && contract_allowed.include?("treadmill")
+      available_cardio = %w[rowing_machine ski_erg assault_bike] & contract_allowed - banned
       return nil if available_cardio.empty?
       names = available_cardio.map { |slug| CARDIO_SUBSTITUTION_NAMES.fetch(slug) }
       pref = names.first

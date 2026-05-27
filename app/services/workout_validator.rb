@@ -250,6 +250,7 @@ class WorkoutValidator
     end
   end
 
+
   # Assign a category to each section so downstream methods can rely on it.
   # First pass infers from name patterns; second pass detects finishers.
   def ensure_section_categories(sections)

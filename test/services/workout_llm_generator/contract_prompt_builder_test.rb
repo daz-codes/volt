@@ -62,7 +62,7 @@ class WorkoutLLMGenerator::ContractPromptBuilderTest < ActiveSupport::TestCase
 
   test "iron-engine prompt does not mention cardio machines as allowed or in examples" do
     prompt = build
-    allowed_line = prompt[/ALLOWED EQUIPMENT:([^\n]+)/, 1]
+    allowed_line = prompt[/ALLOWED EQUIPMENT[^:]*:([^\n]+)/, 1]
     refute_nil allowed_line
     refute_match(/treadmill|assault.?bike|rower|ski.?erg/i, allowed_line)
 
@@ -100,9 +100,21 @@ class WorkoutLLMGenerator::ContractPromptBuilderTest < ActiveSupport::TestCase
 
   test "banned_equipment_override merges into contract banned list" do
     prompt = build(banned_override: %w[pull_up_bar])
-    banned = prompt[/BANNED EQUIPMENT:([^\n]+)/, 1]
+    banned = prompt[/BANNED EQUIPMENT[^:]*:([^\n]+)/, 1]
     refute_nil banned
     assert_includes banned, "pull_up_bar"
+  end
+
+  test "allowed equipment line excludes anything that's also in the banned list" do
+    # Kettlebell activity allows kettlebells; ban pull_up_bar via override.
+    # The ALLOWED line must NOT contradict the BAN.
+    prompt = build(banned_override: %w[pull_up_bar])
+    allowed = prompt[/ALLOWED EQUIPMENT[^:]*:([^\n]+)/, 1]
+    banned  = prompt[/BANNED EQUIPMENT[^:]*:([^\n]+)/, 1]
+    refute_nil allowed
+    refute_nil banned
+    refute_match(/pull_up_bar/, allowed, "ALLOWED must not list anything in BANNED")
+    assert_match(/pull_up_bar/, banned)
   end
 
   test "contract_override replaces the activity contract" do
