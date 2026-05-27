@@ -9,8 +9,8 @@ module LLMContext
                 "Treadmill running is the backbone of every session. Assault Bike is NOT " \
                 "a Hyrox machine and must never appear.",
         hybrid_family: true,
-        allowed_equipment: %w[treadmill rowing_machine ski_erg sled wall_ball kettlebells barbell dumbbells pull_up_bar],
-        banned_equipment:  %w[resistance_bands jump_rope assault_bike],
+        allowed_equipment: %w[treadmill rowing_machine ski_erg sled wall_ball kettlebells barbell dumbbells pull_up_bar resistance_bands],
+        banned_equipment:  %w[jump_rope assault_bike],
         banned_exercise_patterns: [
           /\bassault bike\b/i, /\bair bike\b/i, /\becho bike\b/i
         ].freeze,
@@ -59,12 +59,33 @@ module LLMContext
                "meaningfully different — do not create two sections with the same " \
                "exercises and structure but different names. The race stations remain " \
                "the headline movements, but workouts cannot be ONLY stations — every " \
-               "session also needs supplementary work."
+               "session also needs supplementary work. " \
+               "MOBILITY SECTIONS: Hyrox mobility work is PREP, not cool-down. It must " \
+               "FEEL different from the final stretch section — dynamic not static, " \
+               "sets-and-reps not long holds. Target the joints Hyrox stresses: " \
+               "ankle dorsiflexion (sled push, running stride), shoulder (sled pull, " \
+               "ski erg, wall ball overhead), hip (Burpee Broad Jumps, sandbag lunges), " \
+               "and T-spine (rowing, wall ball). Reach for resistance bands (Band Pull-Aparts, " \
+               "Banded Pass-Throughs, Banded Ankle Mobilizations, Banded Leg Swings), " \
+               "controlled active drills (World's Greatest Stretch as a 3-per-side flow, " \
+               "Wall Slides, Cossack Squats as reps not holds, Ankle Circles), and joint " \
+               "prep done in `format: rounds` with reps (8-15) or short controlled " \
+               "duration_s (20-30s). Long static holds (Pigeon 90s+, Cobra hold, Couch " \
+               "Stretch 2min) belong in the cool-down, NEVER in a mid-session mobility " \
+               "section."
       }.freeze
 
       MOVEMENT_VOCABULARY = <<~VOCAB.freeze
         Running:           Treadmill 500m, 1km, 400m repeats
         Stations:          SkiErg, Sled Push, Sled Pull, Burpee Broad Jumps, Rowing Machine, Farmer's Carry, Wall Ball, Sandbag Lunges
+        Mobility (dynamic, sets-and-reps — for mid-session mobility blocks, NOT cool-down):
+          Bands:           Band Pull-Aparts, Banded Pass-Throughs, Banded Ankle Mobilizations, Banded Leg Swings, Banded Hip Openers
+          Shoulder:        Wall Slides, Scapular Push-Ups, Arm Circles, Shoulder Dislocates (PVC), Y-T-W Raises
+          Ankle:           Ankle Circles, Banded Ankle Mobilizations, Calf-on-Wall Drives, Eccentric Calf Raises
+          Hip:             World's Greatest Stretch (3 per side flow), 90/90 Hip Switches (reps not holds), Cossack Squats, Banded Leg Swings, Hip Flexor Knee Drives
+          T-spine:         Thoracic Open Books, Foam Roller Thoracic Extensions, Cat-Cow, Bird-Dog
+        Cool-down statics (long holds, breath-led — for the FINAL section only):
+                           Pigeon, Couch Stretch, Cobra, Thread the Needle, Forward Fold, Child's Pose, Spinal Twist
       VOCAB
 
       # Canonical race-station exercises (Hyrox 8 stations + running). Used
@@ -290,7 +311,7 @@ module LLMContext
         },
         {
           name: "Zone Two Engine",
-          goal: "A long continuous zone 2 ski, a mid-session hip mobility flow, light technique stations, T-spine mobility, and a quiet cool-down — mobility woven through, not just bolted on.",
+          goal: "A long continuous zone 2 ski, banded shoulder + T-spine prep, light Hyrox technique stations, banded ankle + hip prep, then a quiet cool-down — dynamic Hyrox-specific mobility woven through, not just stretches at the end.",
           duration_mins: 60,
           intensity_style: "low",
           sections: [
@@ -298,27 +319,28 @@ module LLMContext
               exercises: [
                 { name: "Easy treadmill walk + Hyrox mobility prep", duration_s: 300, notes: "90/90 hip switches, ankle circles, thoracic open books, world's greatest stretch", equipment: "treadmill" }
               ] },
-            { name: "The Long Way", format: "straight", duration_mins: 25,
+            { name: "The Long Way", format: "straight", duration_mins: 20,
               exercises: [
-                { name: "SkiErg", duration_s: 1500, notes: "conversational pace — nose-breathing where possible, building aerobic engine", equipment: "ski_erg" }
+                { name: "SkiErg", duration_s: 1200, notes: "conversational pace — nose-breathing where possible, building aerobic engine", equipment: "ski_erg" }
               ] },
-            { name: "T-spine Flow", format: "straight", duration_mins: 5,
+            { name: "Shoulder & T-Spine Prep", format: "rounds", rounds: 2, rest_secs: 0, duration_mins: 5,
               exercises: [
-                { name: "Foam Roller Thoracic Extensions", duration_s: 120, notes: "slow controlled extensions over a foam roller" },
-                { name: "Thoracic Open Books", duration_s: 120, notes: "T-spine rotation for rowing and wall ball posture — 60s per side" },
-                { name: "Cat-Cow", duration_s: 60, notes: "spinal articulation, breath into each phase" }
+                { name: "Banded Pass-Throughs",   reps: 12, notes: "light band, slow controlled, keep arms straight, work the end range",   equipment: "resistance_bands" },
+                { name: "Band Pull-Aparts",       reps: 15, notes: "scapular retraction, light band, 2-second pause at full pull",          equipment: "resistance_bands" },
+                { name: "Wall Slides",            reps: 10, notes: "back flat to wall, slow overhead reach, drive elbows down on return",   equipment: "bodyweight" },
+                { name: "Thoracic Open Books",    reps: 10, notes: "5 per side, lying on side, rotate top arm across body to floor",       equipment: "bodyweight" }
               ] },
-            { name: "Technique Stations", format: "rounds", rounds: 3, rest_secs: 20,
+            { name: "Hyrox Technique Stations", format: "rounds", rounds: 3, rest_secs: 20, duration_mins: 8,
               exercises: [
-                { name: "Wall Balls", reps: 20, notes: "light ball, full squat depth, controlled tempo", equipment: "wall_ball" },
-                { name: "Air Squats", reps: 20, notes: "deliberate tempo, full depth, knees track over toes", equipment: "bodyweight" },
-                { name: "Walking Lunges", reps: 20, notes: "10 per leg, tall posture, controlled steps", equipment: "bodyweight" }
+                { name: "Wall Balls",     reps: 20, notes: "light ball, full squat depth, controlled tempo",          equipment: "wall_ball" },
+                { name: "Air Squats",     reps: 20, notes: "deliberate tempo, full depth, knees track over toes",     equipment: "bodyweight" },
+                { name: "Walking Lunges", reps: 20, notes: "10 per leg, tall posture, controlled steps",              equipment: "bodyweight" }
               ] },
-            { name: "Ankle Flow", format: "straight", duration_mins: 5,
+            { name: "Ankle & Hip Prep", format: "rounds", rounds: 2, rest_secs: 0, duration_mins: 5,
               exercises: [
-                { name: "Ankle Circles", duration_s: 60, notes: "both ankles, full range in both directions" },
-                { name: "Calf Stretch", duration_s: 120, notes: "gastrocnemius and soleus — 60s per side" },
-                { name: "Eccentric Calf Raises", duration_s: 60, notes: "controlled 3-second descent, bodyweight" }
+                { name: "Banded Ankle Mobilizations", reps: 10, notes: "10 per side, knee drives forward over toe, posterior glide",       equipment: "resistance_bands" },
+                { name: "Banded Leg Swings",          reps: 10, notes: "10 per side forward-back, then 10 per side side-to-side, controlled", equipment: "resistance_bands" },
+                { name: "Cossack Squats",             reps: 8,  notes: "4 per side, shift weight side-to-side, drive knee over toe",         equipment: "bodyweight" }
               ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
@@ -326,7 +348,7 @@ module LLMContext
         },
         {
           name: "Continuous Engine",
-          goal: "A 40-min continuous-circuit engine builder — Row / Wall Balls / Walking Lunges / SkiErg, one minute each, no rest. Ten rotations of constant easy-pace work, then a hip mobility flow to finish.",
+          goal: "A 40-min continuous-circuit engine builder — Row / Wall Balls / Walking Lunges / SkiErg, one minute each, no rest. Ten rotations of constant easy-pace work, then a dynamic Hyrox mobility reset (bands + active drills) before the cool-down.",
           duration_mins: 60,
           intensity_style: "low",
           sections: [
@@ -341,11 +363,12 @@ module LLMContext
                 { name: "Walking Lunges", notes: "tall posture, deliberate steps, controlled tempo",          equipment: "bodyweight" },
                 { name: "SkiErg",         notes: "easy aerobic pace — sustain the same effort the whole way", equipment: "ski_erg" }
               ] },
-            { name: "Hip Mobility Flow", format: "straight", duration_mins: 10,
+            { name: "Hyrox Mobility Reset", format: "rounds", rounds: 3, rest_secs: 30,
               exercises: [
-                { name: "90/90 Hip Switches", duration_s: 180, notes: "slow controlled rotation — internal/external hip range, breath stays calm" },
-                { name: "Couch Stretch",      duration_s: 240, notes: "120s per side — hip flexor and quad opener, keep ribs stacked over hips" },
-                { name: "Cossack Squats",     duration_s: 180, notes: "lateral squat shifting side to side, bodyweight, focus on depth and ankle range" }
+                { name: "Banded Pass-Throughs",       reps: 12, notes: "light band, slow controlled, shoulder mobility for ski erg + wall ball",     equipment: "resistance_bands" },
+                { name: "Banded Ankle Mobilizations", reps: 10, notes: "10 per side, drive knee over toe, sled push + run prep",                     equipment: "resistance_bands" },
+                { name: "World's Greatest Stretch",   reps: 6,  notes: "3 per side — lunge, hip drop, T-spine reach, smooth transitions",            equipment: "bodyweight" },
+                { name: "Cossack Squats",             reps: 8,  notes: "4 per side, dynamic shift, depth over speed",                                equipment: "bodyweight" }
               ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
