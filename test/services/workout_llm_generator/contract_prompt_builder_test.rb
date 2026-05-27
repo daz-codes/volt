@@ -260,6 +260,92 @@ class WorkoutLLMGenerator::ContractPromptBuilderTest < ActiveSupport::TestCase
     assert seen_trios.uniq.length >= 2, "sampling should produce at least two different trios across 6 calls; got #{seen_trios.uniq.length}"
   end
 
+  test "injects a recent saved workout into the example sample when the dice roll allows" do
+    # Build a valid hash-shaped workout (the existing hyrox_session fixture
+    # uses the legacy array shape, which workout_to_example rejects).
+    activity = Activity.find_by(name: "Hyrox") || Activity.find_or_create_by!(name: "Hyrox")
+    Workout.create!(
+      user: users(:one),
+      activity: activity,
+      name: "Community Hyrox Saved",
+      duration_mins: 60,
+      status: "active",
+      structure: {
+        "goal" => "A community-saved Hyrox session",
+        "sections" => [
+          { "name" => "Warm-Up", "category" => "warm_up", "format" => "straight", "duration_mins" => 5,
+            "exercises" => [{ "name" => "Easy row", "duration_s" => 300 }] },
+          { "name" => "Race Pace", "category" => "main", "format" => "rounds", "rounds" => 4, "rest_secs" => 60,
+            "exercises" => [{ "name" => "Run", "distance_m" => 1000 }] },
+          { "name" => "Cool-Down", "category" => "cool_down", "format" => "straight", "duration_mins" => 5,
+            "exercises" => [{ "name" => "Stretches", "notes" => "10 deep breaths" }] }
+        ]
+      }
+    )
+
+    # Force the 50% gate to PASS (always inject)
+    WorkoutLLMGenerator::ContractPromptBuilder.force_recent_saved_injection = true
+    block = build(activity_slug: "hyrox")[/\<examples\>(.*?)\<\/examples\>/m, 1]
+    assert_match(/"Community Hyrox Saved"/, block, "saved workout should appear in the examples block when injection fires")
+  ensure
+    WorkoutLLMGenerator::ContractPromptBuilder.force_recent_saved_injection = nil
+  end
+
+  test "does NOT inject when the dice roll skips it" do
+    activity = Activity.find_by(name: "Hyrox") || Activity.find_or_create_by!(name: "Hyrox")
+    Workout.create!(
+      user: users(:one), activity: activity, name: "Community Hyrox Saved",
+      duration_mins: 60, status: "active",
+      structure: {
+        "goal" => "x",
+        "sections" => [
+          { "name" => "Warm-Up", "category" => "warm_up", "format" => "straight", "duration_mins" => 5,
+            "exercises" => [{ "name" => "Easy row", "duration_s" => 300 }] },
+          { "name" => "Race Pace", "category" => "main", "format" => "rounds", "rounds" => 4, "rest_secs" => 60,
+            "exercises" => [{ "name" => "Run", "distance_m" => 1000 }] },
+          { "name" => "Cool-Down", "category" => "cool_down", "format" => "straight", "duration_mins" => 5,
+            "exercises" => [{ "name" => "Stretches", "notes" => "10 deep breaths" }] }
+        ]
+      }
+    )
+
+    # Force the 50% gate to SKIP (no injection)
+    WorkoutLLMGenerator::ContractPromptBuilder.force_recent_saved_injection = false
+    block = build(activity_slug: "hyrox")[/\<examples\>(.*?)\<\/examples\>/m, 1]
+    refute_match(/"Community Hyrox Saved"/, block, "saved workout must NOT appear when injection is skipped")
+  ensure
+    WorkoutLLMGenerator::ContractPromptBuilder.force_recent_saved_injection = nil
+  end
+
+  test "intensity_style strictness applies to injected saved workouts too" do
+    # A saved workout whose main sections are all 'medium' should NOT be
+    # injected when the prompt is built for a HIGH-intensity session.
+    activity = Activity.find_by(name: "Hyrox") || Activity.find_or_create_by!(name: "Hyrox")
+    Workout.create!(
+      user: users(:one), activity: activity, name: "Mismatched Intensity Workout",
+      duration_mins: 60, status: "active",
+      structure: {
+        "goal" => "x",
+        "sections" => [
+          { "name" => "Warm-Up", "category" => "warm_up", "format" => "straight", "duration_mins" => 5,
+            "exercises" => [{ "name" => "Easy row", "duration_s" => 300 }] },
+          { "name" => "Easy Block", "category" => "main", "format" => "rounds", "rounds" => 3, "rest_secs" => 60,
+            "intensity_style" => "medium",
+            "exercises" => [{ "name" => "Wall Balls", "reps" => 20 }] },
+          { "name" => "Cool-Down", "category" => "cool_down", "format" => "straight", "duration_mins" => 5,
+            "exercises" => [{ "name" => "Stretches", "notes" => "10 deep breaths" }] }
+        ]
+      }
+    )
+
+    WorkoutLLMGenerator::ContractPromptBuilder.force_recent_saved_injection = true
+    block = build(activity_slug: "hyrox", intensity_style: "high")[/\<examples\>(.*?)\<\/examples\>/m, 1]
+    refute_match(/"Mismatched Intensity Workout"/, block,
+                 "saved workout with medium intensity must NOT inject into a high-intensity prompt")
+  ensure
+    WorkoutLLMGenerator::ContractPromptBuilder.force_recent_saved_injection = nil
+  end
+
   test "task tag uses user_activity_name when provided (free-form typed activity)" do
     prompt = WorkoutLLMGenerator::ContractPromptBuilder.new(
       activity:           LLMContext::Activities.for!("general-fitness"),

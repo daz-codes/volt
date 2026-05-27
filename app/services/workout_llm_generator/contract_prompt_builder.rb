@@ -259,16 +259,104 @@ class WorkoutLLMGenerator
     # sessions instead of fixating on the top-of-list examples.
     EXAMPLE_SAMPLE_SIZE = 4
 
+    # Probability that a recently-saved workout (across all users, matching
+    # the activity and intensity) gets injected as one of the example slots
+    # instead of a static example. Half the time the LLM sees a workout the
+    # community has voted "good" by keeping it; the other half it sees only
+    # the curated static set.
+    SAVED_WORKOUT_INJECTION_RATE = 0.5
+
     # Pick the example pool: intensity-filter first (strict — drop unflagged
     # "flexible" examples when intensity is set, to avoid biasing low/high
     # sessions back toward medium patterns; fall back to all examples if
     # nothing matches), then randomly sample up to EXAMPLE_SAMPLE_SIZE from
     # the result. Pools at or below the sample size are returned as-is.
+    # ~50% of the time the LAST slot of the sample is replaced with the most
+    # recently saved real workout of this activity (across all users).
     def filtered_examples
       pool = intensity_filtered_pool
-      return pool if pool.size <= EXAMPLE_SAMPLE_SIZE
+      sample = pool.size <= EXAMPLE_SAMPLE_SIZE ? pool.dup : pool.sample(EXAMPLE_SAMPLE_SIZE)
+      maybe_inject_recent_saved(sample)
+      sample
+    end
 
-      pool.sample(EXAMPLE_SAMPLE_SIZE)
+    # Test override: when non-nil, replaces the dice roll. Production code
+    # leaves this at nil and the rand check below decides.
+    class << self
+      attr_accessor :force_recent_saved_injection
+    end
+
+    def self.should_inject_recent_saved?
+      override = force_recent_saved_injection
+      return override unless override.nil?
+      rand < SAVED_WORKOUT_INJECTION_RATE
+    end
+
+    def maybe_inject_recent_saved(sample)
+      return unless self.class.should_inject_recent_saved?
+      recent = recent_saved_example
+      return unless recent
+      if sample.empty?
+        sample << recent
+      else
+        sample[-1] = recent
+      end
+    end
+
+    # How many recent saved workouts form the eligibility window. Picking
+    # randomly from this window (rather than always returning the literal
+    # most-recent) breaks the feedback loop where a user's just-saved
+    # workout would seed the next generation, then seed the one after, etc.
+    RECENT_SAVED_WINDOW = 20
+
+    # A real saved workout for this activity — picked at random from the
+    # last RECENT_SAVED_WINDOW eligible workouts across the user base.
+    # Returns nil if none exist. When intensity_style is set we only consider
+    # workouts whose main sections uniformly share that intensity — the same
+    # strict-match standard we apply to the static example pool.
+    def recent_saved_example
+      activity_name = @activity::NAME
+      candidates = Workout.where(status: "active")
+                          .where.not(structure: nil)
+                          .joins(:activity)
+                          .where(activities: { name: activity_name })
+                          .order(created_at: :desc)
+                          .limit(RECENT_SAVED_WINDOW)
+                          .to_a
+
+      eligible = candidates.filter_map do |w|
+        ex = workout_to_example(w)
+        next nil unless ex
+        next nil if @intensity_style.present? && ex[:intensity_style].to_s != @intensity_style.to_s
+        ex
+      end
+
+      eligible.sample
+    end
+
+    # Convert a persisted Workout to the example hash shape (matching the
+    # structure of LLMContext::Activities::Hyrox::EXAMPLES entries). Infers
+    # session-level intensity_style from the main sections when they all
+    # share one. Returns nil if the structure is unusable.
+    def workout_to_example(workout)
+      structure = workout.structure
+      return nil unless structure.is_a?(Hash)
+      sections = Array(structure["sections"])
+      return nil if sections.empty?
+
+      main_intensities = sections
+                           .select { |s| %w[main finisher].include?(s["category"]) }
+                           .filter_map { |s| s["intensity_style"].presence }
+                           .uniq
+      inferred_intensity = main_intensities.size == 1 ? main_intensities.first : nil
+
+      {
+        name: workout.name.to_s.presence || "Saved workout",
+        goal: structure["goal"].to_s.presence || "A workout the athlete kept after generating.",
+        duration_mins: workout.duration_mins,
+        intensity_style: inferred_intensity,
+        sections: sections.map(&:deep_symbolize_keys)
+      }.compact
     end
 
     def intensity_filtered_pool
