@@ -421,6 +421,19 @@ class WorkoutLLMGenerator
     if has_lift_data
       lines << "  CRITICAL: These are absolute maximums — the athlete cannot lift more than their 1RM. " \
                "Scale all prescribed weights to the values above. A 120kg deadlift 1RM means 0 reps at 180kg."
+
+      # Lift rotation nudge: when only ONE lift has data the LLM tends to default to
+      # that lift every session. Tell it explicitly to vary across sessions and use
+      # effort cues for unmeasured lifts.
+      recorded = %w[deadlift_1rm squat_1rm bench_1rm clean_jerk_1rm snatch_1rm].select { |k| pbs[k] }
+      if recorded.size < 3
+        lines << "  LIFT VARIETY: The athlete only has #{recorded.size} recorded 1RM(s). " \
+                 "Do NOT default to the same lift every session — rotate across Deadlift, Back Squat, " \
+                 "Front Squat, Bench Press, Push Press, Overhead Press, Bulgarian Split Squat, RDL, " \
+                 "and Clean & Jerk variants. For lifts without a recorded PB, use effort cues " \
+                 "(`heavy strength load — last rep should be a fight`) instead of an absolute weight. " \
+                 "A workout that only ever uses #{recorded.first&.sub("_1rm", "")&.gsub("_", " ")&.capitalize} is monotonous."
+      end
     end
 
     lines.join("\n")
