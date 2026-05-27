@@ -1104,6 +1104,87 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
     assert_equal 15, section["exercises"][2]["reps"]
   end
 
+  # -- fix_low_intensity_shapes --
+
+  test "fix_low_intensity_shapes converts a low-intensity EMOM into a straight block" do
+    data = build_workout_with_sections([
+      { "name" => "Easy EMOM", "category" => "main", "format" => "emom",
+        "intensity_style" => "low", "duration_mins" => 15, "rest_secs" => 0,
+        "exercises" => [{ "name" => "SkiErg", "notes" => "easy pace", "equipment" => "ski_erg" }] }
+    ])
+    result  = WorkoutValidator.new(data, duration_mins: 30, main_tag_slug: "").validate_and_fix
+    section = result.dig("structure", "sections").first
+    assert_equal "straight",  section["format"]
+    assert_equal 15,          section["duration_mins"]
+    assert_equal 900,         section["exercises"].first["duration_s"]
+    refute section.key?("rounds")
+    refute section.key?("alternating")
+  end
+
+  test "fix_low_intensity_shapes converts a low-intensity Tabata to a 4-min straight block" do
+    data = build_workout_with_sections([
+      { "name" => "Easy Tabata", "category" => "main", "format" => "tabata",
+        "intensity_style" => "low",
+        "exercises" => [{ "name" => "Row", "equipment" => "rowing_machine" }] }
+    ])
+    result  = WorkoutValidator.new(data, duration_mins: 30, main_tag_slug: "").validate_and_fix
+    section = result.dig("structure", "sections").first
+    assert_equal "straight", section["format"]
+    assert_equal 4,          section["duration_mins"]
+  end
+
+  test "fix_low_intensity_shapes leaves a medium-intensity EMOM alone" do
+    data = build_workout_with_sections([
+      { "name" => "Working EMOM", "category" => "main", "format" => "emom",
+        "intensity_style" => "medium", "duration_mins" => 12, "rest_secs" => 0,
+        "exercises" => [{ "name" => "Burpees", "reps" => 10, "equipment" => "bodyweight" }] }
+    ])
+    result  = WorkoutValidator.new(data, duration_mins: 30, main_tag_slug: "").validate_and_fix
+    section = result.dig("structure", "sections").first
+    assert_equal "emom", section["format"]
+  end
+
+  test "fix_low_intensity_shapes strips weight_kg from low-intensity exercises" do
+    data = build_workout_with_sections([
+      { "name" => "Light Block", "category" => "main", "format" => "rounds",
+        "intensity_style" => "low", "rounds" => 3, "rest_secs" => 30,
+        "exercises" => [
+          { "name" => "Goblet Squat", "reps" => 20, "weight_kg" => 24, "equipment" => "kettlebells" }
+        ] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 30, main_tag_slug: "").validate_and_fix
+    ex     = result.dig("structure", "sections").first["exercises"].first
+    refute ex.key?("weight_kg")
+    assert_equal "bodyweight", ex["equipment"]
+  end
+
+  test "fix_low_intensity_shapes snaps odd duration_mins to nearest 5" do
+    data = build_workout_with_sections([
+      { "name" => "Steady Row", "category" => "main", "format" => "straight",
+        "intensity_style" => "low", "duration_mins" => 26,
+        "exercises" => [{ "name" => "Row", "duration_s" => 1560, "equipment" => "rowing_machine" }] }
+    ])
+    result  = WorkoutValidator.new(data, duration_mins: 60, main_tag_slug: "").validate_and_fix
+    section = result.dig("structure", "sections").first
+    assert_equal 25, section["duration_mins"]
+  end
+
+  test "fix_low_intensity_shapes does not touch warm-up or cool-down sections" do
+    data = build_workout_with_sections([
+      { "name" => "Warm-Up", "category" => "warm_up", "format" => "straight",
+        "intensity_style" => "low", "duration_mins" => 3,
+        "exercises" => [{ "name" => "Easy jog", "duration_s" => 180 }] },
+      { "name" => "Cool-Down", "category" => "cool_down", "format" => "straight",
+        "intensity_style" => "low", "duration_mins" => 4,
+        "exercises" => [{ "name" => "Stretches", "notes" => "10 deep breaths" }] }
+    ])
+    result   = WorkoutValidator.new(data, duration_mins: 30, main_tag_slug: "").validate_and_fix
+    warmup   = result.dig("structure", "sections")[0]
+    cooldown = result.dig("structure", "sections")[1]
+    assert_equal 3, warmup["duration_mins"],   "warm-up duration must not be snapped"
+    assert_equal 4, cooldown["duration_mins"], "cool-down duration must not be snapped"
+  end
+
   private
 
   def build_workout_with_sections(sections)

@@ -139,12 +139,88 @@ class WorkoutValidator
       fix_fm_section_order(sections)
     end
 
+    fix_low_intensity_shapes(sections)
     fix_goal_durations(sections)
 
     @data
   end
 
   private
+
+  # Low-intensity sections may not be EMOMs, Tabatas, or carry weights;
+  # duration_mins on main/finisher sections must be a multiple of 5. These
+  # are soft-swaps — convert the format/strip the field rather than refuse.
+  def fix_low_intensity_shapes(sections)
+    sections.each do |section|
+      next unless section["intensity_style"] == "low"
+      next unless %w[main finisher].include?(section["category"])
+
+      # Snap duration FIRST so the format conversion (which derives duration_s
+      # from duration_mins) uses the already-clean value.
+      fix_low_intensity_duration_multiple(section)
+      fix_low_intensity_format(section)
+      fix_low_intensity_weights(section)
+    end
+  end
+
+  # Low + EMOM or Tabata → straight block at easy pace. Tabatas always 4 min;
+  # EMOMs keep their original duration. The first exercise is preserved so the
+  # cardio modality survives; subsequent exercises are dropped (an EMOM circuit
+  # with multiple movements doesn't translate to a single steady block).
+  def fix_low_intensity_format(section)
+    fmt = section["format"]
+    return unless %w[emom tabata continuous_circuit].include?(fmt)
+
+    dur =
+      if fmt == "tabata"
+        4
+      else
+        d = section["duration_mins"].to_i
+        d < 5 ? 10 : d
+      end
+    section["format"] = "straight"
+    section["duration_mins"] = dur
+    section.delete("rounds")
+    section.delete("rest_secs")
+    section.delete("period_mins")
+    section.delete("alternating")
+
+    if (first = Array(section["exercises"]).first)
+      first["duration_s"] = dur * 60
+      %w[reps calories distance_m].each { |k| first.delete(k) }
+      first["notes"] = "easy aerobic pace — sustain the same effort the whole way"
+      section["exercises"] = [ first ]
+    end
+
+    @fixes << "Low-intensity '#{section["name"]}': #{fmt} → straight #{dur}min (low intensity disallows #{fmt})"
+  end
+
+  # Strip `weight_kg` from every exercise in a low-intensity section. Drop
+  # equipment hints that imply load (barbell, dumbbells, kettlebells) when the
+  # exercise's only purpose is movement quality at light load.
+  LOAD_EQUIPMENT_PATTERN = /\A(barbell|dumbbells?|kettlebells?)\z/i.freeze
+
+  def fix_low_intensity_weights(section)
+    Array(section["exercises"]).each do |ex|
+      if ex["weight_kg"]
+        ex.delete("weight_kg")
+        @fixes << "Low-intensity '#{section["name"]}' / '#{ex["name"]}': stripped weight_kg (low intensity is bodyweight/mobility only)"
+      end
+      next unless ex["equipment"].to_s.match?(LOAD_EQUIPMENT_PATTERN)
+      ex["equipment"] = "bodyweight"
+      @fixes << "Low-intensity '#{section["name"]}' / '#{ex["name"]}': equipment → bodyweight (no loaded work in low intensity)"
+    end
+  end
+
+  # Snap odd duration_mins to nearest 5 (rounding 1-2 down, 3-4 up).
+  def fix_low_intensity_duration_multiple(section)
+    dur = section["duration_mins"].to_i
+    return if dur <= 0 || (dur % 5).zero?
+    snapped = ((dur / 5.0).round) * 5
+    snapped = 5 if snapped < 5
+    section["duration_mins"] = snapped
+    @fixes << "Low-intensity '#{section["name"]}': duration_mins #{dur} → #{snapped} (must be multiple of 5)"
+  end
 
   # Assign a category to each section so downstream methods can rely on it.
   # First pass infers from name patterns; second pass detects finishers.
