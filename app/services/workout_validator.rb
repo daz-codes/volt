@@ -216,18 +216,38 @@ class WorkoutValidator
   end
 
   # Snap odd duration_mins to nearest 5 (rounding 1-2 down, 3-4 up).
-  # Skip continuous_circuit sections: their duration is structurally constrained
-  # to a multiple of the exercise count (fix_continuous_circuit_structure), and
-  # that constraint wins — multiple-of-5 here is aesthetic, multiple-of-N there
-  # is structural.
+  # Scope: cardio blocks only (`format: straight` containing a cardio exercise,
+  # OR `format: rounds` with a single cardio exercise — the "long-interval
+  # cardio rounds" shape). Mobility flows (rounds with multiple drills,
+  # bodyweight prep) keep their natural durations; continuous_circuit is
+  # structurally constrained elsewhere.
+  CARDIO_EXERCISE_PATTERN = /\b(row|ski|skierg|run|jog|treadmill|bike|assault|echo|erg)\b/i.freeze
+
   def fix_low_intensity_duration_multiple(section)
-    return if section["format"] == "continuous_circuit"
+    return unless low_intensity_cardio_block?(section)
     dur = section["duration_mins"].to_i
     return if dur <= 0 || (dur % 5).zero?
     snapped = ((dur / 5.0).round) * 5
     snapped = 5 if snapped < 5
     section["duration_mins"] = snapped
-    @fixes << "Low-intensity '#{section["name"]}': duration_mins #{dur} → #{snapped} (must be multiple of 5)"
+    @fixes << "Low-intensity '#{section["name"]}': duration_mins #{dur} → #{snapped} (cardio blocks must be a multiple of 5)"
+  end
+
+  def low_intensity_cardio_block?(section)
+    fmt = section["format"]
+    exercises = Array(section["exercises"])
+    return false if exercises.empty?
+
+    case fmt
+    when "straight"
+      # Single-modality cardio block: the only or first exercise is cardio.
+      exercises.first["name"].to_s.match?(CARDIO_EXERCISE_PATTERN)
+    when "rounds"
+      # Long-interval cardio rounds: single exercise and it's cardio.
+      exercises.size == 1 && exercises.first["name"].to_s.match?(CARDIO_EXERCISE_PATTERN)
+    else
+      false
+    end
   end
 
   # Assign a category to each section so downstream methods can rely on it.
@@ -840,10 +860,13 @@ class WorkoutValidator
   end
 
   # Alternating EMOMs (one exercise per period rotating across the duration)
-  # need duration_mins to be a multiple of the exercise count so every exercise
-  # gets the same number of work bouts. A 15-min EMOM with 2 alternating
-  # exercises gives 8 of one and 7 of the other — unbalanced. Snap to the
-  # nearest multiple, tie goes UP (give the full rotation rather than truncate).
+  # need duration_mins to be a multiple of the rotation cycle so every exercise
+  # gets the same number of work bouts. Cycle = exercise_count × period_mins
+  # (e.g. 2 exercises at period_mins:2 → 4-minute cycle; 3 exercises at
+  # period_mins:1 → 3-minute cycle). A 10-min E2MOM with 2 alternating
+  # exercises has a 4-min cycle and gives 2.5 rotations — unbalanced. Snap to
+  # the nearest multiple, tie goes UP (give the full rotation rather than
+  # truncate).
   # Runs AFTER fix_timed_section_durations so the input is already a clean
   # number (10/12/15/16/...); we override that snap when alternation requires it.
   def fix_emom_alternating_duration(sections)
@@ -854,16 +877,21 @@ class WorkoutValidator
       n = exercises.size
       next if n <= 1
 
+      period = section["period_mins"].to_i.nonzero? || 1
+      cycle  = n * period
+
       dur = section["duration_mins"].to_i
-      next if dur <= 0 || (dur % n).zero?
+      next if dur <= 0 || (dur % cycle).zero?
 
-      floor_mult = (dur / n) * n
-      ceil_mult  = floor_mult + n
+      floor_mult = (dur / cycle) * cycle
+      ceil_mult  = floor_mult + cycle
       snapped = (ceil_mult - dur) <= (dur - floor_mult) ? ceil_mult : floor_mult
-      snapped = n if snapped <= 0
+      snapped = cycle if snapped <= 0
 
+      label = period == 1 ? "Alternating EMOM" : "Alternating E#{period}MOM"
+      reason = period == 1 ? "#{n} exercises" : "#{n} exercises × #{period}-min period = #{cycle}-min cycle"
       section["duration_mins"] = snapped
-      @fixes << "Alternating EMOM '#{section["name"]}': duration_mins #{dur} → #{snapped} (must be a multiple of #{n} exercises for an even rotation)"
+      @fixes << "#{label} '#{section["name"]}': duration_mins #{dur} → #{snapped} (must be a multiple of #{cycle} for an even rotation — #{reason})"
     end
   end
 

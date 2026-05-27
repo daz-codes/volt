@@ -1265,6 +1265,22 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
     assert_equal 16, section["duration_mins"]
   end
 
+  test "fix_emom_alternating_duration handles period_mins > 1 (E2MOM rotation cycle)" do
+    # 2 exercises at period_mins:2 = 4-min rotation cycle.
+    # 10 isn't a multiple of 4 — snap UP to 12 (tie 8 vs 12, prefer 12).
+    data = build_workout_with_sections([
+      { "name" => "Sled Carry Grind", "category" => "main", "format" => "emom",
+        "duration_mins" => 10, "period_mins" => 2, "alternating" => true,
+        "exercises" => [
+          { "name" => "Sled Push",     "distance_m" => 20, "equipment" => "sled" },
+          { "name" => "Farmer's Carry", "distance_m" => 30, "equipment" => "kettlebells" }
+        ] }
+    ])
+    result  = WorkoutValidator.new(data, duration_mins: 45, main_tag_slug: "hyrox").validate_and_fix
+    section = result.dig("structure", "sections").first
+    assert_equal 12, section["duration_mins"], "10-min E2MOM with 2 ex must snap to 12 (multiple of 4-min cycle)"
+  end
+
   test "fix_emom_alternating_duration ignores non-alternating EMOMs" do
     data = build_workout_with_sections([
       { "name" => "Both Each Minute", "category" => "main", "format" => "emom",

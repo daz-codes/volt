@@ -40,7 +40,7 @@ class LLMContext::ContractIntegrityTest < ActiveSupport::TestCase
     end
 
     examples = mod::EXAMPLES
-    assert (3..20).include?(examples.length), "#{mod}: need 3-20 EXAMPLES (got #{examples.length})"
+    assert (3..22).include?(examples.length), "#{mod}: need 3-22 EXAMPLES (got #{examples.length})"
     examples.each_with_index do |ex, i|
       assert ex[:name].present?, "#{mod}: example #{i} missing :name"
       assert ex[:goal].present?, "#{mod}: example #{i} missing :goal"

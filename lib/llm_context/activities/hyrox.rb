@@ -43,10 +43,18 @@ module LLMContext
           medium: "Race-prep working pace — the bread-and-butter Hyrox session. Mix run intervals " \
                   "with station blocks at ~RPE 7-8, 60s rest between rounds. **Reach for `format: emom` " \
                   "and `format: continuous_circuit` often — they're the two best-fitting shapes for " \
-                  "hybrid race training.** AMRAPs and for-time chippers also fit naturally. " \
-                  "**If the session includes a strength block (heavy compound lift), place it " \
-                  "immediately after the warm-up — same rule as high intensity. Strength always " \
-                  "comes first in Hyrox, never tacked on after the metcon.**",
+                  "hybrid race training.** AMRAPs, for-time chippers, and bookends (buy-in + cash-out) " \
+                  "all fit naturally. " \
+                  "**STRENGTH IS OPTIONAL AT MEDIUM INTENSITY** — many medium sessions are pure metcon " \
+                  "(EMOM-led, continuous_circuit-led, bookend-led, chipper-led) with no strength block " \
+                  "at all. Only include a strength block when the session genuinely warrants one (e.g. " \
+                  "a focused 'strength + metcon' session). DO NOT include strength in every medium " \
+                  "workout — variety matters. When you DO include strength at medium intensity, place " \
+                  "it after the warm-up by default, but you can also tuck it after a primer cardio " \
+                  "piece (e.g. Warm-Up → 1km Row buy-in → Strength → metcon) or use it as accessory " \
+                  "work after the main metcon (e.g. Warm-Up → metcon → DB accessory pairs). Variety " \
+                  "in placement is fine at medium. (Note: at HIGH intensity, strength still goes " \
+                  "strictly first — the fresh-athlete rule is non-negotiable when loads are near-max.)",
           high:   "Race-day energy — strength block goes FIRST (heavy 3-5 rep lifts at near-max load, " \
                   "120-180s rest). **Pick a different lift each session — Deadlift, Back Squat, Front " \
                   "Squat, Bench Press, Push Press, Overhead Press, Clean & Jerk. Do NOT default to " \
@@ -92,10 +100,14 @@ module LLMContext
                "as a separate follow-on section after a longer-distance block (4×400m followed " \
                "by 8×200m), or as the final rung of a descending distance ladder (500→400→300→ " \
                "200→100m). Never solo-200m or solo-300m as the headline shape. " \
-               "STRENGTH BLOCK PLACEMENT: when a session includes a strength block (heavy " \
-               "barbell / kettlebell / dumbbell sets, format: rounds with low reps), place it " \
-               "IMMEDIATELY AFTER the warm-up — while the athlete is fresh. This applies to " \
-               "both medium AND high intensity Hyrox sessions, not just high. " \
+               "STRENGTH BLOCK PLACEMENT: at HIGH intensity, when a session includes a strength " \
+               "block (heavy barbell / kettlebell / dumbbell sets), place it IMMEDIATELY AFTER " \
+               "the warm-up — the fresh-athlete rule is non-negotiable when loads are near-max. " \
+               "At MEDIUM intensity, strength is OPTIONAL — many medium sessions should be pure " \
+               "metcon (EMOM-led, continuous_circuit-led, bookend-led) with no strength block. " \
+               "When medium DOES include strength, after-warm-up is the default but variety in " \
+               "placement is welcome (after a primer cardio piece, or as accessory work post-metcon). " \
+               "Don't put strength in every medium session. " \
                "BOOKENDS (BUY-IN + CASH-OUT): a powerful Hyrox session shape that's currently " \
                "under-used. Open with a single hard-paced cardio piece (the 'Buy In') and close " \
                "with a matching one (the 'Cash Out'), framing the metcon work in the middle. " \
@@ -737,6 +749,59 @@ module LLMContext
               exercises: [
                 { name: "Burpee Broad Jumps", equipment: "bodyweight" },
                 { name: "Sandbag Lunges", equipment: "bodyweight" }
+              ] },
+            { name: "Cool-Down", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
+          ]
+        },
+        {
+          name: "Easy Bookends",
+          goal: "Easy-pace cardio bookends framing a long mixed-modality engine block. 10-min Row buy-in at conversational pace, a continuous-circuit engine builder through the Hyrox stations, then a 10-min SkiErg cash-out. Matched-cardio entries and exits — feel the body settle into pace, then settle back out.",
+          duration_mins: 60,
+          intensity_style: "low",
+          sections: [
+            { name: "Warm-Up", format: "straight", duration_mins: 5,
+              exercises: [
+                { name: "Easy row + Hyrox mobility prep", duration_s: 300, notes: "cat-cow, ankle circles, kneeling hip flexor stretch, dynamic lunges", equipment: "rowing_machine" }
+              ] },
+            { name: "Buy In", format: "for_time", duration_mins: 10,
+              exercises: [
+                { name: "Row", duration_s: 600, notes: "easy aerobic pace — sustain the same effort the whole way, breath stays calm", equipment: "rowing_machine" }
+              ] },
+            { name: "The Wheel", format: "continuous_circuit", duration_mins: 20,
+              exercises: [
+                { name: "Wall Balls",     notes: "light ball, full squat depth, controlled tempo",          equipment: "wall_ball" },
+                { name: "Walking Lunges", notes: "tall posture, deliberate steps, controlled tempo",        equipment: "bodyweight" },
+                { name: "Run",            notes: "easy aerobic pace — breath stays calm",                  equipment: "treadmill" },
+                { name: "SkiErg",         notes: "easy aerobic pace — sustain the same effort the whole way", equipment: "ski_erg" }
+              ] },
+            { name: "Cash Out", format: "for_time", duration_mins: 10,
+              exercises: [
+                { name: "SkiErg", duration_s: 600, notes: "easy aerobic pace — same effort as the Row buy-in, breath calm to the end", equipment: "ski_erg" }
+              ] },
+            { name: "Cool-Down", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }
+          ]
+        },
+        {
+          name: "Sprint Bookends",
+          goal: "All-out cardio bookends framing a heavy strength block. 500m Row sprint buy-in for time, heavy push press triples with full recovery, then a 500m SkiErg sprint cash-out. Two max-effort cardio benchmarks pre- and post-fatigue.",
+          duration_mins: 45,
+          intensity_style: "high",
+          sections: [
+            { name: "Warm-Up", format: "straight", duration_mins: 5,
+              exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "rowing_machine" } ] },
+            { name: "Buy In", format: "for_time",
+              exercises: [
+                { name: "Row", distance_m: 500, notes: "all-out — fastest 500m, set the benchmark, no pacing", equipment: "rowing_machine" }
+              ] },
+            { name: "Heavy Press", format: "rounds", intensity_style: "high", rounds: 5, rest_secs: 180,
+              exercises: [
+                { name: "Push Press", reps: 3, notes: "near-max strength load — full recovery between sets", equipment: "barbell" }
+              ] },
+            { name: "Cash Out", format: "for_time",
+              exercises: [
+                { name: "SkiErg", distance_m: 500, notes: "all-out — same 500m benchmark cooked, give everything", equipment: "ski_erg" }
               ] },
             { name: "Cool-Down", format: "straight", duration_mins: 5,
               exercises: [ { name: "Dynamic stretches", notes: "10 deep breaths" } ] }

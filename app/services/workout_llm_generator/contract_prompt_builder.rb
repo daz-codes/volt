@@ -246,7 +246,7 @@ class WorkoutLLMGenerator
     # time" is meaningless single-shot). Sampling a random slice each call
     # rotates the examples the LLM sees, so output naturally varies across
     # sessions instead of fixating on the top-of-list examples.
-    EXAMPLE_SAMPLE_SIZE = 3
+    EXAMPLE_SAMPLE_SIZE = 4
 
     # Pick the example pool: intensity-filter first (strict — drop unflagged
     # "flexible" examples when intensity is set, to avoid biasing low/high
