@@ -365,78 +365,33 @@ class WorkoutLLMGenerator
   # Pre-computes actual training weights at common rep ranges from 1RM values.
   # Returns a formatted string with per-lift, per-rep-range weights so the LLM
   # never has to calculate percentages — it can just read the target kg directly.
-  def build_strength_weight_guide(pbs, bw)
-    lines = []
+  # Static menu of strength lifts the LLM should rotate through, plus the
+  # effort-cue convention. We deliberately do NOT prescribe absolute kg loads
+  # from 1RM data — that drove monotony (always the same lift the athlete had
+  # data for) and locked the system into needing 1RM input forever. The athlete
+  # self-calibrates from the percentage cue.
+  STRENGTH_LIFT_MENU = <<~MENU.freeze
+    Strength lift menu — pick from these and rotate across sessions (do NOT default to the same lift every time):
+      HINGE / PULL:    Deadlift, Trap Bar Deadlift, RDL, Sumo Deadlift, Bent-over Row, Pendlay Row
+      SQUAT:           Back Squat, Front Squat, Goblet Squat, Bulgarian Split Squat, Walking Lunges (weighted)
+      HORIZONTAL PUSH: Bench Press, Incline Bench Press, DB Bench Press, Close-Grip Bench Press
+      VERTICAL PUSH:   Strict Press, Push Press, Overhead Press, DB Shoulder Press
+      OLYMPIC / POWER: Clean & Jerk, Power Clean, Hang Clean, Hang Power Clean, Snatch, Hang Snatch
 
-    # 1RM → training weight at standard rep ranges (Epley approximation)
-    # 3-5 reps=87% | 6-8 reps=80% | 10 reps=75% | 15 reps=68% | 20+ reps=62%
-    lift_map = {
-      "deadlift_1rm"   => "Deadlift / Trap Bar Deadlift / RDL / Sumo Deadlift",
-      "squat_1rm"      => "Back Squat / Front Squat / Bulgarian Split Squat",
-      "bench_1rm"      => "Bench Press / Incline Press / DB Press",
-      "clean_jerk_1rm" => "Clean & Jerk / Power Clean / Hang Clean / Hang Power Clean",
-      "snatch_1rm"     => "Snatch / Hang Snatch / Power Snatch"
-    }
+    For strength prescriptions, NEVER write an absolute kg figure (no `weight_kg` field on strength lifts). Use a percentage-of-1RM cue in the notes — the athlete self-calibrates from their own max:
+      3–5 reps  → "approx 90% of 1 rep max"
+      6–8 reps  → "approx 80% of 1 rep max"
+      10 reps   → "approx 70–75% of 1 rep max"
+      15 reps   → "approx 65% of 1 rep max"
+      20+ reps  → "approx 60% of 1 rep max"
 
-    lift_map.each do |key, label|
-      next unless pbs[key]
-      rm = pbs[key].to_f
-      lines << "  #{label} (1RM #{rm.round}kg): " \
-               "3–5 reps=#{(rm * 0.87).round}kg | " \
-               "6–8 reps=#{(rm * 0.80).round}kg | " \
-               "10 reps=#{(rm * 0.75).round}kg | " \
-               "15 reps=#{(rm * 0.68).round}kg | " \
-               "20+ reps=#{(rm * 0.62).round}kg — NEVER exceed the 1RM of #{rm.round}kg"
-    end
+    Plain effort language is also fine: "heavy — last rep should be a fight", "near-max effort, full reset between sets", "moderate working weight, last 2 reps a struggle".
 
-    # Derive overhead press weights from bench 1RM (~50% of bench).
-    # Conservative: these are conditioning weights, not fresh max-effort sets.
-    if pbs["bench_1rm"]
-      bench = pbs["bench_1rm"].to_f
-      ohp = (bench * 0.50).round
-      lines << "  Push Press / Strict Press / Overhead Press (est. working max #{ohp}kg from bench — these are CONDITIONING weights, not powerlifting): " \
-               "3–5 reps=#{(ohp * 0.85).round}kg | " \
-               "6–8 reps=#{(ohp * 0.75).round}kg | " \
-               "10 reps=#{(ohp * 0.68).round}kg | " \
-               "15 reps=#{(ohp * 0.60).round}kg | " \
-               "20+ reps=#{(ohp * 0.55).round}kg"
-      lines << "  DB Shoulder Press / DB Push Press: use roughly half the barbell overhead figure per hand"
-    end
+    EXCEPTION — race weights: Hyrox stations (sandbag 20kg, sled, wall ball 6/9kg), Deka stations (KB 16/24kg, sandbag, RAM med ball), and other competition-spec loads ARE absolute and use `weight_kg`. Race weights are the only place absolute kg belongs on a strength/station movement.
+  MENU
 
-    # Derive carry / unilateral loads from deadlift 1RM if available
-    if pbs["deadlift_1rm"]
-      dl = pbs["deadlift_1rm"].to_f
-      fc_lo = (dl * 0.30).round
-      fc_hi = (dl * 0.40).round
-      sb_lo = (bw * 0.50).round
-      sb_hi = (bw * 0.75).round
-      lines << "  Farmer's Carry: #{fc_lo}–#{fc_hi}kg per hand (30–40% of deadlift 1RM)"
-      lines << "  Sandbag / Yoke / Atlas stone: #{sb_lo}–#{sb_hi}kg (50–75% body weight)" if bw > 0
-    end
-
-    lines << "  Body weight: #{bw.round(1)}kg" if bw > 0
-
-    # Only add the 1RM warning when we actually have lift data to reference
-    has_lift_data = %w[deadlift_1rm squat_1rm bench_1rm clean_jerk_1rm snatch_1rm].any? { |k| pbs[k] }
-    if has_lift_data
-      lines << "  CRITICAL: These are absolute maximums — the athlete cannot lift more than their 1RM. " \
-               "Scale all prescribed weights to the values above. A 120kg deadlift 1RM means 0 reps at 180kg."
-
-      # Lift rotation nudge: when only ONE lift has data the LLM tends to default to
-      # that lift every session. Tell it explicitly to vary across sessions and use
-      # effort cues for unmeasured lifts.
-      recorded = %w[deadlift_1rm squat_1rm bench_1rm clean_jerk_1rm snatch_1rm].select { |k| pbs[k] }
-      if recorded.size < 3
-        lines << "  LIFT VARIETY: The athlete only has #{recorded.size} recorded 1RM(s). " \
-                 "Do NOT default to the same lift every session — rotate across Deadlift, Back Squat, " \
-                 "Front Squat, Bench Press, Push Press, Overhead Press, Bulgarian Split Squat, RDL, " \
-                 "and Clean & Jerk variants. For lifts without a recorded PB, use effort cues " \
-                 "(`heavy strength load — last rep should be a fight`) instead of an absolute weight. " \
-                 "A workout that only ever uses #{recorded.first&.sub("_1rm", "")&.gsub("_", " ")&.capitalize} is monotonous."
-      end
-    end
-
-    lines.join("\n")
+  def build_strength_weight_guide(_pbs = nil, _bw = nil)
+    STRENGTH_LIFT_MENU
   end
 
   # Builds a unified benchmarks block giving the LLM raw PBs plus scaling principles.
@@ -444,9 +399,7 @@ class WorkoutLLMGenerator
   # receiving pre-computed fixed bands.
   def format_benchmarks
     pbs = @user.personal_bests || {}
-    bw  = @user.weight_kg.to_f
-    has_cardio   = false
-    has_strength = false
+    has_cardio = false
 
     cardio_lines    = []
     other_pb_lines  = []
@@ -528,11 +481,6 @@ class WorkoutLLMGenerator
 
     has_cardio = cardio_lines.any?
 
-    # ── Strength PBs — detect presence for the output block ─────────────────
-    %w[bench_1rm squat_1rm deadlift_1rm clean_jerk_1rm snatch_1rm].each do |key|
-      has_strength = true if pbs[key]
-    end
-
     # ── Other PBs (functional tests, bodyweight) ─────────────────────────────
     {
       "press_ups_2min" => "Press-ups (2 min)", "pull_ups_max" => "Max pull-ups",
@@ -557,8 +505,7 @@ class WorkoutLLMGenerator
     end
 
     # ── Assemble ─────────────────────────────────────────────────────────────
-    return nil if cardio_lines.empty? && !has_strength && other_pb_lines.empty? && bw.zero?
-
+    # The strength lift menu is static and always relevant — no early-return.
     out = []
 
     if has_cardio
@@ -566,10 +513,7 @@ class WorkoutLLMGenerator
              "#{cardio_lines.map { |l| "  - #{l}" }.join("\n")}"
     end
 
-    if has_strength || bw > 0
-      strength_guide = build_strength_weight_guide(pbs, bw)
-      out << "Strength weight guide — HARD LIMITS, do not exceed these:\n#{strength_guide}"
-    end
+    out << build_strength_weight_guide
 
     unless other_pb_lines.empty?
       out << "Other PBs:\n#{other_pb_lines.map { |l| "  - #{l}" }.join("\n")}"
