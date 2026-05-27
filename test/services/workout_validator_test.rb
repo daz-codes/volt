@@ -1022,6 +1022,88 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
     assert_equal 2, section["exercises"].size, "Box Jump must not be deleted"
   end
 
+  # -- period_mins-aware EMOM validator behaviour --
+
+  test "fix_emom_structure leaves 3-exercise rotating EMOM alone (alternating:true)" do
+    data = build_workout_with_sections([
+      { "name" => "Race Day Energy", "category" => "main", "format" => "emom",
+        "duration_mins" => 15, "alternating" => true,
+        "exercises" => [
+          { "name" => "Burpees",        "reps" => 8 },
+          { "name" => "Reverse Lunges", "reps" => 12 },
+          { "name" => "Sit Ups",        "reps" => 15 }
+        ] }
+    ])
+    result  = WorkoutValidator.new(data, duration_mins: 15, main_tag_slug: "").validate_and_fix
+    section = result.dig("structure", "sections").first
+    assert_equal 3, section["exercises"].size, "rotating EMOMs may carry 3+ exercises"
+  end
+
+  test "fix_emom_structure leaves 3-exercise E2MOM alone (period_mins:2)" do
+    data = build_workout_with_sections([
+      { "name" => "Triple Threat", "category" => "main", "format" => "emom",
+        "duration_mins" => 20, "period_mins" => 2,
+        "exercises" => [
+          { "name" => "Press Ups", "reps" => 5 },
+          { "name" => "Slams",     "reps" => 10 },
+          { "name" => "Sit Ups",   "reps" => 20 }
+        ] }
+    ])
+    result  = WorkoutValidator.new(data, duration_mins: 20, main_tag_slug: "").validate_and_fix
+    section = result.dig("structure", "sections").first
+    assert_equal 3, section["exercises"].size, "E2MOMs may carry 3+ exercises"
+  end
+
+  test "fix_emom_structure still trims 3+ exercises in a vanilla EMOM (no period, not alternating)" do
+    data = build_workout_with_sections([
+      { "name" => "Overstuffed", "category" => "main", "format" => "emom", "duration_mins" => 12,
+        "exercises" => [
+          { "name" => "Burpees",   "reps" => 5 },
+          { "name" => "Wall Balls", "reps" => 5 },
+          { "name" => "Sit Ups",   "reps" => 5 }
+        ] }
+    ])
+    result  = WorkoutValidator.new(data, duration_mins: 12, main_tag_slug: "").validate_and_fix
+    section = result.dig("structure", "sections").first
+    assert_equal 2, section["exercises"].size, "vanilla EMOMs still cap at 2 exercises"
+  end
+
+  test "fix_emom_reps scales the rep cap by period_mins for the all-together case" do
+    # Period 2 → cap is 20. Total of 5+10+20 = 35 should scale to ~20 total, not 10.
+    data = build_workout_with_sections([
+      { "name" => "Triple Threat", "category" => "main", "format" => "emom",
+        "duration_mins" => 20, "period_mins" => 2,
+        "exercises" => [
+          { "name" => "Press Ups", "reps" => 5 },
+          { "name" => "Slams",     "reps" => 10 },
+          { "name" => "Sit Ups",   "reps" => 20 }
+        ] }
+    ])
+    result    = WorkoutValidator.new(data, duration_mins: 20, main_tag_slug: "").validate_and_fix
+    section   = result.dig("structure", "sections").first
+    total     = section["exercises"].sum { |e| e["reps"].to_i }
+    assert total <= 20, "total reps should respect the period-scaled cap of 20 (got #{total})"
+    assert total >  10, "total reps should NOT be clamped to the 1-min cap of 10 (got #{total})"
+  end
+
+  test "fix_emom_reps does not aggregate-cap a rotating EMOM" do
+    # Each exercise owns its full minute, so 15 sit ups + 12 lunges + 8 burpees is fine.
+    data = build_workout_with_sections([
+      { "name" => "Race Day Energy", "category" => "main", "format" => "emom",
+        "duration_mins" => 15, "alternating" => true,
+        "exercises" => [
+          { "name" => "Burpees",        "reps" => 8 },
+          { "name" => "Reverse Lunges", "reps" => 12 },
+          { "name" => "Sit Ups",        "reps" => 15 }
+        ] }
+    ])
+    result  = WorkoutValidator.new(data, duration_mins: 15, main_tag_slug: "").validate_and_fix
+    section = result.dig("structure", "sections").first
+    assert_equal 8,  section["exercises"][0]["reps"]
+    assert_equal 12, section["exercises"][1]["reps"]
+    assert_equal 15, section["exercises"][2]["reps"]
+  end
+
   private
 
   def build_workout_with_sections(sections)

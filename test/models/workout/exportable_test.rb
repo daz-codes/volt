@@ -115,6 +115,49 @@ class Workout::ExportableTest < ActiveSupport::TestCase
     assert_equal "Alternating each minute", sections.first[:description]
   end
 
+  test "export_sections renders 3-exercise rotating EMOM with rotation cycle description" do
+    @workout.structure = {
+      "sections" => [
+        { "name" => "Race Day Energy", "category" => "main", "format" => "emom", "duration_mins" => 15, "alternating" => true,
+          "exercises" => [
+            { "name" => "Burpees",        "reps" => 8 },
+            { "name" => "Reverse Lunges", "reps" => 12 },
+            { "name" => "Sit Ups",        "reps" => 15 }
+          ] }
+      ]
+    }
+    sections = @workout.export_sections
+    assert_equal "EMOM 15min", sections.first[:label]
+    assert_equal "3-min rotation · one exercise per minute", sections.first[:description]
+  end
+
+  test "export_sections renders E2MOM with all-together description and E2MOM label" do
+    @workout.structure = {
+      "sections" => [
+        { "name" => "Triple Threat", "category" => "main", "format" => "emom", "duration_mins" => 20, "period_mins" => 2,
+          "exercises" => [
+            { "name" => "Press Ups", "reps" => 5 },
+            { "name" => "Slams",     "reps" => 10 },
+            { "name" => "Sit Ups",   "reps" => 20 }
+          ] }
+      ]
+    }
+    sections = @workout.export_sections
+    assert_equal "E2MOM 20min", sections.first[:label]
+    assert_equal "All 3 exercises every 2 minutes", sections.first[:description]
+  end
+
+  test "export_sections renders E3MOM label for period_mins:3" do
+    @workout.structure = {
+      "sections" => [
+        { "name" => "Heavy Lift", "category" => "main", "format" => "emom", "duration_mins" => 15, "period_mins" => 3,
+          "exercises" => [ { "name" => "Back Squat", "reps" => 5 } ] }
+      ]
+    }
+    sections = @workout.export_sections
+    assert_equal "E3MOM 15min", sections.first[:label]
+  end
+
   test "export_sections renders continuous_circuit format as Continuous Circuit" do
     @workout.structure = {
       "sections" => [

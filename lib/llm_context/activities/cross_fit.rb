@@ -81,7 +81,7 @@ module LLMContext
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
-            { name: "Skill EMOM", format: "emom", duration_mins: 20, rest_secs: 0,
+            { name: "Skill EMOM", format: "emom", duration_mins: 20, rest_secs: 0, alternating: true,
               exercises: [
                 { name: "Hang Power Clean", reps: 5, equipment: "barbell" },
                 { name: "Wall Balls", reps: 15, equipment: "wall_ball" },

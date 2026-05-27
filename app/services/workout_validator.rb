@@ -278,15 +278,15 @@ class WorkoutValidator
     period     = section["period_mins"].to_i.nonzero? || 1
     alternates = section["alternating"]
 
-    unless period > 1 || alternates
-      is_fm = @main_tag_slug == "functional-muscle"
-      max_exercises = is_fm ? 3 : 2
-      if exercises.size > max_exercises
-        section["exercises"] = exercises.first(max_exercises)
-        section.delete("notes") # LLM notes reference the old exercise count
-        @fixes << "EMOM circuit '#{section["name"]}': trimmed to #{max_exercises} exercises (was #{exercises.size})"
-        exercises = section["exercises"]
-      end
+    return if period > 1 || alternates
+
+    is_fm = @main_tag_slug == "functional-muscle"
+    max_exercises = is_fm ? 3 : 2
+    if exercises.size > max_exercises
+      section["exercises"] = exercises.first(max_exercises)
+      section.delete("notes") # LLM notes reference the old exercise count
+      @fixes << "EMOM circuit '#{section["name"]}': trimmed to #{max_exercises} exercises (was #{exercises.size})"
+      exercises = section["exercises"]
     end
 
     exercises.each do |ex|

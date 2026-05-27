@@ -46,7 +46,7 @@ module LLMContext
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "rowing_machine" } ] },
-            { name: "Sprint Pyramid", format: "emom", intensity_style: "high", duration_mins: 20, rest_secs: 0,
+            { name: "Sprint Pyramid", format: "emom", intensity_style: "high", duration_mins: 20, rest_secs: 0, alternating: true,
               exercises: [
                 { name: "Row sprint",     duration_s: 20, notes: "work 20s, rest 10s", equipment: "rowing_machine" },
                 { name: "Row moderate",   duration_s: 30, notes: "work 30s, rest 30s", equipment: "rowing_machine" },
