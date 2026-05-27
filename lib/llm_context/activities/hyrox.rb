@@ -325,8 +325,8 @@ module LLMContext
           ]
         },
         {
-          name: "Aerobic Build",
-          goal: "A long steady row, an easy circuit with mobility woven into each round, a dedicated hip mobility flow, then a quiet cool-down.",
+          name: "Continuous Engine",
+          goal: "A 40-min continuous-circuit engine builder — Row / Wall Balls / Walking Lunges / SkiErg, one minute each, no rest. Ten rotations of constant easy-pace work, then a hip mobility flow to finish.",
           duration_mins: 60,
           intensity_style: "low",
           sections: [
@@ -334,15 +334,12 @@ module LLMContext
               exercises: [
                 { name: "Easy row + Hyrox mobility prep", duration_s: 300, notes: "cat-cow, ankle circles, kneeling hip flexor stretch, dynamic lunges", equipment: "rowing_machine" }
               ] },
-            { name: "Steady State", format: "straight", duration_mins: 25,
+            { name: "The Wheel", format: "continuous_circuit", duration_mins: 40,
               exercises: [
-                { name: "Row", duration_s: 1500, notes: "easy aerobic pace — sustain the same effort the whole way, breath stays calm", equipment: "rowing_machine" }
-              ] },
-            { name: "Easy Circuit", format: "rounds", rounds: 4, rest_secs: 30,
-              exercises: [
-                { name: "Wall Balls", reps: 20, notes: "light ball, controlled tempo, full range", equipment: "wall_ball" },
-                { name: "Ankle Banded Mobilizations", duration_s: 60, notes: "ankle dorsiflexion prep — 30s per side, drive knee forward" },
-                { name: "Walking Lunges", reps: 20, notes: "deliberate steps, focus on knee tracking", equipment: "bodyweight" }
+                { name: "Row",            notes: "easy aerobic pace — breath stays calm",                     equipment: "rowing_machine" },
+                { name: "Wall Balls",     notes: "light ball, full squat depth, controlled tempo",            equipment: "wall_ball" },
+                { name: "Walking Lunges", notes: "tall posture, deliberate steps, controlled tempo",          equipment: "bodyweight" },
+                { name: "SkiErg",         notes: "easy aerobic pace — sustain the same effort the whole way", equipment: "ski_erg" }
               ] },
             { name: "Hip Mobility Flow", format: "straight", duration_mins: 10,
               exercises: [
