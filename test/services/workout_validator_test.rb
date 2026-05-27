@@ -1110,7 +1110,7 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
     data = build_workout_with_sections([
       { "name" => "Easy EMOM", "category" => "main", "format" => "emom",
         "intensity_style" => "low", "duration_mins" => 15, "rest_secs" => 0,
-        "exercises" => [{ "name" => "SkiErg", "notes" => "easy pace", "equipment" => "ski_erg" }] }
+        "exercises" => [ { "name" => "SkiErg", "notes" => "easy pace", "equipment" => "ski_erg" } ] }
     ])
     result  = WorkoutValidator.new(data, duration_mins: 30, main_tag_slug: "").validate_and_fix
     section = result.dig("structure", "sections").first
@@ -1125,7 +1125,7 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
     data = build_workout_with_sections([
       { "name" => "Easy Tabata", "category" => "main", "format" => "tabata",
         "intensity_style" => "low",
-        "exercises" => [{ "name" => "Row", "equipment" => "rowing_machine" }] }
+        "exercises" => [ { "name" => "Row", "equipment" => "rowing_machine" } ] }
     ])
     result  = WorkoutValidator.new(data, duration_mins: 30, main_tag_slug: "").validate_and_fix
     section = result.dig("structure", "sections").first
@@ -1137,7 +1137,7 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
     data = build_workout_with_sections([
       { "name" => "Working EMOM", "category" => "main", "format" => "emom",
         "intensity_style" => "medium", "duration_mins" => 12, "rest_secs" => 0,
-        "exercises" => [{ "name" => "Burpees", "reps" => 10, "equipment" => "bodyweight" }] }
+        "exercises" => [ { "name" => "Burpees", "reps" => 10, "equipment" => "bodyweight" } ] }
     ])
     result  = WorkoutValidator.new(data, duration_mins: 30, main_tag_slug: "").validate_and_fix
     section = result.dig("structure", "sections").first
@@ -1162,7 +1162,7 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
     data = build_workout_with_sections([
       { "name" => "Steady Row", "category" => "main", "format" => "straight",
         "intensity_style" => "low", "duration_mins" => 26,
-        "exercises" => [{ "name" => "Row", "duration_s" => 1560, "equipment" => "rowing_machine" }] }
+        "exercises" => [ { "name" => "Row", "duration_s" => 1560, "equipment" => "rowing_machine" } ] }
     ])
     result  = WorkoutValidator.new(data, duration_mins: 60, main_tag_slug: "").validate_and_fix
     section = result.dig("structure", "sections").first
@@ -1173,10 +1173,10 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
     data = build_workout_with_sections([
       { "name" => "Warm-Up", "category" => "warm_up", "format" => "straight",
         "intensity_style" => "low", "duration_mins" => 3,
-        "exercises" => [{ "name" => "Easy jog", "duration_s" => 180 }] },
+        "exercises" => [ { "name" => "Easy jog", "duration_s" => 180 } ] },
       { "name" => "Cool-Down", "category" => "cool_down", "format" => "straight",
         "intensity_style" => "low", "duration_mins" => 4,
-        "exercises" => [{ "name" => "Stretches", "notes" => "10 deep breaths" }] }
+        "exercises" => [ { "name" => "Stretches", "notes" => "10 deep breaths" } ] }
     ])
     result   = WorkoutValidator.new(data, duration_mins: 30, main_tag_slug: "").validate_and_fix
     warmup   = result.dig("structure", "sections")[0]
