@@ -2337,6 +2337,19 @@ class WorkoutValidator
   # requires it). We no longer inject a fallback cool-down, which caused duplicates
   # when the LLM used creative section names. We still clean up the last section's
   # exercises (strip reps/durations, add breath notes) since it should be a stretch.
+  # Parenthetical / inline duration mentions inside cool-down notes
+  # (e.g. "pigeon (90s per side)", "forward fold (90s hold)", "couch
+  # stretch — 60s per side"). The cool-down convention is "10 deep
+  # breaths" per pose; explicit timings duplicate that and clutter the
+  # render.
+  COOLDOWN_INLINE_DURATION = /
+    \s*[—–-]?\s*               # optional dash separator
+    \(? \s*                    # optional opening paren
+    \d+\s*(?:s|sec|secs|seconds|m|min|mins|minute|minutes)\b
+    (?:\s*(?:hold|per\s+side|each\s+side))?
+    \s* \)?                    # optional closing paren
+  /xi.freeze
+
   def check_cooldown(sections)
     breaths = @duration_mins <= 30 ? 5 : 10
     last = sections.last
@@ -2352,6 +2365,20 @@ class WorkoutValidator
         end
       end
       @fixes << "Cool-down: stripped #{stripped.join(", ")} from '#{ex["name"]}'" if stripped.any?
+
+      # Strip embedded duration mentions from notes. Repeat until stable in case
+      # the regex leaves trailing commas/dashes after a removal.
+      original_notes = ex["notes"].to_s
+      cleaned = original_notes.gsub(COOLDOWN_INLINE_DURATION, "")
+                              .gsub(/,\s*,/, ",")              # collapse double commas left behind
+                              .gsub(/\(\s*\)/, "")              # empty parens
+                              .gsub(/\s+([,;.])/, '\1')         # whitespace before punctuation
+                              .gsub(/\s{2,}/, " ")              # collapse runs of spaces
+                              .strip
+      if cleaned != original_notes
+        ex["notes"] = cleaned
+        @fixes << "Cool-down: stripped inline duration mentions from '#{ex["name"]}' notes"
+      end
 
       # Ensure notes contain breaths instruction
       notes = ex["notes"].to_s

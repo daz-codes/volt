@@ -1130,6 +1130,42 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
     assert_equal 20, section["duration_mins"]
   end
 
+  # -- check_cooldown inline-duration stripping --
+
+  test "check_cooldown strips parenthetical durations from notes" do
+    data = build_workout_with_sections([
+      { "name" => "Cool-Down", "category" => "cool_down", "format" => "straight", "duration_mins" => 5,
+        "exercises" => [
+          { "name" => "Recovery stretches",
+            "notes" => "pigeon (90s per side), couch stretch (90s per side), spinal twist, child's pose, forward fold (90s hold), chest opener (60s per side)" }
+        ] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 60, main_tag_slug: "hyrox").validate_and_fix
+    notes  = result.dig("structure", "sections").first["exercises"].first["notes"]
+    refute_match(/\d+\s*s/i,    notes, "no second-based durations")
+    refute_match(/\d+\s*min/i,  notes, "no minute-based durations")
+    assert_match(/breath/i,     notes, "breath cue still present")
+    assert_match(/pigeon/i,     notes, "stretch names preserved")
+    assert_match(/forward fold/i, notes, "stretch names preserved")
+  end
+
+  test "check_cooldown strips dash-separated durations from notes" do
+    data = build_workout_with_sections([
+      { "name" => "Cool-Down", "category" => "cool_down", "format" => "straight", "duration_mins" => 5,
+        "exercises" => [
+          { "name" => "Static stretches",
+            "notes" => "couch stretch — 60s per side, then hip flexor — 2 mins, then forward fold 90s" }
+        ] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 60, main_tag_slug: "hyrox").validate_and_fix
+    notes  = result.dig("structure", "sections").first["exercises"].first["notes"]
+    refute_match(/\d+\s*s\b/i,   notes)
+    refute_match(/\d+\s*min/i,   notes)
+    assert_match(/couch stretch/i,  notes)
+    assert_match(/hip flexor/i,     notes)
+    assert_match(/forward fold/i,   notes)
+  end
+
   # -- fix_low_intensity_shapes --
 
   test "fix_low_intensity_shapes converts a low-intensity EMOM into a straight block" do
