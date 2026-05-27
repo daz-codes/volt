@@ -108,9 +108,14 @@ module LLMContext
                "When medium DOES include strength, after-warm-up is the default but variety in " \
                "placement is welcome (after a primer cardio piece, or as accessory work post-metcon). " \
                "Don't put strength in every medium session. " \
-               "BOOKENDS (BUY-IN + CASH-OUT): a powerful Hyrox session shape that's currently " \
-               "under-used. Open with a single hard-paced cardio piece (the 'Buy In') and close " \
-               "with a matching one (the 'Cash Out'), framing the metcon work in the middle. " \
+               "BOOKENDS (BUY-IN + CASH-OUT): a powerful Hyrox session shape. **They come as " \
+               "a PAIR — never one without the other.** If you write a section named 'Buy In' " \
+               "at the start of the workout, you MUST write a matching section named 'Cash Out' " \
+               "as the last main section before the cool-down. Likewise, if you write a 'Cash " \
+               "Out' you MUST have opened with a 'Buy In'. A buy-in alone with no cash-out is " \
+               "BROKEN — the shape requires both ends. If you only want a single anchor cardio " \
+               "piece, use a normal section name (e.g. 'Engine Opener', 'Race Pace Row') — DO " \
+               "NOT call it 'Buy In' unless the matching 'Cash Out' is also in the session. " \
                "Canonical patterns: 'Buy In: 1km Row for time' → main work → 'Cash Out: 1km " \
                "SkiErg for time' (matched-cardio bookends); 'Buy In: 50 Wall Balls' → main work " \
                "→ 'Cash Out: 50 Wall Balls' (same-movement bookends — feel the difference fresh " \
@@ -120,7 +125,10 @@ module LLMContext
                "easy-pace cardio pieces (Buy In: 10-min Row at easy pace; Cash Out: 10-min Ski), " \
                "at high intensity they're all-out efforts (Buy In: 500m Row sprint for time; " \
                "Cash Out: 500m Ski sprint for time). Use `format: for_time` for the bookends, " \
-               "give them their own section. The shape works for any session 45+ min long."
+               "give them their own section. The shape works for any session 45+ min long. " \
+               "BAD: a section called 'Buy In' with no 'Cash Out' anywhere else in the workout. " \
+               "BAD: a section called 'Cash Out' with no 'Buy In' as the opening main section. " \
+               "GOOD: matched buy-in and cash-out sections framing the main work."
       }.freeze
 
       MOVEMENT_VOCABULARY = <<~VOCAB.freeze
