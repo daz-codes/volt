@@ -36,6 +36,9 @@ module LLMContext
                   "movements allowed are light Wall Balls for form, mobility flows, or bodyweight " \
                   "technique drills. NO EMOMs, NO Tabatas, NO sprints. duration_mins on every " \
                   "main/finisher section must be a multiple of 5. " \
+                  "BOOKENDS work at low intensity too: an easy-pace cardio Buy In (e.g. 10-min Row " \
+                  "at conversational pace) framing the main work, with a matching Cash Out (10-min " \
+                  "Ski) at the end — frames the session and gives variety beyond one big cardio block. " \
                   "Effort cue: easy, conversational, nose-breathing pace.",
           medium: "Race-prep working pace — the bread-and-butter Hyrox session. Mix run intervals " \
                   "with station blocks at ~RPE 7-8, 60s rest between rounds. **Reach for `format: emom` " \
@@ -51,9 +54,13 @@ module LLMContext
                   "long recovery. **Strongly prefer `format: emom`** (with the ~50% of 1-min max cue " \
                   "or rotating `alternating: true`) over `continuous_circuit` for metcons at high " \
                   "intensity. Use the 30s hard / 30s rest pattern for hard cardio. Run intervals are " \
-                  "all-out sprints (200-400m), never threshold pace. Pack LESS total work into the " \
-                  "session than you would at medium — typically one main block fewer — so transitions " \
-                  "between sections are unhurried."
+                  "all-out sprints (400m+, never 200m on its own — see RUN DISTANCES rule). Pack " \
+                  "LESS total work into the session than you would at medium — typically one main " \
+                  "block fewer — so transitions between sections are unhurried. " \
+                  "BOOKENDS work at high intensity too: short all-out cardio bookends frame the " \
+                  "session well — Buy In: 500m Row sprint for time → strength + main work → Cash " \
+                  "Out: 500m Ski sprint for time. The matched bookends give a clear pre/post " \
+                  "benchmark."
         },
         notes: "MANDATORY: every session must include at least 2 treadmill running " \
                "intervals (500m–1km each) placed between station blocks. Stations " \
@@ -88,7 +95,20 @@ module LLMContext
                "STRENGTH BLOCK PLACEMENT: when a session includes a strength block (heavy " \
                "barbell / kettlebell / dumbbell sets, format: rounds with low reps), place it " \
                "IMMEDIATELY AFTER the warm-up — while the athlete is fresh. This applies to " \
-               "both medium AND high intensity Hyrox sessions, not just high."
+               "both medium AND high intensity Hyrox sessions, not just high. " \
+               "BOOKENDS (BUY-IN + CASH-OUT): a powerful Hyrox session shape that's currently " \
+               "under-used. Open with a single hard-paced cardio piece (the 'Buy In') and close " \
+               "with a matching one (the 'Cash Out'), framing the metcon work in the middle. " \
+               "Canonical patterns: 'Buy In: 1km Row for time' → main work → 'Cash Out: 1km " \
+               "SkiErg for time' (matched-cardio bookends); 'Buy In: 50 Wall Balls' → main work " \
+               "→ 'Cash Out: 50 Wall Balls' (same-movement bookends — feel the difference fresh " \
+               "vs. cooked); 'Buy In: 50 Box Jumps' → main work → 'Cash Out: 50 Burpees' " \
+               "(different-movement bookends — two distinct tests). Reach for this shape in " \
+               "ALL intensity styles, not just mixed-medium — at low intensity the bookends are " \
+               "easy-pace cardio pieces (Buy In: 10-min Row at easy pace; Cash Out: 10-min Ski), " \
+               "at high intensity they're all-out efforts (Buy In: 500m Row sprint for time; " \
+               "Cash Out: 500m Ski sprint for time). Use `format: for_time` for the bookends, " \
+               "give them their own section. The shape works for any session 45+ min long."
       }.freeze
 
       MOVEMENT_VOCABULARY = <<~VOCAB.freeze
