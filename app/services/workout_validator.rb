@@ -143,6 +143,7 @@ class WorkoutValidator
     fix_low_intensity_shapes(sections)
     fix_orphan_bookend(sections)
     fix_emom_period_cue(sections)
+    fix_emom_running_exercises(sections)
     fix_cooldown_single_exercise(sections)
     fix_goal_durations(sections)
 
@@ -270,13 +271,17 @@ class WorkoutValidator
     Marshal.load(Marshal.dump(section))
   end
 
-  # The "~50% of your 1-min max (leaves ~20s rest)" cue is built around a
-  # 1-minute work block. In an EMOM with period_mins > 1 (an E2MOM or
-  # E3MOM), each work block is 2+ minutes — the cue contradicts the period
-  # and doesn't tell the athlete how much volume to do. Strip the cue and
-  # set explicit reps so the prescription is unambiguous.
+  # `period_mins > 1` (E2MOM, E3MOM) combined with `alternating: true`
+  # produces a "rotation on a slower cadence" shape that has no real
+  # training utility — if you want rotation, use period_mins: 1 +
+  # alternating: true; if you want a longer work window with multiple
+  # exercises, use period_mins: 2 + alternating: false. The combo is a
+  # symptom of the LLM stitching fragments together. Force alternating
+  # off whenever period > 1 — that lands the section on the canonical
+  # "all-together" E2MOM shape (matching the user's mental model).
+  # Strip the "~50% of 1-min max" cue too — that cue is built for a
+  # 1-minute work block and is meaningless across a longer period.
   EMOM_1MIN_MAX_CUE = /~\s*50\s*%[^.]*?1.?min\s*max[^.]*?\.?/i.freeze
-  DEFAULT_E2MOM_REPS = 15
 
   def fix_emom_period_cue(sections)
     sections.each do |section|
@@ -284,13 +289,53 @@ class WorkoutValidator
       period = section["period_mins"].to_i
       next unless period > 1
 
+      if section["alternating"]
+        section.delete("alternating")
+        @fixes << "E#{period}MOM '#{section["name"]}': removed `alternating: true` (period > 1 means all exercises share each #{period}-min window, not a rotation across periods — use period_mins: 1 if you want rotation)"
+      end
+
       Array(section["exercises"]).each do |ex|
         notes = ex["notes"].to_s
         next unless notes.match?(EMOM_1MIN_MAX_CUE)
         cleaned = notes.gsub(EMOM_1MIN_MAX_CUE, "").strip
         ex["notes"] = cleaned.presence
-        ex["reps"] ||= DEFAULT_E2MOM_REPS unless ex["distance_m"] || ex["calories"] || ex["duration_s"]
-        @fixes << "E#{period}MOM '#{section["name"]}' / '#{ex["name"]}': stripped 1-min-max cue (only valid for period_mins=1); set reps to #{ex["reps"]} for the longer work block"
+        @fixes << "E#{period}MOM '#{section["name"]}' / '#{ex["name"]}': stripped 1-min-max cue (only valid for period_mins=1; the athlete needs explicit reps inside a longer period)"
+      end
+    end
+  end
+
+  # Running doesn't fit inside an EMOM — the minute frame doesn't align with
+  # running pace, "reps" is the wrong unit, and pairing it with other movements
+  # in the same window is impractical. Drop running exercises from any EMOM
+  # that has multiple exercises. For SINGLE-exercise EMOMs (just a Run), drop
+  # any rogue `reps` field and require `distance_m` or `duration_s`.
+  RUNNING_NAME_PATTERN = /\b(run|treadmill|jog|sprint)(ning|s)?\b/i.freeze
+
+  def fix_emom_running_exercises(sections)
+    sections.each do |section|
+      next unless section["format"] == "emom"
+      exercises = Array(section["exercises"])
+      runners, others = exercises.partition { |ex| ex["name"].to_s.match?(RUNNING_NAME_PATTERN) }
+      next if runners.empty?
+
+      if exercises.size > 1
+        # Multi-exercise EMOM: drop the runners entirely.
+        section["exercises"] = others
+        runners.each do |ex|
+          @fixes << "EMOM '#{section["name"]}': removed running exercise '#{ex["name"]}' (running doesn't fit in a multi-exercise EMOM — use rounds or for_time for run intervals)"
+        end
+      else
+        # Single-exercise running EMOM: ensure it has a real metric and strip
+        # any rogue `reps`.
+        ex = runners.first
+        if ex["reps"]
+          @fixes << "EMOM '#{section["name"]}' / '#{ex["name"]}': stripped reps:#{ex["reps"]} (running uses distance_m or duration_s, not reps)"
+          ex.delete("reps")
+        end
+        unless ex["distance_m"] || ex["duration_s"]
+          ex["distance_m"] = 200
+          @fixes << "EMOM '#{section["name"]}' / '#{ex["name"]}': set distance_m:200 (running EMOMs need an explicit per-minute distance)"
+        end
       end
     end
   end

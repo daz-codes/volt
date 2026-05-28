@@ -75,10 +75,11 @@ module LLMContext
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 3,
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 180, equipment: "rowing_machine" } ] },
-            { name: "The Anvil", format: "emom", duration_mins: 10, rest_secs: 0, alternating: true,
+            { name: "The Anvil", format: "emom", duration_mins: 10, period_mins: 2, rest_secs: 0,
               exercises: [
-                { name: "Box Jump", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "bodyweight" },
-                { name: "RAM Reverse Lunges", notes: "~50% of your 1-min max (leaves ~20s rest)" }
+                { name: "Box Jump",            reps: 10, equipment: "bodyweight" },
+                { name: "RAM Reverse Lunges",  reps: 16, equipment: "bodyweight" },
+                { name: "Med Ball Sit-up Throw", reps: 12, notes: "explosive throw at the top", equipment: "wall_ball" }
               ] },
             { name: "Ski Sprint", format: "rounds", rounds: 12, rest_secs: 30,
               exercises: [

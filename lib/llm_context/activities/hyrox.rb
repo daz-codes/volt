@@ -314,7 +314,7 @@ module LLMContext
           sections: [
             { name: "Warm-Up", format: "straight", duration_mins: 5,
               exercises: [ { name: "Easy cardio + Dynamic stretches", duration_s: 300, equipment: "ski_erg" } ] },
-            { name: "Triple Trouble", format: "emom", duration_mins: 16, rest_secs: 0,
+            { name: "Triple Trouble", format: "emom", duration_mins: 16, period_mins: 2, rest_secs: 0,
               exercises: [
                 { name: "Burpees", reps: 5, equipment: "bodyweight" },
                 { name: "Walking Lunges", reps: 10, equipment: "bodyweight" },

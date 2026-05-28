@@ -1166,7 +1166,7 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
 
   # -- fix_emom_period_cue --
 
-  test "fix_emom_period_cue strips 1-min-max cue from E2MOM exercises and sets explicit reps" do
+  test "fix_emom_period_cue strips 1-min-max cue AND forces alternating off at period > 1" do
     data = build_workout_with_sections([
       { "name" => "Station Stack", "category" => "main", "format" => "emom",
         "duration_mins" => 20, "period_mins" => 2, "alternating" => true,
@@ -1177,9 +1177,9 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
     ])
     result = WorkoutValidator.new(data, duration_mins: 60, main_tag_slug: "deka-fit").validate_and_fix
     section = result.dig("structure", "sections").first
+    refute section["alternating"], "alternating must be dropped at period_mins > 1 (canonical E2MOM = all-together)"
     section["exercises"].each do |ex|
       refute_match(/1.?min\s*max/i, ex["notes"].to_s, "1-min-max cue must be stripped at period_mins > 1")
-      assert ex["reps"].to_i.positive?, "explicit reps must be set when the cue is stripped"
     end
   end
 
@@ -1197,6 +1197,39 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
     section["exercises"].each do |ex|
       assert_match(/1.?min\s*max/i, ex["notes"].to_s, "1-min-max cue is valid at period_mins=1 (default)")
     end
+  end
+
+  # -- fix_emom_running_exercises --
+
+  test "fix_emom_running_exercises drops Run from a multi-exercise EMOM" do
+    data = build_workout_with_sections([
+      { "name" => "The Engine", "category" => "main", "format" => "emom",
+        "duration_mins" => 30, "period_mins" => 2,
+        "exercises" => [
+          { "name" => "Run",     "reps" => 5,  "equipment" => "treadmill" },
+          { "name" => "Box Jump", "reps" => 10, "equipment" => "bodyweight" },
+          { "name" => "Row",     "calories" => 5, "equipment" => "rowing_machine" }
+        ] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 60, main_tag_slug: "deka-fit").validate_and_fix
+    section = result.dig("structure", "sections").first
+    names = section["exercises"].map { |e| e["name"] }
+    refute_includes names, "Run", "Run must be dropped from a multi-exercise EMOM"
+    assert_includes names, "Box Jump"
+    assert_includes names, "Row"
+  end
+
+  test "fix_emom_running_exercises strips rogue reps from a single-exercise Run EMOM" do
+    data = build_workout_with_sections([
+      { "name" => "Run Cycle", "category" => "main", "format" => "emom", "duration_mins" => 10,
+        "exercises" => [
+          { "name" => "Run", "reps" => 5, "equipment" => "treadmill" }
+        ] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 30, main_tag_slug: "hyrox").validate_and_fix
+    ex     = result.dig("structure", "sections").first["exercises"].first
+    refute ex.key?("reps"), "running EMOM must not have reps"
+    assert ex["distance_m"].to_i.positive?, "running EMOM must have distance_m set"
   end
 
   # -- fix_cooldown_single_exercise --

@@ -168,10 +168,11 @@ module LLMContext
                 { name: "Bar-Facing Burpees Over Bar", reps: 20, equipment: "barbell" },
                 { name: "Atlas Shoulder to Carry", distance_m: 50, equipment: "sled" }
               ] },
-            { name: "Strongman Cycle", format: "emom", duration_mins: 16, rest_secs: 0, alternating: true,
+            { name: "Strongman Cycle", format: "emom", duration_mins: 16, period_mins: 2, rest_secs: 0,
               exercises: [
-                { name: "Surrender Lunges", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "dumbbells" },
-                { name: "Single Arm DB Ground to Overhead", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "dumbbells" }
+                { name: "Surrender Lunges", reps: 12, notes: "race weight DB — 6 per leg", equipment: "dumbbells" },
+                { name: "Single Arm DB Ground to Overhead", reps: 10, notes: "5 per side, race weight DB", equipment: "dumbbells" },
+                { name: "Weighted Sit-ups", reps: 15, equipment: "dumbbells" }
               ] },
             { name: "Devil's Tabata", format: "tabata",
               exercises: [

@@ -173,10 +173,11 @@ module LLMContext
                 { name: "Sandbag Lunges", reps: 20, equipment: "sled" },
                 { name: "Farmer's Carry", distance_m: 30, equipment: "kettlebells" }
               ] },
-            { name: "Broad Strokes", format: "emom", duration_mins: 16, rest_secs: 0, alternating: true,
+            { name: "Broad Strokes", format: "emom", duration_mins: 16, period_mins: 2, rest_secs: 0,
               exercises: [
-                { name: "Burpee Broad Jumps", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "bodyweight" },
-                { name: "Wall Balls", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "wall_ball" }
+                { name: "Burpee Broad Jumps", reps: 8,  equipment: "bodyweight" },
+                { name: "Wall Balls",         reps: 15, equipment: "wall_ball" },
+                { name: "KB Swings",          reps: 15, equipment: "kettlebells" }
               ] },
             { name: "Tabata Cooker", format: "tabata",
               exercises: [

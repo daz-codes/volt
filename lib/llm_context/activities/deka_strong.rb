@@ -161,10 +161,11 @@ module LLMContext
                 { name: "Med Ball Sit-up Throw", reps: 20, equipment: "wall_ball" },
                 { name: "Farmer's Carry", distance_m: 30, equipment: "kettlebells" }
               ] },
-            { name: "Box Cycle", format: "emom", duration_mins: 16, rest_secs: 0, alternating: true,
+            { name: "Box Cycle", format: "emom", duration_mins: 16, period_mins: 2, rest_secs: 0,
               exercises: [
-                { name: "Box Jump", notes: "~50% of your 1-min max (leaves ~20s rest)", equipment: "bodyweight" },
-                { name: "RAM Reverse Lunges", notes: "~50% of your 1-min max (leaves ~20s rest)" }
+                { name: "Box Jump",            reps: 12, equipment: "bodyweight" },
+                { name: "RAM Reverse Lunges",  reps: 20, equipment: "bodyweight" },
+                { name: "KB Swings",           reps: 15, equipment: "kettlebells" }
               ] },
             { name: "Burpee Bash", format: "tabata",
               exercises: [
