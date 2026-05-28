@@ -27,19 +27,19 @@ class Program::SessionFocusTest < ActiveSupport::TestCase
 
   test "strength keyword overrides activity to Transformer" do
     result = Program.parse_session_focus("high strength", default_activity_name: "Hyrox")
-    assert_equal "Transformer", result[:activity_name]
+    assert_equal "Volt Strong", result[:activity_name]
     assert_equal "high",        result[:intensity_style]
   end
 
   test "label-style 'medium intensity strength focused' overrides activity to Transformer" do
     result = Program.parse_session_focus("Medium intensity strength focused", default_activity_name: "Hyrox")
-    assert_equal "Transformer", result[:activity_name]
+    assert_equal "Volt Strong", result[:activity_name]
     assert_equal "medium",      result[:intensity_style]
   end
 
-  test "explicit 'transformer' keyword still maps to Transformer" do
+  test "legacy 'transformer' keyword still maps to Volt Strong" do
     result = Program.parse_session_focus("transformer day", default_activity_name: "Hyrox")
-    assert_equal "Transformer", result[:activity_name]
+    assert_equal "Volt Strong", result[:activity_name]
   end
 
   test "no activity keyword falls back to default" do

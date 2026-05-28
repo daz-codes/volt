@@ -1,11 +1,12 @@
 module Program::HyroxWeeklyShape
   extend ActiveSupport::Concern
 
-  # The activity name the LLM should use for each session type. Matched
-  # against `Activity.name` (case-insensitive, find_or_create_by).
+  # The activity name the LLM should use for each session type. These match
+  # the canonical user-facing names (Engine Room and Volt Strong are slug
+  # aliases for the internal turbine and transformer contracts).
   HYROX        = "Hyrox".freeze
   ENGINE_ROOM  = "Engine Room".freeze
-  TRANSFORMER  = "Transformer".freeze
+  VOLT_STRONG  = "Volt Strong".freeze
 
   # Canonical session shapes that get composed into a week. Each shape names
   # the activity, the intensity_style, a short label for prefilling the form's
@@ -23,10 +24,10 @@ module Program::HyroxWeeklyShape
     cardio_low:    { activity: ENGINE_ROOM, intensity_style: "low",
                      label: "Low intensity cardio focused",
                      notes: "long zone-2 cardio engine builder — single block or stacked single-modality blocks" },
-    strength_high: { activity: TRANSFORMER, intensity_style: "high",
+    strength_high: { activity: VOLT_STRONG, intensity_style: "high",
                      label: "High intensity strength focused",
                      notes: "heavy compound strength — 3-5 reps near-max, full recovery between sets" },
-    strength_med:  { activity: TRANSFORMER, intensity_style: "medium",
+    strength_med:  { activity: VOLT_STRONG, intensity_style: "medium",
                      label: "Medium intensity strength focused",
                      notes: "hypertrophy / accessory strength — 6-10 reps, 90-120s rest" }
   }.freeze

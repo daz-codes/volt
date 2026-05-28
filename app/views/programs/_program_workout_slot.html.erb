@@ -17,11 +17,11 @@
           <span class="text-xs text-gray-600">Queued</span>
         <% end %>
       </div>
-      <% planned = pw.activity&.name %>
-      <% if planned.present? || pw.intensity_style.present? %>
+      <% plan_activity = pw.program.activity&.name %>
+      <% if plan_activity.present? || pw.intensity_style.present? %>
         <div class="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wide">
-          <% if planned.present? %><span class="text-lime-400"><%= planned %></span><% end %>
-          <% if pw.intensity_style.present? %><span class="text-gray-500">· <%= pw.intensity_style %></span><% end %>
+          <% if plan_activity.present? %><span class="text-lime-400"><%= plan_activity %></span><% end %>
+          <% if pw.intensity_style.present? %><span class="text-gray-500">· <%= pw.intensity_style %> intensity</span><% end %>
         </div>
       <% end %>
     </div>
@@ -38,10 +38,8 @@
   <% elsif pw.complete? && pw.workout %>
     <% workout = pw.workout %>
     <% sections = workout.structure.is_a?(Hash) ? Array(workout.structure["sections"]) : [] %>
-    <% all_exercises = sections.flat_map { |s| Array(s["exercises"]).map { |e| e["name"] } }.uniq %>
-    <% summary_text = all_exercises.first(6).join(" · ") %>
-    <% summary_text += " +#{all_exercises.size - 6} more" if all_exercises.size > 6 %>
     <% goal = workout.structure.is_a?(Hash) ? workout.structure["goal"] : nil %>
+    <% plan_activity = pw.program.activity&.name %>
 
     <div class="bg-zinc-800 border border-zinc-600/70 rounded-2xl overflow-hidden shadow-sm hover:border-gray-600 hover:shadow-md transition-all duration-200 cursor-pointer"
          onclick="document.getElementById('program_workout_modal_<%= pw.id %>').showModal()">
@@ -49,13 +47,13 @@
         <div class="flex items-start justify-between gap-3">
           <div class="min-w-0">
             <p class="text-gray-600 text-[10px] font-black uppercase tracking-widest mb-1">Session <%= pw.session_number %></p>
-            <p class="text-gray-300 text-2xl leading-tight tracking-tight font-jost uppercase">
+            <p class="text-gray-300 text-base font-bold leading-tight tracking-tight font-jost uppercase">
               <%= workout.name.presence || "Untitled Workout" %>
             </p>
           </div>
           <div class="flex flex-col items-end gap-1 flex-shrink-0 mt-0.5">
-            <% if workout.activity.present? %>
-              <p class="text-lime-400 font-black text-sm uppercase tracking-wide leading-none"><%= workout.activity&.name %></p>
+            <% if plan_activity.present? %>
+              <p class="text-lime-400 font-black text-sm uppercase tracking-wide leading-none"><%= plan_activity %></p>
             <% end %>
             <div class="flex items-center gap-1.5">
               <div class="flex flex-col items-center justify-center w-10 h-10 rounded-full bg-volt shadow-sm shadow-volt/25 flex-shrink-0">
@@ -66,8 +64,8 @@
           </div>
         </div>
 
-        <% if summary_text.present? %>
-          <p class="text-sky-200 text-xs font-medium mt-2 leading-relaxed"><%= summary_text %></p>
+        <% if goal.present? %>
+          <p class="text-gray-400 text-xs italic mt-2 leading-relaxed"><%= goal %></p>
         <% end %>
       </div>
 
@@ -93,8 +91,8 @@
           <p class="text-gray-600 text-[10px] font-black uppercase tracking-widest mb-1">Session <%= pw.session_number %></p>
           <h2 class="text-xl font-black tracking-tight uppercase" style="font-family: 'Jost', sans-serif"><%= workout.name %></h2>
           <div class="flex items-center gap-1.5 mt-1.5 flex-wrap">
-            <% if workout.activity.present? %>
-              <span class="text-lime-400 text-[10px] font-black uppercase tracking-wide"><%= workout.activity&.name %></span>
+            <% if plan_activity.present? %>
+              <span class="text-lime-400 text-[10px] font-black uppercase tracking-wide"><%= plan_activity %></span>
             <% end %>
             <span class="text-gray-600 text-xs"><%= workout.duration_mins %> min</span>
           </div>

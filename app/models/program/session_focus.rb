@@ -7,7 +7,7 @@ module Program::SessionFocus
   # by writing "cardio" or "engine room" in that session's focus.
   ACTIVITY_KEYWORDS = [
     [ /\b(engine\s*room|cardio\s*only|cardio\b|zone\s*2|zone\s*two)\b/i, "Engine Room" ],
-    [ /\b(transformer|strength|lift(ing)?|heavy)\b/i,                    "Transformer" ]
+    [ /\b(volt\s*strong|transformer|strength|lift(ing)?|heavy)\b/i,      "Volt Strong" ]
   ].freeze
 
   INTENSITY_KEYWORDS = [

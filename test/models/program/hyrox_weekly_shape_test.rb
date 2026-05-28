@@ -24,7 +24,7 @@ class Program::HyroxWeeklyShapeTest < ActiveSupport::TestCase
 
   test "4 sessions → low Hyrox + high strength + low cardio + medium Hyrox" do
     shape = Program.hyrox_weekly_shape(4)
-    assert_equal [ "Hyrox", "Transformer", "Engine Room", "Hyrox" ], shape.map { |s| s[:activity] }
+    assert_equal [ "Hyrox", "Volt Strong", "Engine Room", "Hyrox" ], shape.map { |s| s[:activity] }
     assert_equal [ "low",   "high",        "low",         "medium" ], shape.map { |s| s[:intensity_style] }
   end
 
@@ -34,7 +34,7 @@ class Program::HyroxWeeklyShapeTest < ActiveSupport::TestCase
     assert_equal({
       [ "Hyrox",       "low"  ] => 2,
       [ "Engine Room", "low"  ] => 1,
-      [ "Transformer", "high" ] => 1,
+      [ "Volt Strong", "high" ] => 1,
       [ "Hyrox",       "high" ] => 1
     }, breakdown)
   end
@@ -50,7 +50,7 @@ class Program::HyroxWeeklyShapeTest < ActiveSupport::TestCase
     six   = Program.hyrox_weekly_shape(6).map { |s| [ s[:activity], s[:intensity_style] ] }.tally
     seven = Program.hyrox_weekly_shape(7).map { |s| [ s[:activity], s[:intensity_style] ] }.tally
     diff = seven.merge(six) { |_, b, a| b - a }
-    assert_equal({ [ "Transformer", "medium" ] => 1 }, diff.reject { |_, v| v.zero? })
+    assert_equal({ [ "Volt Strong", "medium" ] => 1 }, diff.reject { |_, v| v.zero? })
   end
 
   # -- recovery rule: every high session is followed by ≥1 low later in the week --
@@ -107,7 +107,7 @@ class Program::HyroxWeeklyShapeTest < ActiveSupport::TestCase
     user = users(:one)
     hyrox = Activity.find_or_create_by!(name: "Hyrox")
     Activity.find_or_create_by!(name: "Engine Room")
-    Activity.find_or_create_by!(name: "Transformer")
+    Activity.find_or_create_by!(name: "Volt Strong")
 
     program = Program.create!(
       user: user, name: "4-Week Hyrox Program", activity: hyrox,
@@ -123,7 +123,7 @@ class Program::HyroxWeeklyShapeTest < ActiveSupport::TestCase
     # "High strength (Transformer)" → Transformer + high
     # "Low cardio (Engine Room)" → Engine Room + low
     # "Medium Hyrox" → Hyrox + medium
-    assert_equal [ nil,           "Transformer", "Engine Room", nil ],     pws.map { |pw| pw.activity&.name }
+    assert_equal [ nil,           "Volt Strong", "Engine Room", nil ],     pws.map { |pw| pw.activity&.name }
     assert_equal [ "low",         "high",        "low",         "medium" ], pws.map(&:intensity_style)
     # Same notes repeat every week
     week2 = program.program_workouts.where(week_number: 2).order(:session_number).to_a
