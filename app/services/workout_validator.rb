@@ -1019,13 +1019,25 @@ class WorkoutValidator
   def fix_emom_alternating_duration(sections)
     sections.each do |section|
       next unless section["format"] == "emom"
-      next unless section["alternating"]
-      exercises = Array(section["exercises"])
-      n = exercises.size
-      next if n <= 1
 
-      period = section["period_mins"].to_i.nonzero? || 1
-      cycle  = n * period
+      exercises = Array(section["exercises"])
+      n         = exercises.size
+      period    = section["period_mins"].to_i.nonzero? || 1
+      alternating = section["alternating"]
+
+      # The "cycle" is how many minutes a complete rotation takes:
+      #   - alternating: one full pass through all exercises = period × n
+      #   - non-alternating, period > 1 (E2MOM, E3MOM): one work block = period
+      #   - vanilla EMOM (period=1, not alternating): cycle is 1 min, any
+      #     duration works — skip
+      cycle =
+        if alternating && n >= 2
+          period * n
+        elsif period > 1
+          period
+        else
+          next
+        end
 
       dur = section["duration_mins"].to_i
       next if dur <= 0 || (dur % cycle).zero?
@@ -1035,10 +1047,17 @@ class WorkoutValidator
       snapped = (ceil_mult - dur) <= (dur - floor_mult) ? ceil_mult : floor_mult
       snapped = cycle if snapped <= 0
 
-      label = period == 1 ? "Alternating EMOM" : "Alternating E#{period}MOM"
-      reason = period == 1 ? "#{n} exercises" : "#{n} exercises × #{period}-min period = #{cycle}-min cycle"
+      label = period == 1 ? "Alternating EMOM" : "E#{period}MOM"
+      reason =
+        if alternating && period == 1
+          "#{n} exercises"
+        elsif alternating
+          "#{n} exercises × #{period}-min period = #{cycle}-min cycle"
+        else
+          "period_mins #{period}"
+        end
       section["duration_mins"] = snapped
-      @fixes << "#{label} '#{section["name"]}': duration_mins #{dur} → #{snapped} (must be a multiple of #{cycle} for an even rotation — #{reason})"
+      @fixes << "#{label} '#{section["name"]}': duration_mins #{dur} → #{snapped} (must be a multiple of #{cycle} — #{reason})"
     end
   end
 

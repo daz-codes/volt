@@ -229,6 +229,14 @@ class WorkoutLLMGenerator
         set both the section's duration_mins AND the exercise's duration_s. The two
         MUST agree (duration_mins × 60 = duration_s). The renderer surfaces the
         duration prominently — if these go out of sync the workout looks broken.
+
+        For format: rounds where each exercise has a `duration_s`, remember the
+        section's total time is **rounds × (sum of exercise duration_s) + rest_secs ×
+        (rounds − 1)**, NOT just one round's work. `4 rounds × (8min Row + 5min Ski)
+        with 45s rest` is 52+ minutes of work, not 13. Either keep round durations
+        tight enough that the math fits the budget, or use format: straight (a
+        single long block) when you want a long steady piece. BAD: 4 rounds of
+        13-min work in a 45-min session.
       SHAPE
     end
 

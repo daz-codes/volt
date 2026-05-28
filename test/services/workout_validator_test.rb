@@ -1478,7 +1478,22 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
     assert_equal 12, section["duration_mins"], "10-min E2MOM with 2 ex must snap to 12 (multiple of 4-min cycle)"
   end
 
-  test "fix_emom_alternating_duration ignores non-alternating EMOMs" do
+  test "fix_emom_alternating_duration snaps E3MOM (period 3, not alternating) to a multiple of 3" do
+    data = build_workout_with_sections([
+      { "name" => "Hyrox Gauntlet", "category" => "main", "format" => "emom",
+        "duration_mins" => 8, "period_mins" => 3,
+        "exercises" => [
+          { "name" => "Sandbag Thrusters",  "reps" => 8,  "equipment" => "kettlebells" },
+          { "name" => "Burpee Box Overs",   "reps" => 6,  "equipment" => "bodyweight" },
+          { "name" => "Rope Pulls",         "reps" => 12, "equipment" => "kettlebells" }
+        ] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 60, main_tag_slug: "hyrox").validate_and_fix
+    section = result.dig("structure", "sections").first
+    assert_equal 9, section["duration_mins"], "8 must snap to nearest multiple of 3 (9, distance 1)"
+  end
+
+  test "fix_emom_alternating_duration ignores vanilla EMOM (period 1, not alternating)" do
     data = build_workout_with_sections([
       { "name" => "Both Each Minute", "category" => "main", "format" => "emom",
         "duration_mins" => 15,
