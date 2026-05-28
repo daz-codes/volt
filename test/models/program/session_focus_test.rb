@@ -14,10 +14,15 @@ class Program::SessionFocusTest < ActiveSupport::TestCase
     assert_equal "low",         result[:intensity_style]
   end
 
-  test "'engine room' phrase overrides activity to Engine Room" do
-    result = Program.parse_session_focus("Low cardio (Engine Room)", default_activity_name: "Hyrox")
+  test "label-style 'low intensity cardio focused' overrides activity to Engine Room" do
+    result = Program.parse_session_focus("Low intensity cardio focused", default_activity_name: "Hyrox")
     assert_equal "Engine Room", result[:activity_name]
     assert_equal "low",         result[:intensity_style]
+  end
+
+  test "explicit 'engine room' phrase still works" do
+    result = Program.parse_session_focus("engine room day", default_activity_name: "Hyrox")
+    assert_equal "Engine Room", result[:activity_name]
   end
 
   test "strength keyword overrides activity to Transformer" do
@@ -26,14 +31,19 @@ class Program::SessionFocusTest < ActiveSupport::TestCase
     assert_equal "high",        result[:intensity_style]
   end
 
-  test "'transformer' phrase overrides activity to Transformer" do
-    result = Program.parse_session_focus("Medium strength (Transformer)", default_activity_name: "Hyrox")
+  test "label-style 'medium intensity strength focused' overrides activity to Transformer" do
+    result = Program.parse_session_focus("Medium intensity strength focused", default_activity_name: "Hyrox")
     assert_equal "Transformer", result[:activity_name]
     assert_equal "medium",      result[:intensity_style]
   end
 
+  test "explicit 'transformer' keyword still maps to Transformer" do
+    result = Program.parse_session_focus("transformer day", default_activity_name: "Hyrox")
+    assert_equal "Transformer", result[:activity_name]
+  end
+
   test "no activity keyword falls back to default" do
-    result = Program.parse_session_focus("Low Hyrox", default_activity_name: "Hyrox")
+    result = Program.parse_session_focus("Low intensity Hyrox", default_activity_name: "Hyrox")
     assert_equal "Hyrox", result[:activity_name]
     assert_equal "low",   result[:intensity_style]
   end

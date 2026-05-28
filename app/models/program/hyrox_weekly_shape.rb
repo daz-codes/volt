@@ -12,22 +12,22 @@ module Program::HyroxWeeklyShape
   # session-focus input, and a longer note to seed the LLM.
   SHAPES = {
     hyrox_low:     { activity: HYROX,       intensity_style: "low",
-                     label: "Low Hyrox",
+                     label: "Low intensity Hyrox",
                      notes: "easy aerobic Hyrox session — bookends or long continuous circuit at conversational pace" },
     hyrox_medium:  { activity: HYROX,       intensity_style: "medium",
-                     label: "Medium Hyrox",
+                     label: "Medium intensity Hyrox",
                      notes: "race-prep working pace — mix run intervals with station blocks at RPE 7-8" },
     hyrox_high:    { activity: HYROX,       intensity_style: "high",
-                     label: "High Hyrox",
+                     label: "High intensity Hyrox",
                      notes: "race-day energy — strength block first, all-out cardio with long recovery" },
     cardio_low:    { activity: ENGINE_ROOM, intensity_style: "low",
-                     label: "Low cardio (Engine Room)",
+                     label: "Low intensity cardio focused",
                      notes: "long zone-2 cardio engine builder — single block or stacked single-modality blocks" },
     strength_high: { activity: TRANSFORMER, intensity_style: "high",
-                     label: "High strength (Transformer)",
+                     label: "High intensity strength focused",
                      notes: "heavy compound strength — 3-5 reps near-max, full recovery between sets" },
     strength_med:  { activity: TRANSFORMER, intensity_style: "medium",
-                     label: "Medium strength (Transformer)",
+                     label: "Medium intensity strength focused",
                      notes: "hypertrophy / accessory strength — 6-10 reps, 90-120s rest" }
   }.freeze
 
