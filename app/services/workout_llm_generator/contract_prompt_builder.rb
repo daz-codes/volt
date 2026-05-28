@@ -205,16 +205,30 @@ class WorkoutLLMGenerator
                      end
       <<~SHAPE.strip
         Shape: Warm-up (#{warm_up_min} min) → main section(s) → Cool-down (#{cool_down_min} min).
-        Total duration: #{@duration_mins} min. Working budget is roughly #{working} min MINUS
-        ~3-5 min per transition between adjacent sections for equipment changes and rest.
-        Do NOT emit transitions as their own sections or mention them in the output — just
-        leave room in the timing budget when sizing the work.
+        Total duration: #{@duration_mins} min.
+
+        **DURATIONS MUST ADD UP TO THE TARGET.** Every section MUST have an explicit
+        duration: either a `duration_mins` on the section, or a `duration_s` on its
+        exercise (for steady-state cardio blocks). Before finalising, sum:
+          warm_up.duration_mins  (= #{warm_up_min})
+        + main sections' duration_mins  (one entry per main section)
+        + cool_down.duration_mins  (= #{cool_down_min})
+        + 3 min per transition between adjacent main sections (DO NOT emit transitions
+          as their own sections — just account for them in the budget)
+        = #{@duration_mins} min  (±2 min slack only).
+        If your sum is short, EXTEND a cardio main section to fill the gap. If your sum
+        is long, TRIM the longest section. A 45-min target session that totals 30 min
+        of work is broken — fill the time.
+
         Target #{target_mains} main section(s). A single long main section is a valid and
         often better shape when the workout is one unbroken effort — chippers, long AMRAPs,
         hero WODs, race simulations, extended metcons. Pick the count the workout calls for,
-        not the upper end of the range. Err on the side of fewer, tighter sections —
-        workouts consistently run long, so cut a section if in doubt.
-        Do NOT set duration_mins on main sets.
+        not the upper end of the range.
+
+        For format: straight cardio blocks (one steady movement for a long stretch),
+        set both the section's duration_mins AND the exercise's duration_s. The two
+        MUST agree (duration_mins × 60 = duration_s). The renderer surfaces the
+        duration prominently — if these go out of sync the workout looks broken.
       SHAPE
     end
 
