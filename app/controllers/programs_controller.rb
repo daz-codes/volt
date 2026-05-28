@@ -23,8 +23,13 @@ class ProgramsController < ApplicationController
     @program.name = "#{@program.weeks_count}-Week #{activity.name.titleize} Program"
 
     if @program.save
-      session_notes = Array(params[:session_notes]).first(@program.sessions_per_week)
-      @program.create_workout_placeholders(session_notes, custom_activity: params[:custom_activity].presence)
+      session_notes     = Array(params[:session_notes]).first(@program.sessions_per_week)
+      session_durations = Array(params[:session_durations]).first(@program.sessions_per_week)
+      @program.create_workout_placeholders(
+        session_notes,
+        custom_activity:   params[:custom_activity].presence,
+        session_durations: session_durations
+      )
       @program.build_later
       redirect_to program_path(@program), notice: "Building your #{@program.weeks_count}-week program — workouts will appear as they're generated."
     else

@@ -8,7 +8,11 @@ import { Controller } from "@hotwired/stimulus"
 //    hasn't manually edited)
 //  * Clears prefilled values when the user moves off Hyrox
 export default class extends Controller {
-  static targets = ["weeksDisplay", "weeksInput", "sessionRow", "pill", "customInput"]
+  static targets = [
+    "weeksDisplay", "weeksInput",
+    "sessionsDisplay", "sessionsInput",
+    "sessionRow", "pill", "customInput"
+  ]
   static values = {
     // Race-family prefill labels — { "Hyrox": { "1": ["..."], "2": [...] },
     // "Deka Fit": { ... }, "Deka Atlas": { ... }, ... }. Stimulus looks up
@@ -30,13 +34,19 @@ export default class extends Controller {
   updateSessions() {
     const count = this.#selectedSessionCount()
 
+    if (this.hasSessionsDisplayTarget) {
+      this.sessionsDisplayTarget.textContent = count
+    }
+
     this.sessionRowTargets.forEach((row, i) => {
       row.classList.toggle("hidden", i >= count)
       if (i >= count) {
-        const input = row.querySelector("input")
-        if (input) {
-          input.value = ""
-          delete input.dataset.prefilled
+        // Reset the focus text (first text input) when the row is hidden so
+        // we don't submit stale entries from a higher previous count.
+        const focusInput = row.querySelector("input[type='text']")
+        if (focusInput) {
+          focusInput.value = ""
+          delete focusInput.dataset.prefilled
         }
       }
     })
@@ -52,12 +62,20 @@ export default class extends Controller {
   }
 
   customTyped() {
+    // While the user is typing we only update the visual border and clear
+    // any selected pill — prefill is deferred until they click away (blur).
     if (!this.hasCustomInputTarget) return
     const hasText = this.customInputTarget.value.trim() !== ""
     if (hasText) {
       this.pillTargets.forEach(radio => radio.checked = false)
     }
     this.#toggleCustomBorder(hasText)
+  }
+
+  customBlurred() {
+    // Apply prefill once the user has committed their typing (clicked away
+    // or tabbed out). Avoids re-populating session focus fields on every
+    // keystroke.
     this.applyPrefill()
   }
 
@@ -105,6 +123,7 @@ export default class extends Controller {
   }
 
   #selectedSessionCount() {
+    if (this.hasSessionsInputTarget) return parseInt(this.sessionsInputTarget.value)
     const selected = this.element.querySelector("input[name='program[sessions_per_week]']:checked")
     return selected ? parseInt(selected.value) : 3
   }

@@ -6,6 +6,7 @@ class ProgramWorkout < ApplicationRecord
   STATUSES = %w[pending generating complete failed].freeze
   validates :status, inclusion: { in: STATUSES }
   validates :intensity_style, inclusion: { in: %w[low medium high], allow_nil: true }
+  validates :duration_mins, numericality: { greater_than: 0 }, allow_nil: true
 
   def pending?    = status == "pending"
   def generating? = status == "generating"
@@ -18,5 +19,11 @@ class ProgramWorkout < ApplicationRecord
   # if set; otherwise falls back to the program's primary activity.
   def effective_activity
     activity || program.activity
+  end
+
+  # The duration used to generate this session. Per-session override if set;
+  # otherwise falls back to the program's default duration.
+  def effective_duration_mins
+    duration_mins.presence || program.duration_mins
   end
 end

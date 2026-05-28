@@ -4,7 +4,7 @@
    keyed by activity name and sessions_per_week. Stimulus reads these on
    activity/sessions change to pre-populate the session focus inputs. %>
 <% prefill_labels = Program::WeeklyShape::PLAN_ACTIVITIES.index_with do |activity|
-     (1..7).index_with { |n| Program.weekly_labels(activity, n) }
+     (1..10).index_with { |n| Program.weekly_labels(activity, n) }
    end %>
 <div class="max-w-2xl mx-auto px-4 pb-12" data-controller="program-form"
      data-program-form-prefill-labels-value="<%= prefill_labels.to_json %>">
@@ -104,7 +104,7 @@
         <%= text_field_tag :custom_activity, params[:custom_activity].presence || custom_default,
             placeholder: "Or type any workout style…",
             class: "w-full bg-zinc-800 rounded-xl px-3 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-lime-400 transition-colors #{custom_default.present? ? "border border-lime-400 bg-lime-400/5" : "border border-zinc-700"}",
-            data: { program_form_target: "customInput", action: "input->program-form#customTyped" } %>
+            data: { program_form_target: "customInput", action: "input->program-form#customTyped blur->program-form#customBlurred" } %>
       </div>
       <% if @program.errors[:activity].any? %>
         <p class="text-red-400 text-xs mt-2"><%= @program.errors[:activity].first %></p>
@@ -120,67 +120,65 @@
           <span class="text-base font-normal text-gray-400">weeks</span>
         </p>
       </div>
-      <%= f.range_field :weeks_count, value: @program.weeks_count, min: 2, max: 16, step: 1,
+      <%= f.range_field :weeks_count, value: @program.weeks_count, min: 2, max: 8, step: 1,
           class: "w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-lime-400",
           data: { program_form_target: "weeksInput", action: "input->program-form#updateWeeks" },
           required: true %>
       <div class="flex justify-between text-xs text-gray-600 mt-1.5">
-        <span>2 weeks</span><span>16 weeks</span>
+        <span>2 weeks</span><span>8 weeks</span>
       </div>
     </div>
 
-    <%# Sessions per week %>
+    <%# Sessions per week — slider 1-10 %>
     <div class="mb-8">
-      <p class="text-sm font-bold text-gray-300 uppercase tracking-wide mb-4">Sessions per Week</p>
-      <div class="flex gap-2 flex-wrap">
-        <% (1..7).each do |n| %>
-          <label class="cursor-pointer">
-            <%= f.radio_button :sessions_per_week, n, class: "peer sr-only",
-                checked: @program.sessions_per_week == n,
-                data: { action: "change->program-form#updateSessions" } %>
-            <div class="border-2 border-zinc-600 rounded-xl px-5 py-3 peer-checked:border-lime-400 peer-checked:bg-lime-400/15 transition-all text-center min-w-[72px]">
-              <p class="font-black text-base"><%= n %>×</p>
-              <p class="text-gray-500 text-xs">per week</p>
-            </div>
-          </label>
-        <% end %>
-      </div>
-    </div>
-
-    <%# Duration — reuse duration-slider Stimulus controller %>
-    <div class="mb-8" data-controller="duration-slider">
       <div class="flex items-baseline justify-between mb-3">
-        <p class="text-sm font-bold text-gray-300 uppercase tracking-wide">Session Duration</p>
+        <p class="text-sm font-bold text-gray-300 uppercase tracking-wide">Sessions per Week</p>
         <p class="text-3xl font-black text-white">
-          <span data-duration-slider-target="display"><%= @program.duration_mins %></span>
-          <span class="text-base font-normal text-gray-400">min</span>
+          <span data-program-form-target="sessionsDisplay"><%= @program.sessions_per_week %></span>
+          <span class="text-base font-normal text-gray-400">×</span>
         </p>
       </div>
-      <%= f.range_field :duration_mins, value: @program.duration_mins, min: 20, max: 120, step: 5,
+      <%= f.range_field :sessions_per_week, value: @program.sessions_per_week, min: 1, max: 10, step: 1,
           class: "w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-lime-400",
-          data: { duration_slider_target: "input", action: "input->duration-slider#update" },
+          data: { program_form_target: "sessionsInput", action: "input->program-form#updateSessions" },
           required: true %>
       <div class="flex justify-between text-xs text-gray-600 mt-1.5">
-        <span>20 min</span><span>2 hrs</span>
+        <span>1×</span><span>10×</span>
       </div>
     </div>
 
-    <%# Session focus — dynamically matches sessions_per_week %>
+    <%# Hidden program-wide duration — the per-session sliders carry the real
+       values; this stays at the default so the Program model validates. %>
+    <%= f.hidden_field :duration_mins, value: @program.duration_mins %>
+
+    <%# Sessions — focus text + duration slider per session. Dynamically
+       matches sessions_per_week. %>
     <div class="mb-10">
-      <p class="text-sm font-bold text-gray-300 uppercase tracking-wide mb-1">Session Focus <span class="text-gray-600 normal-case font-normal">(optional)</span></p>
-      <p class="text-xs text-gray-500 mb-4">Give each weekly session a focus — e.g. "strength", "cardio", "upper body". Leave blank and the AI will auto-balance.</p>
-      <div class="space-y-2">
-        <% (1..7).each do |i| %>
-          <div class="flex items-center gap-3 <%= i > @program.sessions_per_week ? 'hidden' : '' %>"
-               data-program-form-target="sessionRow">
-            <span class="text-gray-600 text-xs font-black uppercase tracking-widest w-16 flex-shrink-0">Day <%= i %></span>
-            <%= text_field_tag "session_notes[]", nil,
-                placeholder: "e.g. strength, cardio, upper body…",
-                class: "flex-1 bg-zinc-800 border border-zinc-600 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-lime-400 transition-colors" %>
+      <p class="text-sm font-bold text-gray-300 uppercase tracking-wide mb-3">Sessions</p>
+      <div class="space-y-5">
+        <% (1..10).each do |i| %>
+          <div class="<%= i > @program.sessions_per_week ? 'hidden' : '' %> bg-zinc-900/40 border border-zinc-700/60 rounded-xl p-3"
+               data-program-form-target="sessionRow"
+               data-controller="duration-slider">
+            <div class="flex items-center gap-3 mb-2">
+              <span class="text-gray-600 text-xs font-black uppercase tracking-widest w-16 flex-shrink-0">Day <%= i %></span>
+              <%= text_field_tag "session_notes[]", nil,
+                  placeholder: "e.g. strength, cardio, upper body…",
+                  class: "flex-1 bg-zinc-800 border border-zinc-600 rounded-xl px-4 py-2.5 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-lime-400 transition-colors" %>
+            </div>
+            <div class="flex items-center gap-3 pl-19">
+              <span class="text-gray-600 text-[10px] font-bold uppercase tracking-wide w-16 flex-shrink-0">Duration</span>
+              <%= range_field_tag "session_durations[]", @program.duration_mins, min: 20, max: 120, step: 5,
+                  class: "flex-1 h-1.5 bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-lime-400",
+                  data: { duration_slider_target: "input", action: "input->duration-slider#update" } %>
+              <span class="text-gray-300 text-sm font-bold tabular-nums w-14 text-right">
+                <span data-duration-slider-target="display"><%= @program.duration_mins %></span>
+                <span class="text-gray-500 text-xs">min</span>
+              </span>
+            </div>
           </div>
         <% end %>
       </div>
-      <p class="text-xs text-gray-600 mt-3">Tip: write "cardio" to send a session through the cardio template; write "strength" to send it through the strength template. Add a low / medium / high keyword to set its intensity.</p>
     </div>
 
     <% if @program.errors.any? %>

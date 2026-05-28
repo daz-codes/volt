@@ -12,8 +12,8 @@ class Program < ApplicationRecord
 
   STATUSES     = %w[pending building complete failed].freeze
   validates :name,              presence: true
-  validates :weeks_count,       inclusion: { in: 2..16 }
-  validates :sessions_per_week, inclusion: { in: 1..7 }
+  validates :weeks_count,       inclusion: { in: 2..8 }
+  validates :sessions_per_week, inclusion: { in: 1..10 }
   validates :duration_mins,     numericality: { greater_than: 0 }
   validates :status,            inclusion: { in: STATUSES }
 
@@ -37,7 +37,7 @@ class Program < ApplicationRecord
   # intensity_style; blank entries fall back to the program's primary
   # activity with no intensity directive. The same shape repeats every week
   # — Week-2+ remix from Week-1's matching session.
-  def create_workout_placeholders(session_notes = [], custom_activity: nil)
+  def create_workout_placeholders(session_notes = [], custom_activity: nil, session_durations: [])
     activity_cache = {}
     primary_name   = activity&.name
     rows = []
@@ -56,6 +56,10 @@ class Program < ApplicationRecord
         notes = parsed[:notes]
         notes = [ custom_activity, notes ].compact_blank.join(" — ").presence if custom_activity
 
+        # Per-session duration override — nil means "use program's duration"
+        per_session_duration = session_durations[session - 1].to_i
+        per_session_duration = nil if per_session_duration <= 0 || per_session_duration == duration_mins
+
         rows << {
           program_id: id,
           week_number: week,
@@ -63,6 +67,7 @@ class Program < ApplicationRecord
           activity_id: activity_id,
           intensity_style: parsed[:intensity_style],
           session_notes: notes,
+          duration_mins: per_session_duration,
           status: "pending",
           created_at: Time.current, updated_at: Time.current
         }
@@ -117,14 +122,15 @@ class Program < ApplicationRecord
     pw.update!(status: "generating")
     broadcast_slot(pw)
 
+    duration = pw.effective_duration_mins
     workout = if source
       WorkoutLLMGenerator.call(
-        user: user, source_workout: source, duration_mins: duration_mins,
+        user: user, source_workout: source, duration_mins: duration,
         session_notes: pw.session_notes, intensity_style: pw.intensity_style
       )
     else
       WorkoutLLMGenerator.call(
-        user: user, activity: pw.effective_activity&.name, duration_mins: duration_mins,
+        user: user, activity: pw.effective_activity&.name, duration_mins: duration,
         session_notes: pw.session_notes, intensity_style: pw.intensity_style
       )
     end
