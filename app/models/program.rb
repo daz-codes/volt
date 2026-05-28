@@ -1,7 +1,7 @@
 class Program < ApplicationRecord
   include Program::Broadcasting
   include Program::WorkoutBuilder
-  include Program::HyroxWeeklyShape
+  include Program::WeeklyShape
   include Program::SessionFocus
 
   belongs_to :user

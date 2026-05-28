@@ -1,12 +1,13 @@
 <% content_for :title, "Build a Training Program" %>
 
-<%# Per-session prefill labels for Hyrox plans, keyed by sessions_per_week.
-   Stimulus reads these on activity/sessions change to pre-populate the
-   session focus inputs. %>
-<% hyrox_labels = (1..7).index_with { |n| Program.hyrox_weekly_labels(n) } %>
+<%# Per-session prefill labels for race-family plans (Hyrox + Deka variants),
+   keyed by activity name and sessions_per_week. Stimulus reads these on
+   activity/sessions change to pre-populate the session focus inputs. %>
+<% prefill_labels = Program::WeeklyShape::PLAN_ACTIVITIES.index_with do |activity|
+     (1..7).index_with { |n| Program.weekly_labels(activity, n) }
+   end %>
 <div class="max-w-2xl mx-auto px-4 pb-12" data-controller="program-form"
-     data-program-form-hyrox-labels-value="<%= hyrox_labels.to_json %>"
-     data-program-form-prefill-activity-value="Hyrox">
+     data-program-form-prefill-labels-value="<%= prefill_labels.to_json %>">
   <div class="flex items-center justify-between mb-8">
     <div>
       <p class="text-lime-400 text-xs font-black uppercase tracking-widest mb-1">Programs</p>
@@ -179,7 +180,7 @@
           </div>
         <% end %>
       </div>
-      <p class="text-xs text-gray-600 mt-3">Tip: write "cardio" or "engine room" to send a session through the Engine Room cardio template; write "strength" or "transformer" to send it through the Transformer strength template. Add a low / medium / high keyword to set its intensity.</p>
+      <p class="text-xs text-gray-600 mt-3">Tip: write "cardio" to send a session through the cardio template; write "strength" to send it through the strength template. Add a low / medium / high keyword to set its intensity.</p>
     </div>
 
     <% if @program.errors.any? %>

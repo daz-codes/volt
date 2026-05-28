@@ -10,8 +10,10 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   static targets = ["weeksDisplay", "weeksInput", "sessionRow", "pill", "customInput"]
   static values = {
-    hyroxLabels: Object,        // { "1": ["Medium Hyrox"], "2": [...], ... }
-    prefillActivity: String     // activity name to pre-fill against ("Hyrox")
+    // Race-family prefill labels — { "Hyrox": { "1": ["..."], "2": [...] },
+    // "Deka Fit": { ... }, "Deka Atlas": { ... }, ... }. Stimulus looks up
+    // labels by the currently-selected activity name.
+    prefillLabels: Object
   }
 
   connect() {
@@ -62,16 +64,17 @@ export default class extends Controller {
   // ---- prefill ----
 
   applyPrefill() {
-    if (!this.hasHyroxLabelsValue || !this.hasPrefillActivityValue) return
+    if (!this.hasPrefillLabelsValue) return
 
-    const matches = this.#selectedActivityName().toLowerCase() === this.prefillActivityValue.toLowerCase()
-    if (!matches) {
+    const activity = this.#selectedActivityName()
+    const activityLabels = this.prefillLabelsValue[activity]
+    if (!activityLabels) {
       this.#clearPrefilledFields()
       return
     }
 
     const count = this.#selectedSessionCount()
-    const labels = this.hyroxLabelsValue[String(count)] || []
+    const labels = activityLabels[String(count)] || []
     this.sessionRowTargets.forEach((row, i) => {
       if (i >= count) return
       const input = row.querySelector("input")
