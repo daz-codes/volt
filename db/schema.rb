@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.2].define(version: 2026_05_04_085359) do
+ActiveRecord::Schema[8.2].define(version: 2026_05_28_100000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -191,7 +191,9 @@ ActiveRecord::Schema[8.2].define(version: 2026_05_04_085359) do
   end
 
   create_table "program_workouts", force: :cascade do |t|
+    t.integer "activity_id"
     t.datetime "created_at", null: false
+    t.string "intensity_style"
     t.integer "program_id", null: false
     t.text "session_notes"
     t.integer "session_number", null: false
@@ -199,6 +201,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_05_04_085359) do
     t.datetime "updated_at", null: false
     t.integer "week_number", null: false
     t.integer "workout_id"
+    t.index ["activity_id"], name: "index_program_workouts_on_activity_id"
     t.index ["program_id", "week_number", "session_number"], name: "index_program_workouts_on_program_week_session", unique: true
     t.index ["program_id"], name: "index_program_workouts_on_program_id"
     t.index ["workout_id"], name: "index_program_workouts_on_workout_id"
@@ -358,6 +361,7 @@ ActiveRecord::Schema[8.2].define(version: 2026_05_04_085359) do
   add_foreign_key "notifications", "users", column: "recipient_id"
   add_foreign_key "personal_records", "users"
   add_foreign_key "personal_records", "workout_logs"
+  add_foreign_key "program_workouts", "activities"
   add_foreign_key "program_workouts", "programs"
   add_foreign_key "program_workouts", "workouts"
   add_foreign_key "programs", "activities"

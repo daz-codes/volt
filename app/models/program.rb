@@ -1,6 +1,7 @@
 class Program < ApplicationRecord
   include Program::Broadcasting
   include Program::WorkoutBuilder
+  include Program::HyroxWeeklyShape
 
   belongs_to :user
   belongs_to :activity, optional: true
@@ -11,9 +12,16 @@ class Program < ApplicationRecord
   STATUSES     = %w[pending building complete failed].freeze
   validates :name,              presence: true
   validates :weeks_count,       inclusion: { in: 2..16 }
-  validates :sessions_per_week, inclusion: { in: 2..5 }
+  validates :sessions_per_week, inclusion: { in: 1..7 }
   validates :duration_mins,     numericality: { greater_than: 0 }
   validates :status,            inclusion: { in: STATUSES }
+
+  # True when the program's primary activity is one whose weekly shape we
+  # prescribe explicitly (rather than rotating the generic SESSION_FOCUSES).
+  # Currently only Hyrox; other activities fall back to the legacy shape.
+  def hyrox_weekly_plan?
+    activity&.name.to_s.casecmp("Hyrox").zero?
+  end
 
   SESSION_FOCUSES = [
     "strength and power focus — heavy compound movements, lower rep ranges",
@@ -36,6 +44,8 @@ class Program < ApplicationRecord
   end
 
   def create_workout_placeholders(session_notes = [], custom_activity: nil)
+    return create_hyrox_weekly_placeholders if hyrox_weekly_plan?
+
     rows = []
     (1..weeks_count).each do |week|
       (1..sessions_per_week).each do |session|
@@ -45,6 +55,32 @@ class Program < ApplicationRecord
         rows << {
           program_id: id, week_number: week, session_number: session,
           session_notes: notes, status: "pending",
+          created_at: Time.current, updated_at: Time.current
+        }
+      end
+    end
+    ProgramWorkout.insert_all!(rows)
+  end
+
+  # Hyrox plans use the prescribed weekly shape (Program::HyroxWeeklyShape):
+  # each session gets a specific activity (Hyrox / Engine Room / Transformer)
+  # and intensity (low / medium / high) per the shape table. The same shape
+  # repeats every week — Week-2+ remix from Week-1's matching session.
+  def create_hyrox_weekly_placeholders
+    shape = self.class.hyrox_weekly_shape(sessions_per_week)
+    activity_lookup = shape.map { |s| s[:activity] }.uniq.index_with { |name| Activity.find_or_create_by!(name: name) }
+
+    rows = []
+    (1..weeks_count).each do |week|
+      shape.each_with_index do |slot, idx|
+        rows << {
+          program_id: id,
+          week_number: week,
+          session_number: idx + 1,
+          activity_id: activity_lookup[slot[:activity]].id,
+          intensity_style: slot[:intensity_style],
+          session_notes: slot[:notes],
+          status: "pending",
           created_at: Time.current, updated_at: Time.current
         }
       end
@@ -99,11 +135,15 @@ class Program < ApplicationRecord
     broadcast_slot(pw)
 
     workout = if source
-      WorkoutLLMGenerator.call(user: user, source_workout: source, duration_mins: duration_mins,
-                               session_notes: pw.session_notes)
+      WorkoutLLMGenerator.call(
+        user: user, source_workout: source, duration_mins: duration_mins,
+        session_notes: pw.session_notes, intensity_style: pw.intensity_style
+      )
     else
-      WorkoutLLMGenerator.call(user: user, activity: activity&.name, duration_mins: duration_mins,
-                               session_notes: pw.session_notes)
+      WorkoutLLMGenerator.call(
+        user: user, activity: pw.effective_activity&.name, duration_mins: duration_mins,
+        session_notes: pw.session_notes, intensity_style: pw.intensity_style
+      )
     end
 
     pw.update!(workout: workout, status: "complete")

@@ -107,7 +107,7 @@
     <div class="mb-8">
       <p class="text-sm font-bold text-gray-300 uppercase tracking-wide mb-4">Sessions per Week</p>
       <div class="flex gap-2 flex-wrap">
-        <% (2..5).each do |n| %>
+        <% (1..7).each do |n| %>
           <label class="cursor-pointer">
             <%= f.radio_button :sessions_per_week, n, class: "peer sr-only",
                 checked: @program.sessions_per_week == n,
@@ -144,7 +144,7 @@
       <p class="text-sm font-bold text-gray-300 uppercase tracking-wide mb-1">Session Focus <span class="text-gray-600 normal-case font-normal">(optional)</span></p>
       <p class="text-xs text-gray-500 mb-4">Give each weekly session a focus — e.g. "strength", "cardio", "upper body". Leave blank and the AI will auto-balance.</p>
       <div class="space-y-2">
-        <% (1..5).each do |i| %>
+        <% (1..7).each do |i| %>
           <div class="flex items-center gap-3 <%= i > @program.sessions_per_week ? 'hidden' : '' %>"
                data-program-form-target="sessionRow">
             <span class="text-gray-600 text-xs font-black uppercase tracking-widest w-16 flex-shrink-0">Day <%= i %></span>
@@ -154,6 +154,7 @@
           </div>
         <% end %>
       </div>
+      <p class="text-xs text-gray-600 mt-3">For Hyrox programs the weekly shape is prescribed automatically (low/medium/high mix across Hyrox, Engine Room, and Transformer) — these notes are ignored.</p>
     </div>
 
     <% if @program.errors.any? %>

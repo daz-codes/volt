@@ -3,17 +3,26 @@
 
 <div id="<%= pw.turbo_dom_id %>">
   <% if pw.pending? || pw.generating? %>
-    <div class="bg-zinc-800 border border-zinc-700 rounded-2xl p-4 min-h-[100px] flex items-center justify-center gap-3">
-      <p class="text-gray-600 text-[10px] font-black uppercase tracking-widest">Session <%= pw.session_number %></p>
-      <% if pw.generating? %>
-        <svg class="animate-spin w-4 h-4 text-lime-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-        </svg>
-        <span class="text-xs text-lime-400 font-medium">Generating…</span>
-      <% else %>
-        <div class="w-4 h-4 rounded-full bg-zinc-700 animate-pulse"></div>
-        <span class="text-xs text-gray-600">Queued</span>
+    <div class="bg-zinc-800 border border-zinc-700 rounded-2xl p-4 min-h-[100px] flex flex-col items-center justify-center gap-2">
+      <div class="flex items-center justify-center gap-3">
+        <p class="text-gray-600 text-[10px] font-black uppercase tracking-widest">Session <%= pw.session_number %></p>
+        <% if pw.generating? %>
+          <svg class="animate-spin w-4 h-4 text-lime-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+          </svg>
+          <span class="text-xs text-lime-400 font-medium">Generating…</span>
+        <% else %>
+          <div class="w-4 h-4 rounded-full bg-zinc-700 animate-pulse"></div>
+          <span class="text-xs text-gray-600">Queued</span>
+        <% end %>
+      </div>
+      <% planned = pw.activity&.name %>
+      <% if planned.present? || pw.intensity_style.present? %>
+        <div class="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wide">
+          <% if planned.present? %><span class="text-lime-400"><%= planned %></span><% end %>
+          <% if pw.intensity_style.present? %><span class="text-gray-500">· <%= pw.intensity_style %></span><% end %>
+        </div>
       <% end %>
     </div>
 
