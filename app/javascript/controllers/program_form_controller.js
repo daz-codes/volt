@@ -84,8 +84,16 @@ export default class extends Controller {
   applyPrefill() {
     if (!this.hasPrefillLabelsValue) return
 
-    const activity = this.#selectedActivityName()
-    const activityLabels = this.prefillLabelsValue[activity]
+    const typed = this.#selectedActivityName()
+    if (!typed) {
+      this.#clearPrefilledFields()
+      return
+    }
+    // Case-insensitive lookup — "DEKA Atlas" matches "Deka Atlas".
+    const normalized = typed.trim().toLowerCase()
+    const matchedKey = Object.keys(this.prefillLabelsValue)
+      .find(key => key.toLowerCase() === normalized)
+    const activityLabels = matchedKey ? this.prefillLabelsValue[matchedKey] : null
     if (!activityLabels) {
       this.#clearPrefilledFields()
       return
