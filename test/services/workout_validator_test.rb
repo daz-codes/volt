@@ -1130,6 +1130,108 @@ class WorkoutValidatorTest < ActiveSupport::TestCase
     assert_equal 20, section["duration_mins"]
   end
 
+  # -- fix_orphan_bookend --
+
+  test "fix_orphan_bookend synthesizes a Cash Out when Buy In has no pair" do
+    data = build_workout_with_sections([
+      { "name" => "Buy In", "category" => "main", "format" => "for_time",
+        "exercises" => [{ "name" => "Run", "distance_m" => 500, "notes" => "set the tone, don't sandbag", "equipment" => "treadmill" }] },
+      { "name" => "Engine Room", "category" => "main", "format" => "rounds", "rounds" => 4, "rest_secs" => 60,
+        "exercises" => [{ "name" => "Wall Balls", "reps" => 20, "equipment" => "wall_ball" }] },
+      { "name" => "Cool-Down", "category" => "cool_down", "format" => "straight", "duration_mins" => 5,
+        "exercises" => [{ "name" => "Static stretches", "notes" => "10 deep breaths" }] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 60, main_tag_slug: "hyrox").validate_and_fix
+    names = result.dig("structure", "sections").map { |s| s["name"] }
+    assert_includes names, "Cash Out", "Cash Out must be synthesized"
+    # Cash Out is BEFORE the cool-down
+    cool_idx = names.index("Cool-Down")
+    cash_idx = names.index("Cash Out")
+    assert cash_idx < cool_idx, "Cash Out must come before the cool-down"
+  end
+
+  test "fix_orphan_bookend leaves matched bookends alone" do
+    data = build_workout_with_sections([
+      { "name" => "Buy In", "category" => "main", "format" => "for_time",
+        "exercises" => [{ "name" => "Row", "distance_m" => 1000, "equipment" => "rowing_machine" }] },
+      { "name" => "Engine Room", "category" => "main", "format" => "rounds", "rounds" => 4,
+        "exercises" => [{ "name" => "Wall Balls", "reps" => 20, "equipment" => "wall_ball" }] },
+      { "name" => "Cash Out", "category" => "main", "format" => "for_time",
+        "exercises" => [{ "name" => "SkiErg", "distance_m" => 1000, "equipment" => "ski_erg" }] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 60, main_tag_slug: "hyrox").validate_and_fix
+    cash_outs = result.dig("structure", "sections").count { |s| s["name"].match?(/cash.?out/i) }
+    assert_equal 1, cash_outs, "must not synthesize a second Cash Out when one already exists"
+  end
+
+  # -- fix_emom_period_cue --
+
+  test "fix_emom_period_cue strips 1-min-max cue from E2MOM exercises and sets explicit reps" do
+    data = build_workout_with_sections([
+      { "name" => "Station Stack", "category" => "main", "format" => "emom",
+        "duration_mins" => 20, "period_mins" => 2, "alternating" => true,
+        "exercises" => [
+          { "name" => "RAM Reverse Lunges", "notes" => "~50% of your 1-min max (leaves ~20s rest)", "equipment" => "bodyweight" },
+          { "name" => "Box Jump",            "notes" => "~50% of your 1-min max (leaves ~20s rest)", "equipment" => "bodyweight" }
+        ] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 60, main_tag_slug: "deka-fit").validate_and_fix
+    section = result.dig("structure", "sections").first
+    section["exercises"].each do |ex|
+      refute_match(/1.?min\s*max/i, ex["notes"].to_s, "1-min-max cue must be stripped at period_mins > 1")
+      assert ex["reps"].to_i.positive?, "explicit reps must be set when the cue is stripped"
+    end
+  end
+
+  test "fix_emom_period_cue leaves period:1 EMOMs alone" do
+    data = build_workout_with_sections([
+      { "name" => "Box Cycle", "category" => "main", "format" => "emom",
+        "duration_mins" => 16, "alternating" => true,
+        "exercises" => [
+          { "name" => "Box Jump",           "notes" => "~50% of your 1-min max (leaves ~20s rest)", "equipment" => "bodyweight" },
+          { "name" => "RAM Reverse Lunges", "notes" => "~50% of your 1-min max (leaves ~20s rest)", "equipment" => "bodyweight" }
+        ] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 60, main_tag_slug: "hyrox").validate_and_fix
+    section = result.dig("structure", "sections").first
+    section["exercises"].each do |ex|
+      assert_match(/1.?min\s*max/i, ex["notes"].to_s, "1-min-max cue is valid at period_mins=1 (default)")
+    end
+  end
+
+  # -- fix_cooldown_single_exercise --
+
+  test "fix_cooldown_single_exercise collapses multi-exercise cool-down to one summary line" do
+    data = build_workout_with_sections([
+      { "name" => "Cool-Down", "category" => "cool_down", "format" => "straight", "duration_mins" => 5,
+        "exercises" => [
+          { "name" => "Pigeon",        "notes" => "10 deep breaths each side" },
+          { "name" => "Spinal Twist",  "notes" => "10 deep breaths each side" },
+          { "name" => "Forward Fold",  "notes" => "10 deep breaths" },
+          { "name" => "Chest Opener",  "notes" => "10 deep breaths" }
+        ] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 60, main_tag_slug: "hyrox").validate_and_fix
+    cooldown = result.dig("structure", "sections").last
+    assert_equal 1, cooldown["exercises"].size, "multi-exercise cool-down must collapse to a single row"
+    notes = cooldown["exercises"].first["notes"]
+    %w[Pigeon Spinal Forward Chest].each { |pose| assert_match(/#{pose}/i, notes, "#{pose} should be named in the summary notes") }
+    assert_match(/deep breaths/i, notes)
+  end
+
+  test "fix_cooldown_single_exercise leaves a single-exercise cool-down alone" do
+    data = build_workout_with_sections([
+      { "name" => "Cool-Down", "category" => "cool_down", "format" => "straight", "duration_mins" => 5,
+        "exercises" => [
+          { "name" => "Static stretches", "notes" => "10 deep breaths each. Pigeon, forward fold." }
+        ] }
+    ])
+    result = WorkoutValidator.new(data, duration_mins: 60, main_tag_slug: "hyrox").validate_and_fix
+    cooldown = result.dig("structure", "sections").last
+    assert_equal 1, cooldown["exercises"].size
+    assert_equal "Static stretches", cooldown["exercises"].first["name"]
+  end
+
   # -- check_cooldown inline-duration stripping --
 
   test "check_cooldown strips parenthetical durations from notes" do

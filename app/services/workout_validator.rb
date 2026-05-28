@@ -141,6 +141,9 @@ class WorkoutValidator
     end
 
     fix_low_intensity_shapes(sections)
+    fix_orphan_bookend(sections)
+    fix_emom_period_cue(sections)
+    fix_cooldown_single_exercise(sections)
     fix_goal_durations(sections)
 
     @data
@@ -231,6 +234,85 @@ class WorkoutValidator
     snapped = 5 if snapped < 5
     section["duration_mins"] = snapped
     @fixes << "Low-intensity '#{section["name"]}': duration_mins #{dur} → #{snapped} (cardio blocks must be a multiple of 5)"
+  end
+
+  # Bookends MUST come as a pair (Buy In + Cash Out). When the LLM gives us
+  # an orphan Buy In with no Cash Out, mirror the Buy In as a matched Cash
+  # Out at the end. (User preference: push the LLM toward bookends, don't
+  # rename orphans away.) The mirrored cash-out is the safest synthesis —
+  # same exercise, same metric — and produces a valid "same-movement
+  # bookends" pattern that gives the athlete a pre/post benchmark.
+  BUY_IN_PATTERN   = /\A\s*buy\W?in\b/i.freeze
+  CASH_OUT_PATTERN = /\A\s*cash\W?out\b/i.freeze
+
+  def fix_orphan_bookend(sections)
+    buy_in_idx = sections.find_index { |s| s["name"].to_s.match?(BUY_IN_PATTERN) }
+    return unless buy_in_idx
+    return if sections.any? { |s| s["name"].to_s.match?(CASH_OUT_PATTERN) }
+
+    buy_in = sections[buy_in_idx]
+    cash_out = deep_dup_section(buy_in)
+    cash_out["name"] = "Cash Out"
+    # Refresh notes so it doesn't say "set the tone, don't sandbag" (a Buy In
+    # cue). The athlete's job at the Cash Out is to finish, not pace.
+    Array(cash_out["exercises"]).each do |ex|
+      next if ex["notes"].blank?
+      ex["notes"] = "everything left in the tank — race the clock home"
+    end
+
+    cooldown_idx = sections.rindex { |s| s["category"] == "cool_down" }
+    insert_at = cooldown_idx || sections.size
+    sections.insert(insert_at, cash_out)
+    @fixes << "Synthesized matched 'Cash Out' to pair with the Buy In (bookends must be atomic)"
+  end
+
+  def deep_dup_section(section)
+    Marshal.load(Marshal.dump(section))
+  end
+
+  # The "~50% of your 1-min max (leaves ~20s rest)" cue is built around a
+  # 1-minute work block. In an EMOM with period_mins > 1 (an E2MOM or
+  # E3MOM), each work block is 2+ minutes — the cue contradicts the period
+  # and doesn't tell the athlete how much volume to do. Strip the cue and
+  # set explicit reps so the prescription is unambiguous.
+  EMOM_1MIN_MAX_CUE = /~\s*50\s*%[^.]*?1.?min\s*max[^.]*?\.?/i.freeze
+  DEFAULT_E2MOM_REPS = 15
+
+  def fix_emom_period_cue(sections)
+    sections.each do |section|
+      next unless section["format"] == "emom"
+      period = section["period_mins"].to_i
+      next unless period > 1
+
+      Array(section["exercises"]).each do |ex|
+        notes = ex["notes"].to_s
+        next unless notes.match?(EMOM_1MIN_MAX_CUE)
+        cleaned = notes.gsub(EMOM_1MIN_MAX_CUE, "").strip
+        ex["notes"] = cleaned.presence
+        ex["reps"] ||= DEFAULT_E2MOM_REPS unless ex["distance_m"] || ex["calories"] || ex["duration_s"]
+        @fixes << "E#{period}MOM '#{section["name"]}' / '#{ex["name"]}': stripped 1-min-max cue (only valid for period_mins=1); set reps to #{ex["reps"]} for the longer work block"
+      end
+    end
+  end
+
+  # Cool-down should be a SINGLE summary exercise — "Static stretches" or
+  # similar — with the pose names in the notes line. When the LLM gives us
+  # multi-exercise cool-downs (Pigeon, Spinal Twist, Forward Fold, ...
+  # each as their own exercise row) collapse to one row.
+  def fix_cooldown_single_exercise(sections)
+    last = sections.last
+    return unless last && last["category"] == "cool_down"
+    exercises = Array(last["exercises"])
+    return if exercises.size <= 1
+
+    pose_names = exercises.map { |ex| ex["name"].to_s.strip }.compact_blank
+    breaths_phrase = @duration_mins <= 30 ? "5 deep breaths" : "10 deep breaths"
+    summary_note = "#{breaths_phrase} each. #{pose_names.join(', ')} — breath-led, settle into each pose."
+
+    last["exercises"] = [
+      { "name" => "Static stretches", "notes" => summary_note }
+    ]
+    @fixes << "Cool-down: collapsed #{exercises.size} separate pose exercises into a single 'Static stretches' summary"
   end
 
   # True when the section is a cardio block — a section whose principal
