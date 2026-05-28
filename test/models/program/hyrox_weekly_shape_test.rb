@@ -28,26 +28,43 @@ class Program::HyroxWeeklyShapeTest < ActiveSupport::TestCase
     assert_equal [ "low",   "high",        "low",         "medium" ], shape.map { |s| s[:intensity_style] }
   end
 
-  test "5 sessions → low cardio + low Hyrox × 2 + high strength + high Hyrox" do
+  test "5 sessions composition: 2 low Hyrox + 1 low cardio + 1 high strength + 1 high Hyrox" do
     shape = Program.hyrox_weekly_shape(5)
-    assert_equal [ "Engine Room", "Hyrox", "Hyrox", "Transformer", "Hyrox" ], shape.map { |s| s[:activity] }
-    assert_equal [ "low",         "low",   "low",   "high",        "high" ],  shape.map { |s| s[:intensity_style] }
+    breakdown = shape.map { |s| [ s[:activity], s[:intensity_style] ] }.tally
+    assert_equal({
+      [ "Hyrox",       "low"  ] => 2,
+      [ "Engine Room", "low"  ] => 1,
+      [ "Transformer", "high" ] => 1,
+      [ "Hyrox",       "high" ] => 1
+    }, breakdown)
   end
 
-  test "6 sessions → 5-session plan + an extra low cardio" do
-    shape = Program.hyrox_weekly_shape(6)
-    five  = Program.hyrox_weekly_shape(5)
-    assert_equal five, shape.first(5)
-    assert_equal "Engine Room", shape.last[:activity]
-    assert_equal "low",         shape.last[:intensity_style]
+  test "6 sessions = 5-session composition + 1 extra low cardio" do
+    five = Program.hyrox_weekly_shape(5).map { |s| [ s[:activity], s[:intensity_style] ] }.tally
+    six  = Program.hyrox_weekly_shape(6).map { |s| [ s[:activity], s[:intensity_style] ] }.tally
+    diff = six.merge(five) { |_, b, a| b - a }
+    assert_equal({ [ "Engine Room", "low" ] => 1 }, diff.reject { |_, v| v.zero? })
   end
 
-  test "7 sessions → 6-session plan + a medium-intensity strength session" do
-    shape = Program.hyrox_weekly_shape(7)
-    six   = Program.hyrox_weekly_shape(6)
-    assert_equal six, shape.first(6)
-    assert_equal "Transformer", shape.last[:activity]
-    assert_equal "medium",      shape.last[:intensity_style]
+  test "7 sessions = 6-session composition + 1 medium strength" do
+    six   = Program.hyrox_weekly_shape(6).map { |s| [ s[:activity], s[:intensity_style] ] }.tally
+    seven = Program.hyrox_weekly_shape(7).map { |s| [ s[:activity], s[:intensity_style] ] }.tally
+    diff = seven.merge(six) { |_, b, a| b - a }
+    assert_equal({ [ "Transformer", "medium" ] => 1 }, diff.reject { |_, v| v.zero? })
+  end
+
+  # -- recovery rule: every high session is followed by ≥1 low later in the week --
+
+  test "every high-intensity session is followed by at least one low-intensity session" do
+    (1..9).each do |n|
+      shape = Program.hyrox_weekly_shape(n)
+      shape.each_with_index do |slot, i|
+        next unless slot[:intensity_style] == "high"
+        rest = shape[(i + 1)..]
+        assert rest.any? { |s| s[:intensity_style] == "low" },
+               "n=#{n}: high-intensity session at slot #{i + 1} has no low session after it (rest: #{rest.map { |s| s[:intensity_style] }.inspect})"
+      end
+    end
   end
 
   test "8+ sessions → 7-session plan + extra low Hyrox sessions for each additional" do
@@ -86,7 +103,7 @@ class Program::HyroxWeeklyShapeTest < ActiveSupport::TestCase
 
   # -- integration with Program#create_workout_placeholders --
 
-  test "Hyrox program routes through hyrox shape and stamps per-session activity + intensity" do
+  test "Hyrox program: form-prefilled labels parse into per-session activity + intensity" do
     user = users(:one)
     hyrox = Activity.find_or_create_by!(name: "Hyrox")
     Activity.find_or_create_by!(name: "Engine Room")
@@ -96,29 +113,53 @@ class Program::HyroxWeeklyShapeTest < ActiveSupport::TestCase
       user: user, name: "4-Week Hyrox Program", activity: hyrox,
       weeks_count: 2, sessions_per_week: 4, duration_mins: 45, status: "pending"
     )
-    program.create_workout_placeholders
+    # Simulate the form's Stimulus prefill: pass the canonical Hyrox labels
+    # back in as session_notes. The parser maps them to per-session overrides.
+    program.create_workout_placeholders(Program.hyrox_weekly_labels(4))
 
     pws = program.program_workouts.where(week_number: 1).order(:session_number).to_a
     assert_equal 4, pws.size
-    assert_equal [ "Hyrox", "Transformer", "Engine Room", "Hyrox" ], pws.map { |pw| pw.activity.name }
-    assert_equal [ "low",   "high",        "low",         "medium" ], pws.map(&:intensity_style)
-    # Same shape repeats every week
+    # "Low Hyrox" → Hyrox + low (parser keyword "low"; no activity override since no cardio/strength keyword)
+    # "High strength (Transformer)" → Transformer + high
+    # "Low cardio (Engine Room)" → Engine Room + low
+    # "Medium Hyrox" → Hyrox + medium
+    assert_equal [ nil,           "Transformer", "Engine Room", nil ],     pws.map { |pw| pw.activity&.name }
+    assert_equal [ "low",         "high",        "low",         "medium" ], pws.map(&:intensity_style)
+    # Same notes repeat every week
     week2 = program.program_workouts.where(week_number: 2).order(:session_number).to_a
-    assert_equal pws.map { |pw| pw.activity.name }, week2.map { |pw| pw.activity.name }
+    assert_equal pws.map(&:session_notes), week2.map(&:session_notes)
   end
 
-  test "non-Hyrox program falls back to legacy SESSION_FOCUSES (no per-session activity stamp)" do
+  test "non-Hyrox program with blank session_notes: no overrides, no intensity, no notes" do
     user = users(:one)
     kettlebell = Activity.find_or_create_by!(name: "Kettlebell")
     program = Program.create!(
       user: user, name: "2-Week KB Program", activity: kettlebell,
       weeks_count: 2, sessions_per_week: 3, duration_mins: 30, status: "pending"
     )
-    program.create_workout_placeholders
+    program.create_workout_placeholders  # no session_notes passed
 
     pws = program.program_workouts.where(week_number: 1).order(:session_number).to_a
-    assert pws.all? { |pw| pw.activity.nil? },         "no per-session activity overrides for non-Hyrox programs"
-    assert pws.all? { |pw| pw.intensity_style.nil? },  "no per-session intensity overrides for non-Hyrox programs"
-    assert pws.all? { |pw| pw.session_notes.present? }, "session_notes still come from SESSION_FOCUSES rotation"
+    assert pws.all? { |pw| pw.activity.nil? },        "blank focus → no per-session activity override (program activity is used)"
+    assert pws.all? { |pw| pw.intensity_style.nil? }, "blank focus → no intensity directive"
+    assert pws.all? { |pw| pw.session_notes.nil? },   "blank focus → no notes"
+  end
+
+  test "free-text 'cardio only' on a Hyrox program parses to Engine Room override" do
+    user = users(:one)
+    Activity.find_or_create_by!(name: "Engine Room")
+    hyrox = Activity.find_or_create_by!(name: "Hyrox")
+    program = Program.create!(
+      user: user, name: "Custom Hyrox", activity: hyrox,
+      weeks_count: 2, sessions_per_week: 2, duration_mins: 60, status: "pending"
+    )
+    # User overrides slot 1 with "cardio only" and leaves slot 2 blank
+    program.create_workout_placeholders([ "low cardio only", "" ])
+
+    pws = program.program_workouts.where(week_number: 1).order(:session_number).to_a
+    assert_equal "Engine Room", pws[0].activity&.name, "cardio keyword → Engine Room override"
+    assert_equal "low",         pws[0].intensity_style
+    assert_nil pws[1].activity,                        "blank slot → no override (program's Hyrox primary used)"
+    assert_nil pws[1].intensity_style
   end
 end

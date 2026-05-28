@@ -1,12 +1,22 @@
 import { Controller } from "@hotwired/stimulus"
 
-// Keeps session focus fields in sync with the selected sessions-per-week count.
-// Also drives the weeks-count slider display.
+// Drives the new-program form:
+//  * Reveals exactly N session-focus inputs based on the sessions-per-week pick
+//  * Keeps the weeks-count slider readout in sync
+//  * Pre-fills the session-focus inputs with the prescribed Hyrox weekly-shape
+//    labels when Hyrox is the selected activity (and only for inputs the user
+//    hasn't manually edited)
+//  * Clears prefilled values when the user moves off Hyrox
 export default class extends Controller {
   static targets = ["weeksDisplay", "weeksInput", "sessionRow", "pill", "customInput"]
+  static values = {
+    hyroxLabels: Object,        // { "1": ["Medium Hyrox"], "2": [...], ... }
+    prefillActivity: String     // activity name to pre-fill against ("Hyrox")
+  }
 
   connect() {
     this.updateSessions()
+    this.applyPrefill()
   }
 
   updateWeeks() {
@@ -16,16 +26,19 @@ export default class extends Controller {
   }
 
   updateSessions() {
-    const selected = this.element.querySelector("input[name='program[sessions_per_week]']:checked")
-    const count = selected ? parseInt(selected.value) : 3
+    const count = this.#selectedSessionCount()
 
     this.sessionRowTargets.forEach((row, i) => {
       row.classList.toggle("hidden", i >= count)
       if (i >= count) {
         const input = row.querySelector("input")
-        if (input) input.value = ""
+        if (input) {
+          input.value = ""
+          delete input.dataset.prefilled
+        }
       }
     })
+    this.applyPrefill()
   }
 
   pillSelected() {
@@ -33,6 +46,7 @@ export default class extends Controller {
       this.customInputTarget.value = ""
       this.#toggleCustomBorder(false)
     }
+    this.applyPrefill()
   }
 
   customTyped() {
@@ -42,6 +56,54 @@ export default class extends Controller {
       this.pillTargets.forEach(radio => radio.checked = false)
     }
     this.#toggleCustomBorder(hasText)
+    this.applyPrefill()
+  }
+
+  // ---- prefill ----
+
+  applyPrefill() {
+    if (!this.hasHyroxLabelsValue || !this.hasPrefillActivityValue) return
+
+    const matches = this.#selectedActivityName().toLowerCase() === this.prefillActivityValue.toLowerCase()
+    if (!matches) {
+      this.#clearPrefilledFields()
+      return
+    }
+
+    const count = this.#selectedSessionCount()
+    const labels = this.hyroxLabelsValue[String(count)] || []
+    this.sessionRowTargets.forEach((row, i) => {
+      if (i >= count) return
+      const input = row.querySelector("input")
+      if (!input) return
+      // Only fill fields that are empty or that we previously prefilled.
+      if (input.value === "" || input.dataset.prefilled === "true") {
+        input.value = labels[i] || ""
+        input.dataset.prefilled = "true"
+      }
+    })
+  }
+
+  #clearPrefilledFields() {
+    this.sessionRowTargets.forEach(row => {
+      const input = row.querySelector("input")
+      if (input && input.dataset.prefilled === "true") {
+        input.value = ""
+        delete input.dataset.prefilled
+      }
+    })
+  }
+
+  #selectedActivityName() {
+    const customValue = this.hasCustomInputTarget ? this.customInputTarget.value.trim() : ""
+    if (customValue) return customValue
+    const selected = this.pillTargets.find(p => p.checked)
+    return selected ? selected.value : ""
+  }
+
+  #selectedSessionCount() {
+    const selected = this.element.querySelector("input[name='program[sessions_per_week]']:checked")
+    return selected ? parseInt(selected.value) : 3
   }
 
   #toggleCustomBorder(active) {

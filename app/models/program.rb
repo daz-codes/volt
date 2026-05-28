@@ -2,6 +2,7 @@ class Program < ApplicationRecord
   include Program::Broadcasting
   include Program::WorkoutBuilder
   include Program::HyroxWeeklyShape
+  include Program::SessionFocus
 
   belongs_to :user
   belongs_to :activity, optional: true
@@ -15,19 +16,6 @@ class Program < ApplicationRecord
   validates :sessions_per_week, inclusion: { in: 1..7 }
   validates :duration_mins,     numericality: { greater_than: 0 }
   validates :status,            inclusion: { in: STATUSES }
-
-  # True when the program's primary activity is one whose weekly shape we
-  # prescribe explicitly (rather than rotating the generic SESSION_FOCUSES).
-  # Currently only Hyrox; other activities fall back to the legacy shape.
-  def hyrox_weekly_plan?
-    activity&.name.to_s.casecmp("Hyrox").zero?
-  end
-
-  SESSION_FOCUSES = [
-    "strength and power focus — heavy compound movements, lower rep ranges",
-    "cardio engine and endurance focus — sustained effort, machine work, conditioning",
-    "mixed modal and full body — variety of formats, balanced across all qualities"
-  ].freeze
 
   before_destroy :cleanup_workouts, prepend: true
 
@@ -43,43 +31,38 @@ class Program < ApplicationRecord
                     .group_by(&:week_number)
   end
 
+  # Build the per-session prescriptions from the session focus text supplied
+  # by the user (possibly pre-filled in the form). Each text entry is parsed
+  # via Program::SessionFocus: keywords drive the activity override and
+  # intensity_style; blank entries fall back to the program's primary
+  # activity with no intensity directive. The same shape repeats every week
+  # — Week-2+ remix from Week-1's matching session.
   def create_workout_placeholders(session_notes = [], custom_activity: nil)
-    return create_hyrox_weekly_placeholders if hyrox_weekly_plan?
-
+    activity_cache = {}
+    primary_name   = activity&.name
     rows = []
+
     (1..weeks_count).each do |week|
       (1..sessions_per_week).each do |session|
-        notes = session_notes[session - 1].presence
-        notes = SESSION_FOCUSES[(session - 1) % SESSION_FOCUSES.size] if week == 1 && notes.nil?
-        notes = [ custom_activity, notes ].compact.join(" — ").presence if custom_activity
-        rows << {
-          program_id: id, week_number: week, session_number: session,
-          session_notes: notes, status: "pending",
-          created_at: Time.current, updated_at: Time.current
-        }
-      end
-    end
-    ProgramWorkout.insert_all!(rows)
-  end
+        raw = session_notes[session - 1].to_s
+        parsed = self.class.parse_session_focus(raw, default_activity_name: primary_name)
 
-  # Hyrox plans use the prescribed weekly shape (Program::HyroxWeeklyShape):
-  # each session gets a specific activity (Hyrox / Engine Room / Transformer)
-  # and intensity (low / medium / high) per the shape table. The same shape
-  # repeats every week — Week-2+ remix from Week-1's matching session.
-  def create_hyrox_weekly_placeholders
-    shape = self.class.hyrox_weekly_shape(sessions_per_week)
-    activity_lookup = shape.map { |s| s[:activity] }.uniq.index_with { |name| Activity.find_or_create_by!(name: name) }
+        activity_id = nil
+        if parsed[:activity_name].present? && parsed[:activity_name] != primary_name
+          activity_cache[parsed[:activity_name]] ||= Activity.find_or_create_by!(name: parsed[:activity_name])
+          activity_id = activity_cache[parsed[:activity_name]].id
+        end
 
-    rows = []
-    (1..weeks_count).each do |week|
-      shape.each_with_index do |slot, idx|
+        notes = parsed[:notes]
+        notes = [ custom_activity, notes ].compact_blank.join(" — ").presence if custom_activity
+
         rows << {
           program_id: id,
           week_number: week,
-          session_number: idx + 1,
-          activity_id: activity_lookup[slot[:activity]].id,
-          intensity_style: slot[:intensity_style],
-          session_notes: slot[:notes],
+          session_number: session,
+          activity_id: activity_id,
+          intensity_style: parsed[:intensity_style],
+          session_notes: notes,
           status: "pending",
           created_at: Time.current, updated_at: Time.current
         }
