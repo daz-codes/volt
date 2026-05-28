@@ -309,7 +309,11 @@ class WorkoutValidator
   # in the same window is impractical. Drop running exercises from any EMOM
   # that has multiple exercises. For SINGLE-exercise EMOMs (just a Run), drop
   # any rogue `reps` field and require `distance_m` or `duration_s`.
-  RUNNING_NAME_PATTERN = /\b(run|treadmill|jog|sprint)(ning|s)?\b/i.freeze
+  # Only catch exercises whose name actually implies running. "Sprint" alone
+  # is dropped from the pattern because it's commonly used as an effort
+  # qualifier on cardio-machine work ("Row sprint", "Ski Erg sprint") — those
+  # aren't running.
+  RUNNING_NAME_PATTERN = /\b(run|treadmill|jog)(ning|s)?\b/i.freeze
 
   def fix_emom_running_exercises(sections)
     sections.each do |section|
